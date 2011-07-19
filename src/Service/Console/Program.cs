@@ -9,6 +9,7 @@ namespace pGina.Service.Console
     {
         static void Main(string[] args)
         {
+            pGina.Service.Impl.Service service = new pGina.Service.Impl.Service();
         }
     }
 }
