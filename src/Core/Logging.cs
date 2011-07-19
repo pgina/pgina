@@ -8,11 +8,11 @@ using System.Reflection;
 using log4net;
 using log4net.Config;
 
-namespace pGina.Service.Impl
+namespace pGina.Core
 {
-    static class Logging
-    {        
-        public static void InitializeLogging()
+    public static class Logging
+    {
+        public static void Init()
         {
             string curPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string l4nConfig = string.Format("{0}\\{1}", curPath, "log4net.config");
