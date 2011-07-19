@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="AuthenticationResult.cs" />
     <Compile Include="AuthenticationUI\Elements.cs" />
+    <Compile Include="UserInformation.cs" />
     <Compile Include="IPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

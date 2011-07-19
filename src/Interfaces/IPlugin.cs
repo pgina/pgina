@@ -25,17 +25,20 @@ namespace pGina.Interfaces
     }
 
     // Plugins that want to be available for use in authentication must
-    // implement this interface
+    //  implement this interface.  Changes to the UI element values will 
+    //  be passed along to subsequent plugins.
     public interface IPluginAuthentication : IPluginBase
     {
-        bool AuthenticateUser(AuthenticationUI.Element[] values, Guid trackingToken);
+        AuthenticationResult AuthenticateUser(AuthenticationUI.Element[] values, Guid trackingToken);
     }
 
     // Plugins that want to be involved in account management (post-auth) 
-    // must implement this interface
-    public interface IPluginAuthenticationResult : IPluginBase
+    //  must implement this interface.  
+    public interface IPluginAuthenticationGateway : IPluginBase
     {
-        AuthenticationResult PrepareWayForAuthenticatedUser(AuthenticationUI.Element[] values, Guid trackingToken);        
+        // User has been authenticated (trackingToken from AuthenticateUser will match) - now
+        //  is your chance to do other accounting/management before the user's login is successful.        
+        void AuthenticatedUserGateway(AuthenticationUI.Element[] values, UserInformation userData, Guid trackingToken);                
     }
     
     // Plugins that want notification of events as they occur must implement

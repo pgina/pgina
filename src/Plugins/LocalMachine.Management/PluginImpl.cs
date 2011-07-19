@@ -10,7 +10,7 @@ using pGina.Interfaces;
 
 namespace pGina.Plugin.LocalMachine.Management
 {
-    public class LocalMachineManager : IPluginAuthenticationResult
+    public class LocalMachineManager : IPluginAuthenticationGateway
     {
         private ILog m_logger = LogManager.GetLogger("LocalMachineManager");
 
@@ -36,8 +36,8 @@ namespace pGina.Plugin.LocalMachine.Management
         {
             get { return new Guid("{12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D}"); }      // May be used for explicit ordering in the future
         }
-
-        public AuthenticationResult PrepareWayForAuthenticatedUser(Interfaces.AuthenticationUI.Element[] values, Guid trackingToken)
+        
+        public void AuthenticatedUserGateway(Interfaces.AuthenticationUI.Element[] values, UserInformation userData, Guid trackingToken)
         {
             throw new NotImplementedException();
         }

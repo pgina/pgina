@@ -67,8 +67,8 @@ namespace pGina.Plugin.Sample
         {
             get { return new Guid("{16FC47C0-F17B-4D99-A820-EDBF0B0C764A}"); }
         }
-
-        public bool AuthenticateUser(Interfaces.AuthenticationUI.Element[] values, Guid trackingToken)
+        
+        AuthenticationResult IPluginAuthentication.AuthenticateUser(Interfaces.AuthenticationUI.Element[] values, Guid trackingToken)
         {
             try
             {
@@ -87,16 +87,16 @@ namespace pGina.Plugin.Sample
                 if (usernameField.Text.StartsWith("p"))
                 {
                     m_logger.InfoFormat("Authenticated user: {0}", usernameField.Text);
-                    return true;
+                    return new AuthenticationResult() { Success = true };
                 }
 
                 m_logger.ErrorFormat("Failed to authenticate user: {0}", usernameField.Text);
-                return false;
+                return new AuthenticationResult() { Success = false };
             }
             catch (Exception e)
             {
                 m_logger.ErrorFormat("AuthenticateUser exception: {0}", e);
-                return false;
+                throw;  // Allow pGina service to catch and handle exception
             }
         }
     }
