@@ -44,11 +44,6 @@
     <Compile Include="Service.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="log4net.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Core\Core.csproj">
       <Project>{56387F00-81DB-4449-93DD-7B8C4B44A725}</Project>
       <Name>Core</Name>

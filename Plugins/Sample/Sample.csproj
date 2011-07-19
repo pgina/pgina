@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{69DAC431-718D-4361-8DB4-84EF2C125239}</ProjectGuid>
+    <ProjectGuid>{40AA44E3-9A7F-4166-AEDF-D817C2A0854B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>pGina.Interfaces</RootNamespace>
-    <AssemblyName>pGina.Interfaces</AssemblyName>
+    <RootNamespace>pGina.Plugin.Sample</RootNamespace>
+    <AssemblyName>pGina.Plugin.Sample</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,9 +31,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\SDK\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="pGina.Interfaces">
+      <HintPath>..\SDK\pGina.Interfaces.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,10 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuthenticationResult.cs" />
-    <Compile Include="AuthenticationUI\Elements.cs" />
-    <Compile Include="UserInformation.cs" />
-    <Compile Include="IPlugin.cs" />
+    <Compile Include="PluginImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
