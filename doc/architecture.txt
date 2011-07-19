@@ -1,0 +1,17 @@
+The Service
+===========
+  This is the meat of pGina 3.x's functionality.  This is where anything and everything actually happens.  The credential provider is a thin
+shim which just executes verbs via the service.  The service is responsible for actual logic, plugin handling etc.
+
+The Provider
+============
+  A credential provider that just calls to the service (named pipe) to work out layout, image, and react to events.  All communication is initiated
+by the provider (i.e. the service does not call the provider)
+
+The GINA
+=========
+  A legacy GINA that also talks to the service
+
+The Plugins
+===========
+  Managed code! Loaded by the service at runtime, dynamically used, support for > 1 plugin with rules for precedence etc.
