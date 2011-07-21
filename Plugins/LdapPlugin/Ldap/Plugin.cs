@@ -10,14 +10,14 @@ namespace pGina.Plugin.Ldap
 {
     public class LdapPlugin : IPluginAuthentication, IPluginAuthenticationUI
     {
-        private ILog m_logger = LogManager.GetLogger("LdapPlugin");
+        internal static ILog logger = LogManager.GetLogger("LdapPlugin");
         private Guid m_descriptionGuid = new Guid("{5FF90A12-8C06-4E21-8C99-3B01E893F430}");        
 
         public LdapPlugin()
         {
             using(Process me = Process.GetCurrentProcess())
             {
-                m_logger.DebugFormat("LDAP Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
+                logger.DebugFormat("LDAP Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
             }
         }
 
