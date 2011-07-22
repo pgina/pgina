@@ -9,38 +9,29 @@ using Microsoft.Win32;
 
 namespace pGina.Plugin.Ldap
 {
-    class LdapPluginConfigProperty
-    {
-        public string Name { get; set; }
-        public Type Type { get; set; }
-        public Object DefaultValue { get; set; }
-
-        public LdapPluginConfigProperty(string name, Type type, Object defaultValue)
-        {
-            Name = name;
-            Type = type;
-            DefaultValue = defaultValue;
-        }
-    }
-
-    class LdapPluginConfigElement
-    {
-        public LdapPluginConfigProperty ElementProperty { get; set; }
-        public Object Value { get; set; }
-
-        public LdapPluginConfigElement(LdapPluginConfigProperty prop)
-        {
-            ElementProperty = prop;
-            Value = prop.DefaultValue;
-        }
-    }
-
+    /// <summary>
+    /// This class contains each setting as a property.  The values for the properties are stored in a 
+    /// dictionary that contains information about each property including the default value.
+    /// </summary>
     public class LdapPluginSettings
     {
+        /// <summary>
+        /// The registry key where the settings for this plugin are stored.
+        /// </summary>
         public static readonly string PGINA_LDAP_PLUGIN_SUB_KEY = @"SOFTWARE\pGina3\Plugins\LdapPlugin";
 
+        /// <summary>
+        /// This map stores one key value pair for each of the properties in this
+        /// class.  The actual values for each property are kept in this map including
+        /// other information such as type and default value.
+        /// </summary>
         private Dictionary<string, LdapPluginConfigElement> configMap;
  
+        /// <summary>
+        /// Indexer for accessing each configuration element by name.
+        /// </summary>
+        /// <param name="key">The name of the configuration property.</param>
+        /// <returns>The value of the configuration property (as Object).</returns>
         public Object this[string key]
         {
             get
@@ -56,6 +47,10 @@ namespace pGina.Plugin.Ldap
                 }
             }
         }
+
+        /////////////////////////////////////////////////////////////////
+        ///////////////////  Settings ///////////////////////////////////
+        /////////////////////////////////////////////////////////////////
 
         /// <summary>
         /// LDAP server host name(s).
@@ -93,18 +88,27 @@ namespace pGina.Plugin.Ldap
             set { this["ServerCertFile"] = value; }
         }
 
+        /// <summary>
+        /// Whether or not to do a search in order to find the DN for the user.
+        /// </summary>
         public bool DoSearch
         {
             get { return (bool)this["DoSearch"]; }
             set { this["DoSearch"] = value; }
         }
 
+        /// <summary>
+        /// The contexts to search (if DoSearch is true).
+        /// </summary>
         public String[] SearchContexts
         {
             get { return (string[])this["SearchContexts"]; }
             set { this["SearchContexts"] = value; }
         }
 
+        /// <summary>
+        /// The search filter to use (if DoSearch is true).
+        /// </summary>
         public string SearchFilter
         {
             get { return (string)this["SearchFilter"]; }
@@ -112,17 +116,8 @@ namespace pGina.Plugin.Ldap
         }
 
         /// <summary>
-        /// The pattern that is used to create the DN for use in authenticating 
-        /// the login.
-        /// </summary>
-        public string DnPattern
-        {
-            get { return (string)this["DnPattern"]; }
-            set { this["DnPattern"] = value; }
-        }
-
-        /// <summary>
-        /// The DN that is used for binding to the LDAP server when performing searches.
+        /// The DN that is used for binding to the LDAP server when performing searches
+        /// (when DoSearch is true).
         /// </summary>
         public string SearchDN
         {
@@ -131,12 +126,23 @@ namespace pGina.Plugin.Ldap
         }
 
         /// <summary>
-        /// The password used when binding to the LDAP server for performing searches.
+        /// The password used when binding to the LDAP server for performing searches
+        /// (when DoSearch is true).
         /// </summary>
         public string SearchPW
         {
             get { return (string)this["SearchPW"]; }
             set { this["SearchPW"] = value; }
+        }
+
+        /// <summary>
+        /// The pattern that is used to create the DN for use in authenticating 
+        /// the login (used when DoSearch is false).
+        /// </summary>
+        public string DnPattern
+        {
+            get { return (string)this["DnPattern"]; }
+            set { this["DnPattern"] = value; }
         }
 
         /// <summary>
@@ -169,11 +175,14 @@ namespace pGina.Plugin.Ldap
         }
 
         /// <summary>
-        /// Private constructor, use Load method to get settings from registry.
+        /// Private constructor, use Load method to get settings from registry.  This sets each
+        /// property to its default value.
         /// </summary>
         private LdapPluginSettings() 
         {
             this.configMap = new Dictionary<string, LdapPluginConfigElement>();
+
+            // Set default values
 
             // So far, we only support the following types:
             //   string[], string, int, bool
@@ -249,6 +258,9 @@ namespace pGina.Plugin.Ldap
             return settings;
         }
 
+        /// <summary>
+        /// Saves these settings to the registry.
+        /// </summary>
         public void Save()
         {
             using ( RegistryKey key = Registry.LocalMachine.CreateSubKey(PGINA_LDAP_PLUGIN_SUB_KEY) )
@@ -258,6 +270,56 @@ namespace pGina.Plugin.Ldap
                     key.SetValue(entry.Key, entry.Value.Value);
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Instances of this class store name, type, and default value for each of the settings
+    /// in LdapPluginSettings.
+    /// </summary>
+    class LdapPluginConfigProperty
+    {
+        /// <summary>
+        /// The name of the setting (same as the property name in LdapPluginSettings)
+        /// </summary>
+        public string Name { get; set; }
+        /// <summary>
+        /// The data type for the setting
+        /// </summary>
+        public Type Type { get; set; }
+        /// <summary>
+        /// The default value for the setting
+        /// </summary>
+        public Object DefaultValue { get; set; }
+
+        public LdapPluginConfigProperty(string name, Type type, Object defaultValue)
+        {
+            Name = name;
+            Type = type;
+            DefaultValue = defaultValue;
+        }
+    }
+
+    /// <summary>
+    /// Instances of this are used as the values in the configuration map.  Stores
+    /// the LdapPluginConfigProperty object for each setting as well as the actual
+    /// value.
+    /// </summary>
+    class LdapPluginConfigElement
+    {
+        /// <summary>
+        /// The LdapPluginConfigProperty object that describes this setting.
+        /// </summary>
+        public LdapPluginConfigProperty ElementProperty { get; set; }
+        /// <summary>
+        /// The value of this setting.
+        /// </summary>
+        public Object Value { get; set; }
+
+        public LdapPluginConfigElement(LdapPluginConfigProperty prop)
+        {
+            ElementProperty = prop;
+            Value = prop.DefaultValue;
         }
     }
 }
