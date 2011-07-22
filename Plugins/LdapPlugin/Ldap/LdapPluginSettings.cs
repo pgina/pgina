@@ -21,18 +21,6 @@ namespace pGina.Plugin.Ldap
             Type = type;
             DefaultValue = defaultValue;
         }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is LdapPluginConfigProperty)
-            {
-                return this.Name.Equals(((LdapPluginConfigProperty)obj).Name);
-            }
-            else
-            {
-                return false;
-            }
-        }
     }
 
     class LdapPluginConfigElement
@@ -49,9 +37,7 @@ namespace pGina.Plugin.Ldap
 
     public class LdapPluginSettings
     {
-        public static readonly string PGINA_SUB_KEY = "pGina3";
-        public static readonly string PGINA_PLUGIN_SUB_KEY = "Plugins";
-        public static readonly string PGINA_PLUGIN_LDAP_SUB_KEY = "LdapPlugin";
+        public static readonly string PGINA_LDAP_PLUGIN_SUB_KEY = @"SOFTWARE\pGina3\Plugins\LdapPlugin";
 
         private Dictionary<string, LdapPluginConfigElement> configMap;
  
@@ -189,8 +175,11 @@ namespace pGina.Plugin.Ldap
         {
             this.configMap = new Dictionary<string, LdapPluginConfigElement>();
 
+            // So far, we only support the following types:
+            //   string[], string, int, bool
+            //
             AddProperty(new LdapPluginConfigProperty("LdapHost", typeof(string[]), new string[] { "ldap.example.com" }));
-            AddProperty(new LdapPluginConfigProperty("LdapPort", typeof(string), 389));
+            AddProperty(new LdapPluginConfigProperty("LdapPort", typeof(int), 389));
             AddProperty(new LdapPluginConfigProperty("UseSsl", typeof(bool), false));
             AddProperty(new LdapPluginConfigProperty("ServerCertFile", typeof(string), ""));
             AddProperty(new LdapPluginConfigProperty("DoSearch", typeof(bool), false));
@@ -219,32 +208,50 @@ namespace pGina.Plugin.Ldap
         {
             LdapPluginSettings settings = new LdapPluginSettings();
 
-            RegistryKey baseKey = Registry.LocalMachine.OpenSubKey("SOFTWARE");
-            if (baseKey != null)
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(PGINA_LDAP_PLUGIN_SUB_KEY) )
             {
-                using (RegistryKey key = baseKey.OpenSubKey(PGINA_SUB_KEY + "\\" + PGINA_PLUGIN_SUB_KEY + "\\" + PGINA_PLUGIN_LDAP_SUB_KEY))
+                if (key != null)
                 {
-                    baseKey.Close();
-                    if (key != null)
+                    foreach (KeyValuePair<string, LdapPluginConfigElement> entry in settings.configMap)
                     {
-                        foreach (KeyValuePair<string, LdapPluginConfigElement> entry in settings.configMap)
+                        object o = key.GetValue(entry.Key, entry.Value.ElementProperty.DefaultValue);
+                        Type t = entry.Value.ElementProperty.Type;
+
+                        // We expect only the following types:
+                        //   string[], bool, string, int
+                        // More may be added later...
+                        if (t.IsArray)
                         {
-                            entry.Value.Value = key.GetValue(entry.Key, entry.Value.ElementProperty.DefaultValue);
+                            entry.Value.Value = (string[])o;
+                        }
+                        else
+                        {
+                            switch (Type.GetTypeCode(t))
+                            {
+                                case TypeCode.String:
+                                    entry.Value.Value = Convert.ToString(o);
+                                    break;
+                                case TypeCode.Boolean:
+                                    entry.Value.Value = Convert.ToBoolean(o);
+                                    break;
+                                case TypeCode.Int32:
+                                    entry.Value.Value = Convert.ToInt32(o);
+                                    break;
+                                default:
+                                    throw new Exception("Unrecognized data type found in LdapPluginSettings configMap!");
+
+                            }
                         }
                     }
                 }
             }
-
+            
             return settings;
         }
 
-        [RegistryPermission(SecurityAction.Demand, Unrestricted = true)]
         public void Save()
         {
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(
-                "SOFTWARE" + "\\" + PGINA_SUB_KEY + "\\" + PGINA_PLUGIN_SUB_KEY + "\\" + PGINA_PLUGIN_LDAP_SUB_KEY
-                , RegistryKeyPermissionCheck.ReadWriteSubTree) 
-                )
+            using ( RegistryKey key = Registry.LocalMachine.CreateSubKey(PGINA_LDAP_PLUGIN_SUB_KEY) )
             {          
                 foreach (KeyValuePair<string, LdapPluginConfigElement> entry in configMap)
                 {

@@ -11,14 +11,23 @@ namespace pGina.Plugin.Ldap.Tests
 {
     public class TestLdapPluginSettings
     {
+        public TestLdapPluginSettings()
+        {
+            LdapPluginSettings settings = LdapPluginSettings.Load();
+            settings.LdapHost = new string[] { "one.example.com", "two.example.com" };
+            settings.LdapPort = 389;
+            settings.UseSsl = true;
+            settings.Save();
+        }
+
         [Fact]
-        public void testDefaults()
+        public void testLoad01()
         {
             LdapPluginSettings settings = LdapPluginSettings.Load();
                 
-            Assert.Equal(new string[] {"ldap.example.com"}, settings.LdapHost);
+            Assert.Equal(new string[] {"one.example.com", "two.example.com"}, settings.LdapHost);
             Assert.Equal(389, settings.LdapPort);
-            Assert.False(settings.UseSsl);
+            Assert.True(settings.UseSsl);
             Assert.Equal("", settings.ServerCertFile);
             Assert.False(settings.DoSearch);
             Assert.Equal(new string[] {}, settings.SearchContexts);
@@ -28,29 +37,6 @@ namespace pGina.Plugin.Ldap.Tests
             Assert.Equal("", settings.SearchPW);
             Assert.False(settings.DoGroupAuthorization);
             Assert.Equal(new string[] {}, settings.LdapLoginGroups);
-            Assert.Equal("wheel", settings.LdapAdminGroup);
-        }
-
-        [Fact]
-        public void testDefaultsSave()
-        {
-            LdapPluginSettings settings = LdapPluginSettings.Load();
-            settings.LdapPort = 222;
-            settings.Save();
-            settings = LdapPluginSettings.Load();
-
-            Assert.Equal(new string[] { "ldap.example.com" }, settings.LdapHost);
-            Assert.Equal(222, settings.LdapPort);
-            Assert.False(settings.UseSsl);
-            Assert.Equal("", settings.ServerCertFile);
-            Assert.False(settings.DoSearch);
-            Assert.Equal(new string[] { }, settings.SearchContexts);
-            Assert.Equal("", settings.SearchFilter);
-            Assert.Equal("uid=%u,dc=example,dc=com", settings.DnPattern);
-            Assert.Equal("", settings.SearchDN);
-            Assert.Equal("", settings.SearchPW);
-            Assert.False(settings.DoGroupAuthorization);
-            Assert.Equal(new string[] { }, settings.LdapLoginGroups);
             Assert.Equal("wheel", settings.LdapAdminGroup);
         }
 
