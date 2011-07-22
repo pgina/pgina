@@ -8,8 +8,8 @@
     <ProjectGuid>{2FCCB288-F6BB-484A-9681-D3864BD05F60}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tests</RootNamespace>
-    <AssemblyName>Tests</AssemblyName>
+    <RootNamespace>pGina.Plugin.Ldap.Tests</RootNamespace>
+    <AssemblyName>pGina.Plugin.Ldap.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -44,6 +44,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestLdapPluginSettings.cs" />
     <Compile Include="TestLdapServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
