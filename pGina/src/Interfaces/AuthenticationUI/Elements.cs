@@ -172,7 +172,7 @@ namespace pGina.Interfaces.AuthenticationUI
 
         public static PasswordTextElement PasswordElement
         {
-            get { return new PasswordTextElement("Password", Constants.UsernameElementUuid); }
+            get { return new PasswordTextElement("Password", Constants.PasswordElementUuid); }
         }
     }
 
