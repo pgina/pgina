@@ -14,9 +14,23 @@ namespace pGina.Plugin.Ldap.Tests
         public TestLdapPluginSettings()
         {
             LdapPluginSettings settings = LdapPluginSettings.Load();
-            settings.LdapHost = new string[] { "one.example.com", "two.example.com" };
+
+            settings.LdapHost = new string[] { "192.168.51.100", "192.168.56.101" };
             settings.LdapPort = 389;
-            settings.UseSsl = true;
+            settings.LdapTimeout = 10;
+            settings.UseSsl = false;
+            settings.RequireCert = true;
+            settings.ServerCertFile = "";
+            settings.DoSearch = true;
+            settings.SearchContexts = new string[] { "ou=Stuff,dc=example,dc=com", "ou=People,dc=example,dc=com" };
+            settings.SearchFilter = "(&(uid=%u)(objectClass=posixAccount))";
+            settings.DnPattern = "uid=%u,dc=example,dc=com";
+            settings.SearchDN = "cn=Manager,dc=example,dc=com";
+            settings.SearchPW = "secret";
+            settings.DoGroupAuthorization = false;
+            settings.LdapLoginGroups = new string[] { };
+            settings.LdapAdminGroup = "wheel";
+
             settings.Save();
         }
 
@@ -25,16 +39,18 @@ namespace pGina.Plugin.Ldap.Tests
         {
             LdapPluginSettings settings = LdapPluginSettings.Load();
                 
-            Assert.Equal(new string[] {"one.example.com", "two.example.com"}, settings.LdapHost);
+            Assert.Equal(new string[] {"192.168.51.100", "192.168.56.101"}, settings.LdapHost);
             Assert.Equal(389, settings.LdapPort);
-            Assert.True(settings.UseSsl);
+            Assert.Equal(10, settings.LdapTimeout);
+            Assert.False(settings.UseSsl);
+            Assert.True(settings.RequireCert);
             Assert.Equal("", settings.ServerCertFile);
-            Assert.False(settings.DoSearch);
-            Assert.Equal(new string[] {}, settings.SearchContexts);
-            Assert.Equal("", settings.SearchFilter);
+            Assert.True(settings.DoSearch);
+            Assert.Equal(new string[] { "ou=Stuff,dc=example,dc=com", "ou=People,dc=example,dc=com" }, settings.SearchContexts);
+            Assert.Equal("(&(uid=%u)(objectClass=posixAccount))", settings.SearchFilter);
             Assert.Equal("uid=%u,dc=example,dc=com", settings.DnPattern);
-            Assert.Equal("", settings.SearchDN);
-            Assert.Equal("", settings.SearchPW);
+            Assert.Equal("cn=Manager,dc=example,dc=com", settings.SearchDN);
+            Assert.Equal("secret", settings.SearchPW);
             Assert.False(settings.DoGroupAuthorization);
             Assert.Equal(new string[] {}, settings.LdapLoginGroups);
             Assert.Equal("wheel", settings.LdapAdminGroup);

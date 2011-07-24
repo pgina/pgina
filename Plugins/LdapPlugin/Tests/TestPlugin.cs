@@ -46,7 +46,6 @@ namespace pGina.Plugin.Ldap.Tests
             passEl.Text = "secret";
             AuthenticationResult result = plugIn.AuthenticateUser(elements.ToArray(), new Guid());
 
-            // This fails for the time being...
             Assert.True( result.Success );
         }
 
