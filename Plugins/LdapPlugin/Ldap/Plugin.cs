@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 
 using log4net;
 
@@ -11,7 +12,9 @@ namespace pGina.Plugin.Ldap
 {
     public class LdapPlugin : IPluginAuthentication, IPluginAuthenticationUI
     {
-        internal static ILog m_logger = LogManager.GetLogger("LdapPlugin");
+        private ILog m_logger = LogManager.GetLogger("LdapPlugin");
+        internal static LdapPluginSettings Settings = null;
+
         private Guid m_descriptionGuid = new Guid("{5FF90A12-8C06-4E21-8C99-3B01E893F430}");        
 
         public LdapPlugin()
@@ -43,18 +46,31 @@ namespace pGina.Plugin.Ldap
             {
                 m_logger.DebugFormat("AuthenticateUser(..., {0})", trackingToken.ToString());
 
-                // Dump UI elements, cuz we can
+                // Dump UI elements, for debugging
                 foreach (Interfaces.AuthenticationUI.Element e in values)
                 {
                     m_logger.DebugFormat("Element[{0}]: {1} => {2}", e.UUid, e.Type, e.Name);
                 }
 
+                // Get the username text field
                 Interfaces.AuthenticationUI.EditTextElement usernameField = (Interfaces.AuthenticationUI.EditTextElement)
                     values.First(v => v.UUid == Interfaces.AuthenticationUI.Constants.UsernameElementUuid);
+                // Get the password field
+                Interfaces.AuthenticationUI.PasswordTextElement passwordField = (Interfaces.AuthenticationUI.PasswordTextElement)
+                    values.First(v => v.UUid == Interfaces.AuthenticationUI.Constants.PasswordElementUuid);
 
-                m_logger.DebugFormat("Found username: {0}", usernameField.Text);
-                
-                return new AuthenticationResult() { Success = false };
+                m_logger.DebugFormat("Received username: {0}", usernameField.Text);
+
+                // Place credentials into a NetworkCredentials object
+                NetworkCredential creds = new NetworkCredential(usernameField.Text, passwordField.Text);
+
+                // (Re)load settings
+                Settings = LdapPluginSettings.Load();
+
+                // Authenticate the login
+                m_logger.DebugFormat("Attempting authentication for {0}", creds.UserName);
+                LdapAuthenticator authenticator = new LdapAuthenticator(creds);
+                return authenticator.Authenticate();
             }
             catch (Exception e)
             {

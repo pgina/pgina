@@ -71,6 +71,16 @@ namespace pGina.Plugin.Ldap
         }
 
         /// <summary>
+        /// The number of seconds to wait for a LDAP server connection before
+        /// giving up.
+        /// </summary>
+        public int LdapTimeout
+        {
+            get { return (int)this["LdapTimeout"]; }
+            set { this["LdapTimeout"] = value; }
+        }
+
+        /// <summary>
         /// Whether or not to use SSL when connecting to the LDAP server.
         /// </summary>
         public bool UseSsl
@@ -80,7 +90,19 @@ namespace pGina.Plugin.Ldap
         }
 
         /// <summary>
-        /// The file name containing the server sertificate used for validation.
+        /// Whether or not to do server certificate validation.
+        /// </summary>
+        public bool RequireCert
+        {
+            get { return (bool)this["RequireCert"]; }
+            set { this["RequireCert"] = value; }
+        }
+
+        /// <summary>
+        /// The file name containing the server sertificate used for validation
+        /// (when RequireCert is true).  If this is empty or the file doesn't exist
+        /// and RequireCert is true, 
+        /// the server cert is validated against the Windows certificate store.
         /// </summary>
         public string ServerCertFile
         {
@@ -189,7 +211,9 @@ namespace pGina.Plugin.Ldap
             //
             AddProperty(new LdapPluginConfigProperty("LdapHost", typeof(string[]), new string[] { "ldap.example.com" }));
             AddProperty(new LdapPluginConfigProperty("LdapPort", typeof(int), 389));
+            AddProperty(new LdapPluginConfigProperty("LdapTimeout", typeof(int), 15));
             AddProperty(new LdapPluginConfigProperty("UseSsl", typeof(bool), false));
+            AddProperty(new LdapPluginConfigProperty("RequireCert", typeof(bool), false));
             AddProperty(new LdapPluginConfigProperty("ServerCertFile", typeof(string), ""));
             AddProperty(new LdapPluginConfigProperty("DoSearch", typeof(bool), false));
             AddProperty(new LdapPluginConfigProperty("SearchContexts", typeof(string[]), new string[] {} ));

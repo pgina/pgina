@@ -13,6 +13,8 @@ namespace pGina.Plugin.Ldap
 {
     public class LdapServer : IDisposable
     {
+        private log4net.ILog m_logger = log4net.LogManager.GetLogger("LdapServer");
+        
         /// <summary>
         /// The connection object.
         /// </summary>
@@ -39,6 +41,11 @@ namespace pGina.Plugin.Ldap
         private X509Certificate2 m_cert;
 
         /// <summary>
+        /// The number of seconds to wait for a connection before giving up.
+        /// </summary>
+        public int Timeout { get; set; }
+
+        /// <summary>
         /// Private constructor, sets defaults for member variables.
         /// </summary>
         private LdapServer()
@@ -59,7 +66,6 @@ namespace pGina.Plugin.Ldap
             this()
         {
             m_serverIdentifier = new LdapDirectoryIdentifier(host, port);
-            Connect();
         }
 
         /// <summary>
@@ -77,7 +83,6 @@ namespace pGina.Plugin.Ldap
             m_serverIdentifier = new LdapDirectoryIdentifier(host, port);
             m_useSsl = useSsl;
             m_verifyCert = verifyCert;
-            Connect();
         }
 
         /// <summary>
@@ -95,10 +100,9 @@ namespace pGina.Plugin.Ldap
             m_useSsl = true;
             m_verifyCert = true;
             m_cert = cert;
-            Connect();
         }
 
-        private void Connect()
+        public void Connect(int timeout)
         {
             // Are we re-connecting?  If so, close the previous connection.
             if (m_conn != null)
@@ -107,10 +111,13 @@ namespace pGina.Plugin.Ldap
             }
 
             m_conn = new LdapConnection(m_serverIdentifier);
+            m_conn.Timeout = new System.TimeSpan(0,0,timeout);
+            m_logger.DebugFormat("Timeout set to {0} seconds.", timeout);
             LdapSessionOptions opts = m_conn.SessionOptions;
             opts.ProtocolVersion = 3;
             opts.SecureSocketLayer = m_useSsl;
-            opts.VerifyServerCertificate = this.VerifyCert;
+            if( m_useSsl )
+                opts.VerifyServerCertificate = this.VerifyCert;
         }
 
         /// <summary>
@@ -122,8 +129,6 @@ namespace pGina.Plugin.Ldap
         /// <returns>true if verification succeeds, false otherwise.</returns>
         private bool VerifyCert(LdapConnection conn, X509Certificate cert)
         {
-            if (!m_useSsl) return false;
-
             // If we don't need to verify the cert, the verification succeeds
             if (!m_verifyCert) return true;
 
@@ -217,6 +222,26 @@ namespace pGina.Plugin.Ldap
                 m_conn.Dispose();
                 m_conn = null;
             }
+        }
+
+        /// <summary>
+        /// Does a search in the subtree at searchBase, using the filter provided and 
+        /// returns the DN of the first match.
+        /// </summary>
+        /// <param name="searchBase">The DN of the root of the subtree for the search (search context).</param>
+        /// <param name="filter">The search filter.</param>
+        /// <returns>The DN of the first match, or null if no matches are found.</returns>
+        public string FindFirstDN(string searchBase, string filter)
+        {
+            SearchRequest req = new SearchRequest(searchBase, filter, System.DirectoryServices.Protocols.SearchScope.Subtree, null);
+            SearchResponse resp = (SearchResponse)m_conn.SendRequest(req);
+
+            if (resp.Entries.Count > 0)
+            {
+                return resp.Entries[0].DistinguishedName;
+            }
+
+            return null;
         }
 
         public void Dispose()
