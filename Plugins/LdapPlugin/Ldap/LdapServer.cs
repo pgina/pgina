@@ -129,12 +129,22 @@ namespace pGina.Plugin.Ldap
         /// <returns>true if verification succeeds, false otherwise.</returns>
         private bool VerifyCert(LdapConnection conn, X509Certificate cert)
         {
+            m_logger.Debug("VerifyCert(...)");
+
+            // Convert to X509Certificate2
+            X509Certificate2 serverCert = new X509Certificate2(cert);
+
             // If we don't need to verify the cert, the verification succeeds
-            if (!m_verifyCert) return true;
+            if (!m_verifyCert)
+            {
+                m_logger.Debug("Server certificate accepted without verification.");
+                return true;
+            }
 
             // If the certificate is null, then we verify against the machine's/user's certificate store
             if (m_cert == null)
             {
+                m_logger.Debug("Verifying server cert with Windows store.");
                 // Use default policy
                 X509ChainPolicy policy = new X509ChainPolicy();
 
@@ -142,20 +152,27 @@ namespace pGina.Plugin.Ldap
                 X509CertificateValidator validator = X509CertificateValidator.CreateChainTrustValidator(false, policy);
                 try
                 {
-                    validator.Validate(m_cert);
-                    return true;  // If we get here, validation succeeded
+                    validator.Validate(serverCert);
+
+                    // If we get here, validation succeeded.
+                    m_logger.Debug("Server certificate verification succeeded.");
+                    return true;
                 }
                 catch (SecurityTokenValidationException)
                 {
+                    m_logger.Debug("Server certificate validation failed.");
                     return false;
                 }
             }
             else
             {
-                // Verify against the provided cert by comparing the thumbprints
-                X509Certificate2 serverCert = new X509Certificate2(cert);
+                m_logger.Debug("Validating server certificate with provided certificate.");
 
-                return m_cert.Thumbprint == serverCert.Thumbprint;
+                // Verify against the provided cert by comparing the thumbprint
+                bool result = m_cert.Thumbprint == serverCert.Thumbprint;
+                if (result) m_logger.Debug("Server certificate validated.");
+                else m_logger.Debug("Server certificate validation failed.");
+                return result;
             }
         }
 
