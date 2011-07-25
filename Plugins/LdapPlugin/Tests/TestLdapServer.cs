@@ -27,7 +27,7 @@ namespace pGina.Plugin.Ldap.Tests
         [Fact]
         public void TestConnect1()
         {
-            LdapServer serv = new LdapServer(host, port);
+            LdapServer serv = new LdapServer(new string[] {host}, port, false, false, null);
             serv.Connect(10);
             serv.Bind();
         }
@@ -38,7 +38,7 @@ namespace pGina.Plugin.Ldap.Tests
         [Fact]
         public void TestConnect2()
         {
-            LdapServer serv = new LdapServer(host, port);
+            LdapServer serv = new LdapServer(new string[] {host}, port, false, false, null);
             serv.Connect(10);
             serv.Bind(new NetworkCredential("cn=Manager,dc=example,dc=com", "secret"));
         }
@@ -49,7 +49,7 @@ namespace pGina.Plugin.Ldap.Tests
         [Fact]
         public void TestConnect3()
         {
-            LdapServer serv = new LdapServer(host, port);
+            LdapServer serv = new LdapServer(new string[]{host}, port, false, false, null);
             serv.Connect(10);
             Assert.Throws<LdapException>(delegate
                 {

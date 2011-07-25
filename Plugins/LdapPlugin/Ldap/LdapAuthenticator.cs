@@ -33,48 +33,29 @@ namespace pGina.Plugin.Ldap
                 userDN = CreateUserDN();
             }
 
-            LdapServer serv = null;
-            try
+            X509Certificate2 serverCert = null;
+            if( LdapPlugin.Settings.UseSsl && LdapPlugin.Settings.RequireCert && LdapPlugin.Settings.ServerCertFile.Length > 0 ) 
             {
-                // Try each host
-                foreach (string host in LdapPlugin.Settings.LdapHost)
+                if (File.Exists(LdapPlugin.Settings.ServerCertFile))
                 {
-                    m_logger.DebugFormat("Attempting to connect to {0}:{1}", host, LdapPlugin.Settings.LdapPort);
+                    m_logger.DebugFormat("Loading server certificate: {0}", LdapPlugin.Settings.ServerCertFile);
+                    serverCert = new X509Certificate2(LdapPlugin.Settings.ServerCertFile);
+                }
+                else
+                {
+                    m_logger.ErrorFormat("Certificate file {0} not found, giving up.", LdapPlugin.Settings.ServerCertFile);
+                    return new AuthenticationResult{ Success = false, Message = "Server certificate not found" };
+                }
+            }
 
-                    // Create the server object
-                    if (LdapPlugin.Settings.UseSsl)
-                    {
-                        if (LdapPlugin.Settings.RequireCert)
-                        {
-                            if (LdapPlugin.Settings.ServerCertFile.Length > 0 &&
-                                File.Exists(LdapPlugin.Settings.ServerCertFile) )
-                            {
-                                m_logger.DebugFormat("Using SSL and validating with provided server certificate");
-                                m_logger.DebugFormat("Loading server certificate: {0}", LdapPlugin.Settings.ServerCertFile);
-                                X509Certificate2 cert = new X509Certificate2(LdapPlugin.Settings.ServerCertFile);
-                                serv = new LdapServer(host, LdapPlugin.Settings.LdapPort, cert);
-                            }
-                            else
-                            {
-                                m_logger.DebugFormat("Using SSL and validating with Windows certificate store");
-                                serv = new LdapServer(host, LdapPlugin.Settings.LdapPort, true, true);
-                            }
-                        }
-                        else
-                        {
-                            m_logger.DebugFormat("Using SSL without server certificate validation.");
-                            serv = new LdapServer(host, LdapPlugin.Settings.LdapPort, true, false);
-                        }
-                    } // end if UseSsl
-                    else
-                    {
-                        // We're not using SSL
-                        serv = new LdapServer(host, LdapPlugin.Settings.LdapPort);
-                    }
-
+            using (LdapServer serv = new LdapServer(LdapPlugin.Settings.LdapHost, LdapPlugin.Settings.LdapPort,
+                LdapPlugin.Settings.UseSsl, LdapPlugin.Settings.RequireCert, serverCert))
+            {
+                try
+                {
                     // Connect.  Note that this always succeeds whether or not the server is 
-                    // actually available.  It doesn't actually talk to the server at all.  
-                    // The timeout only takes effect when binding.
+                    // actually available.  It not clear to me whether this actually talks to the server at all.  
+                    // The timeout only seems to take effect when binding.
                     serv.Connect(LdapPlugin.Settings.LdapTimeout);
 
                     // If we're searching, attempt to bind with the search credentials, or anonymously
@@ -106,7 +87,7 @@ namespace pGina.Plugin.Ldap
                         {
                             if (e.ErrorCode == 81)
                             {
-                                m_logger.ErrorFormat("Server {0} unavailable, moving on.", host);
+                                m_logger.ErrorFormat("Server unavailable", e.Message);
                             }
                             else if (e.ErrorCode == 49)
                             {
@@ -137,7 +118,7 @@ namespace pGina.Plugin.Ldap
                         {
                             if (e.ErrorCode == 81)
                             {
-                                m_logger.ErrorFormat("Server {0} unavailable, moving on.", host);
+                                m_logger.ErrorFormat("Server unavailable");
                             }
                             else if (e.ErrorCode == 49)
                             {
@@ -150,26 +131,19 @@ namespace pGina.Plugin.Ldap
                         }
 
                     } // end if(userDN != null)
-
-                    if (serv != null)
+                }
+                catch (Exception e)
+                {
+                    if (e is LdapException)
                     {
-                        m_logger.DebugFormat("Closing connection to server {0}", host);
-                        serv.Dispose();
+                        m_logger.ErrorFormat("LdapException ({0}): {1}", ((LdapException)e).ErrorCode, e);
                     }
-
-                } // end loop over hosts
-            }
-            catch (Exception e)
-            {
-                if (e is LdapException)
-                {
-                    m_logger.ErrorFormat("LdapException ({0}): {1}", ((LdapException)e).ErrorCode, e);
+                    else
+                    {
+                        m_logger.DebugFormat("Exception: {0}", e);
+                    }
                 }
-                else
-                {
-                    m_logger.DebugFormat("Exception: {0}", e);
-                }
-            }
+            } // end using
 
             return new AuthenticationResult{ Success = false };
         }

@@ -46,59 +46,20 @@ namespace pGina.Plugin.Ldap
         public int Timeout { get; set; }
 
         /// <summary>
-        /// Private constructor, sets defaults for member variables.
-        /// </summary>
-        private LdapServer()
-        {
-            m_conn = null;
-            m_serverIdentifier = null;
-            m_useSsl = false;
-            m_cert = null;
-        }
-
-        /// <summary>
         /// Create a connection to the LDAP server at the given host and port.
-        /// This creates a connection that does not use SSL.
-        ///</summary>
-        /// <param name="host">The FQDN or IP of the LDAP host.</param>
-        /// <param name="port">The port number on the LDAP host.</param>
-        public LdapServer(string host, int port) :
-            this()
-        {
-            m_serverIdentifier = new LdapDirectoryIdentifier(host, port);
-        }
-
-        /// <summary>
-        /// Create a connection to the LDAP server at the given host and port.
-        /// The caller can specify whether or not to use SSL and whether or not
-        /// to do certificate verification.
-        /// </summary>
-        /// <param name="host">The FQDN or IP of the LDAP host.</param>
-        /// <param name="port">The port number on the LDAP host.</param>
-        /// <param name="useSsl">Whether or not to use SSL.</param>
-        /// <param name="verifyCert">Whether or not to attempt to verify the server's certficate against
-        /// the user/machine certificate store.</param>
-        public LdapServer(string host, int port, bool useSsl, bool verifyCert) : this()
-        {
-            m_serverIdentifier = new LdapDirectoryIdentifier(host, port);
-            m_useSsl = useSsl;
-            m_verifyCert = verifyCert;
-        }
-
-        /// <summary>
-        /// Create a connection to the LDAP server at the given host and port.
-        /// Use of this constructor implies that the connection will be made with
-        /// SSL enabled.  The server's SSL certificate will be verified against
-        /// cert.
         /// </summary>
         /// <param name="host">The FQDN or IP of the LDAP host.</param>
         /// <param name="port">The port number of the LDAP host.</param>
-        /// <param name="cert">A certificate to verify against the server's certificate.</param>
-        public LdapServer(string host, int port, X509Certificate2 cert) : this()
+        /// <param name="useSsl">Whether or not to use SSL.</param>
+        /// <param name="verifyCert">Whether or not to verify the server certificate.</param>
+        /// <param name="cert">A certificate to verify against the server's certificate (can be null).  If this is null,
+        /// and verifyCert is true, then the server's cert is verified with the Windows certificate store.</param>
+        public LdapServer(string[] hosts, int port, bool useSsl, bool verifyCert, X509Certificate2 cert) 
         {
-            m_serverIdentifier = new LdapDirectoryIdentifier(host, port);
+            m_conn = null;
+            m_serverIdentifier = new LdapDirectoryIdentifier(hosts, port, false, false);
             m_useSsl = true;
-            m_verifyCert = true;
+            m_verifyCert = verifyCert;
             m_cert = cert;
         }
 
@@ -130,6 +91,7 @@ namespace pGina.Plugin.Ldap
         private bool VerifyCert(LdapConnection conn, X509Certificate cert)
         {
             m_logger.Debug("VerifyCert(...)");
+            m_logger.DebugFormat("Verifying certificate from host: {0}", conn.SessionOptions.HostName);
 
             // Convert to X509Certificate2
             X509Certificate2 serverCert = new X509Certificate2(cert);
@@ -185,21 +147,24 @@ namespace pGina.Plugin.Ldap
             if (m_conn == null)
                 throw new LdapException("Bind attempted when server is not connected.");
 
+            m_logger.DebugFormat("Attempting anonymous bind", m_conn.SessionOptions.HostName);
+
             m_conn.AuthType = AuthType.Anonymous;
             m_conn.Credential = null;
             try
             {
                 m_conn.Bind();
+                m_logger.DebugFormat("Successful bind to {0}", m_conn.SessionOptions.HostName);
             }
             catch (LdapException e)
             {
-                // TODO: probably log this exception
+                m_logger.ErrorFormat("LdapException: {0}", e.Message);
                 throw e;
             }
             catch (InvalidOperationException e)
             {
                 // This shouldn't happen, but log it and re-throw
-                // TODO: log this exception
+                m_logger.ErrorFormat("InvalidOperationException: {0}", e.Message);
                 throw e;
             }
         }
@@ -214,20 +179,23 @@ namespace pGina.Plugin.Ldap
             if (m_conn == null)
                 throw new LdapException("Bind attempted when server is not connected.");
 
+            m_logger.DebugFormat("Attempting bind as {0}", creds.UserName);
+
             m_conn.AuthType = AuthType.Basic;
             try
             {
                 m_conn.Bind(creds);
+                m_logger.DebugFormat("Successful bind to {0} as {1}", m_conn.SessionOptions.HostName, creds.UserName);
             }
             catch (LdapException e)
             {
-                // TODO: probably log this exception
+                m_logger.ErrorFormat("LdapException: {0}", e.Message);
                 throw e;
             }
             catch (InvalidOperationException e)
             {
                 // This shouldn't happen, but log it and re-throw
-                // TODO: log this exception
+                m_logger.ErrorFormat("InvalidOperationException: {0}", e.Message);
                 throw e;
             }
         }
@@ -236,6 +204,7 @@ namespace pGina.Plugin.Ldap
         {
             if (m_conn != null)
             {
+                m_logger.DebugFormat("Closing LDAP connection to {0}.", m_conn.SessionOptions.HostName);
                 m_conn.Dispose();
                 m_conn = null;
             }
