@@ -7,7 +7,8 @@ using System.Reflection;
 
 using Xunit;
 using pGina.Plugin.Ldap;
-using pGina.Interfaces;
+using pGina.Shared.Interfaces;
+using pGina.Shared.AuthenticationUI;
 
 namespace pGina.Plugin.Ldap.Tests
 {
@@ -16,26 +17,26 @@ namespace pGina.Plugin.Ldap.Tests
     {
         public Fixture()
         {
-            pGina.Core.Logging.Init();
+            pGina.Shared.Logging.Logging.Init();
         }
     }
 
     public class TestPlugin :IUseFixture<Fixture>
     {
         private LdapPlugin plugIn;
-        private List<Interfaces.AuthenticationUI.Element> elements;
-        private Interfaces.AuthenticationUI.EditTextElement unameEl;
-        private Interfaces.AuthenticationUI.PasswordTextElement passEl;
+        private List<Element> elements;
+        private EditTextElement unameEl;
+        private PasswordTextElement passEl;
 
         public TestPlugin()
         {
             // Setup the UI
-            elements = new List<Interfaces.AuthenticationUI.Element>();
+            elements = new List<Element>();
             plugIn = new LdapPlugin();
             plugIn.SetupUI(elements);
             // Store the username and password elements.
-            unameEl = (Interfaces.AuthenticationUI.EditTextElement)elements[0];
-            passEl = (Interfaces.AuthenticationUI.PasswordTextElement)elements[1];
+            unameEl = (EditTextElement)elements[0];
+            passEl = (PasswordTextElement)elements[1];
         }
 
         [Fact]

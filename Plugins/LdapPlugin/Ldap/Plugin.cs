@@ -6,7 +6,9 @@ using System.Net;
 
 using log4net;
 
-using pGina.Interfaces;
+using pGina.Shared;
+using pGina.Shared.Interfaces;
+using pGina.Shared.AuthenticationUI;
 
 namespace pGina.Plugin.Ldap
 {
@@ -40,24 +42,24 @@ namespace pGina.Plugin.Ldap
             get { return new Guid("{9C758C53-BDF2-446A-A927-B359B697CDA5}"); }
         }
         
-        public BooleanResult AuthenticateUser(Interfaces.AuthenticationUI.Element[] values, Guid trackingToken)
+        public BooleanResult AuthenticateUser(Element[] values, Guid trackingToken)
         {
             try
             {
                 m_logger.DebugFormat("AuthenticateUser(..., {0})", trackingToken.ToString());
 
                 // Dump UI elements, for debugging
-                foreach (Interfaces.AuthenticationUI.Element e in values)
+                foreach (Element e in values)
                 {
                     m_logger.DebugFormat("Element[{0}]: {1} => {2}", e.UUid, e.Type, e.Name);
                 }
 
                 // Get the username text field
-                Interfaces.AuthenticationUI.EditTextElement usernameField = (Interfaces.AuthenticationUI.EditTextElement)
-                    values.First(v => v.UUid == Interfaces.AuthenticationUI.Constants.UsernameElementUuid);
+                EditTextElement usernameField = (EditTextElement)
+                    values.First(v => v.UUid == Constants.UsernameElementUuid);
                 // Get the password field
-                Interfaces.AuthenticationUI.PasswordTextElement passwordField = (Interfaces.AuthenticationUI.PasswordTextElement)
-                    values.First(v => v.UUid == Interfaces.AuthenticationUI.Constants.PasswordElementUuid);
+                PasswordTextElement passwordField = (PasswordTextElement)
+                    values.First(v => v.UUid == Constants.PasswordElementUuid);
 
                 m_logger.DebugFormat("Received username: {0}", usernameField.Text);
 
@@ -79,21 +81,21 @@ namespace pGina.Plugin.Ldap
             }
         }
 
-        public void SetupUI(List<Interfaces.AuthenticationUI.Element> elements)
+        public void SetupUI(List<Element> elements)
         {
             try
             {
                 // Must have the username|password element            
-                if (elements.Where(element => element.UUid == Interfaces.AuthenticationUI.EditTextElement.UsernameElement.UUid).Count() == 0)
+                if (elements.Where(element => element.UUid == EditTextElement.UsernameElement.UUid).Count() == 0)
                 {
                     m_logger.DebugFormat("SetupUI: Adding username element");
-                    elements.Add(Interfaces.AuthenticationUI.EditTextElement.UsernameElement);
+                    elements.Add(EditTextElement.UsernameElement);
                 }
 
-                if (elements.Where(element => element.UUid == Interfaces.AuthenticationUI.PasswordTextElement.PasswordElement.UUid).Count() == 0)
+                if (elements.Where(element => element.UUid == PasswordTextElement.PasswordElement.UUid).Count() == 0)
                 {
                     m_logger.DebugFormat("SetupUI: Adding password element");
-                    elements.Add(Interfaces.AuthenticationUI.PasswordTextElement.PasswordElement);
+                    elements.Add(PasswordTextElement.PasswordElement);
                 }
             }
             catch (Exception e)

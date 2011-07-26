@@ -10,7 +10,7 @@ using System.IO;
 
 using log4net;
 
-using pGina.Interfaces;
+using pGina.Shared.Interfaces;
 
 namespace pGina.Plugin.Ldap
 {

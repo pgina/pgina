@@ -31,12 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="pGina.Core">
-      <HintPath>..\..\SDK\pGina.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="pGina.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SDK\pGina.Interfaces.dll</HintPath>
+    <Reference Include="pGina.Shared">
+      <HintPath>..\..\SDK\pGina.Shared.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
