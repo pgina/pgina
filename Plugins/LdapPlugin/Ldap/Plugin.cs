@@ -27,7 +27,7 @@ namespace pGina.Plugin.Ldap
 
         public string Name
         {
-            get { return "LDAP Authentication Plugin"; }
+            get { return "LDAP Authentication"; }
         }
 
         public string Description
@@ -40,7 +40,7 @@ namespace pGina.Plugin.Ldap
             get { return new Guid("{9C758C53-BDF2-446A-A927-B359B697CDA5}"); }
         }
         
-        public AuthenticationResult AuthenticateUser(Interfaces.AuthenticationUI.Element[] values, Guid trackingToken)
+        public BooleanResult AuthenticateUser(Interfaces.AuthenticationUI.Element[] values, Guid trackingToken)
         {
             try
             {

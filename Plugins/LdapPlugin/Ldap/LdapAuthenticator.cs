@@ -24,7 +24,7 @@ namespace pGina.Plugin.Ldap
             m_creds = creds;
         }
 
-        public AuthenticationResult Authenticate()
+        public BooleanResult Authenticate()
         {
             // Generate username (if we're not doing a search for it)
             string userDN = null;
@@ -131,7 +131,7 @@ namespace pGina.Plugin.Ldap
 
                             // If we get here, the authentication was successful, we're done!
                             m_logger.DebugFormat("LDAP DN {0} successfully bound to server, return success", ldapCredential.UserName);
-                            return new AuthenticationResult { Success = true };
+                            return new BooleanResult { Success = true };
                         }
                         catch (LdapException e)
                         {
@@ -171,7 +171,7 @@ namespace pGina.Plugin.Ldap
                 }
             }
 
-            return new AuthenticationResult{ Success = false };
+            return new BooleanResult{ Success = false };
         }
 
         /// <summary>
