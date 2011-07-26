@@ -9,6 +9,7 @@ using Xunit;
 using pGina.Plugin.Ldap;
 using pGina.Shared.Interfaces;
 using pGina.Shared.AuthenticationUI;
+using pGina.Shared.Settings;
 
 namespace pGina.Plugin.Ldap.Tests
 {
@@ -34,9 +35,24 @@ namespace pGina.Plugin.Ldap.Tests
             elements = new List<Element>();
             plugIn = new LdapPlugin();
             plugIn.SetupUI(elements);
+
             // Store the username and password elements.
             unameEl = (EditTextElement)elements[0];
             passEl = (PasswordTextElement)elements[1];
+
+            dynamic settings = new DynamicSettings(LdapPlugin.LdapUuid);
+
+            settings.LdapHost = new string[] { "192.168.51.100", "192.168.56.101" };
+            settings.LdapPort = 636;
+            settings.UseSsl = true;
+            settings.RequireCert = true;
+            settings.ServerCertFile = @"c:\slapd.cer";
+            settings.DoSearch = true;
+            settings.SearchContexts = new string[] { "ou=Stuff,dc=example,dc=com", "ou=People,dc=example,dc=com" };
+            settings.SearchFilter = "(&(uid=%u)(objectClass=posixAccount))";
+            settings.DnPattern = "uid=%u,dc=example,dc=com";
+            settings.SearchDN = "cn=search user,dc=example,dc=com";
+            settings.SearchPW = "secret";
         }
 
         [Fact]
