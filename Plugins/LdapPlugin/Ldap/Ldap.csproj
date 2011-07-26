@@ -50,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LdapAuthenticator.cs" />
-    <Compile Include="LdapPluginSettings.cs" />
     <Compile Include="LdapServer.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

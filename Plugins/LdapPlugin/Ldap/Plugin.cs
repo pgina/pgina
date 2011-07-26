@@ -9,22 +9,47 @@ using log4net;
 using pGina.Shared;
 using pGina.Shared.Interfaces;
 using pGina.Shared.AuthenticationUI;
+using pGina.Shared.Settings;
 
 namespace pGina.Plugin.Ldap
 {
     public class LdapPlugin : IPluginAuthentication, IPluginAuthenticationUI
     {
+        public static readonly Guid LdapUuid = new Guid("{0F52390B-C781-43AE-BD62-553C77FA4CF7}");
+
+        private dynamic m_settings = null;
         private ILog m_logger = LogManager.GetLogger("LdapPlugin");
-        internal static LdapPluginSettings Settings = null;
-
-        private Guid m_descriptionGuid = new Guid("{5FF90A12-8C06-4E21-8C99-3B01E893F430}");        
-
+        
         public LdapPlugin()
         {
+            InitSettings();
+
             using(Process me = Process.GetCurrentProcess())
             {
                 m_logger.DebugFormat("LDAP Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
             }
+        }
+
+        private void InitSettings()
+        {
+            m_settings = new DynamicSettings(LdapUuid);
+
+            // Set default values for settings (if not already set)
+            m_settings.SetDefault("LdapHost", new string[] { "ldap.example.com" });
+            m_settings.SetDefault("LdapPort", 389);
+            m_settings.SetDefault("LdapTimeout", 10);
+            m_settings.SetDefault("UseSsl", false);
+            m_settings.SetDefault("RequireCert", false);
+            m_settings.SetDefault("ServerCertFile", "");
+            m_settings.SetDefault("DoSearch", false);
+            m_settings.SetDefault("SearchContexts", new string[] { });
+            m_settings.SetDefault("SearchFilter", "");
+            m_settings.SetDefault("DnPattern", "uid=%u,dc=example,dc=com");
+            m_settings.SetDefault("SearchDN", "");
+            m_settings.SetDefault("SearchPW", "");
+            m_settings.SetDefault("DoGroupAuthorization", false);
+            m_settings.SetDefault("LdapLoginGroups", new string[] { });
+            m_settings.SetDefault("LdapAdminGroup", "wheel");
         }
 
         public string Name
@@ -65,9 +90,6 @@ namespace pGina.Plugin.Ldap
 
                 // Place credentials into a NetworkCredentials object
                 NetworkCredential creds = new NetworkCredential(usernameField.Text, passwordField.Text);
-
-                // (Re)load settings
-                Settings = LdapPluginSettings.Load();
 
                 // Authenticate the login
                 m_logger.DebugFormat("Attempting authentication for {0}", creds.UserName);
