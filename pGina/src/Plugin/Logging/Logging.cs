@@ -8,7 +8,7 @@ using System.Reflection;
 using log4net;
 using log4net.Config;
 
-namespace pGina.Core
+namespace pGina.Shared.Logging
 {
     public static class Logging
     {

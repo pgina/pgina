@@ -44,7 +44,7 @@ namespace pGina.Plugin.Ldap
                 else
                 {
                     m_logger.ErrorFormat("Certificate file {0} not found, giving up.", LdapPlugin.Settings.ServerCertFile);
-                    return new AuthenticationResult{ Success = false, Message = "Server certificate not found" };
+                    return new BooleanResult{ Success = false, Message = "Server certificate not found" };
                 }
             }
 

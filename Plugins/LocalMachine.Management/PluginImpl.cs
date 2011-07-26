@@ -6,7 +6,9 @@ using System.Diagnostics;
 
 using log4net;
 
-using pGina.Interfaces;
+using pGina.Shared.AuthenticationUI;
+using pGina.Shared.Interfaces;
+using pGina.Shared.Types;
 
 namespace pGina.Plugin.LocalMachine.Management
 {
@@ -24,7 +26,7 @@ namespace pGina.Plugin.LocalMachine.Management
  
         public string Name
         {
-            get { return "Local Machine Account Management Plugin"; }
+            get { return "Local Machine Account Management"; }
         }
 
         public string Description
@@ -37,9 +39,9 @@ namespace pGina.Plugin.LocalMachine.Management
             get { return new Guid("{12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D}"); }      // May be used for explicit ordering in the future
         }
         
-        public void AuthenticatedUserGateway(Interfaces.AuthenticationUI.Element[] values, UserInformation userData, Guid trackingToken)
+        public void AuthenticatedUserGateway(Element[] values, UserInformation userData, Guid trackingToken)
         {
             throw new NotImplementedException();
-        }
+        }        
     }
 }

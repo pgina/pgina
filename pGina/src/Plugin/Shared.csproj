@@ -8,8 +8,8 @@
     <ProjectGuid>{0EEFBC3F-4DFD-42F6-888E-1A28F4EFEFE3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>pGina.Plugin</RootNamespace>
-    <AssemblyName>pGina.Plugin</AssemblyName>
+    <RootNamespace>pGina.Shared</RootNamespace>
+    <AssemblyName>pGina.Shared</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -37,6 +37,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,9 +45,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuthenticationUI\Elements.cs" />
+    <Compile Include="AuthenticationUI\ImageElement.cs" />
+    <Compile Include="AuthenticationUI\TextElements.cs" />
+    <Compile Include="Settings\DynamicSetting.cs" />
+    <Compile Include="Settings\DynamicSettings.cs" />
+    <Compile Include="Types\GroupInformation.cs" />
+    <Compile Include="Interfaces\IPlugin.cs" />
+    <Compile Include="Logging\Logging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Types\SessionProperties.cs" />
+    <Compile Include="Types\UserInformation.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /y "$(TargetPath)" ..\..\..\Plugins\SDK\
+copy /y "$(OutDir)\log4net.config" ..\..\..\Plugins\SDK\
+
+copy /y "$(OutDir)\log4net.dll" ..\..\..\Plugins\SDK\</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

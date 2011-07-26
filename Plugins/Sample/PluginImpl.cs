@@ -6,46 +6,59 @@ using System.Diagnostics;
 
 using log4net;
 
-using pGina.Interfaces;
+using pGina.Shared.AuthenticationUI;
+using pGina.Shared.Interfaces;
+using pGina.Shared.Types;
+using pGina.Shared.Settings;
 
 namespace pGina.Plugin.Sample
 {
-    public class SimplePlugin : IPluginAuthenticationUI, IPluginAuthentication
+    public class SimplePlugin : IPluginConfiguration, IPluginAuthenticationUI, IPluginAuthentication
     {
         private ILog m_logger = LogManager.GetLogger("SimplePlugin");
-        private Guid m_descriptionGuid = new Guid("{22B06063-DEF1-4CE2-96DC-C6FDB409FEFD}");        
+        private Guid m_descriptionGuid = new Guid("{22B06063-DEF1-4CE2-96DC-C6FDB409FEFD}");
+        public static Guid SimpleUuid = new Guid("{16FC47C0-F17B-4D99-A820-EDBF0B0C764A}");
+        private string m_defaultDescription = "A demonstration plugin that allows all usernames that begin with the letter \"p\" to succeed.";
+        private dynamic m_settings = null;
 
         public SimplePlugin()
         {
             using(Process me = Process.GetCurrentProcess())
             {
+                m_settings = new DynamicSettings(SimpleUuid);
+                m_settings.SetDefault("ShowDescription", true);
+                m_settings.SetDefault("Description", m_defaultDescription);
+                
                 m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
             }
         }
 
-        public void SetupUI(List<Interfaces.AuthenticationUI.Element> elements)
+        public void SetupUI(List<Element> elements)
         {
             try
             {
                 // Must have the username|password element            
-                if (elements.Where(element => element.UUid == Interfaces.AuthenticationUI.EditTextElement.UsernameElement.UUid).Count() == 0)
+                if (elements.Where(element => element.UUid == EditTextElement.UsernameElement.UUid).Count() == 0)
                 {
                     m_logger.DebugFormat("SetupUI: Adding username element");
-                    elements.Add(Interfaces.AuthenticationUI.EditTextElement.UsernameElement);
+                    elements.Add(EditTextElement.UsernameElement);
                 }
 
-                if (elements.Where(element => element.UUid == Interfaces.AuthenticationUI.PasswordTextElement.PasswordElement.UUid).Count() == 0)
+                if (elements.Where(element => element.UUid == PasswordTextElement.PasswordElement.UUid).Count() == 0)
                 {
                     m_logger.DebugFormat("SetupUI: Adding password element");
-                    elements.Add(Interfaces.AuthenticationUI.PasswordTextElement.PasswordElement);
+                    elements.Add(PasswordTextElement.PasswordElement);
                 }
 
-                elements.Add(
-                    new Interfaces.AuthenticationUI.SmallTextElement("Description", "A simple demonstration, enter a username that starts with 'p' to login") 
-                    { 
-                        UUid = m_descriptionGuid 
-                    }
-                );
+                if (m_settings.ShowDescription)
+                {
+                    elements.Add(
+                        new SmallTextElement("Description", "A simple demonstration, enter a username that starts with 'p' to login")
+                        {
+                            UUid = m_descriptionGuid
+                        }
+                    );
+                }
             }
             catch (Exception e)
             {
@@ -55,49 +68,55 @@ namespace pGina.Plugin.Sample
 
         public string Name
         {
-            get { return "Simple Demonstration Plugin"; }
+            get { return "Simple Demonstration"; }
         }
 
         public string Description
         {
-            get { return "A demonstration plugin that allows all usernames that begin with the letter \"p\" to succeed."; }
+            get { return m_settings.Description; }
         }
 
         public Guid Uuid
         {
-            get { return new Guid("{16FC47C0-F17B-4D99-A820-EDBF0B0C764A}"); }
+            get { return SimpleUuid; }
         }
         
-        AuthenticationResult IPluginAuthentication.AuthenticateUser(Interfaces.AuthenticationUI.Element[] values, Guid trackingToken)
+        BooleanResult IPluginAuthentication.AuthenticateUser(Element[] values, Guid trackingToken)
         {
             try
             {
                 m_logger.DebugFormat("AuthenticateUser(..., {0})", trackingToken.ToString());
 
                 // Dump UI elements, cuz we can
-                foreach (Interfaces.AuthenticationUI.Element e in values)
+                foreach (Element e in values)
                 {
                     m_logger.DebugFormat("Element[{0}]: {1} => {2}", e.UUid, e.Type, e.Name);
                 }
 
-                Interfaces.AuthenticationUI.EditTextElement usernameField = (Interfaces.AuthenticationUI.EditTextElement)
-                    values.First(v => v.UUid == Interfaces.AuthenticationUI.Constants.UsernameElementUuid);
+                EditTextElement usernameField = (EditTextElement)
+                    values.First(v => v.UUid == Constants.UsernameElementUuid);
 
                 m_logger.DebugFormat("Found username: {0}", usernameField.Text);
                 if (usernameField.Text.StartsWith("p"))
                 {
                     m_logger.InfoFormat("Authenticated user: {0}", usernameField.Text);
-                    return new AuthenticationResult() { Success = true };
+                    return new BooleanResult() { Success = true };
                 }
 
                 m_logger.ErrorFormat("Failed to authenticate user: {0}", usernameField.Text);
-                return new AuthenticationResult() { Success = false };
+                return new BooleanResult() { Success = false };
             }
             catch (Exception e)
             {
                 m_logger.ErrorFormat("AuthenticateUser exception: {0}", e);
                 throw;  // Allow pGina service to catch and handle exception
             }
+        }
+
+        public void Configure()
+        {
+            Configuration conf = new Configuration();
+            conf.ShowDialog();
         }
     }
 }

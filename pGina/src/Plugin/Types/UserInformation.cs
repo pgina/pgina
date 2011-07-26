@@ -4,15 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Security.Principal;
 
-namespace pGina.Interfaces
+namespace pGina.Shared.Types
 {
-    public class GroupInformation
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public SecurityIdentifier SID { get; set; }
-    }
-    
     public class UserInformation
     {
         public List<GroupInformation> Groups { get; set; }

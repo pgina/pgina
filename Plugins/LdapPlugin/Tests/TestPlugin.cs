@@ -44,7 +44,7 @@ namespace pGina.Plugin.Ldap.Tests
             // Test a basic login.
             unameEl.Text = "doej";
             passEl.Text = "secret";
-            AuthenticationResult result = plugIn.AuthenticateUser(elements.ToArray(), new Guid());
+            BooleanResult result = plugIn.AuthenticateUser(elements.ToArray(), new Guid());
 
             Assert.True( result.Success );
         }
