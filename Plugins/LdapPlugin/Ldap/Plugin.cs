@@ -13,7 +13,7 @@ using pGina.Shared.Settings;
 
 namespace pGina.Plugin.Ldap
 {
-    public class LdapPlugin : IPluginAuthentication, IPluginAuthenticationUI
+    public class LdapPlugin : IPluginAuthentication, IPluginAuthenticationUI, IPluginConfiguration
     {
         public static readonly Guid LdapUuid = new Guid("{0F52390B-C781-43AE-BD62-553C77FA4CF7}");
 
@@ -64,7 +64,7 @@ namespace pGina.Plugin.Ldap
 
         public Guid Uuid
         {
-            get { return new Guid("{9C758C53-BDF2-446A-A927-B359B697CDA5}"); }
+            get { return LdapUuid; }
         }
         
         public BooleanResult AuthenticateUser(Element[] values, Guid trackingToken)
@@ -124,6 +124,12 @@ namespace pGina.Plugin.Ldap
             {
                 m_logger.ErrorFormat("SetupUI exception: {0}", e);
             }
+        }
+
+        public void Configure()
+        {
+            Configuration conf = new Configuration();
+            conf.ShowDialog();
         }
     }
 }
