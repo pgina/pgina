@@ -37,36 +37,36 @@
             this.label1 = new System.Windows.Forms.Label();
             this.ldapPortTextBox = new System.Windows.Forms.TextBox();
             this.ldapPortLabel = new System.Windows.Forms.Label();
+            this.useSslCheckBox = new System.Windows.Forms.CheckBox();
+            this.dnPatternLabel = new System.Windows.Forms.Label();
+            this.searchForDnCheckBox = new System.Windows.Forms.CheckBox();
+            this.searchFilterLabel = new System.Windows.Forms.Label();
+            this.searchContextsLabel = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.timeoutLabel = new System.Windows.Forms.Label();
+            this.timeoutTextBox = new System.Windows.Forms.TextBox();
             this.ldapServerGroupBox = new System.Windows.Forms.GroupBox();
             this.sslCertFileBrowseButton = new System.Windows.Forms.Button();
             this.sslCertFileTextBox = new System.Windows.Forms.TextBox();
-            this.useSslCheckBox = new System.Windows.Forms.CheckBox();
             this.authenticationGroupBox = new System.Windows.Forms.GroupBox();
-            this.dnPatternLabel = new System.Windows.Forms.Label();
-            this.dnPatternTextBox = new System.Windows.Forms.TextBox();
-            this.searchForDnCheckBox = new System.Windows.Forms.CheckBox();
-            this.searchFilterLabel = new System.Windows.Forms.Label();
-            this.searchFilterTextBox = new System.Windows.Forms.TextBox();
-            this.searchContextsLabel = new System.Windows.Forms.Label();
-            this.searchContextsTextBox = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.searchDnTextBox = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.cancelButton = new System.Windows.Forms.Button();
-            this.timeoutLabel = new System.Windows.Forms.Label();
-            this.timeoutTextBox = new System.Windows.Forms.TextBox();
             this.searchPassTextBox = new System.Windows.Forms.TextBox();
+            this.searchDnTextBox = new System.Windows.Forms.TextBox();
+            this.searchContextsTextBox = new System.Windows.Forms.TextBox();
+            this.searchFilterTextBox = new System.Windows.Forms.TextBox();
+            this.dnPatternTextBox = new System.Windows.Forms.TextBox();
+            this.cancelButton = new System.Windows.Forms.Button();
             this.ldapServerGroupBox.SuspendLayout();
             this.authenticationGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // okButton
             // 
-            this.okButton.Location = new System.Drawing.Point(591, 407);
+            this.okButton.Location = new System.Drawing.Point(591, 409);
             this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(97, 28);
+            this.okButton.Size = new System.Drawing.Size(97, 26);
             this.okButton.TabIndex = 0;
-            this.okButton.Text = "Ok";
+            this.okButton.Text = "OK";
             this.okButton.UseVisualStyleBackColor = true;
             this.okButton.Click += new System.EventHandler(this.okButton_Click);
             // 
@@ -132,6 +132,104 @@
             this.ldapPortLabel.Text = "LDAP Port";
             this.descriptionToolTip.SetToolTip(this.ldapPortLabel, "The port number");
             // 
+            // useSslCheckBox
+            // 
+            this.useSslCheckBox.AutoSize = true;
+            this.useSslCheckBox.Location = new System.Drawing.Point(6, 79);
+            this.useSslCheckBox.Name = "useSslCheckBox";
+            this.useSslCheckBox.Size = new System.Drawing.Size(68, 17);
+            this.useSslCheckBox.TabIndex = 5;
+            this.useSslCheckBox.Text = "Use SSL";
+            this.descriptionToolTip.SetToolTip(this.useSslCheckBox, "Whether or not to use SSL encryption.");
+            this.useSslCheckBox.UseVisualStyleBackColor = true;
+            this.useSslCheckBox.CheckedChanged += new System.EventHandler(this.useSslCheckBox_CheckedChanged);
+            // 
+            // dnPatternLabel
+            // 
+            this.dnPatternLabel.AutoSize = true;
+            this.dnPatternLabel.Location = new System.Drawing.Point(6, 22);
+            this.dnPatternLabel.Name = "dnPatternLabel";
+            this.dnPatternLabel.Size = new System.Drawing.Size(60, 13);
+            this.dnPatternLabel.TabIndex = 0;
+            this.dnPatternLabel.Text = "DN Pattern";
+            this.descriptionToolTip.SetToolTip(this.dnPatternLabel, "The pattern to use when creating a DN from a user name.\r\n%u can be used to indica" +
+                    "te the user name.\r\n");
+            // 
+            // searchForDnCheckBox
+            // 
+            this.searchForDnCheckBox.AutoSize = true;
+            this.searchForDnCheckBox.Location = new System.Drawing.Point(9, 47);
+            this.searchForDnCheckBox.Name = "searchForDnCheckBox";
+            this.searchForDnCheckBox.Size = new System.Drawing.Size(94, 17);
+            this.searchForDnCheckBox.TabIndex = 2;
+            this.searchForDnCheckBox.Text = "Search for DN";
+            this.descriptionToolTip.SetToolTip(this.searchForDnCheckBox, "Whether or not to search a set of LDAP trees for the\r\nDN rather than using the ab" +
+                    "ove pattern.");
+            this.searchForDnCheckBox.UseVisualStyleBackColor = true;
+            this.searchForDnCheckBox.CheckedChanged += new System.EventHandler(this.searchForDnCheckBox_CheckedChanged);
+            // 
+            // searchFilterLabel
+            // 
+            this.searchFilterLabel.AutoSize = true;
+            this.searchFilterLabel.Location = new System.Drawing.Point(6, 72);
+            this.searchFilterLabel.Name = "searchFilterLabel";
+            this.searchFilterLabel.Size = new System.Drawing.Size(66, 13);
+            this.searchFilterLabel.TabIndex = 3;
+            this.searchFilterLabel.Text = "Search Filter";
+            this.descriptionToolTip.SetToolTip(this.searchFilterLabel, "The filter to use when searching.\r\n%u is replaced with the user name\r\n");
+            // 
+            // searchContextsLabel
+            // 
+            this.searchContextsLabel.AutoSize = true;
+            this.searchContextsLabel.Location = new System.Drawing.Point(6, 101);
+            this.searchContextsLabel.Name = "searchContextsLabel";
+            this.searchContextsLabel.Size = new System.Drawing.Size(91, 13);
+            this.searchContextsLabel.TabIndex = 5;
+            this.searchContextsLabel.Text = "Search Context(s)";
+            this.descriptionToolTip.SetToolTip(this.searchContextsLabel, "A list of one or more DNs (one per line) that indicate\r\nroots of LDAP subtrees th" +
+                    "at will be searched.");
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 152);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(60, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Search DN";
+            this.descriptionToolTip.SetToolTip(this.label2, "The DN to use when connecting to the server in order\r\nto perform the search.  If " +
+                    "this is left blank, an anonymous\r\nbind will be attempted.");
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(6, 178);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(90, 13);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "Search Password";
+            this.descriptionToolTip.SetToolTip(this.label3, "The password to use when searching");
+            // 
+            // timeoutLabel
+            // 
+            this.timeoutLabel.AutoSize = true;
+            this.timeoutLabel.Location = new System.Drawing.Point(206, 48);
+            this.timeoutLabel.Name = "timeoutLabel";
+            this.timeoutLabel.Size = new System.Drawing.Size(45, 13);
+            this.timeoutLabel.TabIndex = 10;
+            this.timeoutLabel.Text = "Timeout";
+            this.descriptionToolTip.SetToolTip(this.timeoutLabel, "The number of seconds to wait for a server to respond before giving up \r\nand movi" +
+                    "ng on to the next server.");
+            // 
+            // timeoutTextBox
+            // 
+            this.timeoutTextBox.Location = new System.Drawing.Point(265, 45);
+            this.timeoutTextBox.Name = "timeoutTextBox";
+            this.timeoutTextBox.Size = new System.Drawing.Size(76, 20);
+            this.timeoutTextBox.TabIndex = 11;
+            this.descriptionToolTip.SetToolTip(this.timeoutTextBox, "The number of seconds to wait for a server to respond before\r\ngiving up and movin" +
+                    "g on to the next server in the list.\r\n");
+            // 
             // ldapServerGroupBox
             // 
             this.ldapServerGroupBox.Controls.Add(this.timeoutTextBox);
@@ -170,18 +268,6 @@
             this.sslCertFileTextBox.Size = new System.Drawing.Size(463, 20);
             this.sslCertFileTextBox.TabIndex = 8;
             // 
-            // useSslCheckBox
-            // 
-            this.useSslCheckBox.AutoSize = true;
-            this.useSslCheckBox.Location = new System.Drawing.Point(6, 79);
-            this.useSslCheckBox.Name = "useSslCheckBox";
-            this.useSslCheckBox.Size = new System.Drawing.Size(68, 17);
-            this.useSslCheckBox.TabIndex = 5;
-            this.useSslCheckBox.Text = "Use SSL";
-            this.descriptionToolTip.SetToolTip(this.useSslCheckBox, "Whether or not to use SSL encryption.");
-            this.useSslCheckBox.UseVisualStyleBackColor = true;
-            this.useSslCheckBox.CheckedChanged += new System.EventHandler(this.useSslCheckBox_CheckedChanged);
-            // 
             // authenticationGroupBox
             // 
             this.authenticationGroupBox.Controls.Add(this.searchPassTextBox);
@@ -202,64 +288,20 @@
             this.authenticationGroupBox.TabStop = false;
             this.authenticationGroupBox.Text = "Authentication";
             // 
-            // dnPatternLabel
+            // searchPassTextBox
             // 
-            this.dnPatternLabel.AutoSize = true;
-            this.dnPatternLabel.Location = new System.Drawing.Point(6, 22);
-            this.dnPatternLabel.Name = "dnPatternLabel";
-            this.dnPatternLabel.Size = new System.Drawing.Size(60, 13);
-            this.dnPatternLabel.TabIndex = 0;
-            this.dnPatternLabel.Text = "DN Pattern";
-            this.descriptionToolTip.SetToolTip(this.dnPatternLabel, "The pattern to use when creating a DN from a user name.\r\n%u can be used to indica" +
-                    "te the user name.\r\n");
+            this.searchPassTextBox.Location = new System.Drawing.Point(110, 175);
+            this.searchPassTextBox.Name = "searchPassTextBox";
+            this.searchPassTextBox.Size = new System.Drawing.Size(462, 20);
+            this.searchPassTextBox.TabIndex = 11;
+            this.searchPassTextBox.UseSystemPasswordChar = true;
             // 
-            // dnPatternTextBox
+            // searchDnTextBox
             // 
-            this.dnPatternTextBox.Location = new System.Drawing.Point(110, 19);
-            this.dnPatternTextBox.Name = "dnPatternTextBox";
-            this.dnPatternTextBox.Size = new System.Drawing.Size(463, 20);
-            this.dnPatternTextBox.TabIndex = 1;
-            // 
-            // searchForDnCheckBox
-            // 
-            this.searchForDnCheckBox.AutoSize = true;
-            this.searchForDnCheckBox.Location = new System.Drawing.Point(9, 47);
-            this.searchForDnCheckBox.Name = "searchForDnCheckBox";
-            this.searchForDnCheckBox.Size = new System.Drawing.Size(94, 17);
-            this.searchForDnCheckBox.TabIndex = 2;
-            this.searchForDnCheckBox.Text = "Search for DN";
-            this.descriptionToolTip.SetToolTip(this.searchForDnCheckBox, "Whether or not to search a set of LDAP trees for the\r\nDN rather than using the ab" +
-                    "ove pattern.");
-            this.searchForDnCheckBox.UseVisualStyleBackColor = true;
-            this.searchForDnCheckBox.CheckedChanged += new System.EventHandler(this.searchForDnCheckBox_CheckedChanged);
-            // 
-            // searchFilterLabel
-            // 
-            this.searchFilterLabel.AutoSize = true;
-            this.searchFilterLabel.Location = new System.Drawing.Point(6, 72);
-            this.searchFilterLabel.Name = "searchFilterLabel";
-            this.searchFilterLabel.Size = new System.Drawing.Size(66, 13);
-            this.searchFilterLabel.TabIndex = 3;
-            this.searchFilterLabel.Text = "Search Filter";
-            this.descriptionToolTip.SetToolTip(this.searchFilterLabel, "The filter to use when searching.\r\n%u is replaced with the user name\r\n");
-            // 
-            // searchFilterTextBox
-            // 
-            this.searchFilterTextBox.Location = new System.Drawing.Point(110, 69);
-            this.searchFilterTextBox.Name = "searchFilterTextBox";
-            this.searchFilterTextBox.Size = new System.Drawing.Size(462, 20);
-            this.searchFilterTextBox.TabIndex = 4;
-            // 
-            // searchContextsLabel
-            // 
-            this.searchContextsLabel.AutoSize = true;
-            this.searchContextsLabel.Location = new System.Drawing.Point(6, 101);
-            this.searchContextsLabel.Name = "searchContextsLabel";
-            this.searchContextsLabel.Size = new System.Drawing.Size(91, 13);
-            this.searchContextsLabel.TabIndex = 5;
-            this.searchContextsLabel.Text = "Search Context(s)";
-            this.descriptionToolTip.SetToolTip(this.searchContextsLabel, "A list of one or more DNs (one per line) that indicate\r\nroots of LDAP subtrees th" +
-                    "at will be searched.");
+            this.searchDnTextBox.Location = new System.Drawing.Point(110, 149);
+            this.searchDnTextBox.Name = "searchDnTextBox";
+            this.searchDnTextBox.Size = new System.Drawing.Size(462, 20);
+            this.searchDnTextBox.TabIndex = 9;
             // 
             // searchContextsTextBox
             // 
@@ -270,33 +312,19 @@
             this.searchContextsTextBox.Size = new System.Drawing.Size(462, 45);
             this.searchContextsTextBox.TabIndex = 6;
             // 
-            // label2
+            // searchFilterTextBox
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 152);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(60, 13);
-            this.label2.TabIndex = 8;
-            this.label2.Text = "Search DN";
-            this.descriptionToolTip.SetToolTip(this.label2, "The DN to use when connecting to the server in order\r\nto perform the search.  If " +
-                    "this is left blank, an anonymous\r\nbind will be attempted.");
+            this.searchFilterTextBox.Location = new System.Drawing.Point(110, 69);
+            this.searchFilterTextBox.Name = "searchFilterTextBox";
+            this.searchFilterTextBox.Size = new System.Drawing.Size(462, 20);
+            this.searchFilterTextBox.TabIndex = 4;
             // 
-            // searchDnTextBox
+            // dnPatternTextBox
             // 
-            this.searchDnTextBox.Location = new System.Drawing.Point(110, 149);
-            this.searchDnTextBox.Name = "searchDnTextBox";
-            this.searchDnTextBox.Size = new System.Drawing.Size(462, 20);
-            this.searchDnTextBox.TabIndex = 9;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 178);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(90, 13);
-            this.label3.TabIndex = 10;
-            this.label3.Text = "Search Password";
-            this.descriptionToolTip.SetToolTip(this.label3, "The password to use when searching");
+            this.dnPatternTextBox.Location = new System.Drawing.Point(110, 19);
+            this.dnPatternTextBox.Name = "dnPatternTextBox";
+            this.dnPatternTextBox.Size = new System.Drawing.Size(463, 20);
+            this.dnPatternTextBox.TabIndex = 1;
             // 
             // cancelButton
             // 
@@ -307,34 +335,6 @@
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
-            // 
-            // timeoutLabel
-            // 
-            this.timeoutLabel.AutoSize = true;
-            this.timeoutLabel.Location = new System.Drawing.Point(206, 48);
-            this.timeoutLabel.Name = "timeoutLabel";
-            this.timeoutLabel.Size = new System.Drawing.Size(53, 13);
-            this.timeoutLabel.TabIndex = 10;
-            this.timeoutLabel.Text = "Timout (s)";
-            this.descriptionToolTip.SetToolTip(this.timeoutLabel, "The number of seconds to wait for a server to respond before giving up \r\nand movi" +
-                    "ng on to the next server.");
-            // 
-            // timeoutTextBox
-            // 
-            this.timeoutTextBox.Location = new System.Drawing.Point(265, 45);
-            this.timeoutTextBox.Name = "timeoutTextBox";
-            this.timeoutTextBox.Size = new System.Drawing.Size(76, 20);
-            this.timeoutTextBox.TabIndex = 11;
-            this.descriptionToolTip.SetToolTip(this.timeoutTextBox, "The number of seconds to wait for a server to respond before\r\ngiving up and movin" +
-                    "g on to the next server in the list.\r\n");
-            // 
-            // searchPassTextBox
-            // 
-            this.searchPassTextBox.Location = new System.Drawing.Point(110, 175);
-            this.searchPassTextBox.Name = "searchPassTextBox";
-            this.searchPassTextBox.Size = new System.Drawing.Size(462, 20);
-            this.searchPassTextBox.TabIndex = 11;
-            this.searchPassTextBox.UseSystemPasswordChar = true;
             // 
             // Configuration
             // 

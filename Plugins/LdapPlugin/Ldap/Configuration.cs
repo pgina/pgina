@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
+using System.IO;
 
 using pGina.Shared.Settings;
 using pGina.Plugin.Ldap;
@@ -196,6 +197,12 @@ namespace pGina.Plugin.Ldap
 
         private bool ValidateInput()
         {
+            if (ldapHostTextBox.Text.Trim().Length == 0)
+            {
+                MessageBox.Show("Please provide at least one LDAP host");
+                return false;
+            }
+
             try
             {
                 int port = Convert.ToInt32(ldapPortTextBox.Text.Trim());
@@ -215,6 +222,36 @@ namespace pGina.Plugin.Ldap
             catch (FormatException)
             {
                 MessageBox.Show("The timout be a positive integer > 0.");
+                return false;
+            }
+
+            if (validateServerCertCheckBox.CheckState == CheckState.Checked &&
+                sslCertFileTextBox.Text.Trim().Length > 0 &&
+                !(File.Exists(sslCertFileTextBox.Text.Trim())))
+            {
+                MessageBox.Show("SSL certificate file does not exist."
+                    + "Please select a valid certificate file.");
+                return false;
+            }
+
+            if (searchForDnCheckBox.CheckState == CheckState.Checked &&
+                searchFilterTextBox.Text.Trim().Length == 0)
+            {
+                MessageBox.Show("Please provide a search filter when \"Search for DN\" is enabled.");
+                return false;
+            }
+
+            if (searchForDnCheckBox.CheckState == CheckState.Checked &&
+                searchContextsTextBox.Text.Trim().Length == 0)
+            {
+                MessageBox.Show("Please provide at least one search context when \"Search for DN\" is enabled.");
+                return false;
+            }
+
+            if (searchForDnCheckBox.CheckState != CheckState.Checked &&
+                dnPatternTextBox.Text.Trim().Length == 0)
+            {
+                MessageBox.Show("Please provide a DN pattern.");
                 return false;
             }
 
