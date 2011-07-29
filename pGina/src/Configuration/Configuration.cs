@@ -46,7 +46,8 @@ namespace pGina.Configuration
                 Name = PLUGIN_NAME_COLUMN,
                 HeaderText = "Plugin Name",
                 Width = 250,
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                ReadOnly = true
             });
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
@@ -94,6 +95,8 @@ namespace pGina.Configuration
             // Implement the cell paint event so that we can blank out cells
             // that shouldn't be there.
             pluginsDG.CellPainting += this.pluginsDG_PaintCell;
+
+            pluginsDG.SelectionChanged += this.pluginsDG_SelectionChanged;
         }
 
         private void RefreshPluginList()
@@ -115,13 +118,13 @@ namespace pGina.Configuration
                     new object[] { p.Name, false, false, false, false, false, false, false });
                 DataGridViewRow row = pluginsDG.Rows[i];
 
-                this.SetupCheckBoxCell<IPluginAuthenticationUI>(row.Cells[1], p);
-                this.SetupCheckBoxCell<IPluginAuthentication>(row.Cells[2], p);
-                this.SetupCheckBoxCell<IPluginAuthorization>(row.Cells[3], p);
-                this.SetupCheckBoxCell<IPluginAuthenticationGateway>(row.Cells[4], p);
-                this.SetupCheckBoxCell<IPluginEventNotifications>(row.Cells[5], p);
-                this.SetupCheckBoxCell<IPluginUserSessionHelper>(row.Cells[6], p);
-                this.SetupCheckBoxCell<IPluginSystemSessionHelper>(row.Cells[7], p);
+                this.SetupCheckBoxCell<IPluginAuthenticationUI>(row.Cells[AUTH_UI_COLUMN], p);
+                this.SetupCheckBoxCell<IPluginAuthentication>(row.Cells[AUTHENTICATION_COLUMN], p);
+                this.SetupCheckBoxCell<IPluginAuthorization>(row.Cells[AUTHORIZATION_COLUMN], p);
+                this.SetupCheckBoxCell<IPluginAuthenticationGateway>(row.Cells[GATEWAY_COLUMN], p);
+                this.SetupCheckBoxCell<IPluginEventNotifications>(row.Cells[NOTIFICATION_COLUMN], p);
+                this.SetupCheckBoxCell<IPluginUserSessionHelper>(row.Cells[USER_SESSION_COLUMN], p);
+                this.SetupCheckBoxCell<IPluginSystemSessionHelper>(row.Cells[SYSTEM_SESSION_COLUMN], p);
             }
         }
 
@@ -263,5 +266,51 @@ namespace pGina.Configuration
                 }
             }
         }
+
+        private void configureButton_Click(object sender, EventArgs e)
+        {
+            int nSelectedRows = pluginsDG.SelectedRows.Count;
+            if (nSelectedRows > 0)
+            {
+                DataGridViewRow row = pluginsDG.SelectedRows[0];
+                string pluginName = (string)row.Cells[PLUGIN_NAME_COLUMN].Value;
+                IPluginBase plug = this.m_plugins[pluginName];
+
+                if (plug is IPluginConfiguration)
+                {
+                    IPluginConfiguration configPlugin = plug as IPluginConfiguration;
+                    configPlugin.Configure();
+                }
+            }
+        }
+
+        private void pluginsDG_SelectionChanged(object sender, EventArgs e)
+        {
+            int nSelectedRows = pluginsDG.SelectedRows.Count;
+            if (nSelectedRows > 0)
+            {
+                DataGridViewRow row = pluginsDG.SelectedRows[0];
+                string pluginName = (string)row.Cells[PLUGIN_NAME_COLUMN].Value;
+                IPluginBase plug = this.m_plugins[pluginName];
+
+                configureButton.Enabled = plug is IPluginConfiguration;
+            }
+        }
+
+        private void pluginInfoButton_Click(object sender, EventArgs e)
+        {
+            int nSelectedRows = pluginsDG.SelectedRows.Count;
+            if (nSelectedRows > 0)
+            {
+                DataGridViewRow row = pluginsDG.SelectedRows[0];
+                string pluginName = (string)row.Cells[PLUGIN_NAME_COLUMN].Value;
+                IPluginBase plug = this.m_plugins[pluginName];
+
+                PluginInfoForm dialog = new PluginInfoForm();
+                dialog.Plugin = plug;
+                dialog.Show();
+            }
+        }
+
     }
 }
