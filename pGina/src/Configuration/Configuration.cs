@@ -11,18 +11,147 @@ using pGina.Core;
 using pGina.Shared.Logging;
 using pGina.Shared.Interfaces;
 
-namespace Configuration
+namespace pGina.Configuration
 {
     public partial class Configuration : Form
     {
-        private PluginLoader m_loader = new PluginLoader();
-        List<pGina.Configuration.PluginPage> m_pages = new List<pGina.Configuration.PluginPage>();
-        
+        private Dictionary<string, IPluginBase> m_plugins = new Dictionary<string,IPluginBase>();
+
+        private static readonly string PLUGIN_NAME_COLUMN = "Name";
+        private static readonly string AUTH_UI_COLUMN = "UI";
+        private static readonly string AUTHENTICATION_COLUMN = "Authentication";
+        private static readonly string AUTHORIZATION_COLUMN = "Authorization";
+        private static readonly string GATEWAY_COLUMN = "Gateway";
+        private static readonly string NOTIFICATION_COLUMN = "Notification";
+        private static readonly string USER_SESSION_COLUMN = "UserSession";
+        private static readonly string SYSTEM_SESSION_COLUMN = "SystemSession";
+
         public Configuration()
         {
-            Framework.Init();            
+            Framework.Init();
             InitializeComponent();
-            LoadSettings();
+            InitPluginsDGV();
+            RefreshPluginList();
+        }
+
+        private void InitPluginsDGV()
+        {
+            pluginsDG.RowHeadersVisible = false;
+            pluginsDG.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            pluginsDG.MultiSelect = false;
+            pluginsDG.AllowUserToAddRows = false;
+
+            pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                Name = PLUGIN_NAME_COLUMN,
+                HeaderText = "Plugin Name",
+                Width = 250,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            });
+            pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = AUTH_UI_COLUMN,
+                HeaderText = "UI",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = AUTHENTICATION_COLUMN,
+                HeaderText = "Authentication",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = AUTHORIZATION_COLUMN,
+                HeaderText = "Authorization",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = GATEWAY_COLUMN,
+                HeaderText = "Gateway",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = NOTIFICATION_COLUMN,
+                HeaderText = "Notification",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = USER_SESSION_COLUMN,
+                HeaderText = "User Session",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = SYSTEM_SESSION_COLUMN,
+                HeaderText = "System Session",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+
+            // Implement the cell paint event so that we can blank out cells
+            // that shouldn't be there.
+            pluginsDG.CellPainting += this.pluginsDG_PaintCell;
+        }
+
+        private void RefreshPluginList()
+        {
+            // Get plugins
+            PluginLoader loader = new PluginLoader();
+            loader.PluginDirectories = Settings.Get.PluginDirectories;
+            loader.Load();
+            List<IPluginBase> plugins = loader.AllPlugins;
+            
+            m_plugins.Clear();
+            pluginsDG.Rows.Clear();
+
+            for(int i = 0; i < plugins.Count; i++ )
+            {
+                IPluginBase p = plugins[i];
+                this.m_plugins.Add(p.Name, p);
+                pluginsDG.Rows.Add(
+                    new object[] { p.Name, false, false, false, false, false, false, false });
+                DataGridViewRow row = pluginsDG.Rows[i];
+
+                this.SetupCheckBoxCell<IPluginAuthenticationUI>(row.Cells[1], p);
+                this.SetupCheckBoxCell<IPluginAuthentication>(row.Cells[2], p);
+                this.SetupCheckBoxCell<IPluginAuthorization>(row.Cells[3], p);
+                this.SetupCheckBoxCell<IPluginAuthenticationGateway>(row.Cells[4], p);
+                this.SetupCheckBoxCell<IPluginEventNotifications>(row.Cells[5], p);
+                this.SetupCheckBoxCell<IPluginUserSessionHelper>(row.Cells[6], p);
+                this.SetupCheckBoxCell<IPluginSystemSessionHelper>(row.Cells[7], p);
+            }
+        }
+
+        private void SetupCheckBoxCell<T>(DataGridViewCell cell, IPluginBase plug) where T : IPluginBase
+        {
+            if (plug is T)
+            {
+                cell.Value = PluginLoader.IsEnabledFor<T>(plug);
+            }
+            else
+            {
+                // If a cell is read-only, the paint callback will draw over the
+                // checkbox so that it is not visible.
+                cell.ReadOnly = true;
+            }
+        }
+
+        private void pluginsDG_PaintCell(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            // Determine if the cell should have a checkbox or not (via the ReadOnly setting), 
+            // if not, we draw over the checkbox.
+            if (e != null && sender != null)
+            {
+                if (e.RowIndex >= 0 && e.ColumnIndex > 0 && 
+                    pluginsDG[e.ColumnIndex, e.RowIndex].ReadOnly )
+                {
+                    e.PaintBackground(e.CellBounds, true);
+                    e.Handled = true;
+                }
+            }
         }
 
         private void PopulatePluginDirs()
@@ -42,71 +171,6 @@ namespace Configuration
             }
         }
 
-        private void LoadPlugins()
-        {
-            // Load plugins and add their pages
-            m_loader.PluginDirectories = Settings.Get.PluginDirectories; 
-            m_loader.Load();
-
-            foreach (IPluginBase plugin in m_loader.AllPlugins)
-            {
-                pGina.Configuration.PluginPage page = new pGina.Configuration.PluginPage(plugin);
-                m_pages.Add(page);
-                this.tabConfig.Controls.Add(page.Page);
-            }
-        }
-
-        private void PopulatePluginOrder()
-        {
-            // Now plugin order
-            lstOrder.Sorting = SortOrder.None;            
-            lstOrder.Columns.Clear();
-            lstOrder.Columns.Add("Plugin");
-            lstOrder.Columns[0].Width = lstOrder.Width / 2;
-            lstOrder.Columns.Add("Type");
-            lstOrder.Columns[1].Width = lstOrder.Width / 2;
-
-            List<IPluginAuthenticationUI> uiPlugins = m_loader.GetOrderedPluginsOfType<IPluginAuthenticationUI>();
-            List<IPluginAuthentication> authPlugins = m_loader.GetOrderedPluginsOfType<IPluginAuthentication>();
-            List<IPluginAuthorization> authzPlugins = m_loader.GetOrderedPluginsOfType<IPluginAuthorization>();
-            List<IPluginAuthenticationGateway> gatePlugins = m_loader.GetOrderedPluginsOfType<IPluginAuthenticationGateway>();
-
-            foreach(var p in uiPlugins)
-            {                
-                ListViewItem item = new ListViewItem(new string[] { p.Name, "UI" });
-                item.Tag = p;                                
-                lstOrder.Items.Add(item);
-            }
-
-            foreach(var p in authPlugins)
-            {                
-                ListViewItem item = new ListViewItem(new string[] { p.Name, "Authentication" });                                                
-                item.Tag = p;                
-                lstOrder.Items.Add(item);
-            }
-
-            foreach (var p in authzPlugins)
-            {
-                ListViewItem item = new ListViewItem(new string[] { p.Name, "Authorization" });
-                item.Tag = p;                
-                lstOrder.Items.Add(item);
-            }
-
-            foreach (var p in gatePlugins)
-            {
-                ListViewItem item = new ListViewItem(new string[] { p.Name, "Gateway" });
-                item.Tag = p;                
-                lstOrder.Items.Add(item);
-            }            
-        }
-
-        private void LoadSettings()
-        {
-            PopulatePluginDirs();
-            LoadPlugins();
-            PopulatePluginOrder();                        
-        }
-
         private void SavePluginDirs()
         {
             // Save changes to plugin directories
@@ -119,51 +183,42 @@ namespace Configuration
             Settings.Get.PluginDirectories = pluginDirs.ToArray();
         }
 
-        private void SavePages()
+        private void SavePluginSettings()
         {
-            foreach (pGina.Configuration.PluginPage page in m_pages)
+            foreach( DataGridViewRow row in pluginsDG.Rows )
             {
-                page.Save();
-            }
-        }
-
-        private void SavePluginOrder()
-        {
-            List<string> ui = new List<string>();
-            List<string> auth = new List<string>();
-            List<string> authz = new List<string>();
-            List<string> gate = new List<string>();
-
-            foreach (ListViewItem item in lstOrder.Items)
-            {
-                switch (item.SubItems[1].Text)
+                try
                 {
-                    case "UI":
-                        ui.Add(((IPluginBase)item.Tag).Uuid.ToString());
-                        break;
-                    case "Authentication":
-                        auth.Add(((IPluginBase)item.Tag).Uuid.ToString());
-                        break;
-                    case "Authorization":
-                        authz.Add(((IPluginBase)item.Tag).Uuid.ToString());
-                        break;
-                    case "Gateway":
-                        gate.Add(((IPluginBase)item.Tag).Uuid.ToString());
-                        break;
+                    IPluginBase p = m_plugins[(string)row.Cells[PLUGIN_NAME_COLUMN].Value];
+                    int mask = 0;
+
+                    if (Convert.ToBoolean(row.Cells[AUTH_UI_COLUMN].Value))
+                        mask |= (int)Core.PluginLoader.State.UIEnabled;
+                    if (Convert.ToBoolean(row.Cells[AUTHENTICATION_COLUMN].Value))
+                        mask |= (int)Core.PluginLoader.State.AuthenticateEnabled;
+                    if (Convert.ToBoolean(row.Cells[AUTHORIZATION_COLUMN].Value))
+                        mask |= (int)Core.PluginLoader.State.AuthorizeEnabled;
+                    if (Convert.ToBoolean(row.Cells[GATEWAY_COLUMN].Value))
+                        mask |= (int)Core.PluginLoader.State.GatewayEnabled;
+                    if (Convert.ToBoolean(row.Cells[NOTIFICATION_COLUMN].Value))
+                        mask |= (int)Core.PluginLoader.State.NotificationEnabled;
+                    if (Convert.ToBoolean(row.Cells[SYSTEM_SESSION_COLUMN].Value))
+                        mask |= (int)Core.PluginLoader.State.SystemSessionEnabled;
+                    if (Convert.ToBoolean(row.Cells[USER_SESSION_COLUMN].Value))
+                        mask |= (int)Core.PluginLoader.State.UserSessionEnabled;
+
+                    Core.Settings.Get.SetSetting(p.Uuid.ToString(), mask);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Exception when saving data: " + e);
                 }
             }
-
-            pGina.Core.Settings.Get.SetSetting("IPluginAuthenticationUI_Order", ui.ToArray());
-            pGina.Core.Settings.Get.SetSetting("IPluginAuthentication_Order", auth.ToArray());
-            pGina.Core.Settings.Get.SetSetting("IPluginAuthorization_Order", authz.ToArray());
-            pGina.Core.Settings.Get.SetSetting("IPluginAuthenticationGateway_Order", gate.ToArray());
         }
 
         private void SaveSettings()
         {
-            SavePluginDirs();
-            SavePages();
-            SavePluginOrder();
+            this.SavePluginSettings();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -205,38 +260,6 @@ namespace Configuration
                 foreach (ListViewItem item in lstPluginDirs.SelectedItems)
                 {
                     lstPluginDirs.Items.Remove(item);
-                }
-            }
-        }
-
-        private void btnUp_Click(object sender, EventArgs e)
-        {
-            if (lstOrder.SelectedItems.Count > 0)
-            {
-                ListViewItem item = lstOrder.SelectedItems[0];
-                int srcIdx = item.Index;                
-                int destIdx = item.Index - 1;
-                if (destIdx > 0 && lstOrder.Items[destIdx].SubItems[1].Text == item.SubItems[1].Text)
-                {                    
-                    lstOrder.Items.RemoveAt(srcIdx);
-                    lstOrder.Items.Insert(destIdx, item);
-                    lstOrder.Items[destIdx].Selected = true;
-                }
-            }
-        }
-
-        private void btnDown_Click(object sender, EventArgs e)
-        {
-            if (lstOrder.SelectedItems.Count > 0)
-            {
-                ListViewItem item = lstOrder.SelectedItems[0];
-                int srcIdx = item.Index;
-                int destIdx = item.Index + 1;
-                if (destIdx < lstOrder.Items.Count && lstOrder.Items[destIdx].SubItems[1].Text == item.SubItems[1].Text)
-                {
-                    lstOrder.Items.RemoveAt(srcIdx);
-                    lstOrder.Items.Insert(destIdx, item);
-                    lstOrder.Items[destIdx].Selected = true;
                 }
             }
         }

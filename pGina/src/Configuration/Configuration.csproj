@@ -153,6 +153,12 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UpArrowSolid.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DownArrowSolid.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /y "$(TargetPath)" ..\..\..\Plugins\SDK\</PostBuildEvent>
