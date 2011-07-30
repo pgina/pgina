@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Configuration));
             this.pluginsGroupBox = new System.Windows.Forms.GroupBox();
             this.pluginInfoButton = new System.Windows.Forms.Button();
             this.pluginsDG = new System.Windows.Forms.DataGridView();
@@ -105,18 +104,18 @@
             // btnDown
             // 
             this.btnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.btnDown.Location = new System.Drawing.Point(192, 147);
+            this.btnDown.Location = new System.Drawing.Point(192, 101);
             this.btnDown.Name = "btnDown";
-            this.btnDown.Size = new System.Drawing.Size(39, 41);
+            this.btnDown.Size = new System.Drawing.Size(26, 27);
             this.btnDown.TabIndex = 7;
             this.btnDown.UseVisualStyleBackColor = true;
             // 
             // btnUp
             // 
             this.btnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.btnUp.Location = new System.Drawing.Point(192, 100);
+            this.btnUp.Location = new System.Drawing.Point(192, 54);
             this.btnUp.Name = "btnUp";
-            this.btnUp.Size = new System.Drawing.Size(39, 41);
+            this.btnUp.Size = new System.Drawing.Size(26, 27);
             this.btnUp.TabIndex = 6;
             this.btnUp.UseVisualStyleBackColor = true;
             // 
@@ -164,7 +163,7 @@
             // 
             // btnOkay
             // 
-            this.btnOkay.Location = new System.Drawing.Point(871, 672);
+            this.btnOkay.Location = new System.Drawing.Point(877, 512);
             this.btnOkay.Name = "btnOkay";
             this.btnOkay.Size = new System.Drawing.Size(75, 23);
             this.btnOkay.TabIndex = 1;
@@ -174,7 +173,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(790, 672);
+            this.btnCancel.Location = new System.Drawing.Point(796, 512);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 2;
@@ -202,7 +201,7 @@
             this.groupBox2.Controls.Add(this.btnUp);
             this.groupBox2.Location = new System.Drawing.Point(12, 308);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(940, 358);
+            this.groupBox2.Size = new System.Drawing.Size(940, 183);
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Plugin Order";
@@ -236,55 +235,55 @@
             // 
             // button7
             // 
-            this.button7.Image = ((System.Drawing.Image)(resources.GetObject("button7.Image")));
-            this.button7.Location = new System.Drawing.Point(660, 147);
+            this.button7.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.button7.Location = new System.Drawing.Point(660, 101);
             this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(39, 41);
+            this.button7.Size = new System.Drawing.Size(26, 27);
             this.button7.TabIndex = 18;
             this.button7.UseVisualStyleBackColor = true;
             // 
             // button6
             // 
-            this.button6.Image = ((System.Drawing.Image)(resources.GetObject("button6.Image")));
-            this.button6.Location = new System.Drawing.Point(894, 147);
+            this.button6.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.button6.Location = new System.Drawing.Point(894, 101);
             this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(39, 41);
+            this.button6.Size = new System.Drawing.Size(26, 27);
             this.button6.TabIndex = 17;
             this.button6.UseVisualStyleBackColor = true;
             // 
             // button5
             // 
-            this.button5.Image = ((System.Drawing.Image)(resources.GetObject("button5.Image")));
-            this.button5.Location = new System.Drawing.Point(660, 100);
+            this.button5.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.button5.Location = new System.Drawing.Point(660, 54);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(39, 41);
+            this.button5.Size = new System.Drawing.Size(26, 27);
             this.button5.TabIndex = 16;
             this.button5.UseVisualStyleBackColor = true;
             // 
             // button4
             // 
-            this.button4.Image = ((System.Drawing.Image)(resources.GetObject("button4.Image")));
-            this.button4.Location = new System.Drawing.Point(894, 100);
+            this.button4.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.button4.Location = new System.Drawing.Point(894, 54);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(39, 41);
+            this.button4.Size = new System.Drawing.Size(26, 27);
             this.button4.TabIndex = 15;
             this.button4.UseVisualStyleBackColor = true;
             // 
             // button3
             // 
             this.button3.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.button3.Location = new System.Drawing.Point(426, 147);
+            this.button3.Location = new System.Drawing.Point(426, 101);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(39, 41);
+            this.button3.Size = new System.Drawing.Size(26, 27);
             this.button3.TabIndex = 14;
             this.button3.UseVisualStyleBackColor = true;
             // 
             // button2
             // 
             this.button2.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.button2.Location = new System.Drawing.Point(426, 100);
+            this.button2.Location = new System.Drawing.Point(426, 54);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(39, 41);
+            this.button2.Size = new System.Drawing.Size(26, 27);
             this.button2.TabIndex = 13;
             this.button2.UseVisualStyleBackColor = true;
             // 
@@ -292,7 +291,7 @@
             // 
             this.listView4.Location = new System.Drawing.Point(712, 32);
             this.listView4.Name = "listView4";
-            this.listView4.Size = new System.Drawing.Size(176, 317);
+            this.listView4.Size = new System.Drawing.Size(176, 129);
             this.listView4.TabIndex = 12;
             this.listView4.UseCompatibleStateImageBehavior = false;
             // 
@@ -300,7 +299,7 @@
             // 
             this.listView3.Location = new System.Drawing.Point(478, 32);
             this.listView3.Name = "listView3";
-            this.listView3.Size = new System.Drawing.Size(176, 318);
+            this.listView3.Size = new System.Drawing.Size(176, 130);
             this.listView3.TabIndex = 11;
             this.listView3.UseCompatibleStateImageBehavior = false;
             // 
@@ -308,7 +307,7 @@
             // 
             this.listView2.Location = new System.Drawing.Point(244, 32);
             this.listView2.Name = "listView2";
-            this.listView2.Size = new System.Drawing.Size(176, 319);
+            this.listView2.Size = new System.Drawing.Size(176, 131);
             this.listView2.TabIndex = 10;
             this.listView2.UseCompatibleStateImageBehavior = false;
             // 
@@ -325,7 +324,7 @@
             // 
             this.listView1.Location = new System.Drawing.Point(10, 32);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(176, 320);
+            this.listView1.Size = new System.Drawing.Size(176, 132);
             this.listView1.TabIndex = 8;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
@@ -333,7 +332,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(964, 707);
+            this.ClientSize = new System.Drawing.Size(964, 547);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.pluginsGroupBox);
             this.Controls.Add(this.btnCancel);

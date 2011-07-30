@@ -31,6 +31,7 @@ namespace pGina.Configuration
             Framework.Init();
             InitializeComponent();
             InitPluginsDGV();
+            PopulatePluginDirs();
             RefreshPluginList();
         }
 
