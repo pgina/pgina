@@ -15,8 +15,10 @@ namespace pGina.Configuration
 {
     public partial class Configuration : Form
     {
+        // Plugin information keyed by Guid
         private Dictionary<string, IPluginBase> m_plugins = new Dictionary<string,IPluginBase>();
 
+        private static readonly string PLUGIN_UUID_COLUMN = "Uuid";
         private static readonly string PLUGIN_NAME_COLUMN = "Name";
         private static readonly string AUTH_UI_COLUMN = "UI";
         private static readonly string AUTHENTICATION_COLUMN = "Authentication";
@@ -42,6 +44,11 @@ namespace pGina.Configuration
             pluginsDG.MultiSelect = false;
             pluginsDG.AllowUserToAddRows = false;
 
+            pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                Name = PLUGIN_UUID_COLUMN,
+                Visible = false
+            });
             pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 Name = PLUGIN_NAME_COLUMN,
@@ -114,9 +121,9 @@ namespace pGina.Configuration
             for(int i = 0; i < plugins.Count; i++ )
             {
                 IPluginBase p = plugins[i];
-                this.m_plugins.Add(p.Name, p);
+                this.m_plugins.Add(p.Uuid.ToString(), p);
                 pluginsDG.Rows.Add(
-                    new object[] { p.Name, false, false, false, false, false, false, false });
+                    new object[] { p.Uuid.ToString(), p.Name, false, false, false, false, false, false, false });
                 DataGridViewRow row = pluginsDG.Rows[i];
 
                 this.SetupCheckBoxCell<IPluginAuthenticationUI>(row.Cells[AUTH_UI_COLUMN], p);
@@ -149,7 +156,7 @@ namespace pGina.Configuration
             // if not, we draw over the checkbox.
             if (e != null && sender != null)
             {
-                if (e.RowIndex >= 0 && e.ColumnIndex > 0 && 
+                if (e.RowIndex >= 0 && e.ColumnIndex > 1 && 
                     pluginsDG[e.ColumnIndex, e.RowIndex].ReadOnly )
                 {
                     e.PaintBackground(e.CellBounds, true);
@@ -193,7 +200,7 @@ namespace pGina.Configuration
             {
                 try
                 {
-                    IPluginBase p = m_plugins[(string)row.Cells[PLUGIN_NAME_COLUMN].Value];
+                    IPluginBase p = m_plugins[(string)row.Cells[PLUGIN_UUID_COLUMN].Value];
                     int mask = 0;
 
                     if (Convert.ToBoolean(row.Cells[AUTH_UI_COLUMN].Value))
@@ -274,8 +281,8 @@ namespace pGina.Configuration
             if (nSelectedRows > 0)
             {
                 DataGridViewRow row = pluginsDG.SelectedRows[0];
-                string pluginName = (string)row.Cells[PLUGIN_NAME_COLUMN].Value;
-                IPluginBase plug = this.m_plugins[pluginName];
+                string pluginUuid = (string)row.Cells[PLUGIN_UUID_COLUMN].Value;
+                IPluginBase plug = this.m_plugins[pluginUuid];
 
                 if (plug is IPluginConfiguration)
                 {
@@ -291,8 +298,8 @@ namespace pGina.Configuration
             if (nSelectedRows > 0)
             {
                 DataGridViewRow row = pluginsDG.SelectedRows[0];
-                string pluginName = (string)row.Cells[PLUGIN_NAME_COLUMN].Value;
-                IPluginBase plug = this.m_plugins[pluginName];
+                string pluginUuid = (string)row.Cells[PLUGIN_UUID_COLUMN].Value;
+                IPluginBase plug = this.m_plugins[pluginUuid];
 
                 configureButton.Enabled = plug is IPluginConfiguration;
             }
@@ -304,8 +311,8 @@ namespace pGina.Configuration
             if (nSelectedRows > 0)
             {
                 DataGridViewRow row = pluginsDG.SelectedRows[0];
-                string pluginName = (string)row.Cells[PLUGIN_NAME_COLUMN].Value;
-                IPluginBase plug = this.m_plugins[pluginName];
+                string pluginUuid = (string)row.Cells[PLUGIN_UUID_COLUMN].Value;
+                IPluginBase plug = this.m_plugins[pluginUuid];
 
                 PluginInfoForm dialog = new PluginInfoForm();
                 dialog.Plugin = plug;
