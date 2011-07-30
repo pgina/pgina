@@ -109,30 +109,41 @@ namespace pGina.Configuration
 
         private void RefreshPluginList()
         {
-            // Get plugins
-            PluginLoader loader = new PluginLoader();
-            loader.PluginDirectories = Settings.Get.PluginDirectories;
-            loader.Load();
-            List<IPluginBase> plugins = loader.AllPlugins;
-            
             m_plugins.Clear();
             pluginsDG.Rows.Clear();
 
-            for(int i = 0; i < plugins.Count; i++ )
+            // Get the plugin directories from the list
+            List<string> pluginDirs = new List<string>();
+            foreach (ListViewItem item in lstPluginDirs.Items)
             {
-                IPluginBase p = plugins[i];
-                this.m_plugins.Add(p.Uuid.ToString(), p);
-                pluginsDG.Rows.Add(
-                    new object[] { p.Uuid.ToString(), p.Name, false, false, false, false, false, false, false });
-                DataGridViewRow row = pluginsDG.Rows[i];
+                if (!pluginDirs.Contains((string)item.Tag))
+                    pluginDirs.Add((string)item.Tag);
+            }
 
-                this.SetupCheckBoxCell<IPluginAuthenticationUI>(row.Cells[AUTH_UI_COLUMN], p);
-                this.SetupCheckBoxCell<IPluginAuthentication>(row.Cells[AUTHENTICATION_COLUMN], p);
-                this.SetupCheckBoxCell<IPluginAuthorization>(row.Cells[AUTHORIZATION_COLUMN], p);
-                this.SetupCheckBoxCell<IPluginAuthenticationGateway>(row.Cells[GATEWAY_COLUMN], p);
-                this.SetupCheckBoxCell<IPluginEventNotifications>(row.Cells[NOTIFICATION_COLUMN], p);
-                this.SetupCheckBoxCell<IPluginUserSessionHelper>(row.Cells[USER_SESSION_COLUMN], p);
-                this.SetupCheckBoxCell<IPluginSystemSessionHelper>(row.Cells[SYSTEM_SESSION_COLUMN], p);
+            if (pluginDirs.Count > 0)
+            {
+                // Get plugins
+                PluginLoader loader = new PluginLoader();
+                loader.PluginDirectories = pluginDirs.ToArray();
+                loader.Load();
+                List<IPluginBase> plugins = loader.AllPlugins;
+
+                for (int i = 0; i < plugins.Count; i++)
+                {
+                    IPluginBase p = plugins[i];
+                    this.m_plugins.Add(p.Uuid.ToString(), p);
+                    pluginsDG.Rows.Add(
+                        new object[] { p.Uuid.ToString(), p.Name, false, false, false, false, false, false, false });
+                    DataGridViewRow row = pluginsDG.Rows[i];
+
+                    this.SetupCheckBoxCell<IPluginAuthenticationUI>(row.Cells[AUTH_UI_COLUMN], p);
+                    this.SetupCheckBoxCell<IPluginAuthentication>(row.Cells[AUTHENTICATION_COLUMN], p);
+                    this.SetupCheckBoxCell<IPluginAuthorization>(row.Cells[AUTHORIZATION_COLUMN], p);
+                    this.SetupCheckBoxCell<IPluginAuthenticationGateway>(row.Cells[GATEWAY_COLUMN], p);
+                    this.SetupCheckBoxCell<IPluginEventNotifications>(row.Cells[NOTIFICATION_COLUMN], p);
+                    this.SetupCheckBoxCell<IPluginUserSessionHelper>(row.Cells[USER_SESSION_COLUMN], p);
+                    this.SetupCheckBoxCell<IPluginSystemSessionHelper>(row.Cells[SYSTEM_SESSION_COLUMN], p);
+                }
             }
         }
 
@@ -230,6 +241,7 @@ namespace pGina.Configuration
         private void SaveSettings()
         {
             this.SavePluginSettings();
+            this.SavePluginDirs();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -261,6 +273,7 @@ namespace pGina.Configuration
                     item.Tag = path;
                     lstPluginDirs.Items.Add(item);
                 }
+                this.RefreshPluginList();
             }
         }
 
@@ -272,6 +285,7 @@ namespace pGina.Configuration
                 {
                     lstPluginDirs.Items.Remove(item);
                 }
+                this.RefreshPluginList();
             }
         }
 
