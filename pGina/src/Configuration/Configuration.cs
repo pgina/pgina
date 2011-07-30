@@ -164,7 +164,7 @@ namespace pGina.Configuration
             string[] pluginDirectories = Settings.Get.PluginDirectories;
             lstPluginDirs.Columns.Clear();
             lstPluginDirs.Columns.Add("Directory");
-            lstPluginDirs.Columns[0].Width = lstPluginDirs.Width;
+            lstPluginDirs.Columns[0].Width = lstPluginDirs.Width - 5;
             lstPluginDirs.Items.Clear();
 
             foreach (string dir in pluginDirectories)
