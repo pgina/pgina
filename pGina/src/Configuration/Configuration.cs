@@ -33,7 +33,35 @@ namespace pGina.Configuration
             InitializeComponent();
             InitPluginsDGV();
             PopulatePluginDirs();
+            InitOrderLists();
             RefreshPluginList();
+        }
+
+        private void InitOrderLists()
+        {
+            InitPluginOrderDGV(this.authenticateDGV);
+            InitPluginOrderDGV(this.authorizeDGV);
+            InitPluginOrderDGV(this.gatewayDGV);
+        }
+
+        private void InitPluginOrderDGV(DataGridView dgv)
+        {
+            dgv.RowHeadersVisible = false;
+            dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgv.MultiSelect = false;
+            dgv.AllowUserToAddRows = false;
+            dgv.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                Name = PLUGIN_UUID_COLUMN,
+                Visible = false
+            });
+            dgv.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                Name = PLUGIN_NAME_COLUMN,
+                HeaderText = "Plugin",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                ReadOnly = true
+            });
         }
 
         private void InitPluginsDGV()
@@ -126,7 +154,7 @@ namespace pGina.Configuration
                     IPluginBase p = plugins[i];
                     this.m_plugins.Add(p.Uuid.ToString(), p);
                     pluginsDG.Rows.Add(
-                        new object[] { p.Uuid.ToString(), p.Name, false, false, false, false, false, false, false });
+                        new object[] { p.Uuid.ToString(), p.Name, false, false, false, false, false, false });
                     DataGridViewRow row = pluginsDG.Rows[i];
                     
                     this.SetupCheckBoxCell<IPluginAuthentication>(row.Cells[AUTHENTICATION_COLUMN], p);
