@@ -10,6 +10,7 @@ using System.IO;
 
 using log4net;
 
+using pGina.Shared.Types;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Settings;
 

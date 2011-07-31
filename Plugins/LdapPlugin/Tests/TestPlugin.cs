@@ -9,6 +9,7 @@ using Xunit;
 using pGina.Plugin.Ldap;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Settings;
+using pGina.Shared.Types;
 
 namespace pGina.Plugin.Ldap.Tests
 {

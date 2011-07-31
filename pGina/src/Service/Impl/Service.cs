@@ -17,8 +17,7 @@ namespace pGina.Service.Impl
 {
     public class Service
     {
-        private ILog m_logger = LogManager.GetLogger("pGina.Service.Impl");
-        private PluginLoader m_pluginLoader = new PluginLoader();
+        private ILog m_logger = LogManager.GetLogger("pGina.Service.Impl");        
 
         static Service()
         {
@@ -37,11 +36,11 @@ namespace pGina.Service.Impl
         public void Start()
         {
             m_logger.DebugFormat("Loading plugins");
-            m_pluginLoader.PluginDirectories = Core.Settings.Get.PluginDirectories;
-            m_pluginLoader.Load();
+            PluginLoader.PluginDirectories = Core.Settings.Get.PluginDirectories;
+            PluginLoader.LoadPlugins();
 
             m_logger.DebugFormat("Plugins loaded, list follows: ");
-            foreach (IPluginBase plugin in m_pluginLoader.AllPlugins)
+            foreach (IPluginBase plugin in PluginLoader.AllPlugins)
             {
                 m_logger.DebugFormat("  {0} -> {1}", plugin.Name, plugin.Uuid.ToString());
             }            

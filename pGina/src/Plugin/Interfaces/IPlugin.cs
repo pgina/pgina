@@ -11,15 +11,7 @@ namespace pGina.Shared.Interfaces
         string Version { get; }
         Guid Uuid { get; }
     }
-
-    // Helper type, allows calls to return success/failure as well as a message
-    //  to show the user on failure.
-    public struct BooleanResult
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; }
-    }
-
+    
     // Plugins which wish to integrate with the pGina configuration/Plugin
     // management UI must implement this interface
     public interface IPluginConfiguration : IPluginBase
@@ -32,7 +24,7 @@ namespace pGina.Shared.Interfaces
     //  must succeed for the login process to continue.
     public interface IPluginAuthentication : IPluginBase
     {
-        BooleanResult AuthenticateUser(Types.SessionProperties properties);
+        Types.BooleanResult AuthenticateUser(Types.SessionProperties properties);
     }
 
     // Plugins that want to validate a users access (not identity per-se) must
@@ -40,16 +32,17 @@ namespace pGina.Shared.Interfaces
     //  must succeed for the login process to continue.
     public interface IPluginAuthorization : IPluginBase
     {
-        BooleanResult AuthorizeUser(Types.SessionProperties properties);
+        Types.BooleanResult AuthorizeUser(Types.SessionProperties properties);
     }
 
     // Plugins that want to be involved in account management (post-auth*) 
-    //  must implement this interface.  
+    //  must implement this interface.  All plugins which implement this interface
+    //  must succeed for the login process to continue.
     public interface IPluginAuthenticationGateway : IPluginBase
     {
-        // User has been authenticated and authorized (trackingToken from AuthenticateUser will match) - now
+        // User has been authenticated and authorized - now
         //  is your chance to do other accounting/management before the user's login is successful.        
-        void AuthenticatedUserGateway(Types.SessionProperties properties);
+        Types.BooleanResult AuthenticatedUserGateway(Types.SessionProperties properties);
     }
     
     // Plugins that want notification of events as they occur must implement

@@ -47,10 +47,12 @@
   <ItemGroup>
     <Compile Include="Settings\DynamicSetting.cs" />
     <Compile Include="Settings\DynamicSettings.cs" />
+    <Compile Include="Types\BooleanResult.cs" />
     <Compile Include="Types\GroupInformation.cs" />
     <Compile Include="Interfaces\IPlugin.cs" />
     <Compile Include="Logging\Logging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Types\PluginActivityInformation.cs" />
     <Compile Include="Types\SessionProperties.cs" />
     <Compile Include="Types\UserInformation.cs" />
   </ItemGroup>
