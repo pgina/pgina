@@ -93,11 +93,20 @@
     <Compile Include="Configuration.Designer.cs">
       <DependentUpon>Configuration.cs</DependentUpon>
     </Compile>
+    <Compile Include="PluginInfoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PluginInfoForm.Designer.cs">
+      <DependentUpon>PluginInfoForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="PluginPage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Configuration.resx">
       <DependentUpon>Configuration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PluginInfoForm.resx">
+      <DependentUpon>PluginInfoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -152,6 +161,12 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UpArrowSolid.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DownArrowSolid.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

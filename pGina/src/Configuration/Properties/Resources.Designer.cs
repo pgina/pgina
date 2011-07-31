@@ -59,5 +59,19 @@ namespace pGina.Configuration.Properties {
                 resourceCulture = value;
             }
         }
+        
+        internal static System.Drawing.Bitmap DownArrowSolid {
+            get {
+                object obj = ResourceManager.GetObject("DownArrowSolid", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap UpArrowSolid {
+            get {
+                object obj = ResourceManager.GetObject("UpArrowSolid", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }
