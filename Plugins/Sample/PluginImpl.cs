@@ -76,6 +76,11 @@ namespace pGina.Plugin.Sample
             get { return m_settings.Description; }
         }
 
+        public string Version
+        {
+            get { return "1.0.0"; }
+        }
+
         public Guid Uuid
         {
             get { return SimpleUuid; }

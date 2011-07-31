@@ -8,6 +8,7 @@ namespace pGina.Shared.Interfaces
     {
         string Name { get; }
         string Description { get; }
+        string Version { get; }
         Guid Uuid { get; }
     }
 

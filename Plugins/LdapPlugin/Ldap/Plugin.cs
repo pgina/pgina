@@ -62,6 +62,11 @@ namespace pGina.Plugin.Ldap
             get { return "A plugin that authenticates logins via an LDAP server."; }
         }
 
+        public string Version
+        {
+            get { return "1.0.0"; }
+        }
+
         public Guid Uuid
         {
             get { return LdapUuid; }

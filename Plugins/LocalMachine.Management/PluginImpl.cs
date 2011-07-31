@@ -34,6 +34,11 @@ namespace pGina.Plugin.LocalMachine.Management
             get { return "Manages local machine accounts to match authenticated users"; }
         }
 
+        public string Version
+        {
+            get { return "1.0.0"; }
+        }
+
         public Guid Uuid
         {
             get { return new Guid("{12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D}"); }      // May be used for explicit ordering in the future
