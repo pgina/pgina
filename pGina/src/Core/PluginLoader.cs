@@ -33,6 +33,19 @@ namespace pGina.Core
             get { return m_pluginDirectories; }
             set { m_pluginDirectories = value; }
         }
+
+        public static void Init()
+        {
+            m_logger.DebugFormat("Initializing");
+            PluginDirectories = Core.Settings.Get.PluginDirectories;
+            PluginLoader.LoadPlugins();
+
+            m_logger.DebugFormat("Plugins loaded, list follows: ");
+            foreach (IPluginBase plugin in PluginLoader.AllPlugins)
+            {
+                m_logger.DebugFormat("  {0} -> {1}", plugin.Name, plugin.Uuid.ToString());
+            }            
+        }
         
         public static void LoadPlugins()
         {
@@ -67,6 +80,7 @@ namespace pGina.Core
                 {
                     // Load the assembly up
                     Assembly assembly = Assembly.LoadFile(file);
+                    
                     foreach (Type type in assembly.GetTypes())
                     {
                         // Make sure its a public class

@@ -14,6 +14,7 @@ namespace pGina.Core
         {            
             Logging.Init();
             Settings.Init();
+            PluginLoader.Init();
         }
     }
 }

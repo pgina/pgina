@@ -35,15 +35,7 @@ namespace pGina.Service.Impl
 
         public void Start()
         {
-            m_logger.DebugFormat("Loading plugins");
-            PluginLoader.PluginDirectories = Core.Settings.Get.PluginDirectories;
-            PluginLoader.LoadPlugins();
-
-            m_logger.DebugFormat("Plugins loaded, list follows: ");
-            foreach (IPluginBase plugin in PluginLoader.AllPlugins)
-            {
-                m_logger.DebugFormat("  {0} -> {1}", plugin.Name, plugin.Uuid.ToString());
-            }            
+            
         }
     }
 }
