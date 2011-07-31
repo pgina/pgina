@@ -15,7 +15,7 @@ namespace pGina.Core
         public static dynamic Get
         {
             get { return s_settings; }
-        }
+        }        
         
         public static void Init()
         {

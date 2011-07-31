@@ -11,11 +11,11 @@ using pGina.Shared.Interfaces;
 
 namespace pGina.Core
 {    
-    public class PluginLoader
+    public static class PluginLoader
     {
-        private string[] m_pluginDirectories = null;
-        private List<IPluginBase> m_plugins = new List<IPluginBase>();
-        private ILog m_logger = LogManager.GetLogger("PluginLoader");
+        private static string[] m_pluginDirectories = null;
+        private static List<IPluginBase> m_plugins = new List<IPluginBase>();
+        private static ILog m_logger = LogManager.GetLogger("PluginLoader");
 
         public enum State
         {
@@ -28,22 +28,26 @@ namespace pGina.Core
             SystemSessionEnabled = 1 << 6,
         }
 
-        public string[] PluginDirectories
+        public static string[] PluginDirectories
         {
             get { return m_pluginDirectories; }
             set { m_pluginDirectories = value; }
         }
 
-        public PluginLoader(string[] dirs)
+        public static void Init()
         {
-            m_pluginDirectories = dirs;
-        }
+            m_logger.DebugFormat("Initializing");
+            PluginDirectories = Core.Settings.Get.PluginDirectories;
+            PluginLoader.LoadPlugins();
 
-        public PluginLoader()
-        {
+            m_logger.DebugFormat("Plugins loaded, list follows: ");
+            foreach (IPluginBase plugin in PluginLoader.AllPlugins)
+            {
+                m_logger.DebugFormat("  {0} -> {1}", plugin.Name, plugin.Uuid.ToString());
+            }            
         }
-
-        public void Load()
+        
+        public static void LoadPlugins()
         {
             m_plugins.Clear();
             
@@ -59,7 +63,7 @@ namespace pGina.Core
             }
         }
 
-        private void LoadPluginsFromDir(string dir)
+        private static void LoadPluginsFromDir(string dir)
         {
             if (!Directory.Exists(dir))
             {
@@ -76,6 +80,7 @@ namespace pGina.Core
                 {
                     // Load the assembly up
                     Assembly assembly = Assembly.LoadFile(file);
+                    
                     foreach (Type type in assembly.GetTypes())
                     {
                         // Make sure its a public class
@@ -101,12 +106,12 @@ namespace pGina.Core
             }
         }
 
-        public List<IPluginBase> AllPlugins
+        public static List<IPluginBase> AllPlugins
         {
             get { return m_plugins; }
         }
 
-        public List<T> GetPluginsOfType<T>(bool enabledOnly) where T : class, IPluginBase
+        public static List<T> GetPluginsOfType<T>(bool enabledOnly) where T : class, IPluginBase
         {
             List<T> pluginList = new List<T>();
             foreach (IPluginBase plugin in m_plugins)
@@ -163,12 +168,12 @@ namespace pGina.Core
             return IsEnabledFor<T>(pluginMask);
         }
 
-        public List<IPluginConfiguration> GetConfigurablePlugins()
+        public static List<IPluginConfiguration> GetConfigurablePlugins()
         {
             return GetPluginsOfType<IPluginConfiguration>(false);
         }
 
-        public List<T> GetOrderedPluginsOfType<T>() where T : class, IPluginBase
+        public static List<T> GetOrderedPluginsOfType<T>() where T : class, IPluginBase
         {
             List<T> loadedPlugins = GetPluginsOfType<T>(true);
 

@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PluginDriver.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Init.cs" />
     <Compile Include="PluginLoader.cs" />

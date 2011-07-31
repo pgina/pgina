@@ -144,10 +144,9 @@ namespace pGina.Configuration
             if (pluginDirs.Count > 0)
             {
                 // Get plugins
-                PluginLoader loader = new PluginLoader();
-                loader.PluginDirectories = pluginDirs.ToArray();
-                loader.Load();
-                List<IPluginBase> plugins = loader.AllPlugins;
+                PluginLoader.PluginDirectories = pluginDirs.ToArray();
+                PluginLoader.LoadPlugins();
+                List<IPluginBase> plugins = PluginLoader.AllPlugins;
 
                 for (int i = 0; i < plugins.Count; i++)
                 {
