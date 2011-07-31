@@ -16,8 +16,16 @@ namespace pGina.Core
         public PluginDriver()
         {
             m_properties = new SessionProperties(m_sessionId);
+
+            // Add the user information object we'll be using for this session
             UserInformation userInfo = new UserInformation();
             m_properties.AddTrackedSingle<UserInformation>(userInfo);
+
+            // Add the group information object we'll be using for this session
+            GroupInformation groupInfo = new GroupInformation();
+            m_properties.AddTrackedSingle<GroupInformation>(groupInfo);
+
+            // Add the plugin tracking object we'll be using for this session
             PluginActivityInformation pluginInfo = new PluginActivityInformation();
             m_properties.AddTrackedSingle<PluginActivityInformation>(pluginInfo);
         }
