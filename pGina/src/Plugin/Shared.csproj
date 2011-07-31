@@ -45,9 +45,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuthenticationUI\Elements.cs" />
-    <Compile Include="AuthenticationUI\ImageElement.cs" />
-    <Compile Include="AuthenticationUI\TextElements.cs" />
     <Compile Include="Settings\DynamicSetting.cs" />
     <Compile Include="Settings\DynamicSettings.cs" />
     <Compile Include="Types\GroupInformation.cs" />

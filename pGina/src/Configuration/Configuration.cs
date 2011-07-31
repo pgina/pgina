@@ -19,8 +19,7 @@ namespace pGina.Configuration
         private Dictionary<string, IPluginBase> m_plugins = new Dictionary<string,IPluginBase>();
 
         private static readonly string PLUGIN_UUID_COLUMN = "Uuid";
-        private static readonly string PLUGIN_NAME_COLUMN = "Name";
-        private static readonly string AUTH_UI_COLUMN = "UI";
+        private static readonly string PLUGIN_NAME_COLUMN = "Name";        
         private static readonly string AUTHENTICATION_COLUMN = "Authentication";
         private static readonly string AUTHORIZATION_COLUMN = "Authorization";
         private static readonly string GATEWAY_COLUMN = "Gateway";
@@ -56,12 +55,6 @@ namespace pGina.Configuration
                 Width = 250,
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
                 ReadOnly = true
-            });
-            pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
-            {
-                Name = AUTH_UI_COLUMN,
-                HeaderText = "UI",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
@@ -135,8 +128,7 @@ namespace pGina.Configuration
                     pluginsDG.Rows.Add(
                         new object[] { p.Uuid.ToString(), p.Name, false, false, false, false, false, false, false });
                     DataGridViewRow row = pluginsDG.Rows[i];
-
-                    this.SetupCheckBoxCell<IPluginAuthenticationUI>(row.Cells[AUTH_UI_COLUMN], p);
+                    
                     this.SetupCheckBoxCell<IPluginAuthentication>(row.Cells[AUTHENTICATION_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginAuthorization>(row.Cells[AUTHORIZATION_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginAuthenticationGateway>(row.Cells[GATEWAY_COLUMN], p);
@@ -214,8 +206,6 @@ namespace pGina.Configuration
                     IPluginBase p = m_plugins[(string)row.Cells[PLUGIN_UUID_COLUMN].Value];
                     int mask = 0;
 
-                    if (Convert.ToBoolean(row.Cells[AUTH_UI_COLUMN].Value))
-                        mask |= (int)Core.PluginLoader.State.UIEnabled;
                     if (Convert.ToBoolean(row.Cells[AUTHENTICATION_COLUMN].Value))
                         mask |= (int)Core.PluginLoader.State.AuthenticateEnabled;
                     if (Convert.ToBoolean(row.Cells[AUTHORIZATION_COLUMN].Value))

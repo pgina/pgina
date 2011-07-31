@@ -26,21 +26,13 @@ namespace pGina.Shared.Interfaces
     {
         void Configure();
     }
-
-    // Plugins that want to customize what fields are shown on the login 
-    //  screen must implement this interface
-    public interface IPluginAuthenticationUI : IPluginBase
-    {        
-        void SetupUI(List<AuthenticationUI.Element> elements);
-    }
-
+    
     // Plugins that want to be available for use in authentication must
-    //  implement this interface.  Changes to the UI element values will 
-    //  be passed along to subsequent plugins.  At least one plugin
+    //  implement this interface.  At least one plugin
     //  must succeed for the login process to continue.
     public interface IPluginAuthentication : IPluginBase
     {
-        BooleanResult AuthenticateUser(AuthenticationUI.Element[] values, Guid trackingToken);
+        BooleanResult AuthenticateUser(Types.SessionProperties properties);
     }
 
     // Plugins that want to validate a users access (not identity per-se) must
@@ -48,7 +40,7 @@ namespace pGina.Shared.Interfaces
     //  must succeed for the login process to continue.
     public interface IPluginAuthorization : IPluginBase
     {
-        BooleanResult AuthorizeUser(AuthenticationUI.Element[] values, Guid trackingToken);
+        BooleanResult AuthorizeUser(Types.SessionProperties properties);
     }
 
     // Plugins that want to be involved in account management (post-auth*) 
@@ -57,7 +49,7 @@ namespace pGina.Shared.Interfaces
     {
         // User has been authenticated and authorized (trackingToken from AuthenticateUser will match) - now
         //  is your chance to do other accounting/management before the user's login is successful.        
-        void AuthenticatedUserGateway(AuthenticationUI.Element[] values, Types.UserInformation userData, Guid trackingToken);                
+        void AuthenticatedUserGateway(Types.SessionProperties properties);
     }
     
     // Plugins that want notification of events as they occur must implement

@@ -99,7 +99,6 @@
     <Compile Include="PluginInfoForm.Designer.cs">
       <DependentUpon>PluginInfoForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PluginPage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Configuration.resx">

@@ -5,58 +5,60 @@ using System.Text;
 
 namespace pGina.Shared.Types
 {
-    public static class SessionProperties
+    public class SessionProperties
     {
-        private static Dictionary<Guid, Dictionary<string, object>> s_sessionDictionary = new Dictionary<Guid, Dictionary<string, object>>();
-        private static object s_mutex = new object();
-
-        // Called by pGina before the IAuth* plugins are called
-        public static void StartSessionTracking(Guid newGuid)
+        private Dictionary<string, object> m_sessionDictionary = new Dictionary<string, object>();
+        private Guid m_sessionId = Guid.Empty;
+        public Guid Id
         {
-            lock(s_mutex)
+            get { return m_sessionId; }
+        }
+
+        public SessionProperties(Guid sessionId)
+        {
+            m_sessionId = sessionId;
+            AddTrackedObject("SessionId", new Guid(m_sessionId.ToString()));
+        }
+
+        public void AddTracked<T>(string name, T value)
+        {
+            AddTrackedObject(name, value);
+        }
+
+        public void AddTrackedSingle<T>(T value)
+        {
+            AddTrackedObject(typeof(T).ToString(), value);
+        }
+
+        public void AddTrackedObject(string name, object value)
+        {
+            lock(this)
             {
-                if(!s_sessionDictionary.ContainsKey(newGuid))
-                    s_sessionDictionary.Add(newGuid, new Dictionary<string,object>());
+                if (!m_sessionDictionary.ContainsKey(name))
+                    m_sessionDictionary.Add(name, value);
                 else
-                    s_sessionDictionary[newGuid].Clear();            
+                    m_sessionDictionary[name] = value;
             }
         }
 
-        // Called by pGina after all plugins are called
-        public static void StopSessionTracking(Guid newGuid)
+        public T GetTracked<T>(string name)
         {
-            lock(s_mutex)
+            return (T)GetTrackedObject(name);
+        }
+
+        public T GetTrackedSingle<T>()
+        {
+            return GetTracked<T>(typeof(T).ToString());
+        }
+
+        public object GetTrackedObject(string name)
+        {
+            lock(this)
             {
-                if(s_sessionDictionary.ContainsKey(newGuid))
-                    s_sessionDictionary.Remove(newGuid);
-            }
-        }
+                if(!m_sessionDictionary.ContainsKey(name))
+                    throw new KeyNotFoundException(string.Format("No tracked variable {0} in session {1}", name, m_sessionId));
 
-        public static void AddTrackedObject(Guid trackedGuid, string name, object value)
-        {
-            lock(s_mutex)
-            {            
-                if(!s_sessionDictionary.ContainsKey(trackedGuid))
-                    throw new KeyNotFoundException(string.Format("No tracked session for: {0}", trackedGuid));
-
-                if(!s_sessionDictionary[trackedGuid].ContainsKey(name))
-                    s_sessionDictionary[trackedGuid].Add(name, value);
-                else
-                    s_sessionDictionary[trackedGuid][name] = value;
-            }
-        }
-
-        public static object GetTrackedObject(Guid trackedGuid, string name)
-        {
-            lock(s_mutex)
-            {
-                if(!s_sessionDictionary.ContainsKey(trackedGuid))
-                    throw new KeyNotFoundException(string.Format("No tracked session for: {0}", trackedGuid));
-
-                if(!s_sessionDictionary[trackedGuid].ContainsKey(name))
-                    throw new KeyNotFoundException(string.Format("No tracked variable {0} in session {1}", name, trackedGuid));
-
-                return s_sessionDictionary[trackedGuid][name];
+                return m_sessionDictionary[name];
             }
         }
     }

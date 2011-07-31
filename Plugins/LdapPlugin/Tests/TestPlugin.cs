@@ -8,7 +8,6 @@ using System.Reflection;
 using Xunit;
 using pGina.Plugin.Ldap;
 using pGina.Shared.Interfaces;
-using pGina.Shared.AuthenticationUI;
 using pGina.Shared.Settings;
 
 namespace pGina.Plugin.Ldap.Tests
@@ -25,21 +24,16 @@ namespace pGina.Plugin.Ldap.Tests
     public class TestPlugin :IUseFixture<Fixture>
     {
         private LdapPlugin plugIn;
-        private List<Element> elements;
-        private EditTextElement unameEl;
-        private PasswordTextElement passEl;
+        private Shared.Types.SessionProperties properties = new Shared.Types.SessionProperties(Guid.NewGuid());
+        private Shared.Types.UserInformation userInfo = new Shared.Types.UserInformation();
 
         public TestPlugin()
         {
-            // Setup the UI
-            elements = new List<Element>();
             plugIn = new LdapPlugin();
-            plugIn.SetupUI(elements);
 
-            // Store the username and password elements.
-            unameEl = (EditTextElement)elements[0];
-            passEl = (PasswordTextElement)elements[1];
-
+            // Add a UserInformation object as pGina would            
+            properties.AddTrackedSingle<Shared.Types.UserInformation>(userInfo);
+            
             dynamic settings = new DynamicSettings(LdapPlugin.LdapUuid);
 
             settings.LdapHost = new string[] { "192.168.51.100", "192.168.56.101" };
@@ -59,9 +53,9 @@ namespace pGina.Plugin.Ldap.Tests
         public void TestLogin01()
         {
             // Test a basic login.
-            unameEl.Text = "doej";
-            passEl.Text = "secret";
-            BooleanResult result = plugIn.AuthenticateUser(elements.ToArray(), new Guid());
+            userInfo.Username = "doej";
+            userInfo.Password = "secret";
+            BooleanResult result = plugIn.AuthenticateUser(properties);
 
             Assert.True( result.Success );
         }

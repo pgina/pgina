@@ -138,10 +138,7 @@ namespace pGina.Core
         {
             if (typeof(T) == typeof(IPluginAuthentication) && TestMask(mask, State.AuthenticateEnabled))
                 return true;
-
-            if (typeof(T) == typeof(IPluginAuthenticationUI) && TestMask(mask, State.UIEnabled))
-                return true;
-
+            
             if (typeof(T) == typeof(IPluginAuthorization) && TestMask(mask, State.AuthorizeEnabled))
                 return true;
 

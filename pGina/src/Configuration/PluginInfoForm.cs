@@ -25,6 +25,7 @@ namespace pGina.Configuration
             this.nameTextBox.Text = Plugin.Name;
             this.uuidTextBox.Text = Plugin.Uuid.ToString();
             this.descriptionTextBox.Text = Plugin.Description;
+            this.versionTextBox.Text = Plugin.Version;
         }
     }
 }
