@@ -34,14 +34,18 @@ namespace pGina.Configuration
             InitPluginsDGV();
             PopulatePluginDirs();
             InitOrderLists();
-            RefreshPluginList();
+            RefreshPluginLists();
         }
 
         private void InitOrderLists()
         {
+            // Setup the DataGridViews
             InitPluginOrderDGV(this.authenticateDGV);
             InitPluginOrderDGV(this.authorizeDGV);
             InitPluginOrderDGV(this.gatewayDGV);
+
+            // Load order lists from the registry
+            LoadPluginOrderListsFromReg();
         }
 
         private void InitPluginOrderDGV(DataGridView dgv)
@@ -126,9 +130,53 @@ namespace pGina.Configuration
             pluginsDG.CellPainting += this.pluginsDG_PaintCell;
 
             pluginsDG.SelectionChanged += this.pluginsDG_SelectionChanged;
+            pluginsDG.CurrentCellDirtyStateChanged += new EventHandler(pluginsDG_CurrentCellDirtyStateChanged);
+            pluginsDG.CellValueChanged += new DataGridViewCellEventHandler(pluginsDG_CellValueChanged);
         }
 
-        private void RefreshPluginList()
+        void pluginsDG_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex > 1 && e.RowIndex >= 0)
+            {
+                DataGridViewCell cell = this.pluginsDG[e.ColumnIndex, e.RowIndex];
+                string uuid = (string)this.pluginsDG.Rows[e.RowIndex].Cells[PLUGIN_UUID_COLUMN].Value;
+                IPluginBase plug = m_plugins[uuid];
+                bool checkBoxState = Convert.ToBoolean(cell.Value);
+                string columnName = pluginsDG.Columns[e.ColumnIndex].Name;
+
+                if (columnName == AUTHENTICATION_COLUMN)
+                {
+                    if (checkBoxState)
+                        this.AddToOrderList(plug, this.authenticateDGV);
+                    else
+                        this.RemoveFromOrderList(uuid, this.authenticateDGV);
+                }
+                if (columnName == AUTHORIZATION_COLUMN)
+                {
+                    if (checkBoxState)
+                        this.AddToOrderList(plug, this.authorizeDGV);
+                    else
+                        this.RemoveFromOrderList(uuid, this.authorizeDGV);
+                }
+                if (columnName == GATEWAY_COLUMN)
+                {
+                    if (checkBoxState)
+                        this.AddToOrderList(plug, this.gatewayDGV);
+                    else
+                        this.RemoveFromOrderList(uuid, this.gatewayDGV);
+                }
+            }
+        }
+
+        void pluginsDG_CurrentCellDirtyStateChanged(object sender, EventArgs e)
+        {
+            if (this.pluginsDG.IsCurrentCellDirty)
+            {
+                this.pluginsDG.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        }
+
+        private void RefreshPluginLists()
         {
             m_plugins.Clear();
             pluginsDG.Rows.Clear();
@@ -164,6 +212,8 @@ namespace pGina.Configuration
                     this.SetupCheckBoxCell<IPluginSystemSessionHelper>(row.Cells[SYSTEM_SESSION_COLUMN], p);
                 }
             }
+
+            UpdatePluginOrderListsFromUIState();           
         }
 
         private void SetupCheckBoxCell<T>(DataGridViewCell cell, IPluginBase plug) where T : IPluginBase
@@ -178,6 +228,126 @@ namespace pGina.Configuration
                 // checkbox so that it is not visible.
                 cell.ReadOnly = true;
             }
+        }
+
+        private void LoadPluginOrderListsFromReg()
+        {
+            this.authenticateDGV.Rows.Clear();
+            this.authorizeDGV.Rows.Clear();
+            this.gatewayDGV.Rows.Clear();
+
+            List<IPluginAuthentication> authenticatePlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthentication>();
+            List<IPluginAuthorization> authorizePlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthorization>();
+            List<IPluginAuthenticationGateway> gatewayPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthenticationGateway>();
+            
+            foreach (IPluginBase plug in authenticatePlugins)
+            {                
+                AddToOrderList(plug, this.authenticateDGV);
+            }
+
+            foreach (IPluginBase plug in authorizePlugins)
+            {
+                AddToOrderList(plug, this.authorizeDGV);
+            }
+
+            foreach (IPluginBase plug in gatewayPlugins)
+            {
+                AddToOrderList(plug, this.gatewayDGV);
+            }
+        }
+
+        private void UpdatePluginOrderListsFromUIState()
+        {
+            // Make sure that all checkboxes in the main plugin list agree with the ordered
+            // lists.
+            foreach (DataGridViewRow row in this.pluginsDG.Rows)
+            {
+                string uuid = (string)row.Cells[PLUGIN_UUID_COLUMN].Value;
+                IPluginBase plug = m_plugins[uuid];
+
+                if (!row.Cells[AUTHENTICATION_COLUMN].ReadOnly)
+                {
+                    bool enabledForAuthentication = (bool)row.Cells[AUTHENTICATION_COLUMN].Value;
+                    if (enabledForAuthentication)
+                        this.AddToOrderList(plug, this.authenticateDGV);
+                    else
+                        this.RemoveFromOrderList(uuid, this.authenticateDGV);
+                }
+
+                if (!row.Cells[AUTHORIZATION_COLUMN].ReadOnly)
+                {
+                    bool enabledForAuthorization = (bool)row.Cells[AUTHORIZATION_COLUMN].Value;
+                    if (enabledForAuthorization)
+                        this.AddToOrderList(plug, this.authorizeDGV);
+                    else
+                        this.RemoveFromOrderList(uuid, this.authorizeDGV);
+                }
+
+                if (!row.Cells[GATEWAY_COLUMN].ReadOnly)
+                {
+                    bool enabledForGateway = (bool)row.Cells[GATEWAY_COLUMN].Value;
+                    if (enabledForGateway)
+                        this.AddToOrderList(plug, this.gatewayDGV);
+                    else
+                        this.RemoveFromOrderList(uuid, this.gatewayDGV);
+                }
+            }
+
+            // Remove any plugins that are no longer in the main list from the
+            // ordered lists
+            this.RemoveAllNotInMainList(authorizeDGV);
+            this.RemoveAllNotInMainList(authenticateDGV);
+            this.RemoveAllNotInMainList(gatewayDGV);
+        }
+
+        private void RemoveAllNotInMainList(DataGridView dgv)
+        {
+            List<DataGridViewRow> toRemove = new List<DataGridViewRow>();
+            foreach (DataGridViewRow row in dgv.Rows)
+            {
+                if (!m_plugins.ContainsKey((string)row.Cells[PLUGIN_UUID_COLUMN].Value))
+                {
+                    toRemove.Add(row);
+                }
+            }
+            foreach (DataGridViewRow row in toRemove)
+                dgv.Rows.Remove(row);
+        }
+
+        private void RemoveFromOrderList(string uuid, DataGridView dgv)
+        {
+            foreach (DataGridViewRow row in dgv.Rows)
+            {
+                if ((string)row.Cells[PLUGIN_UUID_COLUMN].Value == uuid)
+                {
+                    dgv.Rows.Remove(row);
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds the plugin to the ordered list in the second parameter.  If the plugin
+        /// is already in the list, does nothing.
+        /// </summary>
+        /// <param name="plug">Plugin to add</param>
+        /// <param name="dgv">The ordered list to add to.</param>
+        private void AddToOrderList(IPluginBase plug, DataGridView dgv)
+        {
+            if (! viewContainsPlugin(dgv, plug.Uuid.ToString()) )
+            {
+                dgv.Rows.Add(new object[] { plug.Uuid.ToString(), plug.Name });
+            }
+        }
+
+        private bool viewContainsPlugin(DataGridView dgv, string plugUuid)
+        {
+            foreach (DataGridViewRow row in dgv.Rows)
+            {
+                if ((string)row.Cells[PLUGIN_UUID_COLUMN].Value == plugUuid)
+                    return true;
+            }
+            return false;
         }
 
         private void pluginsDG_PaintCell(object sender, DataGridViewCellPaintingEventArgs e)
@@ -255,10 +425,39 @@ namespace pGina.Configuration
             }
         }
 
+        private void SavePluginOrder()
+        {
+            List<string> orderedList = new List<string>();
+            string setting = typeof(IPluginAuthorization).Name + "_Order";
+            orderedList.Clear();
+            foreach (DataGridViewRow row in authorizeDGV.Rows)
+            {
+                orderedList.Add((string)row.Cells[PLUGIN_UUID_COLUMN].Value);
+            }
+            Settings.Get.SetSetting(setting, orderedList.ToArray<string>());
+
+            setting = typeof(IPluginAuthentication).Name + "_Order";
+            orderedList.Clear();
+            foreach (DataGridViewRow row in authenticateDGV.Rows)
+            {
+                orderedList.Add((string)row.Cells[PLUGIN_UUID_COLUMN].Value);
+            }
+            Settings.Get.SetSetting(setting, orderedList.ToArray<string>());
+
+            setting = typeof(IPluginAuthenticationGateway).Name + "_Order";
+            orderedList.Clear();
+            foreach (DataGridViewRow row in gatewayDGV.Rows)
+            {
+                orderedList.Add((string)row.Cells[PLUGIN_UUID_COLUMN].Value);
+            }
+            Settings.Get.SetSetting(setting, orderedList.ToArray<string>());
+        }
+
         private void SaveSettings()
         {
             this.SavePluginSettings();
             this.SavePluginDirs();
+            this.SavePluginOrder();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -290,7 +489,7 @@ namespace pGina.Configuration
                     item.Tag = path;
                     lstPluginDirs.Items.Add(item);
                 }
-                this.RefreshPluginList();
+                this.RefreshPluginLists();
             }
         }
 
@@ -302,7 +501,7 @@ namespace pGina.Configuration
                 {
                     lstPluginDirs.Items.Remove(item);
                 }
-                this.RefreshPluginList();
+                this.RefreshPluginLists();
             }
         }
 
@@ -351,5 +550,63 @@ namespace pGina.Configuration
             }
         }
 
+        private void authenticateBtnUp_Click(object sender, EventArgs e)
+        {
+            if (this.authenticateDGV.SelectedRows.Count > 0)
+                MoveUp(this.authenticateDGV, this.authenticateDGV.SelectedRows[0].Index);
+        }
+
+        private void authenticateBtnDown_Click(object sender, EventArgs e)
+        {
+            if (this.authenticateDGV.SelectedRows.Count > 0)
+                MoveDown(this.authenticateDGV, this.authenticateDGV.SelectedRows[0].Index);
+        }
+
+        private void authorizeBtnUp_Click(object sender, EventArgs e)
+        {
+            if (this.authorizeDGV.SelectedRows.Count > 0)
+                MoveUp(this.authorizeDGV, this.authorizeDGV.SelectedRows[0].Index);
+        }
+
+        private void authorizeBtnDown_Click(object sender, EventArgs e)
+        {
+            if (this.authorizeDGV.SelectedRows.Count > 0)
+                MoveDown(this.authorizeDGV, this.authorizeDGV.SelectedRows[0].Index);
+        }
+
+        private void gatewayBtnUp_Click(object sender, EventArgs e)
+        {
+            if (this.gatewayDGV.SelectedRows.Count > 0)
+                MoveUp(this.gatewayDGV, this.gatewayDGV.SelectedRows[0].Index);
+        }
+
+        private void gatewayBtnDown_Click(object sender, EventArgs e)
+        {
+            if (this.gatewayDGV.SelectedRows.Count > 0)
+                MoveDown(this.gatewayDGV, this.gatewayDGV.SelectedRows[0].Index);
+        }
+
+        private void MoveUp(DataGridView dgv, int index)
+        {
+            if (index > 0)
+            {
+                DataGridViewRow row = dgv.Rows[index];
+                dgv.Rows.RemoveAt(index);
+                dgv.Rows.Insert(index - 1, row);
+                dgv.Rows[index - 1].Selected = true;
+            }
+        }
+
+        private void MoveDown(DataGridView dgv, int index)
+        {
+            int rows = dgv.Rows.Count;
+            if (index < rows - 1)
+            {
+                DataGridViewRow row = dgv.Rows[index];
+                dgv.Rows.RemoveAt(index);
+                dgv.Rows.Insert(index + 1, row);
+                dgv.Rows[index + 1].Selected = true;
+            }
+        }
     }
 }

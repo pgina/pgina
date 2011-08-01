@@ -41,31 +41,31 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.gatewayDGV = new System.Windows.Forms.DataGridView();
             this.label3 = new System.Windows.Forms.Label();
             this.gatewayBtnDown = new System.Windows.Forms.Button();
             this.gatewayBtnUp = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.authenticateDGV = new System.Windows.Forms.DataGridView();
             this.label1 = new System.Windows.Forms.Label();
             this.authenticateBtnDown = new System.Windows.Forms.Button();
             this.authenticateBtnUp = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.authorizeDGV = new System.Windows.Forms.DataGridView();
             this.label2 = new System.Windows.Forms.Label();
             this.authorizeBtnUp = new System.Windows.Forms.Button();
             this.authorizeBtnDown = new System.Windows.Forms.Button();
-            this.authenticateDGV = new System.Windows.Forms.DataGridView();
-            this.authorizeDGV = new System.Windows.Forms.DataGridView();
-            this.gatewayDGV = new System.Windows.Forms.DataGridView();
             this.pluginsGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
-            this.panel3.SuspendLayout();
-            this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).BeginInit();
+            this.panel3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).BeginInit();
+            this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).BeginInit();
             this.SuspendLayout();
             // 
             // pluginsGroupBox
@@ -232,6 +232,16 @@
             this.panel1.Size = new System.Drawing.Size(304, 152);
             this.panel1.TabIndex = 22;
             // 
+            // gatewayDGV
+            // 
+            this.gatewayDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.gatewayDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gatewayDGV.Location = new System.Drawing.Point(5, 16);
+            this.gatewayDGV.Name = "gatewayDGV";
+            this.gatewayDGV.Size = new System.Drawing.Size(263, 136);
+            this.gatewayDGV.TabIndex = 22;
+            // 
             // label3
             // 
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.Top;
@@ -251,6 +261,7 @@
             this.gatewayBtnDown.Size = new System.Drawing.Size(26, 27);
             this.gatewayBtnDown.TabIndex = 17;
             this.gatewayBtnDown.UseVisualStyleBackColor = true;
+            this.gatewayBtnDown.Click += new System.EventHandler(this.gatewayBtnDown_Click);
             // 
             // gatewayBtnUp
             // 
@@ -261,6 +272,7 @@
             this.gatewayBtnUp.Size = new System.Drawing.Size(26, 27);
             this.gatewayBtnUp.TabIndex = 15;
             this.gatewayBtnUp.UseVisualStyleBackColor = true;
+            this.gatewayBtnUp.Click += new System.EventHandler(this.gatewayBtnUp_Click);
             // 
             // panel3
             // 
@@ -273,6 +285,16 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(303, 152);
             this.panel3.TabIndex = 20;
+            // 
+            // authenticateDGV
+            // 
+            this.authenticateDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.authenticateDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.authenticateDGV.Location = new System.Drawing.Point(0, 16);
+            this.authenticateDGV.Name = "authenticateDGV";
+            this.authenticateDGV.Size = new System.Drawing.Size(263, 136);
+            this.authenticateDGV.TabIndex = 20;
             // 
             // label1
             // 
@@ -293,6 +315,7 @@
             this.authenticateBtnDown.Size = new System.Drawing.Size(26, 27);
             this.authenticateBtnDown.TabIndex = 14;
             this.authenticateBtnDown.UseVisualStyleBackColor = true;
+            this.authenticateBtnDown.Click += new System.EventHandler(this.authenticateBtnDown_Click);
             // 
             // authenticateBtnUp
             // 
@@ -303,6 +326,7 @@
             this.authenticateBtnUp.Size = new System.Drawing.Size(26, 27);
             this.authenticateBtnUp.TabIndex = 13;
             this.authenticateBtnUp.UseVisualStyleBackColor = true;
+            this.authenticateBtnUp.Click += new System.EventHandler(this.authenticateBtnUp_Click);
             // 
             // panel2
             // 
@@ -315,6 +339,16 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(303, 152);
             this.panel2.TabIndex = 23;
+            // 
+            // authorizeDGV
+            // 
+            this.authorizeDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.authorizeDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.authorizeDGV.Location = new System.Drawing.Point(3, 16);
+            this.authorizeDGV.Name = "authorizeDGV";
+            this.authorizeDGV.Size = new System.Drawing.Size(263, 136);
+            this.authorizeDGV.TabIndex = 21;
             // 
             // label2
             // 
@@ -335,6 +369,7 @@
             this.authorizeBtnUp.Size = new System.Drawing.Size(26, 27);
             this.authorizeBtnUp.TabIndex = 16;
             this.authorizeBtnUp.UseVisualStyleBackColor = true;
+            this.authorizeBtnUp.Click += new System.EventHandler(this.authorizeBtnUp_Click);
             // 
             // authorizeBtnDown
             // 
@@ -345,36 +380,7 @@
             this.authorizeBtnDown.Size = new System.Drawing.Size(26, 27);
             this.authorizeBtnDown.TabIndex = 18;
             this.authorizeBtnDown.UseVisualStyleBackColor = true;
-            // 
-            // authenticateDGV
-            // 
-            this.authenticateDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.authenticateDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.authenticateDGV.Location = new System.Drawing.Point(0, 16);
-            this.authenticateDGV.Name = "authenticateDGV";
-            this.authenticateDGV.Size = new System.Drawing.Size(263, 136);
-            this.authenticateDGV.TabIndex = 20;
-            // 
-            // authorizeDGV
-            // 
-            this.authorizeDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.authorizeDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.authorizeDGV.Location = new System.Drawing.Point(3, 16);
-            this.authorizeDGV.Name = "authorizeDGV";
-            this.authorizeDGV.Size = new System.Drawing.Size(263, 136);
-            this.authorizeDGV.TabIndex = 21;
-            // 
-            // gatewayDGV
-            // 
-            this.gatewayDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.gatewayDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gatewayDGV.Location = new System.Drawing.Point(5, 16);
-            this.gatewayDGV.Name = "gatewayDGV";
-            this.gatewayDGV.Size = new System.Drawing.Size(263, 136);
-            this.gatewayDGV.TabIndex = 22;
+            this.authorizeBtnDown.Click += new System.EventHandler(this.authorizeBtnDown_Click);
             // 
             // Configuration
             // 
@@ -395,13 +401,13 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).EndInit();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).EndInit();
             this.ResumeLayout(false);
 
         }
