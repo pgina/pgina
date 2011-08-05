@@ -93,19 +93,19 @@
     <Compile Include="Configuration.Designer.cs">
       <DependentUpon>Configuration.cs</DependentUpon>
     </Compile>
-    <Compile Include="PluginInfoForm.cs">
+    <Compile Include="ConfigurationUI.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PluginInfoForm.Designer.cs">
-      <DependentUpon>PluginInfoForm.cs</DependentUpon>
+    <Compile Include="ConfigurationUI.Designer.cs">
+      <DependentUpon>ConfigurationUI.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Configuration.resx">
       <DependentUpon>Configuration.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PluginInfoForm.resx">
-      <DependentUpon>PluginInfoForm.cs</DependentUpon>
+    <EmbeddedResource Include="ConfigurationUI.resx">
+      <DependentUpon>ConfigurationUI.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

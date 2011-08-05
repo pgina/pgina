@@ -17,8 +17,10 @@ namespace pGina.Configuration
     {
         // Plugin information keyed by Guid
         private Dictionary<string, IPluginBase> m_plugins = new Dictionary<string,IPluginBase>();
-
+        
         private static readonly string PLUGIN_UUID_COLUMN = "Uuid";
+        private static readonly string PLUGIN_VERSION_COLUMN = "Version";
+        private static readonly string PLUGIN_DESC_COLUMN = "Description";
         private static readonly string PLUGIN_NAME_COLUMN = "Name";        
         private static readonly string AUTHENTICATION_COLUMN = "Authentication";
         private static readonly string AUTHORIZATION_COLUMN = "Authorization";
@@ -74,50 +76,50 @@ namespace pGina.Configuration
             pluginsDG.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             pluginsDG.MultiSelect = false;
             pluginsDG.AllowUserToAddRows = false;
-
-            pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                Name = PLUGIN_UUID_COLUMN,
-                Visible = false
-            });
+            
             pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 Name = PLUGIN_NAME_COLUMN,
                 HeaderText = "Plugin Name",
-                Width = 250,
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
                 ReadOnly = true
             });
+            
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
                 Name = AUTHENTICATION_COLUMN,
                 HeaderText = "Authentication",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
+
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
                 Name = AUTHORIZATION_COLUMN,
                 HeaderText = "Authorization",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
+
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
                 Name = GATEWAY_COLUMN,
                 HeaderText = "Gateway",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
+
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
                 Name = NOTIFICATION_COLUMN,
                 HeaderText = "Notification",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
+
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
                 Name = USER_SESSION_COLUMN,
                 HeaderText = "User Session",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
+
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
                 Name = SYSTEM_SESSION_COLUMN,
@@ -125,6 +127,31 @@ namespace pGina.Configuration
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
 
+
+            pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                Name = PLUGIN_DESC_COLUMN,
+                HeaderText = "Description",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+                ReadOnly = true
+            });
+
+            pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                Name = PLUGIN_VERSION_COLUMN,
+                HeaderText = "Version",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+                ReadOnly = true
+            });
+
+            pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                Name = PLUGIN_UUID_COLUMN,
+                HeaderText = "UUID",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+                ReadOnly = true
+            });
+            
             // Implement the cell paint event so that we can blank out cells
             // that shouldn't be there.
             pluginsDG.CellPainting += this.pluginsDG_PaintCell;
@@ -139,7 +166,7 @@ namespace pGina.Configuration
             if (e.ColumnIndex > 1 && e.RowIndex >= 0)
             {
                 DataGridViewCell cell = this.pluginsDG[e.ColumnIndex, e.RowIndex];
-                string uuid = (string)this.pluginsDG.Rows[e.RowIndex].Cells[PLUGIN_UUID_COLUMN].Value;
+                string uuid = (string) this.pluginsDG.Rows[e.RowIndex].Cells[PLUGIN_UUID_COLUMN].Value;                
                 IPluginBase plug = m_plugins[uuid];
                 bool checkBoxState = Convert.ToBoolean(cell.Value);
                 string columnName = pluginsDG.Columns[e.ColumnIndex].Name;
@@ -201,7 +228,7 @@ namespace pGina.Configuration
                     IPluginBase p = plugins[i];
                     this.m_plugins.Add(p.Uuid.ToString(), p);
                     pluginsDG.Rows.Add(
-                        new object[] { p.Uuid.ToString(), p.Name, false, false, false, false, false, false });
+                        new object[] { p.Name, false, false, false, false, false, false, p.Description, p.Version, p.Uuid.ToString() });
                     DataGridViewRow row = pluginsDG.Rows[i];
                     
                     this.SetupCheckBoxCell<IPluginAuthentication>(row.Cells[AUTHENTICATION_COLUMN], p);
@@ -209,7 +236,7 @@ namespace pGina.Configuration
                     this.SetupCheckBoxCell<IPluginAuthenticationGateway>(row.Cells[GATEWAY_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginEventNotifications>(row.Cells[NOTIFICATION_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginUserSessionHelper>(row.Cells[USER_SESSION_COLUMN], p);
-                    this.SetupCheckBoxCell<IPluginSystemSessionHelper>(row.Cells[SYSTEM_SESSION_COLUMN], p);
+                    this.SetupCheckBoxCell<IPluginSystemSessionHelper>(row.Cells[SYSTEM_SESSION_COLUMN], p);                    
                 }
             }
 
@@ -262,7 +289,7 @@ namespace pGina.Configuration
             // lists.
             foreach (DataGridViewRow row in this.pluginsDG.Rows)
             {
-                string uuid = (string)row.Cells[PLUGIN_UUID_COLUMN].Value;
+                string uuid = (string)row.Cells[PLUGIN_UUID_COLUMN].Value;                                
                 IPluginBase plug = m_plugins[uuid];
 
                 if (!row.Cells[AUTHENTICATION_COLUMN].ReadOnly)
@@ -356,9 +383,11 @@ namespace pGina.Configuration
             // if not, we draw over the checkbox.
             if (e != null && sender != null)
             {
-                if (e.RowIndex >= 0 && e.ColumnIndex > 1 && 
-                    pluginsDG[e.ColumnIndex, e.RowIndex].ReadOnly )
+                if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && 
+                    pluginsDG[e.ColumnIndex, e.RowIndex].ReadOnly &&
+                    pluginsDG[e.ColumnIndex, e.RowIndex].ValueType == typeof(bool))
                 {
+                    Type foo = pluginsDG[e.ColumnIndex, e.RowIndex].ValueType;
                     e.PaintBackground(e.CellBounds, true);
                     e.Handled = true;
                 }
@@ -534,22 +563,7 @@ namespace pGina.Configuration
                 configureButton.Enabled = plug is IPluginConfiguration;
             }
         }
-
-        private void pluginInfoButton_Click(object sender, EventArgs e)
-        {
-            int nSelectedRows = pluginsDG.SelectedRows.Count;
-            if (nSelectedRows > 0)
-            {
-                DataGridViewRow row = pluginsDG.SelectedRows[0];
-                string pluginUuid = (string)row.Cells[PLUGIN_UUID_COLUMN].Value;
-                IPluginBase plug = this.m_plugins[pluginUuid];
-
-                PluginInfoForm dialog = new PluginInfoForm();
-                dialog.Plugin = plug;
-                dialog.Show();
-            }
-        }
-
+        
         private void authenticateBtnUp_Click(object sender, EventArgs e)
         {
             if (this.authenticateDGV.SelectedRows.Count > 0)
