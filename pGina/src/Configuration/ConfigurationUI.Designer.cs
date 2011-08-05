@@ -31,13 +31,6 @@
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
             this.m_pluginConfigTab = new System.Windows.Forms.TabPage();
-            this.btnRemove = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.btnAdd = new System.Windows.Forms.Button();
-            this.lstPluginDirs = new System.Windows.Forms.ListView();
-            this.pluginsGroupBox = new System.Windows.Forms.GroupBox();
-            this.pluginsDG = new System.Windows.Forms.DataGridView();
-            this.configureButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -55,13 +48,17 @@
             this.label2 = new System.Windows.Forms.Label();
             this.authorizeBtnUp = new System.Windows.Forms.Button();
             this.authorizeBtnDown = new System.Windows.Forms.Button();
+            this.pluginsGroupBox = new System.Windows.Forms.GroupBox();
+            this.pluginsDG = new System.Windows.Forms.DataGridView();
+            this.configureButton = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnRemove = new System.Windows.Forms.Button();
+            this.btnAdd = new System.Windows.Forms.Button();
+            this.lstPluginDirs = new System.Windows.Forms.ListView();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnOkay = new System.Windows.Forms.Button();
             this.m_tabs.SuspendLayout();
             this.m_pluginConfigTab.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.pluginsGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -70,19 +67,22 @@
             ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).BeginInit();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).BeginInit();
+            this.pluginsGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // m_tabs
             // 
-            this.m_tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.m_tabs.Controls.Add(this.m_generalConfigTab);
             this.m_tabs.Controls.Add(this.m_pluginConfigTab);
             this.m_tabs.Location = new System.Drawing.Point(12, 12);
             this.m_tabs.Name = "m_tabs";
             this.m_tabs.SelectedIndex = 0;
-            this.m_tabs.Size = new System.Drawing.Size(798, 493);
+            this.m_tabs.Size = new System.Drawing.Size(798, 598);
             this.m_tabs.TabIndex = 0;
             // 
             // m_generalConfigTab
@@ -90,7 +90,7 @@
             this.m_generalConfigTab.Location = new System.Drawing.Point(4, 22);
             this.m_generalConfigTab.Name = "m_generalConfigTab";
             this.m_generalConfigTab.Padding = new System.Windows.Forms.Padding(3);
-            this.m_generalConfigTab.Size = new System.Drawing.Size(790, 480);
+            this.m_generalConfigTab.Size = new System.Drawing.Size(790, 467);
             this.m_generalConfigTab.TabIndex = 1;
             this.m_generalConfigTab.Text = "General";
             this.m_generalConfigTab.UseVisualStyleBackColor = true;
@@ -103,103 +103,17 @@
             this.m_pluginConfigTab.Location = new System.Drawing.Point(4, 22);
             this.m_pluginConfigTab.Name = "m_pluginConfigTab";
             this.m_pluginConfigTab.Padding = new System.Windows.Forms.Padding(3);
-            this.m_pluginConfigTab.Size = new System.Drawing.Size(790, 467);
+            this.m_pluginConfigTab.Size = new System.Drawing.Size(790, 572);
             this.m_pluginConfigTab.TabIndex = 0;
             this.m_pluginConfigTab.Text = "Plugins";
             this.m_pluginConfigTab.UseVisualStyleBackColor = true;
             // 
-            // btnRemove
-            // 
-            this.btnRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRemove.Location = new System.Drawing.Point(670, 88);
-            this.btnRemove.Name = "btnRemove";
-            this.btnRemove.Size = new System.Drawing.Size(75, 23);
-            this.btnRemove.TabIndex = 7;
-            this.btnRemove.Text = "Remove";
-            this.btnRemove.UseVisualStyleBackColor = true;
-            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.btnRemove);
-            this.groupBox1.Controls.Add(this.btnAdd);
-            this.groupBox1.Controls.Add(this.lstPluginDirs);
-            this.groupBox1.Location = new System.Drawing.Point(15, 20);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(758, 121);
-            this.groupBox1.TabIndex = 7;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Search Directories";
-            // 
-            // btnAdd
-            // 
-            this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAdd.Location = new System.Drawing.Point(589, 88);
-            this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(75, 23);
-            this.btnAdd.TabIndex = 6;
-            this.btnAdd.Text = "Add";
-            this.btnAdd.UseVisualStyleBackColor = true;
-            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
-            // 
-            // lstPluginDirs
-            // 
-            this.lstPluginDirs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lstPluginDirs.Location = new System.Drawing.Point(10, 19);
-            this.lstPluginDirs.MultiSelect = false;
-            this.lstPluginDirs.Name = "lstPluginDirs";
-            this.lstPluginDirs.Size = new System.Drawing.Size(735, 63);
-            this.lstPluginDirs.TabIndex = 5;
-            this.lstPluginDirs.UseCompatibleStateImageBehavior = false;
-            this.lstPluginDirs.View = System.Windows.Forms.View.Details;
-            // 
-            // pluginsGroupBox
-            // 
-            this.pluginsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pluginsGroupBox.Controls.Add(this.pluginsDG);
-            this.pluginsGroupBox.Controls.Add(this.configureButton);
-            this.pluginsGroupBox.Location = new System.Drawing.Point(15, 147);
-            this.pluginsGroupBox.Name = "pluginsGroupBox";
-            this.pluginsGroupBox.Size = new System.Drawing.Size(758, 164);
-            this.pluginsGroupBox.TabIndex = 9;
-            this.pluginsGroupBox.TabStop = false;
-            this.pluginsGroupBox.Text = "Current Plugins";
-            // 
-            // pluginsDG
-            // 
-            this.pluginsDG.AllowUserToAddRows = false;
-            this.pluginsDG.AllowUserToDeleteRows = false;
-            this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pluginsDG.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.pluginsDG.Location = new System.Drawing.Point(10, 19);
-            this.pluginsDG.Name = "pluginsDG";
-            this.pluginsDG.Size = new System.Drawing.Size(735, 103);
-            this.pluginsDG.TabIndex = 10;
-            // 
-            // configureButton
-            // 
-            this.configureButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.configureButton.Location = new System.Drawing.Point(671, 128);
-            this.configureButton.Name = "configureButton";
-            this.configureButton.Size = new System.Drawing.Size(74, 25);
-            this.configureButton.TabIndex = 9;
-            this.configureButton.Text = "Configure...";
-            this.configureButton.UseVisualStyleBackColor = true;
-            this.configureButton.Click += new System.EventHandler(this.configureButton_Click);
-            // 
             // groupBox2
             // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.tableLayoutPanel1);
-            this.groupBox2.Location = new System.Drawing.Point(15, 317);
+            this.groupBox2.Location = new System.Drawing.Point(15, 422);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(758, 144);
             this.groupBox2.TabIndex = 10;
@@ -208,9 +122,9 @@
             // 
             // tableLayoutPanel1
             // 
-            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
@@ -240,8 +154,8 @@
             // 
             // gatewayDGV
             // 
-            this.gatewayDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gatewayDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.gatewayDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gatewayDGV.Location = new System.Drawing.Point(12, 16);
             this.gatewayDGV.Name = "gatewayDGV";
@@ -294,8 +208,8 @@
             // 
             // authenticateDGV
             // 
-            this.authenticateDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.authenticateDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.authenticateDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.authenticateDGV.Location = new System.Drawing.Point(14, 16);
             this.authenticateDGV.Name = "authenticateDGV";
@@ -348,8 +262,8 @@
             // 
             // authorizeDGV
             // 
-            this.authorizeDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.authorizeDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.authorizeDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.authorizeDGV.Location = new System.Drawing.Point(15, 16);
             this.authorizeDGV.Name = "authorizeDGV";
@@ -388,10 +302,96 @@
             this.authorizeBtnDown.UseVisualStyleBackColor = true;
             this.authorizeBtnDown.Click += new System.EventHandler(this.authorizeBtnDown_Click);
             // 
+            // pluginsGroupBox
+            // 
+            this.pluginsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.pluginsGroupBox.Controls.Add(this.pluginsDG);
+            this.pluginsGroupBox.Controls.Add(this.configureButton);
+            this.pluginsGroupBox.Location = new System.Drawing.Point(15, 147);
+            this.pluginsGroupBox.Name = "pluginsGroupBox";
+            this.pluginsGroupBox.Size = new System.Drawing.Size(758, 269);
+            this.pluginsGroupBox.TabIndex = 9;
+            this.pluginsGroupBox.TabStop = false;
+            this.pluginsGroupBox.Text = "Current Plugins";
+            // 
+            // pluginsDG
+            // 
+            this.pluginsDG.AllowUserToAddRows = false;
+            this.pluginsDG.AllowUserToDeleteRows = false;
+            this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.pluginsDG.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.pluginsDG.Location = new System.Drawing.Point(10, 19);
+            this.pluginsDG.Name = "pluginsDG";
+            this.pluginsDG.Size = new System.Drawing.Size(735, 208);
+            this.pluginsDG.TabIndex = 10;
+            // 
+            // configureButton
+            // 
+            this.configureButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.configureButton.Location = new System.Drawing.Point(671, 233);
+            this.configureButton.Name = "configureButton";
+            this.configureButton.Size = new System.Drawing.Size(74, 25);
+            this.configureButton.TabIndex = 9;
+            this.configureButton.Text = "Configure...";
+            this.configureButton.UseVisualStyleBackColor = true;
+            this.configureButton.Click += new System.EventHandler(this.configureButton_Click);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.btnRemove);
+            this.groupBox1.Controls.Add(this.btnAdd);
+            this.groupBox1.Controls.Add(this.lstPluginDirs);
+            this.groupBox1.Location = new System.Drawing.Point(15, 20);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(758, 121);
+            this.groupBox1.TabIndex = 7;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Search Directories";
+            // 
+            // btnRemove
+            // 
+            this.btnRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRemove.Location = new System.Drawing.Point(670, 88);
+            this.btnRemove.Name = "btnRemove";
+            this.btnRemove.Size = new System.Drawing.Size(75, 23);
+            this.btnRemove.TabIndex = 7;
+            this.btnRemove.Text = "Remove";
+            this.btnRemove.UseVisualStyleBackColor = true;
+            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
+            // 
+            // btnAdd
+            // 
+            this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAdd.Location = new System.Drawing.Point(589, 88);
+            this.btnAdd.Name = "btnAdd";
+            this.btnAdd.Size = new System.Drawing.Size(75, 23);
+            this.btnAdd.TabIndex = 6;
+            this.btnAdd.Text = "Add";
+            this.btnAdd.UseVisualStyleBackColor = true;
+            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
+            // 
+            // lstPluginDirs
+            // 
+            this.lstPluginDirs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstPluginDirs.Location = new System.Drawing.Point(10, 19);
+            this.lstPluginDirs.MultiSelect = false;
+            this.lstPluginDirs.Name = "lstPluginDirs";
+            this.lstPluginDirs.Size = new System.Drawing.Size(735, 63);
+            this.lstPluginDirs.TabIndex = 5;
+            this.lstPluginDirs.UseCompatibleStateImageBehavior = false;
+            this.lstPluginDirs.View = System.Windows.Forms.View.Details;
+            // 
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.Location = new System.Drawing.Point(650, 522);
+            this.btnCancel.Location = new System.Drawing.Point(650, 627);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 4;
@@ -402,7 +402,7 @@
             // btnOkay
             // 
             this.btnOkay.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOkay.Location = new System.Drawing.Point(731, 522);
+            this.btnOkay.Location = new System.Drawing.Point(731, 627);
             this.btnOkay.Name = "btnOkay";
             this.btnOkay.Size = new System.Drawing.Size(75, 23);
             this.btnOkay.TabIndex = 3;
@@ -414,7 +414,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(822, 557);
+            this.ClientSize = new System.Drawing.Size(822, 662);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOkay);
             this.Controls.Add(this.m_tabs);
@@ -422,9 +422,6 @@
             this.Text = "pGina Configuration";
             this.m_tabs.ResumeLayout(false);
             this.m_pluginConfigTab.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.pluginsGroupBox.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
@@ -436,6 +433,9 @@
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).EndInit();
+            this.pluginsGroupBox.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).EndInit();
+            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
