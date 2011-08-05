@@ -15,7 +15,7 @@ namespace pGina.Configuration
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Configuration());
+            Application.Run(new ConfigurationUI());
         }
     }
 }
