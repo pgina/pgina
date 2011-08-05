@@ -60,6 +60,13 @@ namespace pGina.Configuration.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap arrow_right_3 {
+            get {
+                object obj = ResourceManager.GetObject("arrow_right_3", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap DownArrowSolid {
             get {
                 object obj = ResourceManager.GetObject("DownArrowSolid", resourceCulture);

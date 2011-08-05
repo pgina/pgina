@@ -37,6 +37,13 @@ namespace pGina.Configuration
             PopulatePluginDirs();
             InitOrderLists();
             RefreshPluginLists();
+            InitLiveLog();
+        }
+
+        private void InitLiveLog()
+        {
+            m_liveLog.HeaderStyle = ColumnHeaderStyle.None;
+            m_liveLog.Columns[0].Width = m_liveLog.Width - 5;         
         }
 
         private void InitOrderLists()
@@ -616,6 +623,19 @@ namespace pGina.Configuration
         {
             if (this.gatewayDGV.SelectedRows.Count > 0)
                 MoveDown(this.gatewayDGV, this.gatewayDGV.SelectedRows[0].Index);
+        }
+
+        private void simMethodChanged(object sender, EventArgs e)
+        {
+            if (sender == m_radioCredUI || sender == m_radioUseService)
+            {
+                m_useSavedConfig.Checked = true;
+                m_useSavedConfig.Enabled = false;
+            }
+            else
+            {
+                m_useSavedConfig.Enabled = true;
+            }
         }
     }
 }

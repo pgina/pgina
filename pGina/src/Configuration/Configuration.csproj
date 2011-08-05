@@ -158,6 +158,9 @@
   <ItemGroup>
     <None Include="Resources\DownArrowSolid.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\arrow-right-3.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /y "$(TargetPath)" ..\..\..\Plugins\SDK\</PostBuildEvent>
