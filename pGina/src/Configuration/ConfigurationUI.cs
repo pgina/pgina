@@ -163,7 +163,8 @@ namespace pGina.Configuration
 
         void pluginsDG_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex > 1 && e.RowIndex >= 0)
+            if (e.ColumnIndex >= 0 && e.RowIndex >= 0 &&
+                pluginsDG[e.ColumnIndex, e.RowIndex].ValueType == typeof(bool))
             {
                 DataGridViewCell cell = this.pluginsDG[e.ColumnIndex, e.RowIndex];
                 string uuid = (string)this.pluginsDG.Rows[e.RowIndex].Cells[PLUGIN_UUID_COLUMN].Value;
