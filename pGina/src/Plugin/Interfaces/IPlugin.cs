@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ServiceProcess;
 using System.Collections.Generic;
 
 namespace pGina.Shared.Interfaces
@@ -50,7 +51,9 @@ namespace pGina.Shared.Interfaces
     // session, as the user.  Note that users can stop (kill) the user session helper,
     // so *enforcement* does not belong here.
     public interface IPluginUserSessionHelper : IPluginBase
-    {        
+    {
+        void SessionStarted(Types.UserInformation userInformation);
+        void SessionEnding();
     }
 
     // Plugins that want to perform processing in the users session should implement
@@ -59,6 +62,8 @@ namespace pGina.Shared.Interfaces
     // user's cannot stop this helper (admin users can).
     public interface IPluginSystemSessionHelper : IPluginBase
     {
+        void SessionStarted(Types.UserInformation userInformation);
+        void SessionEnding();
     }
 
     // Plugins that want notification of events as they occur must implement
@@ -69,7 +74,11 @@ namespace pGina.Shared.Interfaces
     // IPlugin[User|System]SessionHelper interfaces.
     public interface IPluginEventNotifications : IPluginBase
     {
-        // on login, logout, ... lock/disconnect etc?        
+        // Default System session notification (as provided to pGina service
+        //  via http://msdn.microsoft.com/en-us/library/system.serviceprocess.servicebase.onsessionchange.aspx)
+        void SessionChange(SessionChangeDescription changeDescription);
+        
+        // Others? login success|fail, logging hook?
     }
 
 }
