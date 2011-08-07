@@ -69,7 +69,7 @@ namespace pGina.Plugin.Sample
                 }
 
                 m_logger.ErrorFormat("Failed to authenticate user: {0}", userInfo.Username);
-                return new BooleanResult() { Success = false };
+                return new BooleanResult() { Success = false, Message = string.Format("Your username does not start with a 'p'") };
             }
             catch (Exception e)
             {

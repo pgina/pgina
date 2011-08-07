@@ -92,9 +92,10 @@ namespace pGina.Core
                         {
                             // TBD: We could do inverted control here.. logger, settings, etc?
                             //  We could also consider loading plugins in their own app domain,
-                            //  making them unloadable...
-                            m_logger.DebugFormat("Created plugin object type: {0} from plugin: {1}", type.ToString(), file);
+                            //  making them unloadable...                            
                             object pluginObject = Activator.CreateInstance(type);
+                            IPluginBase pluginBase = pluginObject as IPluginBase;
+                            m_logger.DebugFormat("Created plugin object type: {0} from plugin: {1} uuid: {2}", type.ToString(), file, pluginBase.Uuid);
                             m_plugins.Add(pluginObject as IPluginBase);
                         }                        
                     }

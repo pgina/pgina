@@ -16,7 +16,7 @@ namespace pGina.Shared.Logging
 
         private static object s_mutex = new object();
 
-        public void AddListener(MessageHandler handler)
+        public static void AddListener(MessageHandler handler)
         {
             lock (s_mutex)
             {
@@ -24,7 +24,7 @@ namespace pGina.Shared.Logging
             }
         }
 
-        public void RemoveListener(MessageHandler handler)
+        public static void RemoveListener(MessageHandler handler)
         {
             lock (s_mutex)
             {

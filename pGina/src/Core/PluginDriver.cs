@@ -41,7 +41,32 @@ namespace pGina.Core
         public List<GroupInformation> GroupInformation
         {
             get { return m_properties.GetTrackedSingle<UserInformation>().Groups; }
-        }                    
+        }
+
+        public BooleanResult PerformLoginProcess()
+        {
+            try
+            {
+                m_logger.DebugFormat("Performing login process");
+                BooleanResult result = AuthenticateUser();
+                if (!result.Success)
+                    return result;
+
+                result = AuthorizeUser();
+                if (!result.Success)
+                    return result;
+
+                result = GatewayProcess();                
+                return result;
+            }
+            catch (Exception e)
+            {
+                // We catch exceptions at a high level here and report failure in these cases,
+                //  with the exception details as our message for now
+                m_logger.ErrorFormat("Exception during login process: {0}", e);
+                return new BooleanResult() { Success = false, Message = string.Format("Exception occurred: {0}", e) };
+            }
+        }
 
         public BooleanResult AuthenticateUser()
         {            
@@ -57,18 +82,27 @@ namespace pGina.Core
             {
                 m_logger.DebugFormat("Calling {0}", plugin.Uuid);
 
-                BooleanResult pluginResult = plugin.AuthenticateUser(m_properties);
-                pluginInfo.AddAuthenticateResult(plugin.Uuid, pluginResult);
+                BooleanResult pluginResult = new BooleanResult() { Message = null, Success = false };
 
-                if (pluginResult.Success)
+                try
                 {
-                    m_logger.DebugFormat("{0} Succeeded", plugin.Uuid);
-                    finalResult.Success = true;
+                    pluginResult = plugin.AuthenticateUser(m_properties);
+                    pluginInfo.AddAuthenticateResult(plugin.Uuid, pluginResult);
+
+                    if (pluginResult.Success)
+                    {
+                        m_logger.DebugFormat("{0} Succeeded", plugin.Uuid);
+                        finalResult.Success = true;
+                    }
+                    else
+                    {
+                        m_logger.WarnFormat("{0} Failed with Message: {1}", plugin.Uuid, pluginResult.Message);
+                        finalResult.Message = pluginResult.Message;
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    m_logger.WarnFormat("{0} Failed with Message: {1}", plugin.Uuid, pluginResult.Message);
-                    finalResult.Message = pluginResult.Message;
+                    m_logger.ErrorFormat("{0} Threw an unexpected exception, assuming failure: {1}", plugin.Uuid, e);
                 }
             }
 
@@ -97,13 +131,23 @@ namespace pGina.Core
             {
                 m_logger.DebugFormat("Calling {0}", plugin.Uuid);
 
-                BooleanResult pluginResult = plugin.AuthorizeUser(m_properties);
-                pluginInfo.AddAuthorizationResult(plugin.Uuid, pluginResult);
+                BooleanResult pluginResult = new BooleanResult() { Message = null, Success = false };
 
-                // All must succeed, fail = total fail
-                if (!pluginResult.Success)
+                try
                 {
-                    m_logger.ErrorFormat("{0} Failed to authorize {1} message: {2}", plugin.Uuid, m_properties.GetTrackedSingle<UserInformation>().Username, pluginResult.Message);
+                    pluginResult = plugin.AuthorizeUser(m_properties);
+                    pluginInfo.AddAuthorizationResult(plugin.Uuid, pluginResult);
+
+                    // All must succeed, fail = total fail
+                    if (!pluginResult.Success)
+                    {
+                        m_logger.ErrorFormat("{0} Failed to authorize {1} message: {2}", plugin.Uuid, m_properties.GetTrackedSingle<UserInformation>().Username, pluginResult.Message);
+                        return pluginResult;
+                    }
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("{0} Threw an unexpected exception, treating this as failure: {1}", plugin.Uuid, e);
                     return pluginResult;
                 }
             }
@@ -122,19 +166,30 @@ namespace pGina.Core
             foreach (IPluginAuthenticationGateway plugin in plugins)
             {
                 m_logger.DebugFormat("Calling {0}", plugin.Uuid);
-                BooleanResult pluginResult = plugin.AuthenticatedUserGateway(m_properties);
-                pluginInfo.AddGatewayResult(plugin.Uuid, pluginResult);
 
-                // All must succeed, fail = total fail
-                if (!pluginResult.Success)
+                BooleanResult pluginResult = new BooleanResult() { Message = null, Success = false };
+
+                try
                 {
-                    m_logger.ErrorFormat("{0} Failed to process gateway for {1} message: {2}", plugin.Uuid, m_properties.GetTrackedSingle<UserInformation>().Username, pluginResult.Message);
+                    pluginResult = plugin.AuthenticatedUserGateway(m_properties);
+                    pluginInfo.AddGatewayResult(plugin.Uuid, pluginResult);
+
+                    // All must succeed, fail = total fail
+                    if (!pluginResult.Success)
+                    {
+                        m_logger.ErrorFormat("{0} Failed to process gateway for {1} message: {2}", plugin.Uuid, m_properties.GetTrackedSingle<UserInformation>().Username, pluginResult.Message);
+                        return pluginResult;
+                    }
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("{0} Threw an unexpected exception, treating this as failure: {1}", plugin.Uuid, e);
                     return pluginResult;
                 }
             }
 
             m_logger.InfoFormat("Successfully processed gateways for {0}", m_properties.GetTrackedSingle<UserInformation>().Username);
             return new BooleanResult() { Success = true };
-        }
+        }        
     }
 }

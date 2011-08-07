@@ -6,11 +6,14 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 using pGina.Core;
 using pGina.Shared.Logging;
 using pGina.Shared.Interfaces;
 using pGina.Shared.WindowsApi;
+
+using log4net;
 
 namespace pGina.Configuration
 {
@@ -18,6 +21,7 @@ namespace pGina.Configuration
     {
         // Plugin information keyed by Guid
         private Dictionary<string, IPluginBase> m_plugins = new Dictionary<string, IPluginBase>();
+        private ILog m_logger = LogManager.GetLogger("ConfigurationUI");
         
         private const string PLUGIN_UUID_COLUMN = "Uuid";
         private const string PLUGIN_VERSION_COLUMN = "Version";
@@ -39,12 +43,34 @@ namespace pGina.Configuration
             InitOrderLists();
             RefreshPluginLists();
             InitLiveLog();
+            LoadGeneralSettings();
+        }
+
+        private void LoadGeneralSettings()
+        {
+            m_tileImageTxt.Text = Settings.Get.GetSetting("TileImage", null);
+            LoadTileImagePreview();
+        }
+
+        private void LoadTileImagePreview()
+        {
+            try
+            {
+                m_tileImagePreview.Image = new Bitmap(m_tileImageTxt.Text);                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Unable to load a preview image for the selected file, pGina may not be able to show this image at login time.\n", "Error", MessageBoxButtons.OK);
+                m_logger.ErrorFormat("User chose {0} as image file, but we failed to load it? Exception: {1}", m_tileImageTxt.Text, ex);
+                m_tileImagePreview.Image = null;
+            }
         }
 
         private void InitLiveLog()
         {
-            m_liveLog.HeaderStyle = ColumnHeaderStyle.None;
-            m_liveLog.Columns[0].Width = m_liveLog.Width - 5;         
+            m_liveLog.HeaderStyle = ColumnHeaderStyle.Nonclickable;
+            m_liveLog.Columns[0].Width = m_liveLog.Width - 5;
+            m_liveLog.Columns[0].Text = null;
         }
 
         private void InitOrderLists()
@@ -506,6 +532,8 @@ namespace pGina.Configuration
             this.SavePluginSettings();
             this.SavePluginDirs();
             this.SavePluginOrder();
+
+            Core.Settings.Get.TileImage = m_tileImageTxt.Text;
         }
 
         private void MoveUp(DataGridView dgv, int index)
@@ -532,14 +560,13 @@ namespace pGina.Configuration
         }
 
         private void btnOkay_Click(object sender, EventArgs e)
-        {
-            SaveSettings();
+        {            
             this.Close();
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void btnApply_Click(object sender, EventArgs e)
         {
-            this.Close();
+            SaveSettings();
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -589,18 +616,13 @@ namespace pGina.Configuration
         }        
 
         private void simMethodChanged(object sender, EventArgs e)
-        {
-            if (sender == m_radioCredUI || sender == m_radioUseService)
-            {
-                m_useSavedConfig.Checked = true;
-                m_useSavedConfig.Enabled = false;
-            }
-            else
-            {
-                m_useSavedConfig.Enabled = true;
-            }
-
-            btnLaunchCredUI.Enabled = (sender == m_radioCredUI);            
+        {            
+            btnLaunchCredUI.Enabled = (sender == m_radioCredUI);
+            chkIgnoreAuthenticateError.Enabled = (sender == m_radioEmulate);
+            chkIgnoreAuthzError.Enabled = (sender == m_radioEmulate);
+            chkInvokeSystem.Enabled = (sender == m_radioEmulate);
+            chkInvokeUser.Enabled = (sender == m_radioEmulate);
+            chkIgnoreGateway.Enabled = (sender == m_radioEmulate);
         }
 
         private void authenticateBtnUp_Click(object sender, EventArgs e)
@@ -689,14 +711,225 @@ namespace pGina.Configuration
             }
         }
 
+        private void HandleLabelTextChange(Label lbl)
+        {
+            if (lbl.Text == "Success")
+                lbl.ForeColor = Color.Green;
+            else if (lbl.Text == "Failure")
+                lbl.ForeColor = Color.Red;
+            else
+                lbl.ForeColor = Color.Black;
+        }
+
         private void m_lblAuthResult_TextChanged(object sender, EventArgs e)
         {
-            if (m_lblAuthResult.Text == "Success")
-                m_lblAuthResult.ForeColor = Color.Green;
-            else if (m_lblAuthResult.Text == "Failure")
-                m_lblAuthResult.ForeColor = Color.Red;
+            HandleLabelTextChange((Label)sender);
+        }
+
+        private void SimLogHandler(string message)
+        {
+            m_liveLog.Items.Add(new ListViewItem(new string[] { message }));
+        }
+
+        private void btnSimGo_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Continuing will save all pending changes in configuration, do you want to continue?",
+                                "Warning", MessageBoxButtons.YesNo) != System.Windows.Forms.DialogResult.Yes)
+            {
+                return;
+            }
+
+            SaveSettings();
+
+            m_message.Text = null;
+            m_liveLog.Items.Clear();
+            m_lblAuthorizeResult.Text = null;
+            m_lblAuthResult.Text = null;
+            m_lblGatewayResult.Text = null;
+            m_usernameResult.Text = null;
+            m_domainResult.Text = null;
+            m_passwordResult.Text = null;
+
+            pGina.Shared.Logging.InProcAppender.AddListener(SimLogHandler);
+
+            PluginDriver sessionDriver = new PluginDriver();
+            sessionDriver.UserInformation.Username = m_username.Text;            
+            sessionDriver.UserInformation.Password = m_password.Text;
+            
+            // We could use PerformLoginProcess, but we want to know what each
+            // stage reports, so we basically duplicate it here to know whats goin on.
+            bool authenticated = false;
+            bool authorized = false;
+            bool gatewayed = false;
+
+            try
+            {
+                Shared.Types.BooleanResult result = sessionDriver.AuthenticateUser();
+                authenticated = result.Success;
+                if (result.Message != null)
+                {
+                    m_message.Text += result.Message;
+                    m_message.Text += "\r\n";
+                }                
+            }
+            catch(Exception ex)
+            {
+                m_logger.ErrorFormat("Exception during authenticate: {0}", ex);                                
+            }
+
+            if (authenticated || chkIgnoreAuthenticateError.Checked)
+            {
+                try
+                {
+                    Shared.Types.BooleanResult result = sessionDriver.AuthorizeUser();
+                    authorized = result.Success;
+                    if (result.Message != null)
+                    {
+                        m_message.Text += result.Message;
+                        m_message.Text += "\r\n";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    m_logger.ErrorFormat("Exception during authorize: {0}", ex);
+                }
+            }
+
+            if (authorized || chkIgnoreAuthzError.Checked)
+            {
+                try
+                {
+                    Shared.Types.BooleanResult result = sessionDriver.GatewayProcess();
+                    gatewayed = result.Success;
+                    if (result.Message != null)
+                    {
+                        m_message.Text += result.Message;
+                        m_message.Text += "\r\n";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    m_logger.ErrorFormat("Exception during gateway: {0}", ex);
+                }
+            }
+
+            SetLabelStatus(m_lblAuthResult, authenticated);
+            SetLabelStatus(m_lblAuthorizeResult, authorized);
+            SetLabelStatus(m_lblGatewayResult, gatewayed);
+            m_usernameResult.Text = sessionDriver.UserInformation.Username;
+            m_domainResult.Text = sessionDriver.UserInformation.Domain;
+            m_passwordResult.Text = sessionDriver.UserInformation.Password;
+
+            // Simplify, now that we've reported actual result to the UI
+            authenticated |= chkIgnoreAuthenticateError.Checked;
+            authorized |= chkIgnoreAuthzError.Checked;
+            gatewayed |= chkIgnoreGateway.Checked;
+
+            if (authenticated && authorized && gatewayed)
+            {
+                if (chkInvokeSystem.Checked)
+                {
+                    // TBD: Work out how to actually invoke these as SYSTEM in the current session, for now
+                    // we settle for at least invoking them, this should probably move into PluginDriver once
+                    // process model is worked out.
+                    m_logger.DebugFormat("Running system session plugins notification");
+                    foreach (IPluginSystemSessionHelper plugin in PluginLoader.GetOrderedPluginsOfType<IPluginSystemSessionHelper>())
+                    {
+                        plugin.SessionStarted(sessionDriver.UserInformation);
+                        plugin.SessionEnding();
+                    }
+                }
+
+                if (chkInvokeUser.Checked)
+                {
+                    // TBD: Work out how to actually invoke these as the user who auth'd, but in the current session, for now
+                    // we settle for at least invoking them, this should probably move into PluginDriver once
+                    // process model is worked out.
+                    m_logger.DebugFormat("Running user session plugins notification");
+                    foreach (IPluginUserSessionHelper plugin in PluginLoader.GetOrderedPluginsOfType<IPluginUserSessionHelper>())
+                    {
+                        plugin.SessionStarted(sessionDriver.UserInformation);
+                        plugin.SessionEnding();
+                    }
+                }
+            }
+
+            pGina.Shared.Logging.InProcAppender.RemoveListener(SimLogHandler);
+        }
+
+        private void SetLabelStatus(Label lbl, bool success)
+        {
+            if (success)
+                lbl.Text = "Success";
             else
-                m_lblAuthResult.ForeColor = Color.Black;
+                lbl.Text = "Failure";
+        }
+
+        private void btnImageBrowse_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.FileName = m_tileImageTxt.Text;
+            ofd.Filter = "Bitmap Files (.bmp)|*.bmp|All Files (*.*)|*.*";
+            ofd.CheckFileExists = true;
+            ofd.CheckPathExists = true;
+
+            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                m_tileImageTxt.Text = ofd.FileName;
+                LoadTileImagePreview();                
+            }
+        }
+
+        private void m_tabs_Selected(object sender, TabControlEventArgs e)
+        {
+            if (e.TabPage == m_simTab)
+            {
+                try
+                {
+                    m_tileImage.Image = new Bitmap(m_tileImageTxt.Text);
+                }
+                catch (Exception)
+                {
+                    m_tileImage.Image = null;
+                }
+
+                m_lblAuthorizeResult.Text = null;
+                m_lblAuthResult.Text = null;
+                m_lblGatewayResult.Text = null;
+            }
+        }
+
+        private void m_lblAuthorizeResult_TextChanged(object sender, EventArgs e)
+        {
+            HandleLabelTextChange((Label)sender);
+        }
+
+        private void m_lblGatewayResult_TextChanged(object sender, EventArgs e)
+        {
+            HandleLabelTextChange((Label)sender);
+        }
+
+        private void m_liveLog_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.Filter = "Text File (.txt)|*.txt|All Files (*.*)|*.*";
+                sfd.CheckPathExists = true;
+
+                if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    using (StreamWriter file = new StreamWriter(sfd.FileName))
+                    {
+                        foreach (ListViewItem item in m_liveLog.SelectedItems)
+                        {
+                            file.WriteLine(item.Text.TrimEnd(new char[] { '\n' }));                            
+                        }                        
+                    }
+
+                    MessageBox.Show(string.Format("File saved successfully: {0}", sfd.FileName), "Log Export", MessageBoxButtons.OK);
+                }
+            }
         }
     }
 }

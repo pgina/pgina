@@ -28,11 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
+            this.groupBox12 = new System.Windows.Forms.GroupBox();
+            this.btnImageBrowse = new System.Windows.Forms.Button();
+            this.label11 = new System.Windows.Forms.Label();
+            this.m_tileImagePreview = new System.Windows.Forms.PictureBox();
+            this.m_tileImageTxt = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
             this.m_pluginConfigTab = new System.Windows.Forms.TabPage();
             this.pluginsGroupBox = new System.Windows.Forms.GroupBox();
             this.pluginsDG = new System.Windows.Forms.DataGridView();
@@ -67,7 +73,18 @@
             this.authenticateBtnUp = new System.Windows.Forms.Button();
             this.authenticateDGV = new System.Windows.Forms.DataGridView();
             this.m_simTab = new System.Windows.Forms.TabPage();
+            this.groupBox13 = new System.Windows.Forms.GroupBox();
+            this.chkIgnoreAuthzError = new System.Windows.Forms.CheckBox();
+            this.chkIgnoreAuthenticateError = new System.Windows.Forms.CheckBox();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.m_passwordResult = new System.Windows.Forms.TextBox();
+            this.m_domainResult = new System.Windows.Forms.TextBox();
+            this.m_usernameResult = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.m_lblAuthResult = new System.Windows.Forms.Label();
+            this.m_lblGatewayResult = new System.Windows.Forms.Label();
             this.m_lblAuthorizeResult = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.m_message = new System.Windows.Forms.TextBox();
@@ -75,7 +92,7 @@
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnSimGo = new System.Windows.Forms.Button();
             this.m_password = new System.Windows.Forms.TextBox();
             this.m_username = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -85,22 +102,19 @@
             this.m_liveLog = new System.Windows.Forms.ListView();
             this.LogEntry = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.m_useSavedConfig = new System.Windows.Forms.CheckBox();
+            this.btnLaunchCredUI = new System.Windows.Forms.Button();
             this.m_radioCredUI = new System.Windows.Forms.RadioButton();
             this.m_radioEmulate = new System.Windows.Forms.RadioButton();
             this.m_radioUseService = new System.Windows.Forms.RadioButton();
-            this.btnCancel = new System.Windows.Forms.Button();
+            this.btnApply = new System.Windows.Forms.Button();
             this.btnOkay = new System.Windows.Forms.Button();
-            this.m_lblGatewayResult = new System.Windows.Forms.Label();
-            this.m_lblAuthResult = new System.Windows.Forms.Label();
-            this.btnLaunchCredUI = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.m_usernameResult = new System.Windows.Forms.TextBox();
-            this.m_domainResult = new System.Windows.Forms.TextBox();
-            this.m_passwordResult = new System.Windows.Forms.TextBox();
+            this.chkInvokeSystem = new System.Windows.Forms.CheckBox();
+            this.chkInvokeUser = new System.Windows.Forms.CheckBox();
+            this.chkIgnoreGateway = new System.Windows.Forms.CheckBox();
             this.m_tabs.SuspendLayout();
+            this.m_generalConfigTab.SuspendLayout();
+            this.groupBox12.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.m_tileImagePreview)).BeginInit();
             this.m_pluginConfigTab.SuspendLayout();
             this.pluginsGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).BeginInit();
@@ -119,6 +133,7 @@
             this.groupBox7.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).BeginInit();
             this.m_simTab.SuspendLayout();
+            this.groupBox13.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_tileImage)).BeginInit();
@@ -140,9 +155,11 @@
             this.m_tabs.SelectedIndex = 0;
             this.m_tabs.Size = new System.Drawing.Size(798, 573);
             this.m_tabs.TabIndex = 0;
+            this.m_tabs.Selected += new System.Windows.Forms.TabControlEventHandler(this.m_tabs_Selected);
             // 
             // m_generalConfigTab
             // 
+            this.m_generalConfigTab.Controls.Add(this.groupBox12);
             this.m_generalConfigTab.Location = new System.Drawing.Point(4, 22);
             this.m_generalConfigTab.Name = "m_generalConfigTab";
             this.m_generalConfigTab.Padding = new System.Windows.Forms.Padding(3);
@@ -150,6 +167,64 @@
             this.m_generalConfigTab.TabIndex = 1;
             this.m_generalConfigTab.Text = "General";
             this.m_generalConfigTab.UseVisualStyleBackColor = true;
+            // 
+            // groupBox12
+            // 
+            this.groupBox12.Controls.Add(this.btnImageBrowse);
+            this.groupBox12.Controls.Add(this.label11);
+            this.groupBox12.Controls.Add(this.m_tileImagePreview);
+            this.groupBox12.Controls.Add(this.m_tileImageTxt);
+            this.groupBox12.Controls.Add(this.label10);
+            this.groupBox12.Location = new System.Drawing.Point(17, 16);
+            this.groupBox12.Name = "groupBox12";
+            this.groupBox12.Size = new System.Drawing.Size(749, 160);
+            this.groupBox12.TabIndex = 0;
+            this.groupBox12.TabStop = false;
+            this.groupBox12.Text = "Tile Image";
+            // 
+            // btnImageBrowse
+            // 
+            this.btnImageBrowse.Location = new System.Drawing.Point(457, 28);
+            this.btnImageBrowse.Name = "btnImageBrowse";
+            this.btnImageBrowse.Size = new System.Drawing.Size(33, 23);
+            this.btnImageBrowse.TabIndex = 4;
+            this.btnImageBrowse.Text = "...";
+            this.btnImageBrowse.UseVisualStyleBackColor = true;
+            this.btnImageBrowse.Click += new System.EventHandler(this.btnImageBrowse_Click);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(537, 74);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(48, 13);
+            this.label11.TabIndex = 3;
+            this.label11.Text = "Preview:";
+            // 
+            // m_tileImagePreview
+            // 
+            this.m_tileImagePreview.Location = new System.Drawing.Point(591, 17);
+            this.m_tileImagePreview.Name = "m_tileImagePreview";
+            this.m_tileImagePreview.Size = new System.Drawing.Size(130, 130);
+            this.m_tileImagePreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.m_tileImagePreview.TabIndex = 2;
+            this.m_tileImagePreview.TabStop = false;
+            // 
+            // m_tileImageTxt
+            // 
+            this.m_tileImageTxt.Location = new System.Drawing.Point(94, 30);
+            this.m_tileImageTxt.Name = "m_tileImageTxt";
+            this.m_tileImageTxt.Size = new System.Drawing.Size(357, 20);
+            this.m_tileImageTxt.TabIndex = 1;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(28, 30);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(58, 13);
+            this.label10.TabIndex = 0;
+            this.label10.Text = "Tile image:";
             // 
             // m_pluginConfigTab
             // 
@@ -184,33 +259,33 @@
             this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.pluginsDG.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle5;
             this.pluginsDG.Location = new System.Drawing.Point(10, 19);
             this.pluginsDG.Name = "pluginsDG";
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.pluginsDG.Size = new System.Drawing.Size(735, 253);
             this.pluginsDG.TabIndex = 10;
             // 
@@ -554,6 +629,7 @@
             // 
             // m_simTab
             // 
+            this.m_simTab.Controls.Add(this.groupBox13);
             this.m_simTab.Controls.Add(this.groupBox6);
             this.m_simTab.Controls.Add(this.groupBox5);
             this.m_simTab.Controls.Add(this.groupBox4);
@@ -565,6 +641,40 @@
             this.m_simTab.TabIndex = 2;
             this.m_simTab.Text = "Simulation";
             this.m_simTab.UseVisualStyleBackColor = true;
+            // 
+            // groupBox13
+            // 
+            this.groupBox13.Controls.Add(this.chkIgnoreGateway);
+            this.groupBox13.Controls.Add(this.chkInvokeUser);
+            this.groupBox13.Controls.Add(this.chkInvokeSystem);
+            this.groupBox13.Controls.Add(this.chkIgnoreAuthzError);
+            this.groupBox13.Controls.Add(this.chkIgnoreAuthenticateError);
+            this.groupBox13.Location = new System.Drawing.Point(338, 18);
+            this.groupBox13.Name = "groupBox13";
+            this.groupBox13.Size = new System.Drawing.Size(426, 113);
+            this.groupBox13.TabIndex = 3;
+            this.groupBox13.TabStop = false;
+            this.groupBox13.Text = "Simulation Options";
+            // 
+            // chkIgnoreAuthzError
+            // 
+            this.chkIgnoreAuthzError.AutoSize = true;
+            this.chkIgnoreAuthzError.Location = new System.Drawing.Point(19, 54);
+            this.chkIgnoreAuthzError.Name = "chkIgnoreAuthzError";
+            this.chkIgnoreAuthzError.Size = new System.Drawing.Size(150, 17);
+            this.chkIgnoreAuthzError.TabIndex = 1;
+            this.chkIgnoreAuthzError.Text = "Ignore Authorization Errors";
+            this.chkIgnoreAuthzError.UseVisualStyleBackColor = true;
+            // 
+            // chkIgnoreAuthenticateError
+            // 
+            this.chkIgnoreAuthenticateError.AutoSize = true;
+            this.chkIgnoreAuthenticateError.Location = new System.Drawing.Point(19, 28);
+            this.chkIgnoreAuthenticateError.Name = "chkIgnoreAuthenticateError";
+            this.chkIgnoreAuthenticateError.Size = new System.Drawing.Size(157, 17);
+            this.chkIgnoreAuthenticateError.TabIndex = 0;
+            this.chkIgnoreAuthenticateError.Text = "Ignore Authentication Errors";
+            this.chkIgnoreAuthenticateError.UseVisualStyleBackColor = true;
             // 
             // groupBox6
             // 
@@ -582,26 +692,98 @@
             this.groupBox6.Controls.Add(this.label8);
             this.groupBox6.Controls.Add(this.label7);
             this.groupBox6.Controls.Add(this.label6);
-            this.groupBox6.Location = new System.Drawing.Point(16, 161);
+            this.groupBox6.Location = new System.Drawing.Point(16, 137);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(315, 203);
+            this.groupBox6.Size = new System.Drawing.Size(393, 227);
             this.groupBox6.TabIndex = 2;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Results";
             // 
+            // m_passwordResult
+            // 
+            this.m_passwordResult.Location = new System.Drawing.Point(105, 156);
+            this.m_passwordResult.Name = "m_passwordResult";
+            this.m_passwordResult.ReadOnly = true;
+            this.m_passwordResult.Size = new System.Drawing.Size(194, 20);
+            this.m_passwordResult.TabIndex = 13;
+            // 
+            // m_domainResult
+            // 
+            this.m_domainResult.Location = new System.Drawing.Point(105, 130);
+            this.m_domainResult.Name = "m_domainResult";
+            this.m_domainResult.ReadOnly = true;
+            this.m_domainResult.Size = new System.Drawing.Size(194, 20);
+            this.m_domainResult.TabIndex = 12;
+            // 
+            // m_usernameResult
+            // 
+            this.m_usernameResult.Location = new System.Drawing.Point(105, 104);
+            this.m_usernameResult.Name = "m_usernameResult";
+            this.m_usernameResult.ReadOnly = true;
+            this.m_usernameResult.Size = new System.Drawing.Size(194, 20);
+            this.m_usernameResult.TabIndex = 11;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(19, 133);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(46, 13);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "Domain:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(19, 159);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(56, 13);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "Password:";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(19, 107);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(58, 13);
+            this.label1.TabIndex = 8;
+            this.label1.Text = "Username:";
+            // 
+            // m_lblAuthResult
+            // 
+            this.m_lblAuthResult.AutoSize = true;
+            this.m_lblAuthResult.Location = new System.Drawing.Point(102, 26);
+            this.m_lblAuthResult.Name = "m_lblAuthResult";
+            this.m_lblAuthResult.Size = new System.Drawing.Size(48, 13);
+            this.m_lblAuthResult.TabIndex = 7;
+            this.m_lblAuthResult.Text = "Success";
+            this.m_lblAuthResult.TextChanged += new System.EventHandler(this.m_lblAuthResult_TextChanged);
+            // 
+            // m_lblGatewayResult
+            // 
+            this.m_lblGatewayResult.AutoSize = true;
+            this.m_lblGatewayResult.Location = new System.Drawing.Point(102, 78);
+            this.m_lblGatewayResult.Name = "m_lblGatewayResult";
+            this.m_lblGatewayResult.Size = new System.Drawing.Size(48, 13);
+            this.m_lblGatewayResult.TabIndex = 6;
+            this.m_lblGatewayResult.Text = "Success";
+            this.m_lblGatewayResult.TextChanged += new System.EventHandler(this.m_lblGatewayResult_TextChanged);
+            // 
             // m_lblAuthorizeResult
             // 
             this.m_lblAuthorizeResult.AutoSize = true;
-            this.m_lblAuthorizeResult.Location = new System.Drawing.Point(251, 26);
+            this.m_lblAuthorizeResult.Location = new System.Drawing.Point(102, 52);
             this.m_lblAuthorizeResult.Name = "m_lblAuthorizeResult";
             this.m_lblAuthorizeResult.Size = new System.Drawing.Size(48, 13);
             this.m_lblAuthorizeResult.TabIndex = 5;
             this.m_lblAuthorizeResult.Text = "Success";
+            this.m_lblAuthorizeResult.TextChanged += new System.EventHandler(this.m_lblAuthorizeResult_TextChanged);
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(19, 129);
+            this.label9.Location = new System.Drawing.Point(19, 191);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(53, 13);
             this.label9.TabIndex = 4;
@@ -611,17 +793,17 @@
             // 
             this.m_message.AcceptsReturn = true;
             this.m_message.AcceptsTab = true;
-            this.m_message.Location = new System.Drawing.Point(76, 129);
+            this.m_message.Location = new System.Drawing.Point(105, 188);
             this.m_message.Multiline = true;
             this.m_message.Name = "m_message";
             this.m_message.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.m_message.Size = new System.Drawing.Size(223, 58);
+            this.m_message.Size = new System.Drawing.Size(270, 29);
             this.m_message.TabIndex = 3;
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(19, 46);
+            this.label8.Location = new System.Drawing.Point(19, 78);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(52, 13);
             this.label8.TabIndex = 2;
@@ -630,7 +812,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(166, 26);
+            this.label7.Location = new System.Drawing.Point(18, 52);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(71, 13);
             this.label7.TabIndex = 1;
@@ -639,7 +821,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(18, 26);
+            this.label6.Location = new System.Drawing.Point(19, 26);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(78, 13);
             this.label6.TabIndex = 0;
@@ -647,38 +829,39 @@
             // 
             // groupBox5
             // 
-            this.groupBox5.Controls.Add(this.button1);
+            this.groupBox5.Controls.Add(this.btnSimGo);
             this.groupBox5.Controls.Add(this.m_password);
             this.groupBox5.Controls.Add(this.m_username);
             this.groupBox5.Controls.Add(this.label5);
             this.groupBox5.Controls.Add(this.label4);
             this.groupBox5.Controls.Add(this.m_tileImage);
-            this.groupBox5.Location = new System.Drawing.Point(337, 18);
+            this.groupBox5.Location = new System.Drawing.Point(415, 137);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(427, 256);
+            this.groupBox5.Size = new System.Drawing.Size(355, 227);
             this.groupBox5.TabIndex = 1;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Simulated LogonUI";
             // 
-            // button1
+            // btnSimGo
             // 
-            this.button1.Image = global::pGina.Configuration.Properties.Resources.arrow_right_3;
-            this.button1.Location = new System.Drawing.Point(349, 204);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(30, 27);
-            this.button1.TabIndex = 5;
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnSimGo.Image = global::pGina.Configuration.Properties.Resources.arrow_right_3;
+            this.btnSimGo.Location = new System.Drawing.Point(307, 184);
+            this.btnSimGo.Name = "btnSimGo";
+            this.btnSimGo.Size = new System.Drawing.Size(30, 27);
+            this.btnSimGo.TabIndex = 5;
+            this.btnSimGo.UseVisualStyleBackColor = true;
+            this.btnSimGo.Click += new System.EventHandler(this.btnSimGo_Click);
             // 
             // m_password
             // 
-            this.m_password.Location = new System.Drawing.Point(121, 208);
+            this.m_password.Location = new System.Drawing.Point(79, 188);
             this.m_password.Name = "m_password";
             this.m_password.Size = new System.Drawing.Size(222, 20);
             this.m_password.TabIndex = 4;
             // 
             // m_username
             // 
-            this.m_username.Location = new System.Drawing.Point(121, 182);
+            this.m_username.Location = new System.Drawing.Point(79, 162);
             this.m_username.Name = "m_username";
             this.m_username.Size = new System.Drawing.Size(222, 20);
             this.m_username.TabIndex = 3;
@@ -686,7 +869,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(57, 211);
+            this.label5.Location = new System.Drawing.Point(15, 191);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(56, 13);
             this.label5.TabIndex = 2;
@@ -695,7 +878,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(57, 185);
+            this.label4.Location = new System.Drawing.Point(15, 165);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(58, 13);
             this.label4.TabIndex = 1;
@@ -703,7 +886,7 @@
             // 
             // m_tileImage
             // 
-            this.m_tileImage.Location = new System.Drawing.Point(167, 28);
+            this.m_tileImage.Location = new System.Drawing.Point(121, 21);
             this.m_tileImage.Name = "m_tileImage";
             this.m_tileImage.Size = new System.Drawing.Size(130, 130);
             this.m_tileImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -712,6 +895,8 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this.m_liveLog);
             this.groupBox4.Location = new System.Drawing.Point(16, 370);
             this.groupBox4.Name = "groupBox4";
@@ -735,32 +920,31 @@
             this.m_liveLog.TabIndex = 0;
             this.m_liveLog.UseCompatibleStateImageBehavior = false;
             this.m_liveLog.View = System.Windows.Forms.View.Details;
+            this.m_liveLog.MouseClick += new System.Windows.Forms.MouseEventHandler(this.m_liveLog_MouseClick);
             // 
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.btnLaunchCredUI);
-            this.groupBox3.Controls.Add(this.m_useSavedConfig);
             this.groupBox3.Controls.Add(this.m_radioCredUI);
             this.groupBox3.Controls.Add(this.m_radioEmulate);
             this.groupBox3.Controls.Add(this.m_radioUseService);
             this.groupBox3.Location = new System.Drawing.Point(16, 18);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(315, 137);
+            this.groupBox3.Size = new System.Drawing.Size(315, 113);
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Simulation Method";
             // 
-            // m_useSavedConfig
+            // btnLaunchCredUI
             // 
-            this.m_useSavedConfig.AutoSize = true;
-            this.m_useSavedConfig.Checked = true;
-            this.m_useSavedConfig.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.m_useSavedConfig.Location = new System.Drawing.Point(21, 104);
-            this.m_useSavedConfig.Name = "m_useSavedConfig";
-            this.m_useSavedConfig.Size = new System.Drawing.Size(144, 17);
-            this.m_useSavedConfig.TabIndex = 3;
-            this.m_useSavedConfig.Text = "Use Saved Configuration";
-            this.m_useSavedConfig.UseVisualStyleBackColor = true;
+            this.btnLaunchCredUI.Enabled = false;
+            this.btnLaunchCredUI.Image = global::pGina.Configuration.Properties.Resources.arrow_right_3;
+            this.btnLaunchCredUI.Location = new System.Drawing.Point(169, 69);
+            this.btnLaunchCredUI.Name = "btnLaunchCredUI";
+            this.btnLaunchCredUI.Size = new System.Drawing.Size(30, 27);
+            this.btnLaunchCredUI.TabIndex = 6;
+            this.btnLaunchCredUI.UseVisualStyleBackColor = true;
+            this.btnLaunchCredUI.Click += new System.EventHandler(this.btnLaunchCredUI_Click);
             // 
             // m_radioCredUI
             // 
@@ -797,16 +981,16 @@
             this.m_radioUseService.UseVisualStyleBackColor = true;
             this.m_radioUseService.CheckedChanged += new System.EventHandler(this.simMethodChanged);
             // 
-            // btnCancel
+            // btnApply
             // 
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.Location = new System.Drawing.Point(650, 602);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 4;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnApply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnApply.Location = new System.Drawing.Point(650, 602);
+            this.btnApply.Name = "btnApply";
+            this.btnApply.Size = new System.Drawing.Size(75, 23);
+            this.btnApply.TabIndex = 4;
+            this.btnApply.Text = "Apply";
+            this.btnApply.UseVisualStyleBackColor = true;
+            this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
             // 
             // btnOkay
             // 
@@ -815,102 +999,55 @@
             this.btnOkay.Name = "btnOkay";
             this.btnOkay.Size = new System.Drawing.Size(75, 23);
             this.btnOkay.TabIndex = 3;
-            this.btnOkay.Text = "OK";
+            this.btnOkay.Text = "Close";
             this.btnOkay.UseVisualStyleBackColor = true;
             this.btnOkay.Click += new System.EventHandler(this.btnOkay_Click);
             // 
-            // m_lblGatewayResult
+            // chkInvokeSystem
             // 
-            this.m_lblGatewayResult.AutoSize = true;
-            this.m_lblGatewayResult.Location = new System.Drawing.Point(96, 46);
-            this.m_lblGatewayResult.Name = "m_lblGatewayResult";
-            this.m_lblGatewayResult.Size = new System.Drawing.Size(48, 13);
-            this.m_lblGatewayResult.TabIndex = 6;
-            this.m_lblGatewayResult.Text = "Success";
+            this.chkInvokeSystem.AutoSize = true;
+            this.chkInvokeSystem.Location = new System.Drawing.Point(207, 54);
+            this.chkInvokeSystem.Name = "chkInvokeSystem";
+            this.chkInvokeSystem.Size = new System.Drawing.Size(175, 17);
+            this.chkInvokeSystem.TabIndex = 2;
+            this.chkInvokeSystem.Text = "Invoke System Session Helpers";
+            this.chkInvokeSystem.UseVisualStyleBackColor = true;
             // 
-            // m_lblAuthResult
+            // chkInvokeUser
             // 
-            this.m_lblAuthResult.AutoSize = true;
-            this.m_lblAuthResult.Location = new System.Drawing.Point(96, 26);
-            this.m_lblAuthResult.Name = "m_lblAuthResult";
-            this.m_lblAuthResult.Size = new System.Drawing.Size(48, 13);
-            this.m_lblAuthResult.TabIndex = 7;
-            this.m_lblAuthResult.Text = "Success";
-            this.m_lblAuthResult.TextChanged += new System.EventHandler(this.m_lblAuthResult_TextChanged);
+            this.chkInvokeUser.AutoSize = true;
+            this.chkInvokeUser.Location = new System.Drawing.Point(207, 29);
+            this.chkInvokeUser.Name = "chkInvokeUser";
+            this.chkInvokeUser.Size = new System.Drawing.Size(163, 17);
+            this.chkInvokeUser.TabIndex = 3;
+            this.chkInvokeUser.Text = "Invoke User Session Helpers";
+            this.chkInvokeUser.UseVisualStyleBackColor = true;
             // 
-            // btnLaunchCredUI
+            // chkIgnoreGateway
             // 
-            this.btnLaunchCredUI.Enabled = false;
-            this.btnLaunchCredUI.Image = global::pGina.Configuration.Properties.Resources.arrow_right_3;
-            this.btnLaunchCredUI.Location = new System.Drawing.Point(169, 69);
-            this.btnLaunchCredUI.Name = "btnLaunchCredUI";
-            this.btnLaunchCredUI.Size = new System.Drawing.Size(30, 27);
-            this.btnLaunchCredUI.TabIndex = 6;
-            this.btnLaunchCredUI.UseVisualStyleBackColor = true;
-            this.btnLaunchCredUI.Click += new System.EventHandler(this.btnLaunchCredUI_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(18, 75);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(58, 13);
-            this.label1.TabIndex = 8;
-            this.label1.Text = "Username:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(18, 100);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(56, 13);
-            this.label2.TabIndex = 9;
-            this.label2.Text = "Password:";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(166, 75);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(46, 13);
-            this.label3.TabIndex = 10;
-            this.label3.Text = "Domain:";
-            // 
-            // m_usernameResult
-            // 
-            this.m_usernameResult.Location = new System.Drawing.Point(79, 73);
-            this.m_usernameResult.Name = "m_usernameResult";
-            this.m_usernameResult.ReadOnly = true;
-            this.m_usernameResult.Size = new System.Drawing.Size(80, 20);
-            this.m_usernameResult.TabIndex = 11;
-            // 
-            // m_domainResult
-            // 
-            this.m_domainResult.Location = new System.Drawing.Point(218, 72);
-            this.m_domainResult.Name = "m_domainResult";
-            this.m_domainResult.ReadOnly = true;
-            this.m_domainResult.Size = new System.Drawing.Size(80, 20);
-            this.m_domainResult.TabIndex = 12;
-            // 
-            // m_passwordResult
-            // 
-            this.m_passwordResult.Location = new System.Drawing.Point(79, 97);
-            this.m_passwordResult.Name = "m_passwordResult";
-            this.m_passwordResult.ReadOnly = true;
-            this.m_passwordResult.Size = new System.Drawing.Size(80, 20);
-            this.m_passwordResult.TabIndex = 13;
+            this.chkIgnoreGateway.AutoSize = true;
+            this.chkIgnoreGateway.Location = new System.Drawing.Point(19, 79);
+            this.chkIgnoreGateway.Name = "chkIgnoreGateway";
+            this.chkIgnoreGateway.Size = new System.Drawing.Size(131, 17);
+            this.chkIgnoreGateway.TabIndex = 4;
+            this.chkIgnoreGateway.Text = "Ignore Gateway Errors";
+            this.chkIgnoreGateway.UseVisualStyleBackColor = true;
             // 
             // ConfigurationUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(822, 637);
-            this.Controls.Add(this.btnCancel);
+            this.Controls.Add(this.btnApply);
             this.Controls.Add(this.btnOkay);
             this.Controls.Add(this.m_tabs);
             this.Name = "ConfigurationUI";
             this.Text = "pGina Configuration";
             this.m_tabs.ResumeLayout(false);
+            this.m_generalConfigTab.ResumeLayout(false);
+            this.groupBox12.ResumeLayout(false);
+            this.groupBox12.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.m_tileImagePreview)).EndInit();
             this.m_pluginConfigTab.ResumeLayout(false);
             this.pluginsGroupBox.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).EndInit();
@@ -929,6 +1066,8 @@
             this.groupBox7.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).EndInit();
             this.m_simTab.ResumeLayout(false);
+            this.groupBox13.ResumeLayout(false);
+            this.groupBox13.PerformLayout();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.groupBox5.ResumeLayout(false);
@@ -953,7 +1092,7 @@
         private System.Windows.Forms.GroupBox pluginsGroupBox;
         private System.Windows.Forms.DataGridView pluginsDG;
         private System.Windows.Forms.Button configureButton;
-        private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.Button btnApply;
         private System.Windows.Forms.Button btnOkay;
         private System.Windows.Forms.TabPage m_simTab;
         private System.Windows.Forms.GroupBox groupBox3;
@@ -964,14 +1103,13 @@
         private System.Windows.Forms.RadioButton m_radioCredUI;
         private System.Windows.Forms.RadioButton m_radioEmulate;
         private System.Windows.Forms.RadioButton m_radioUseService;
-        private System.Windows.Forms.CheckBox m_useSavedConfig;
         private System.Windows.Forms.GroupBox groupBox6;
         private System.Windows.Forms.PictureBox m_tileImage;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox m_password;
         private System.Windows.Forms.TextBox m_username;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnSimGo;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
@@ -1012,5 +1150,17 @@
         private System.Windows.Forms.TextBox m_passwordResult;
         private System.Windows.Forms.TextBox m_domainResult;
         private System.Windows.Forms.TextBox m_usernameResult;
+        private System.Windows.Forms.GroupBox groupBox12;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.PictureBox m_tileImagePreview;
+        private System.Windows.Forms.TextBox m_tileImageTxt;
+        private System.Windows.Forms.Button btnImageBrowse;
+        private System.Windows.Forms.GroupBox groupBox13;
+        private System.Windows.Forms.CheckBox chkIgnoreAuthenticateError;
+        private System.Windows.Forms.CheckBox chkIgnoreAuthzError;
+        private System.Windows.Forms.CheckBox chkInvokeSystem;
+        private System.Windows.Forms.CheckBox chkInvokeUser;
+        private System.Windows.Forms.CheckBox chkIgnoreGateway;
     }
 }
