@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using pGina.Core;
 using pGina.Shared.Logging;
 using pGina.Shared.Interfaces;
+using pGina.Shared.WindowsApi;
 
 namespace pGina.Configuration
 {
@@ -598,6 +599,8 @@ namespace pGina.Configuration
             {
                 m_useSavedConfig.Enabled = true;
             }
+
+            btnLaunchCredUI.Enabled = (sender == m_radioCredUI);            
         }
 
         private void authenticateBtnUp_Click(object sender, EventArgs e)
@@ -670,6 +673,30 @@ namespace pGina.Configuration
         {
             if (this.eventDGV.SelectedRows.Count > 0)
                 MoveDown(this.eventDGV, this.eventDGV.SelectedRows[0].Index);
+        }
+
+        private void btnLaunchCredUI_Click(object sender, EventArgs e)
+        {
+            System.Net.NetworkCredential credential = WindowsApi.GetCredentials("Simulated Login", "Please enter your credentials...");
+            if (credential != null)
+            {
+                m_lblAuthResult.Text = "Success";
+                m_lblAuthorizeResult.Text = "Success";
+                m_lblGatewayResult.Text = "Success";
+                m_usernameResult.Text = credential.UserName;
+                m_domainResult.Text = credential.Domain;
+                m_passwordResult.Text = credential.Password;
+            }
+        }
+
+        private void m_lblAuthResult_TextChanged(object sender, EventArgs e)
+        {
+            if (m_lblAuthResult.Text == "Success")
+                m_lblAuthResult.ForeColor = Color.Green;
+            else if (m_lblAuthResult.Text == "Failure")
+                m_lblAuthResult.ForeColor = Color.Red;
+            else
+                m_lblAuthResult.ForeColor = Color.Black;
         }
     }
 }

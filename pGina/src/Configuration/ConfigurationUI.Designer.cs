@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
             this.m_pluginConfigTab = new System.Windows.Forms.TabPage();
@@ -42,8 +42,33 @@
             this.btnAdd = new System.Windows.Forms.Button();
             this.lstPluginDirs = new System.Windows.Forms.ListView();
             this.m_pluginOrderTab = new System.Windows.Forms.TabPage();
+            this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.userBtnDown = new System.Windows.Forms.Button();
+            this.userBtnUp = new System.Windows.Forms.Button();
+            this.userDGV = new System.Windows.Forms.DataGridView();
+            this.groupBox8 = new System.Windows.Forms.GroupBox();
+            this.gatewayBtnDown = new System.Windows.Forms.Button();
+            this.gatewayBtnUp = new System.Windows.Forms.Button();
+            this.gatewayDGV = new System.Windows.Forms.DataGridView();
+            this.groupBox11 = new System.Windows.Forms.GroupBox();
+            this.eventBtnDown = new System.Windows.Forms.Button();
+            this.eventBtnUp = new System.Windows.Forms.Button();
+            this.eventDGV = new System.Windows.Forms.DataGridView();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.authorizeBtnDown = new System.Windows.Forms.Button();
+            this.authorizeBtnUp = new System.Windows.Forms.Button();
+            this.authorizeDGV = new System.Windows.Forms.DataGridView();
+            this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.systemBtnDown = new System.Windows.Forms.Button();
+            this.systemBtnUp = new System.Windows.Forms.Button();
+            this.systemDGV = new System.Windows.Forms.DataGridView();
+            this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.authenticateBtnDown = new System.Windows.Forms.Button();
+            this.authenticateBtnUp = new System.Windows.Forms.Button();
+            this.authenticateDGV = new System.Windows.Forms.DataGridView();
             this.m_simTab = new System.Windows.Forms.TabPage();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.m_lblAuthorizeResult = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.m_message = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
@@ -66,55 +91,39 @@
             this.m_radioUseService = new System.Windows.Forms.RadioButton();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnOkay = new System.Windows.Forms.Button();
-            this.groupBox7 = new System.Windows.Forms.GroupBox();
-            this.authenticateDGV = new System.Windows.Forms.DataGridView();
-            this.authenticateBtnDown = new System.Windows.Forms.Button();
-            this.authenticateBtnUp = new System.Windows.Forms.Button();
-            this.authorizeBtnDown = new System.Windows.Forms.Button();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.authorizeBtnUp = new System.Windows.Forms.Button();
-            this.authorizeDGV = new System.Windows.Forms.DataGridView();
-            this.groupBox8 = new System.Windows.Forms.GroupBox();
-            this.gatewayBtnDown = new System.Windows.Forms.Button();
-            this.gatewayBtnUp = new System.Windows.Forms.Button();
-            this.gatewayDGV = new System.Windows.Forms.DataGridView();
-            this.systemBtnUp = new System.Windows.Forms.Button();
-            this.groupBox9 = new System.Windows.Forms.GroupBox();
-            this.systemBtnDown = new System.Windows.Forms.Button();
-            this.systemDGV = new System.Windows.Forms.DataGridView();
-            this.groupBox10 = new System.Windows.Forms.GroupBox();
-            this.userBtnDown = new System.Windows.Forms.Button();
-            this.userBtnUp = new System.Windows.Forms.Button();
-            this.userDGV = new System.Windows.Forms.DataGridView();
-            this.eventBtnUp = new System.Windows.Forms.Button();
-            this.groupBox11 = new System.Windows.Forms.GroupBox();
-            this.eventBtnDown = new System.Windows.Forms.Button();
-            this.eventDGV = new System.Windows.Forms.DataGridView();
-            this.groupBox12 = new System.Windows.Forms.GroupBox();
+            this.m_lblGatewayResult = new System.Windows.Forms.Label();
+            this.m_lblAuthResult = new System.Windows.Forms.Label();
+            this.btnLaunchCredUI = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.m_usernameResult = new System.Windows.Forms.TextBox();
+            this.m_domainResult = new System.Windows.Forms.TextBox();
+            this.m_passwordResult = new System.Windows.Forms.TextBox();
             this.m_tabs.SuspendLayout();
             this.m_pluginConfigTab.SuspendLayout();
             this.pluginsGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.m_pluginOrderTab.SuspendLayout();
+            this.groupBox10.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.userDGV)).BeginInit();
+            this.groupBox8.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).BeginInit();
+            this.groupBox11.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.eventDGV)).BeginInit();
+            this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).BeginInit();
+            this.groupBox9.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.systemDGV)).BeginInit();
+            this.groupBox7.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).BeginInit();
             this.m_simTab.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_tileImage)).BeginInit();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            this.groupBox7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).BeginInit();
-            this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).BeginInit();
-            this.groupBox8.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).BeginInit();
-            this.groupBox9.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.systemDGV)).BeginInit();
-            this.groupBox10.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.userDGV)).BeginInit();
-            this.groupBox11.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.eventDGV)).BeginInit();
             this.SuspendLayout();
             // 
             // m_tabs
@@ -137,7 +146,7 @@
             this.m_generalConfigTab.Location = new System.Drawing.Point(4, 22);
             this.m_generalConfigTab.Name = "m_generalConfigTab";
             this.m_generalConfigTab.Padding = new System.Windows.Forms.Padding(3);
-            this.m_generalConfigTab.Size = new System.Drawing.Size(790, 531);
+            this.m_generalConfigTab.Size = new System.Drawing.Size(790, 547);
             this.m_generalConfigTab.TabIndex = 1;
             this.m_generalConfigTab.Text = "General";
             this.m_generalConfigTab.UseVisualStyleBackColor = true;
@@ -175,33 +184,33 @@
             this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this.pluginsDG.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle8;
             this.pluginsDG.Location = new System.Drawing.Point(10, 19);
             this.pluginsDG.Name = "pluginsDG";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
             this.pluginsDG.Size = new System.Drawing.Size(735, 253);
             this.pluginsDG.TabIndex = 10;
             // 
@@ -279,9 +288,272 @@
             this.m_pluginOrderTab.Text = "Plugin Order";
             this.m_pluginOrderTab.UseVisualStyleBackColor = true;
             // 
+            // groupBox10
+            // 
+            this.groupBox10.Controls.Add(this.userBtnDown);
+            this.groupBox10.Controls.Add(this.userBtnUp);
+            this.groupBox10.Controls.Add(this.userDGV);
+            this.groupBox10.Location = new System.Drawing.Point(16, 366);
+            this.groupBox10.Name = "groupBox10";
+            this.groupBox10.Size = new System.Drawing.Size(367, 169);
+            this.groupBox10.TabIndex = 20;
+            this.groupBox10.TabStop = false;
+            this.groupBox10.Text = "User Session";
+            // 
+            // userBtnDown
+            // 
+            this.userBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.userBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.userBtnDown.Location = new System.Drawing.Point(330, 89);
+            this.userBtnDown.Name = "userBtnDown";
+            this.userBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.userBtnDown.TabIndex = 16;
+            this.userBtnDown.UseVisualStyleBackColor = true;
+            this.userBtnDown.Click += new System.EventHandler(this.userBtnDown_Click);
+            // 
+            // userBtnUp
+            // 
+            this.userBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.userBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.userBtnUp.Location = new System.Drawing.Point(330, 56);
+            this.userBtnUp.Name = "userBtnUp";
+            this.userBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.userBtnUp.TabIndex = 15;
+            this.userBtnUp.UseVisualStyleBackColor = true;
+            this.userBtnUp.Click += new System.EventHandler(this.userBtnUp_Click);
+            // 
+            // userDGV
+            // 
+            this.userDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.userDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.userDGV.Location = new System.Drawing.Point(15, 20);
+            this.userDGV.Name = "userDGV";
+            this.userDGV.Size = new System.Drawing.Size(309, 131);
+            this.userDGV.TabIndex = 0;
+            // 
+            // groupBox8
+            // 
+            this.groupBox8.Controls.Add(this.gatewayBtnDown);
+            this.groupBox8.Controls.Add(this.gatewayBtnUp);
+            this.groupBox8.Controls.Add(this.gatewayDGV);
+            this.groupBox8.Location = new System.Drawing.Point(16, 191);
+            this.groupBox8.Name = "groupBox8";
+            this.groupBox8.Size = new System.Drawing.Size(367, 169);
+            this.groupBox8.TabIndex = 18;
+            this.groupBox8.TabStop = false;
+            this.groupBox8.Text = "Gateway";
+            // 
+            // gatewayBtnDown
+            // 
+            this.gatewayBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.gatewayBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.gatewayBtnDown.Location = new System.Drawing.Point(330, 89);
+            this.gatewayBtnDown.Name = "gatewayBtnDown";
+            this.gatewayBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.gatewayBtnDown.TabIndex = 16;
+            this.gatewayBtnDown.UseVisualStyleBackColor = true;
+            this.gatewayBtnDown.Click += new System.EventHandler(this.gatewayBtnDown_Click);
+            // 
+            // gatewayBtnUp
+            // 
+            this.gatewayBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.gatewayBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.gatewayBtnUp.Location = new System.Drawing.Point(330, 56);
+            this.gatewayBtnUp.Name = "gatewayBtnUp";
+            this.gatewayBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.gatewayBtnUp.TabIndex = 15;
+            this.gatewayBtnUp.UseVisualStyleBackColor = true;
+            this.gatewayBtnUp.Click += new System.EventHandler(this.gatewayBtnUp_Click);
+            // 
+            // gatewayDGV
+            // 
+            this.gatewayDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gatewayDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gatewayDGV.Location = new System.Drawing.Point(15, 20);
+            this.gatewayDGV.Name = "gatewayDGV";
+            this.gatewayDGV.Size = new System.Drawing.Size(309, 131);
+            this.gatewayDGV.TabIndex = 0;
+            // 
+            // groupBox11
+            // 
+            this.groupBox11.Controls.Add(this.eventBtnDown);
+            this.groupBox11.Controls.Add(this.eventBtnUp);
+            this.groupBox11.Controls.Add(this.eventDGV);
+            this.groupBox11.Location = new System.Drawing.Point(398, 366);
+            this.groupBox11.Name = "groupBox11";
+            this.groupBox11.Size = new System.Drawing.Size(376, 169);
+            this.groupBox11.TabIndex = 21;
+            this.groupBox11.TabStop = false;
+            this.groupBox11.Text = "Event Notification";
+            // 
+            // eventBtnDown
+            // 
+            this.eventBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.eventBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.eventBtnDown.Location = new System.Drawing.Point(339, 89);
+            this.eventBtnDown.Name = "eventBtnDown";
+            this.eventBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.eventBtnDown.TabIndex = 16;
+            this.eventBtnDown.UseVisualStyleBackColor = true;
+            this.eventBtnDown.Click += new System.EventHandler(this.eventBtnDown_Click);
+            // 
+            // eventBtnUp
+            // 
+            this.eventBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.eventBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.eventBtnUp.Location = new System.Drawing.Point(339, 56);
+            this.eventBtnUp.Name = "eventBtnUp";
+            this.eventBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.eventBtnUp.TabIndex = 15;
+            this.eventBtnUp.UseVisualStyleBackColor = true;
+            this.eventBtnUp.Click += new System.EventHandler(this.eventBtnUp_Click);
+            // 
+            // eventDGV
+            // 
+            this.eventDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.eventDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.eventDGV.Location = new System.Drawing.Point(15, 20);
+            this.eventDGV.Name = "eventDGV";
+            this.eventDGV.Size = new System.Drawing.Size(318, 131);
+            this.eventDGV.TabIndex = 0;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.authorizeBtnDown);
+            this.groupBox2.Controls.Add(this.authorizeBtnUp);
+            this.groupBox2.Controls.Add(this.authorizeDGV);
+            this.groupBox2.Location = new System.Drawing.Point(398, 16);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(376, 169);
+            this.groupBox2.TabIndex = 17;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Authorization";
+            // 
+            // authorizeBtnDown
+            // 
+            this.authorizeBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.authorizeBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.authorizeBtnDown.Location = new System.Drawing.Point(339, 89);
+            this.authorizeBtnDown.Name = "authorizeBtnDown";
+            this.authorizeBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.authorizeBtnDown.TabIndex = 16;
+            this.authorizeBtnDown.UseVisualStyleBackColor = true;
+            this.authorizeBtnDown.Click += new System.EventHandler(this.authorizeBtnDown_Click);
+            // 
+            // authorizeBtnUp
+            // 
+            this.authorizeBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.authorizeBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.authorizeBtnUp.Location = new System.Drawing.Point(339, 56);
+            this.authorizeBtnUp.Name = "authorizeBtnUp";
+            this.authorizeBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.authorizeBtnUp.TabIndex = 15;
+            this.authorizeBtnUp.UseVisualStyleBackColor = true;
+            this.authorizeBtnUp.Click += new System.EventHandler(this.authorizeBtnUp_Click);
+            // 
+            // authorizeDGV
+            // 
+            this.authorizeDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.authorizeDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.authorizeDGV.Location = new System.Drawing.Point(15, 20);
+            this.authorizeDGV.Name = "authorizeDGV";
+            this.authorizeDGV.Size = new System.Drawing.Size(318, 131);
+            this.authorizeDGV.TabIndex = 0;
+            // 
+            // groupBox9
+            // 
+            this.groupBox9.Controls.Add(this.systemBtnDown);
+            this.groupBox9.Controls.Add(this.systemBtnUp);
+            this.groupBox9.Controls.Add(this.systemDGV);
+            this.groupBox9.Location = new System.Drawing.Point(398, 191);
+            this.groupBox9.Name = "groupBox9";
+            this.groupBox9.Size = new System.Drawing.Size(376, 169);
+            this.groupBox9.TabIndex = 19;
+            this.groupBox9.TabStop = false;
+            this.groupBox9.Text = "System Session";
+            // 
+            // systemBtnDown
+            // 
+            this.systemBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.systemBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.systemBtnDown.Location = new System.Drawing.Point(339, 89);
+            this.systemBtnDown.Name = "systemBtnDown";
+            this.systemBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.systemBtnDown.TabIndex = 16;
+            this.systemBtnDown.UseVisualStyleBackColor = true;
+            this.systemBtnDown.Click += new System.EventHandler(this.systemBtnDown_Click);
+            // 
+            // systemBtnUp
+            // 
+            this.systemBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.systemBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.systemBtnUp.Location = new System.Drawing.Point(339, 56);
+            this.systemBtnUp.Name = "systemBtnUp";
+            this.systemBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.systemBtnUp.TabIndex = 15;
+            this.systemBtnUp.UseVisualStyleBackColor = true;
+            this.systemBtnUp.Click += new System.EventHandler(this.systemBtnUp_Click);
+            // 
+            // systemDGV
+            // 
+            this.systemDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.systemDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.systemDGV.Location = new System.Drawing.Point(15, 20);
+            this.systemDGV.Name = "systemDGV";
+            this.systemDGV.Size = new System.Drawing.Size(318, 131);
+            this.systemDGV.TabIndex = 0;
+            // 
+            // groupBox7
+            // 
+            this.groupBox7.Controls.Add(this.authenticateBtnDown);
+            this.groupBox7.Controls.Add(this.authenticateBtnUp);
+            this.groupBox7.Controls.Add(this.authenticateDGV);
+            this.groupBox7.Location = new System.Drawing.Point(16, 16);
+            this.groupBox7.Name = "groupBox7";
+            this.groupBox7.Size = new System.Drawing.Size(367, 169);
+            this.groupBox7.TabIndex = 12;
+            this.groupBox7.TabStop = false;
+            this.groupBox7.Text = "Authentication";
+            // 
+            // authenticateBtnDown
+            // 
+            this.authenticateBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.authenticateBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.authenticateBtnDown.Location = new System.Drawing.Point(330, 89);
+            this.authenticateBtnDown.Name = "authenticateBtnDown";
+            this.authenticateBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.authenticateBtnDown.TabIndex = 16;
+            this.authenticateBtnDown.UseVisualStyleBackColor = true;
+            this.authenticateBtnDown.Click += new System.EventHandler(this.authenticateBtnDown_Click);
+            // 
+            // authenticateBtnUp
+            // 
+            this.authenticateBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.authenticateBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.authenticateBtnUp.Location = new System.Drawing.Point(330, 56);
+            this.authenticateBtnUp.Name = "authenticateBtnUp";
+            this.authenticateBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.authenticateBtnUp.TabIndex = 15;
+            this.authenticateBtnUp.UseVisualStyleBackColor = true;
+            this.authenticateBtnUp.Click += new System.EventHandler(this.authenticateBtnUp_Click);
+            // 
+            // authenticateDGV
+            // 
+            this.authenticateDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.authenticateDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.authenticateDGV.Location = new System.Drawing.Point(15, 20);
+            this.authenticateDGV.Name = "authenticateDGV";
+            this.authenticateDGV.Size = new System.Drawing.Size(309, 131);
+            this.authenticateDGV.TabIndex = 0;
+            // 
             // m_simTab
             // 
-            this.m_simTab.Controls.Add(this.groupBox12);
             this.m_simTab.Controls.Add(this.groupBox6);
             this.m_simTab.Controls.Add(this.groupBox5);
             this.m_simTab.Controls.Add(this.groupBox4);
@@ -296,6 +568,15 @@
             // 
             // groupBox6
             // 
+            this.groupBox6.Controls.Add(this.m_passwordResult);
+            this.groupBox6.Controls.Add(this.m_domainResult);
+            this.groupBox6.Controls.Add(this.m_usernameResult);
+            this.groupBox6.Controls.Add(this.label3);
+            this.groupBox6.Controls.Add(this.label2);
+            this.groupBox6.Controls.Add(this.label1);
+            this.groupBox6.Controls.Add(this.m_lblAuthResult);
+            this.groupBox6.Controls.Add(this.m_lblGatewayResult);
+            this.groupBox6.Controls.Add(this.m_lblAuthorizeResult);
             this.groupBox6.Controls.Add(this.label9);
             this.groupBox6.Controls.Add(this.m_message);
             this.groupBox6.Controls.Add(this.label8);
@@ -308,10 +589,19 @@
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Results";
             // 
+            // m_lblAuthorizeResult
+            // 
+            this.m_lblAuthorizeResult.AutoSize = true;
+            this.m_lblAuthorizeResult.Location = new System.Drawing.Point(251, 26);
+            this.m_lblAuthorizeResult.Name = "m_lblAuthorizeResult";
+            this.m_lblAuthorizeResult.Size = new System.Drawing.Size(48, 13);
+            this.m_lblAuthorizeResult.TabIndex = 5;
+            this.m_lblAuthorizeResult.Text = "Success";
+            // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(19, 96);
+            this.label9.Location = new System.Drawing.Point(19, 129);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(53, 13);
             this.label9.TabIndex = 4;
@@ -321,17 +611,17 @@
             // 
             this.m_message.AcceptsReturn = true;
             this.m_message.AcceptsTab = true;
-            this.m_message.Location = new System.Drawing.Point(76, 93);
+            this.m_message.Location = new System.Drawing.Point(76, 129);
             this.m_message.Multiline = true;
             this.m_message.Name = "m_message";
             this.m_message.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.m_message.Size = new System.Drawing.Size(223, 92);
+            this.m_message.Size = new System.Drawing.Size(223, 58);
             this.m_message.TabIndex = 3;
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(19, 67);
+            this.label8.Location = new System.Drawing.Point(19, 46);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(52, 13);
             this.label8.TabIndex = 2;
@@ -340,7 +630,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(18, 46);
+            this.label7.Location = new System.Drawing.Point(166, 26);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(71, 13);
             this.label7.TabIndex = 1;
@@ -373,9 +663,9 @@
             // button1
             // 
             this.button1.Image = global::pGina.Configuration.Properties.Resources.arrow_right_3;
-            this.button1.Location = new System.Drawing.Point(351, 208);
+            this.button1.Location = new System.Drawing.Point(349, 204);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(23, 20);
+            this.button1.Size = new System.Drawing.Size(30, 27);
             this.button1.TabIndex = 5;
             this.button1.UseVisualStyleBackColor = true;
             // 
@@ -425,7 +715,7 @@
             this.groupBox4.Controls.Add(this.m_liveLog);
             this.groupBox4.Location = new System.Drawing.Point(16, 370);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(754, 142);
+            this.groupBox4.Size = new System.Drawing.Size(754, 161);
             this.groupBox4.TabIndex = 1;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Live Log";
@@ -441,13 +731,14 @@
             this.m_liveLog.Location = new System.Drawing.Point(6, 18);
             this.m_liveLog.Name = "m_liveLog";
             this.m_liveLog.ShowItemToolTips = true;
-            this.m_liveLog.Size = new System.Drawing.Size(742, 114);
+            this.m_liveLog.Size = new System.Drawing.Size(742, 137);
             this.m_liveLog.TabIndex = 0;
             this.m_liveLog.UseCompatibleStateImageBehavior = false;
             this.m_liveLog.View = System.Windows.Forms.View.Details;
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.btnLaunchCredUI);
             this.groupBox3.Controls.Add(this.m_useSavedConfig);
             this.groupBox3.Controls.Add(this.m_radioCredUI);
             this.groupBox3.Controls.Add(this.m_radioEmulate);
@@ -528,278 +819,86 @@
             this.btnOkay.UseVisualStyleBackColor = true;
             this.btnOkay.Click += new System.EventHandler(this.btnOkay_Click);
             // 
-            // groupBox7
+            // m_lblGatewayResult
             // 
-            this.groupBox7.Controls.Add(this.authenticateBtnDown);
-            this.groupBox7.Controls.Add(this.authenticateBtnUp);
-            this.groupBox7.Controls.Add(this.authenticateDGV);
-            this.groupBox7.Location = new System.Drawing.Point(16, 16);
-            this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(367, 169);
-            this.groupBox7.TabIndex = 12;
-            this.groupBox7.TabStop = false;
-            this.groupBox7.Text = "Authentication";
+            this.m_lblGatewayResult.AutoSize = true;
+            this.m_lblGatewayResult.Location = new System.Drawing.Point(96, 46);
+            this.m_lblGatewayResult.Name = "m_lblGatewayResult";
+            this.m_lblGatewayResult.Size = new System.Drawing.Size(48, 13);
+            this.m_lblGatewayResult.TabIndex = 6;
+            this.m_lblGatewayResult.Text = "Success";
             // 
-            // authenticateDGV
+            // m_lblAuthResult
             // 
-            this.authenticateDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.authenticateDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.authenticateDGV.Location = new System.Drawing.Point(15, 20);
-            this.authenticateDGV.Name = "authenticateDGV";
-            this.authenticateDGV.Size = new System.Drawing.Size(309, 131);
-            this.authenticateDGV.TabIndex = 0;
+            this.m_lblAuthResult.AutoSize = true;
+            this.m_lblAuthResult.Location = new System.Drawing.Point(96, 26);
+            this.m_lblAuthResult.Name = "m_lblAuthResult";
+            this.m_lblAuthResult.Size = new System.Drawing.Size(48, 13);
+            this.m_lblAuthResult.TabIndex = 7;
+            this.m_lblAuthResult.Text = "Success";
+            this.m_lblAuthResult.TextChanged += new System.EventHandler(this.m_lblAuthResult_TextChanged);
             // 
-            // authenticateBtnDown
+            // btnLaunchCredUI
             // 
-            this.authenticateBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.authenticateBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.authenticateBtnDown.Location = new System.Drawing.Point(330, 89);
-            this.authenticateBtnDown.Name = "authenticateBtnDown";
-            this.authenticateBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.authenticateBtnDown.TabIndex = 16;
-            this.authenticateBtnDown.UseVisualStyleBackColor = true;
-            this.authenticateBtnDown.Click += new System.EventHandler(this.authenticateBtnDown_Click);
+            this.btnLaunchCredUI.Enabled = false;
+            this.btnLaunchCredUI.Image = global::pGina.Configuration.Properties.Resources.arrow_right_3;
+            this.btnLaunchCredUI.Location = new System.Drawing.Point(169, 69);
+            this.btnLaunchCredUI.Name = "btnLaunchCredUI";
+            this.btnLaunchCredUI.Size = new System.Drawing.Size(30, 27);
+            this.btnLaunchCredUI.TabIndex = 6;
+            this.btnLaunchCredUI.UseVisualStyleBackColor = true;
+            this.btnLaunchCredUI.Click += new System.EventHandler(this.btnLaunchCredUI_Click);
             // 
-            // authenticateBtnUp
+            // label1
             // 
-            this.authenticateBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.authenticateBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.authenticateBtnUp.Location = new System.Drawing.Point(330, 56);
-            this.authenticateBtnUp.Name = "authenticateBtnUp";
-            this.authenticateBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.authenticateBtnUp.TabIndex = 15;
-            this.authenticateBtnUp.UseVisualStyleBackColor = true;
-            this.authenticateBtnUp.Click += new System.EventHandler(this.authenticateBtnUp_Click);
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(18, 75);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(58, 13);
+            this.label1.TabIndex = 8;
+            this.label1.Text = "Username:";
             // 
-            // authorizeBtnDown
+            // label2
             // 
-            this.authorizeBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.authorizeBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.authorizeBtnDown.Location = new System.Drawing.Point(339, 89);
-            this.authorizeBtnDown.Name = "authorizeBtnDown";
-            this.authorizeBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.authorizeBtnDown.TabIndex = 16;
-            this.authorizeBtnDown.UseVisualStyleBackColor = true;
-            this.authorizeBtnDown.Click += new System.EventHandler(this.authorizeBtnDown_Click);
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(18, 100);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(56, 13);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "Password:";
             // 
-            // groupBox2
+            // label3
             // 
-            this.groupBox2.Controls.Add(this.authorizeBtnDown);
-            this.groupBox2.Controls.Add(this.authorizeBtnUp);
-            this.groupBox2.Controls.Add(this.authorizeDGV);
-            this.groupBox2.Location = new System.Drawing.Point(398, 16);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(376, 169);
-            this.groupBox2.TabIndex = 17;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Authorization";
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(166, 75);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(46, 13);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "Domain:";
             // 
-            // authorizeBtnUp
+            // m_usernameResult
             // 
-            this.authorizeBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.authorizeBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.authorizeBtnUp.Location = new System.Drawing.Point(339, 56);
-            this.authorizeBtnUp.Name = "authorizeBtnUp";
-            this.authorizeBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.authorizeBtnUp.TabIndex = 15;
-            this.authorizeBtnUp.UseVisualStyleBackColor = true;
-            this.authorizeBtnUp.Click += new System.EventHandler(this.authorizeBtnUp_Click);
+            this.m_usernameResult.Location = new System.Drawing.Point(79, 73);
+            this.m_usernameResult.Name = "m_usernameResult";
+            this.m_usernameResult.ReadOnly = true;
+            this.m_usernameResult.Size = new System.Drawing.Size(80, 20);
+            this.m_usernameResult.TabIndex = 11;
             // 
-            // authorizeDGV
+            // m_domainResult
             // 
-            this.authorizeDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.authorizeDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.authorizeDGV.Location = new System.Drawing.Point(15, 20);
-            this.authorizeDGV.Name = "authorizeDGV";
-            this.authorizeDGV.Size = new System.Drawing.Size(318, 131);
-            this.authorizeDGV.TabIndex = 0;
+            this.m_domainResult.Location = new System.Drawing.Point(218, 72);
+            this.m_domainResult.Name = "m_domainResult";
+            this.m_domainResult.ReadOnly = true;
+            this.m_domainResult.Size = new System.Drawing.Size(80, 20);
+            this.m_domainResult.TabIndex = 12;
             // 
-            // groupBox8
+            // m_passwordResult
             // 
-            this.groupBox8.Controls.Add(this.gatewayBtnDown);
-            this.groupBox8.Controls.Add(this.gatewayBtnUp);
-            this.groupBox8.Controls.Add(this.gatewayDGV);
-            this.groupBox8.Location = new System.Drawing.Point(16, 191);
-            this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(367, 169);
-            this.groupBox8.TabIndex = 18;
-            this.groupBox8.TabStop = false;
-            this.groupBox8.Text = "Gateway";
-            // 
-            // gatewayBtnDown
-            // 
-            this.gatewayBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.gatewayBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.gatewayBtnDown.Location = new System.Drawing.Point(330, 89);
-            this.gatewayBtnDown.Name = "gatewayBtnDown";
-            this.gatewayBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.gatewayBtnDown.TabIndex = 16;
-            this.gatewayBtnDown.UseVisualStyleBackColor = true;
-            this.gatewayBtnDown.Click += new System.EventHandler(this.gatewayBtnDown_Click);
-            // 
-            // gatewayBtnUp
-            // 
-            this.gatewayBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.gatewayBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.gatewayBtnUp.Location = new System.Drawing.Point(330, 56);
-            this.gatewayBtnUp.Name = "gatewayBtnUp";
-            this.gatewayBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.gatewayBtnUp.TabIndex = 15;
-            this.gatewayBtnUp.UseVisualStyleBackColor = true;
-            this.gatewayBtnUp.Click += new System.EventHandler(this.gatewayBtnUp_Click);
-            // 
-            // gatewayDGV
-            // 
-            this.gatewayDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gatewayDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gatewayDGV.Location = new System.Drawing.Point(15, 20);
-            this.gatewayDGV.Name = "gatewayDGV";
-            this.gatewayDGV.Size = new System.Drawing.Size(309, 131);
-            this.gatewayDGV.TabIndex = 0;
-            // 
-            // systemBtnUp
-            // 
-            this.systemBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.systemBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.systemBtnUp.Location = new System.Drawing.Point(339, 56);
-            this.systemBtnUp.Name = "systemBtnUp";
-            this.systemBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.systemBtnUp.TabIndex = 15;
-            this.systemBtnUp.UseVisualStyleBackColor = true;
-            this.systemBtnUp.Click += new System.EventHandler(this.systemBtnUp_Click);
-            // 
-            // groupBox9
-            // 
-            this.groupBox9.Controls.Add(this.systemBtnDown);
-            this.groupBox9.Controls.Add(this.systemBtnUp);
-            this.groupBox9.Controls.Add(this.systemDGV);
-            this.groupBox9.Location = new System.Drawing.Point(398, 191);
-            this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(376, 169);
-            this.groupBox9.TabIndex = 19;
-            this.groupBox9.TabStop = false;
-            this.groupBox9.Text = "System Session";
-            // 
-            // systemBtnDown
-            // 
-            this.systemBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.systemBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.systemBtnDown.Location = new System.Drawing.Point(339, 89);
-            this.systemBtnDown.Name = "systemBtnDown";
-            this.systemBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.systemBtnDown.TabIndex = 16;
-            this.systemBtnDown.UseVisualStyleBackColor = true;
-            this.systemBtnDown.Click += new System.EventHandler(this.systemBtnDown_Click);
-            // 
-            // systemDGV
-            // 
-            this.systemDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.systemDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.systemDGV.Location = new System.Drawing.Point(15, 20);
-            this.systemDGV.Name = "systemDGV";
-            this.systemDGV.Size = new System.Drawing.Size(318, 131);
-            this.systemDGV.TabIndex = 0;
-            // 
-            // groupBox10
-            // 
-            this.groupBox10.Controls.Add(this.userBtnDown);
-            this.groupBox10.Controls.Add(this.userBtnUp);
-            this.groupBox10.Controls.Add(this.userDGV);
-            this.groupBox10.Location = new System.Drawing.Point(16, 366);
-            this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(367, 169);
-            this.groupBox10.TabIndex = 20;
-            this.groupBox10.TabStop = false;
-            this.groupBox10.Text = "User Session";
-            // 
-            // userBtnDown
-            // 
-            this.userBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.userBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.userBtnDown.Location = new System.Drawing.Point(330, 89);
-            this.userBtnDown.Name = "userBtnDown";
-            this.userBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.userBtnDown.TabIndex = 16;
-            this.userBtnDown.UseVisualStyleBackColor = true;
-            this.userBtnDown.Click += new System.EventHandler(this.userBtnDown_Click);
-            // 
-            // userBtnUp
-            // 
-            this.userBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.userBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.userBtnUp.Location = new System.Drawing.Point(330, 56);
-            this.userBtnUp.Name = "userBtnUp";
-            this.userBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.userBtnUp.TabIndex = 15;
-            this.userBtnUp.UseVisualStyleBackColor = true;
-            this.userBtnUp.Click += new System.EventHandler(this.userBtnUp_Click);
-            // 
-            // userDGV
-            // 
-            this.userDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.userDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.userDGV.Location = new System.Drawing.Point(15, 20);
-            this.userDGV.Name = "userDGV";
-            this.userDGV.Size = new System.Drawing.Size(309, 131);
-            this.userDGV.TabIndex = 0;
-            // 
-            // eventBtnUp
-            // 
-            this.eventBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.eventBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.eventBtnUp.Location = new System.Drawing.Point(339, 56);
-            this.eventBtnUp.Name = "eventBtnUp";
-            this.eventBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.eventBtnUp.TabIndex = 15;
-            this.eventBtnUp.UseVisualStyleBackColor = true;
-            this.eventBtnUp.Click += new System.EventHandler(this.eventBtnUp_Click);
-            // 
-            // groupBox11
-            // 
-            this.groupBox11.Controls.Add(this.eventBtnDown);
-            this.groupBox11.Controls.Add(this.eventBtnUp);
-            this.groupBox11.Controls.Add(this.eventDGV);
-            this.groupBox11.Location = new System.Drawing.Point(398, 366);
-            this.groupBox11.Name = "groupBox11";
-            this.groupBox11.Size = new System.Drawing.Size(376, 169);
-            this.groupBox11.TabIndex = 21;
-            this.groupBox11.TabStop = false;
-            this.groupBox11.Text = "Event Notification";
-            // 
-            // eventBtnDown
-            // 
-            this.eventBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.eventBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.eventBtnDown.Location = new System.Drawing.Point(339, 89);
-            this.eventBtnDown.Name = "eventBtnDown";
-            this.eventBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.eventBtnDown.TabIndex = 16;
-            this.eventBtnDown.UseVisualStyleBackColor = true;
-            this.eventBtnDown.Click += new System.EventHandler(this.eventBtnDown_Click);
-            // 
-            // eventDGV
-            // 
-            this.eventDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.eventDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.eventDGV.Location = new System.Drawing.Point(15, 20);
-            this.eventDGV.Name = "eventDGV";
-            this.eventDGV.Size = new System.Drawing.Size(318, 131);
-            this.eventDGV.TabIndex = 0;
-            // 
-            // groupBox12
-            // 
-            this.groupBox12.Location = new System.Drawing.Point(338, 281);
-            this.groupBox12.Name = "groupBox12";
-            this.groupBox12.Size = new System.Drawing.Size(426, 83);
-            this.groupBox12.TabIndex = 3;
-            this.groupBox12.TabStop = false;
-            this.groupBox12.Text = "Simulated Events";
+            this.m_passwordResult.Location = new System.Drawing.Point(79, 97);
+            this.m_passwordResult.Name = "m_passwordResult";
+            this.m_passwordResult.ReadOnly = true;
+            this.m_passwordResult.Size = new System.Drawing.Size(80, 20);
+            this.m_passwordResult.TabIndex = 13;
             // 
             // ConfigurationUI
             // 
@@ -817,6 +916,18 @@
             ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.m_pluginOrderTab.ResumeLayout(false);
+            this.groupBox10.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.userDGV)).EndInit();
+            this.groupBox8.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).EndInit();
+            this.groupBox11.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.eventDGV)).EndInit();
+            this.groupBox2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).EndInit();
+            this.groupBox9.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.systemDGV)).EndInit();
+            this.groupBox7.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).EndInit();
             this.m_simTab.ResumeLayout(false);
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
@@ -826,18 +937,6 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            this.groupBox7.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).EndInit();
-            this.groupBox2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).EndInit();
-            this.groupBox8.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).EndInit();
-            this.groupBox9.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.systemDGV)).EndInit();
-            this.groupBox10.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.userDGV)).EndInit();
-            this.groupBox11.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.eventDGV)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -903,6 +1002,15 @@
         private System.Windows.Forms.Button eventBtnDown;
         private System.Windows.Forms.Button eventBtnUp;
         private System.Windows.Forms.DataGridView eventDGV;
-        private System.Windows.Forms.GroupBox groupBox12;
+        private System.Windows.Forms.Label m_lblAuthorizeResult;
+        private System.Windows.Forms.Label m_lblAuthResult;
+        private System.Windows.Forms.Label m_lblGatewayResult;
+        private System.Windows.Forms.Button btnLaunchCredUI;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox m_passwordResult;
+        private System.Windows.Forms.TextBox m_domainResult;
+        private System.Windows.Forms.TextBox m_usernameResult;
     }
 }

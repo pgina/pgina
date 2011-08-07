@@ -12,6 +12,7 @@ namespace pGina.Shared.Types
         // Currently ignored if plugin sets this.. but possibly useful if we go LSA in the future...
         public SecurityIdentifier SID { get; set; } 
         public string Username { get; set; }
+        public string Domain { get; set; }      // Null == local machine
         public string Password { get; set; }
         public string Description { get; set; }
 
