@@ -699,6 +699,7 @@ namespace pGina.Configuration
 
         private void btnLaunchCredUI_Click(object sender, EventArgs e)
         {
+            ResetSimUI();
             System.Net.NetworkCredential credential = WindowsApi.GetCredentials("Simulated Login", "Please enter your credentials...");
             if (credential != null)
             {
@@ -731,6 +732,18 @@ namespace pGina.Configuration
             m_liveLog.Items.Add(new ListViewItem(new string[] { message }));
         }
 
+        private void ResetSimUI()
+        {
+            m_message.Text = null;
+            m_liveLog.Items.Clear();
+            m_lblAuthorizeResult.Text = null;
+            m_lblAuthResult.Text = null;
+            m_lblGatewayResult.Text = null;
+            m_usernameResult.Text = null;
+            m_domainResult.Text = null;
+            m_passwordResult.Text = null;
+        }
+
         private void btnSimGo_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Continuing will save all pending changes in configuration, do you want to continue?",
@@ -741,14 +754,7 @@ namespace pGina.Configuration
 
             SaveSettings();
 
-            m_message.Text = null;
-            m_liveLog.Items.Clear();
-            m_lblAuthorizeResult.Text = null;
-            m_lblAuthResult.Text = null;
-            m_lblGatewayResult.Text = null;
-            m_usernameResult.Text = null;
-            m_domainResult.Text = null;
-            m_passwordResult.Text = null;
+            ResetSimUI();
 
             pGina.Shared.Logging.InProcAppender.AddListener(SimLogHandler);
 
