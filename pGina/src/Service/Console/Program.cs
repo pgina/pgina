@@ -18,6 +18,12 @@ namespace pGina.Service.Console
                 logger.DebugFormat("  {0}", dir);
 
             service.Start();
+
+            System.Console.WriteLine("Any key to stop...");
+
+            System.Console.ReadKey();
+
+            service.Stop();
         }
     }
 }

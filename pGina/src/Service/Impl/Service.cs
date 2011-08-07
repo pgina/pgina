@@ -37,5 +37,10 @@ namespace pGina.Service.Impl
         {
             
         }
+
+        public void Stop()
+        {
+
+        }
     }
 }

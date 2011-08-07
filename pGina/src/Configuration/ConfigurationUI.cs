@@ -937,5 +937,10 @@ namespace pGina.Configuration
                 }
             }
         }
+
+        private void pluginsDG_DoubleClick(object sender, EventArgs e)
+        {
+            configureButton_Click(sender, e);
+        }
     }
 }
