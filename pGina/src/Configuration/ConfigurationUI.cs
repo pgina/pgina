@@ -17,17 +17,17 @@ namespace pGina.Configuration
     {
         // Plugin information keyed by Guid
         private Dictionary<string, IPluginBase> m_plugins = new Dictionary<string, IPluginBase>();
-
-        private static readonly string PLUGIN_UUID_COLUMN = "Uuid";
-        private static readonly string PLUGIN_VERSION_COLUMN = "Version";
-        private static readonly string PLUGIN_DESC_COLUMN = "Description";
-        private static readonly string PLUGIN_NAME_COLUMN = "Name";
-        private static readonly string AUTHENTICATION_COLUMN = "Authentication";
-        private static readonly string AUTHORIZATION_COLUMN = "Authorization";
-        private static readonly string GATEWAY_COLUMN = "Gateway";
-        private static readonly string NOTIFICATION_COLUMN = "Notification";
-        private static readonly string USER_SESSION_COLUMN = "UserSession";
-        private static readonly string SYSTEM_SESSION_COLUMN = "SystemSession";
+        
+        private const string PLUGIN_UUID_COLUMN = "Uuid";
+        private const string PLUGIN_VERSION_COLUMN = "Version";
+        private const string PLUGIN_DESC_COLUMN = "Description";
+        private const string PLUGIN_NAME_COLUMN = "Name";
+        private const string AUTHENTICATION_COLUMN = "Authentication";
+        private const string AUTHORIZATION_COLUMN = "Authorization";
+        private const string GATEWAY_COLUMN = "Gateway";
+        private const string NOTIFICATION_COLUMN = "Notification";
+        private const string USER_SESSION_COLUMN = "UserSession";
+        private const string SYSTEM_SESSION_COLUMN = "SystemSession";
 
         public ConfigurationUI()
         {
@@ -52,6 +52,9 @@ namespace pGina.Configuration
             InitPluginOrderDGV(this.authenticateDGV);
             InitPluginOrderDGV(this.authorizeDGV);
             InitPluginOrderDGV(this.gatewayDGV);
+            InitPluginOrderDGV(this.eventDGV);
+            InitPluginOrderDGV(this.userDGV);
+            InitPluginOrderDGV(this.systemDGV);            
 
             // Load order lists from the registry
             LoadPluginOrderListsFromReg();
@@ -179,27 +182,39 @@ namespace pGina.Configuration
                 bool checkBoxState = Convert.ToBoolean(cell.Value);
                 string columnName = pluginsDG.Columns[e.ColumnIndex].Name;
 
-                if (columnName == AUTHENTICATION_COLUMN)
-                {
-                    if (checkBoxState)
-                        this.AddToOrderList(plug, this.authenticateDGV);
-                    else
-                        this.RemoveFromOrderList(uuid, this.authenticateDGV);
-                }
-                if (columnName == AUTHORIZATION_COLUMN)
-                {
-                    if (checkBoxState)
-                        this.AddToOrderList(plug, this.authorizeDGV);
-                    else
-                        this.RemoveFromOrderList(uuid, this.authorizeDGV);
-                }
-                if (columnName == GATEWAY_COLUMN)
-                {
-                    if (checkBoxState)
-                        this.AddToOrderList(plug, this.gatewayDGV);
-                    else
-                        this.RemoveFromOrderList(uuid, this.gatewayDGV);
-                }
+                switch (columnName)
+                {                    
+                    case AUTHENTICATION_COLUMN:
+                        SyncStateToList(checkBoxState, plug, authenticateDGV);
+                        break;
+                    case AUTHORIZATION_COLUMN:
+                        SyncStateToList(checkBoxState, plug, authorizeDGV);
+                        break;
+                    case GATEWAY_COLUMN:
+                        SyncStateToList(checkBoxState, plug, gatewayDGV);
+                        break;
+                    case NOTIFICATION_COLUMN:
+                        SyncStateToList(checkBoxState, plug, eventDGV);
+                        break;
+                    case SYSTEM_SESSION_COLUMN:
+                        SyncStateToList(checkBoxState, plug, systemDGV);
+                        break;
+                    case USER_SESSION_COLUMN:
+                        SyncStateToList(checkBoxState, plug, userDGV);
+                        break;
+                }                
+            }
+        }
+
+        private void SyncStateToList(bool state, IPluginBase plugin, DataGridView grid)
+        {
+            if (state)
+            {
+                this.AddToOrderList(plugin, grid);
+            }
+            else
+            {
+                this.RemoveFromOrderList(plugin.Uuid.ToString(), grid);
             }
         }
 
@@ -280,27 +295,21 @@ namespace pGina.Configuration
 
         private void LoadPluginOrderListsFromReg()
         {
-            this.authenticateDGV.Rows.Clear();
-            this.authorizeDGV.Rows.Clear();
-            this.gatewayDGV.Rows.Clear();
+            LoadPluginOrderListFromReg<IPluginAuthentication>(authenticateDGV);
+            LoadPluginOrderListFromReg<IPluginAuthenticationGateway>(gatewayDGV);
+            LoadPluginOrderListFromReg<IPluginAuthorization>(authorizeDGV);
+            LoadPluginOrderListFromReg<IPluginEventNotifications>(eventDGV);
+            LoadPluginOrderListFromReg<IPluginSystemSessionHelper>(systemDGV);
+            LoadPluginOrderListFromReg<IPluginUserSessionHelper>(userDGV);                        
+        }
 
-            List<IPluginAuthentication> authenticatePlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthentication>();
-            List<IPluginAuthorization> authorizePlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthorization>();
-            List<IPluginAuthenticationGateway> gatewayPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthenticationGateway>();
-
-            foreach (IPluginBase plug in authenticatePlugins)
+        private void LoadPluginOrderListFromReg<T>(DataGridView grid) where T : class, IPluginBase
+        {
+            grid.Rows.Clear();
+            List<T> plugins = PluginLoader.GetOrderedPluginsOfType<T>();
+            foreach (IPluginBase plug in plugins)
             {
-                AddToOrderList(plug, this.authenticateDGV);
-            }
-
-            foreach (IPluginBase plug in authorizePlugins)
-            {
-                AddToOrderList(plug, this.authorizeDGV);
-            }
-
-            foreach (IPluginBase plug in gatewayPlugins)
-            {
-                AddToOrderList(plug, this.gatewayDGV);
+                AddToOrderList(plug, grid);
             }
         }
 
@@ -313,32 +322,24 @@ namespace pGina.Configuration
                 string uuid = (string)row.Cells[PLUGIN_UUID_COLUMN].Value;
                 IPluginBase plug = m_plugins[uuid];
 
-                if (!row.Cells[AUTHENTICATION_COLUMN].ReadOnly)
-                {
-                    bool enabledForAuthentication = (bool)row.Cells[AUTHENTICATION_COLUMN].Value;
-                    if (enabledForAuthentication)
-                        this.AddToOrderList(plug, this.authenticateDGV);
-                    else
-                        this.RemoveFromOrderList(uuid, this.authenticateDGV);
-                }
+                if (!row.Cells[AUTHENTICATION_COLUMN].ReadOnly)                
+                    SyncStateToList((bool)row.Cells[AUTHENTICATION_COLUMN].Value, plug, authenticateDGV);
 
                 if (!row.Cells[AUTHORIZATION_COLUMN].ReadOnly)
-                {
-                    bool enabledForAuthorization = (bool)row.Cells[AUTHORIZATION_COLUMN].Value;
-                    if (enabledForAuthorization)
-                        this.AddToOrderList(plug, this.authorizeDGV);
-                    else
-                        this.RemoveFromOrderList(uuid, this.authorizeDGV);
-                }
+                    SyncStateToList((bool)row.Cells[AUTHORIZATION_COLUMN].Value, plug, authorizeDGV);
 
                 if (!row.Cells[GATEWAY_COLUMN].ReadOnly)
-                {
-                    bool enabledForGateway = (bool)row.Cells[GATEWAY_COLUMN].Value;
-                    if (enabledForGateway)
-                        this.AddToOrderList(plug, this.gatewayDGV);
-                    else
-                        this.RemoveFromOrderList(uuid, this.gatewayDGV);
-                }
+                    SyncStateToList((bool)row.Cells[GATEWAY_COLUMN].Value, plug, gatewayDGV);
+                
+                if (!row.Cells[NOTIFICATION_COLUMN].ReadOnly)
+                    SyncStateToList((bool)row.Cells[NOTIFICATION_COLUMN].Value, plug, eventDGV);
+
+                if (!row.Cells[USER_SESSION_COLUMN].ReadOnly)
+                    SyncStateToList((bool)row.Cells[USER_SESSION_COLUMN].Value, plug, userDGV);
+
+                if (!row.Cells[SYSTEM_SESSION_COLUMN].ReadOnly)
+                    SyncStateToList((bool)row.Cells[SYSTEM_SESSION_COLUMN].Value, plug, systemDGV);
+                
             }
 
             // Remove any plugins that are no longer in the main list from the
@@ -346,6 +347,9 @@ namespace pGina.Configuration
             this.RemoveAllNotInMainList(authorizeDGV);
             this.RemoveAllNotInMainList(authenticateDGV);
             this.RemoveAllNotInMainList(gatewayDGV);
+            this.RemoveAllNotInMainList(eventDGV);
+            this.RemoveAllNotInMainList(systemDGV);
+            this.RemoveAllNotInMainList(userDGV);
         }
 
         private void RemoveAllNotInMainList(DataGridView dgv)
@@ -477,26 +481,19 @@ namespace pGina.Configuration
 
         private void SavePluginOrder()
         {
-            List<string> orderedList = new List<string>();
-            string setting = typeof(IPluginAuthorization).Name + "_Order";
-            orderedList.Clear();
-            foreach (DataGridViewRow row in authorizeDGV.Rows)
-            {
-                orderedList.Add((string)row.Cells[PLUGIN_UUID_COLUMN].Value);
-            }
-            Settings.Get.SetSetting(setting, orderedList.ToArray<string>());
+            SavePluginOrder(authenticateDGV, typeof(IPluginAuthentication));
+            SavePluginOrder(authorizeDGV, typeof(IPluginAuthorization));
+            SavePluginOrder(gatewayDGV, typeof(IPluginAuthenticationGateway));
+            SavePluginOrder(eventDGV, typeof(IPluginEventNotifications));
+            SavePluginOrder(systemDGV, typeof(IPluginSystemSessionHelper));
+            SavePluginOrder(userDGV, typeof(IPluginUserSessionHelper));                        
+        }
 
-            setting = typeof(IPluginAuthentication).Name + "_Order";
-            orderedList.Clear();
-            foreach (DataGridViewRow row in authenticateDGV.Rows)
-            {
-                orderedList.Add((string)row.Cells[PLUGIN_UUID_COLUMN].Value);
-            }
-            Settings.Get.SetSetting(setting, orderedList.ToArray<string>());
-
-            setting = typeof(IPluginAuthenticationGateway).Name + "_Order";
-            orderedList.Clear();
-            foreach (DataGridViewRow row in gatewayDGV.Rows)
+        private void SavePluginOrder(DataGridView grid, Type pluginType)
+        {
+            string setting = pluginType.Name + "_Order";
+            List<string> orderedList = new List<string>();            
+            foreach (DataGridViewRow row in grid.Rows)
             {
                 orderedList.Add((string)row.Cells[PLUGIN_UUID_COLUMN].Value);
             }
@@ -588,6 +585,19 @@ namespace pGina.Configuration
                     configPlugin.Configure();
                 }
             }
+        }        
+
+        private void simMethodChanged(object sender, EventArgs e)
+        {
+            if (sender == m_radioCredUI || sender == m_radioUseService)
+            {
+                m_useSavedConfig.Checked = true;
+                m_useSavedConfig.Enabled = false;
+            }
+            else
+            {
+                m_useSavedConfig.Enabled = true;
+            }
         }
 
         private void authenticateBtnUp_Click(object sender, EventArgs e)
@@ -626,17 +636,40 @@ namespace pGina.Configuration
                 MoveDown(this.gatewayDGV, this.gatewayDGV.SelectedRows[0].Index);
         }
 
-        private void simMethodChanged(object sender, EventArgs e)
+        private void systemBtnUp_Click(object sender, EventArgs e)
         {
-            if (sender == m_radioCredUI || sender == m_radioUseService)
-            {
-                m_useSavedConfig.Checked = true;
-                m_useSavedConfig.Enabled = false;
-            }
-            else
-            {
-                m_useSavedConfig.Enabled = true;
-            }
+            if (this.systemDGV.SelectedRows.Count > 0)
+                MoveUp(this.systemDGV, this.systemDGV.SelectedRows[0].Index);
+        }
+
+        private void systemBtnDown_Click(object sender, EventArgs e)
+        {
+            if (this.systemDGV.SelectedRows.Count > 0)
+                MoveDown(this.systemDGV, this.systemDGV.SelectedRows[0].Index);
+        }
+
+        private void userBtnUp_Click(object sender, EventArgs e)
+        {
+            if (this.userDGV.SelectedRows.Count > 0)
+                MoveUp(this.userDGV, this.userDGV.SelectedRows[0].Index);
+        }
+
+        private void userBtnDown_Click(object sender, EventArgs e)
+        {
+            if (this.userDGV.SelectedRows.Count > 0)
+                MoveDown(this.userDGV, this.userDGV.SelectedRows[0].Index);
+        }
+
+        private void eventBtnUp_Click(object sender, EventArgs e)
+        {
+            if (this.eventDGV.SelectedRows.Count > 0)
+                MoveUp(this.eventDGV, this.eventDGV.SelectedRows[0].Index);
+        }
+
+        private void eventBtnDown_Click(object sender, EventArgs e)
+        {
+            if (this.eventDGV.SelectedRows.Count > 0)
+                MoveDown(this.eventDGV, this.eventDGV.SelectedRows[0].Index);
         }
     }
 }
