@@ -83,16 +83,17 @@ namespace Abstractions.Pipes
                 // Now we just iterate properties and write them out
                 foreach (KeyValuePair<String, Object> property in (IDictionary<String, Object>) message)
                 {
+                    writer.Write(property.Key);
+
+                    // Null values are treated as empty strings
                     if (property.Value == null)
                     {
                         writer.Write((byte)DataType.EmptyString);
                         continue;
                     }
 
-                    System.Type propType = property.Value.GetType();
-
-                    writer.Write(property.Key);
-
+                    System.Type propType = property.Value.GetType();                    
+                    
                     if (propType == typeof(int))
                     {
                         writer.Write((byte) DataType.Integer);                        

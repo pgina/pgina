@@ -782,7 +782,6 @@ namespace pGina.Configuration
             LibraryLogging.AddListener(LibraryLogging.Level.Info, abstractionLogger.InfoFormat);
             LibraryLogging.AddListener(LibraryLogging.Level.Warn, abstractionLogger.WarnFormat);
 
-
             try
             {
                 string pipeName = Core.Settings.Get.ServicePipeName;
@@ -807,6 +806,9 @@ namespace pGina.Configuration
                             case MessageType.LoginResponse:
                                 LoginResponseMessage responseMsg = new LoginResponseMessage(m);
                                 SetLabelStatus(m_lblAuthResult, responseMsg.Result);
+                                m_usernameResult.Text = responseMsg.Username;
+                                m_passwordResult.Text = responseMsg.Password;
+                                m_domainResult.Text = responseMsg.Domain;
                                 if (responseMsg.Message != null)
                                 {
                                     m_message.Text += responseMsg.Message;
@@ -814,6 +816,8 @@ namespace pGina.Configuration
                                 }
                                 // Respond with a disconnect, we're done
                                 return (new EmptyMessage(MessageType.Disconnect).ToExpando());
+                            case MessageType.Ack:   // Ack to our disconnect
+                                return null;    
                             default:
                                 m_logger.ErrorFormat("Server responded with invalid message type: {0}", type);
                                 return null;                                

@@ -60,7 +60,7 @@ namespace Abstractions.Pipes
 
             using (NamedPipeClientStream pipeClient = new NamedPipeClientStream(".", Name, PipeDirection.InOut,
                 PipeOptions.WriteThrough, TokenImpersonationLevel.None, HandleInheritability.None))
-            {
+            {                
                 try
                 {
                     pipeClient.Connect(timeout);

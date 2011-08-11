@@ -48,10 +48,16 @@ namespace Abstractions.Pipes
             dynamic msg = PipeMessage.Demarshal(bytes);
             dynamic reply = callback(msg);
             if (reply != null)
-            {
+            {                            
                 WriteMessage(writer, reply);
-            }
 
+                if (((IDictionary<String, Object>)reply).ContainsKey("LastMessage"))
+                {
+                    ((IDictionary<String, Object>)reply).Remove("LastMessage"); // Don't marshal this property
+                    return false;
+                }
+            }
+            
             return (reply != null);
         }
 

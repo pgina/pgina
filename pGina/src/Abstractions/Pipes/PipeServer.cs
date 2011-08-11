@@ -97,14 +97,12 @@ namespace Abstractions.Pipes
             // Anyone can talk to us
             security.AddAccessRule(new PipeAccessRule("Users", PipeAccessRights.ReadWrite, AccessControlType.Allow)); 
             // But only we have full control (including the 'create' right, which allows us to be the server side of this equation)
-            security.AddAccessRule(new PipeAccessRule(WindowsIdentity.GetCurrent().Owner, PipeAccessRights.FullControl, AccessControlType.Allow)); 
+            security.AddAccessRule(new PipeAccessRule(WindowsIdentity.GetCurrent().Owner, PipeAccessRights.FullControl, AccessControlType.Allow));
 
-            using (NamedPipeServerStream pipeServer = new NamedPipeServerStream(Name, PipeDirection.InOut, MaxClients,
-                    PipeTransmissionMode.Byte, PipeOptions.WriteThrough, 0, 0, security, HandleInheritability.None))
-                    //PipeAccessRights.ChangePermissions | PipeAccessRights.TakeOwnership | PipeAccessRights.AccessSystemSecurity))
-                    //PipeAccessRights.FullControl))
+            while (Running)
             {
-                while (Running)
+                using (NamedPipeServerStream pipeServer = new NamedPipeServerStream(Name, PipeDirection.InOut, MaxClients,
+                        PipeTransmissionMode.Byte, PipeOptions.WriteThrough, 0, 0, security, HandleInheritability.None))
                 {
                     try
                     {
@@ -115,11 +113,11 @@ namespace Abstractions.Pipes
                         LibraryLogging.Error("Error in server connection handler: {0}", e);
                         continue;
                     }
-                     
+
                     // Handle this connection, note that we always expect client to initiate the
                     //  flow of messages, so we do not include an initial message
-                    HandlePipeConnection(pipeServer, null);                    
-                }                
+                    HandlePipeConnection(pipeServer, null);
+                }
             }
         }
 

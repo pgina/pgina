@@ -17,17 +17,35 @@ using pGina.Core.Messages;
 using pGina.Shared.Types;
 
 using Abstractions.Pipes;
+using Abstractions.Logging;
 
 namespace pGina.Service.Impl
 {
     public class Service
     {
         private ILog m_logger = LogManager.GetLogger("pGina.Service.Impl");
+        private ILog m_abstractLogger = LogManager.GetLogger("Abstractions");
         private PipeServer m_server = null;
 
         static Service()
         {
-            Framework.Init();
+            Framework.Init();            
+        }
+
+        private void HookUpAbstractionsLibraryLogging()
+        {
+            LibraryLogging.AddListener(LibraryLogging.Level.Debug, m_abstractLogger.DebugFormat);
+            LibraryLogging.AddListener(LibraryLogging.Level.Error, m_abstractLogger.ErrorFormat);
+            LibraryLogging.AddListener(LibraryLogging.Level.Info, m_abstractLogger.InfoFormat);
+            LibraryLogging.AddListener(LibraryLogging.Level.Warn, m_abstractLogger.WarnFormat);
+        }
+
+        private void DetachAbstractionsLibraryLogging()
+        {
+            LibraryLogging.RemoveListener(LibraryLogging.Level.Debug, m_abstractLogger.DebugFormat);
+            LibraryLogging.RemoveListener(LibraryLogging.Level.Error, m_abstractLogger.ErrorFormat);
+            LibraryLogging.RemoveListener(LibraryLogging.Level.Info, m_abstractLogger.InfoFormat);
+            LibraryLogging.RemoveListener(LibraryLogging.Level.Warn, m_abstractLogger.WarnFormat);
         }
 
         public string[] PluginDirectories
@@ -46,12 +64,14 @@ namespace pGina.Service.Impl
 
         public void Start()
         {
+            HookUpAbstractionsLibraryLogging();
             m_logger.InfoFormat("Starting service");
             m_server.Start();
         }
 
         public void Stop()
         {
+            DetachAbstractionsLibraryLogging();
             m_logger.InfoFormat("Stopping service");
             m_server.Stop();
         }
@@ -73,12 +93,16 @@ namespace pGina.Service.Impl
             switch (type)
             {
                 case MessageType.Disconnect:
-                    return null;                // Ack a disconnect by just closing
+                    // We ack, and mark this as LastMessage, which tells the pipe framework
+                    //  not to expect further messages
+                    dynamic disconnectAck = new EmptyMessage(MessageType.Ack).ToExpando();  // Ack
+                    disconnectAck.LastMessage = true;
+                    return disconnectAck;
                 case MessageType.Hello:
                     return new EmptyMessage(MessageType.Hello).ToExpando();  // Ack with our own hello
                 case MessageType.Log:
                     HandleLogMessage(new LogMessage(msg));
-                    return new EmptyMessage(MessageType.Ack).ToExpando();  // Ack with our own hello
+                    return new EmptyMessage(MessageType.Ack).ToExpando();  // Ack
                 case MessageType.LoginRequest:
                     return HandleLoginRequest(new LoginRequestMessage(msg)).ToExpando();
                 default:
