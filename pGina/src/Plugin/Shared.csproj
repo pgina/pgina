@@ -57,7 +57,6 @@
     <Compile Include="Types\PluginActivityInformation.cs" />
     <Compile Include="Types\SessionProperties.cs" />
     <Compile Include="Types\UserInformation.cs" />
-    <Compile Include="WindowsApi\WindowsApi.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="log4net.config">

@@ -11,7 +11,8 @@ using System.IO;
 using pGina.Core;
 using pGina.Shared.Logging;
 using pGina.Shared.Interfaces;
-using pGina.Shared.WindowsApi;
+
+using Abstractions.WindowsApi;
 
 using log4net;
 

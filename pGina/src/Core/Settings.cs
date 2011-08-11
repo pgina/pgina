@@ -20,7 +20,9 @@ namespace pGina.Core
         public static void Init()
         {
             string curPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);            
-            s_settings.SetDefault("PluginDirectories", new string[] { string.Format("{0}\\Plugins", curPath) });            
+            s_settings.SetDefault("PluginDirectories", new string[] { string.Format("{0}\\Plugins", curPath) });
+            s_settings.SetDefault("ServicePipeName", "pGinaPipe");
+            s_settings.SetDefault("MaxClients", 10);
         }
     }
 }

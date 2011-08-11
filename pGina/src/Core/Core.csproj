@@ -44,6 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Messages\EmptyMessage.cs" />
+    <Compile Include="Messages\LoginRequestMessage.cs" />
+    <Compile Include="Messages\LoginResponseMessage.cs" />
+    <Compile Include="Messages\LogMessage.cs" />
+    <Compile Include="Messages\MessageBase.cs" />
+    <Compile Include="Messages\MessageTypes.cs" />
     <Compile Include="PluginDriver.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Init.cs" />
@@ -51,6 +57,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Abstractions\Abstractions.csproj">
+      <Project>{3E914BA5-74D4-4487-82DA-FFD7F7929363}</Project>
+      <Name>Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Plugin\Shared.csproj">
       <Project>{0EEFBC3F-4DFD-42F6-888E-1A28F4EFEFE3}</Project>
       <Name>Shared</Name>

@@ -8,8 +8,7 @@ using System.Reflection;
 using System.Net;
 using System.Net.Security;
 
-
-namespace pGina.Shared.WindowsApi
+namespace Abstractions.WindowsApi
 {
     public class WindowsApi
     {
