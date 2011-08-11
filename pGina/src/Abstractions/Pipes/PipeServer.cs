@@ -70,25 +70,22 @@ namespace Abstractions.Pipes
             if (!Running)
                 return;
 
-            lock (this)
+            Running = false;
+            
+            // Some or all of our threads may be blocked waiting for connections,
+            // this is a bit nasty, but since I can't seem to get the async 
+            // wait working, we do this - poke em! 
+            for (int x = 0; x < MaxClients; x++)
             {
-                Running = false;
-
-                // Some or all of our threads may be blocked waiting for connections,
-                // this is a bit nasty, but since I can't seem to get the async 
-                // wait working, we do this - poke em! 
-                for (int x = 0; x < MaxClients; x++)
-                {
-                    FakeClientToWakeEmAndShakem();
-                }
-
-                for (int x = 0; x < MaxClients; x++)
-                {
-                    m_serverThreads[x].Join();
-                }
-
-                m_serverThreads = null;
+                FakeClientToWakeEmAndShakem();
             }
+
+            for (int x = 0; x < MaxClients; x++)
+            {
+                m_serverThreads[x].Join();
+            }
+
+            m_serverThreads = null;            
         }
         
         private void ServerThread()
