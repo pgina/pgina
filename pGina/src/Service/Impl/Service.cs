@@ -14,6 +14,7 @@ using pGina.Shared.Interfaces;
 
 using pGina.Core;
 using pGina.Core.Messages;
+using pGina.Shared.Types;
 
 using Abstractions.Pipes;
 
@@ -65,9 +66,10 @@ namespace pGina.Service.Impl
             int instance = Thread.CurrentThread.ManagedThreadId;
             ILog logger = LogManager.GetLogger(string.Format("HandleMessage[{0}]", instance));
 
-            logger.DebugFormat("{0} message received", msg.MessageType);
+            MessageType type = (MessageType)msg.MessageType;
 
-            MessageType type = msg.MessageType;
+            logger.DebugFormat("{0} message received", type);
+            
             switch (type)
             {
                 case MessageType.Disconnect:
@@ -77,6 +79,8 @@ namespace pGina.Service.Impl
                 case MessageType.Log:
                     HandleLogMessage(new LogMessage(msg));
                     return new EmptyMessage(MessageType.Ack).ToExpando();  // Ack with our own hello
+                case MessageType.LoginRequest:
+                    return HandleLoginRequest(new LoginRequestMessage(msg)).ToExpando();
                 default:
                     return null;                // Unknowns get disconnected
             }
@@ -103,6 +107,32 @@ namespace pGina.Service.Impl
                 default:
                     logger.DebugFormat("RemoteLog: {0}", msg.LoggedMessage);
                     break;
+            }
+        }
+
+        private LoginResponseMessage HandleLoginRequest(LoginRequestMessage msg)
+        {
+            try
+            {
+                PluginDriver sessionDriver = new PluginDriver();
+                sessionDriver.UserInformation.Username = msg.Username;
+                sessionDriver.UserInformation.Password = msg.Password;
+
+                BooleanResult result = sessionDriver.PerformLoginProcess();
+
+                return new LoginResponseMessage()
+                {
+                    Result = result.Success,
+                    Message = result.Message,
+                    Username = sessionDriver.UserInformation.Username,
+                    Domain = sessionDriver.UserInformation.Domain,
+                    Password = sessionDriver.UserInformation.Password
+                };                
+            }
+            catch (Exception e)
+            {
+                m_logger.ErrorFormat("Internal error, unexpected exception while handling login request: {0}", e);
+                return new LoginResponseMessage() { Result = false, Message = "Internal error" };
             }
         }
     }

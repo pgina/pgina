@@ -9,10 +9,14 @@ using System.Windows.Forms;
 using System.IO;
 
 using pGina.Core;
+using pGina.Core.Messages;
+
 using pGina.Shared.Logging;
 using pGina.Shared.Interfaces;
 
 using Abstractions.WindowsApi;
+using Abstractions.Logging;
+using Abstractions.Pipes;
 
 using log4net;
 
@@ -746,23 +750,95 @@ namespace pGina.Configuration
         }
 
         private void btnSimGo_Click(object sender, EventArgs e)
-        {
-            if (MessageBox.Show("Continuing will save all pending changes in configuration, do you want to continue?",
-                                "Warning", MessageBoxButtons.YesNo) != System.Windows.Forms.DialogResult.Yes)
-            {
-                return;
-            }
-
-            SaveSettings();
-
+        {            
             ResetSimUI();
-
             pGina.Shared.Logging.InProcAppender.AddListener(SimLogHandler);
 
+            if (m_radioUseService.Checked)
+            {
+                DoServiceClientSimulation();
+            }
+            else
+            {
+                if (MessageBox.Show("Continuing will save all pending changes in configuration, do you want to continue?",
+                                "Warning", MessageBoxButtons.YesNo) != System.Windows.Forms.DialogResult.Yes)
+                {
+                    return;
+                }
+
+                SaveSettings();
+
+                DoInternalSimulation();
+            }
+
+            pGina.Shared.Logging.InProcAppender.RemoveListener(SimLogHandler);
+        }
+
+        private void DoServiceClientSimulation()
+        {
+            ILog abstractionLogger = LogManager.GetLogger("Abstractions");
+            LibraryLogging.AddListener(LibraryLogging.Level.Debug, abstractionLogger.DebugFormat);
+            LibraryLogging.AddListener(LibraryLogging.Level.Error, abstractionLogger.ErrorFormat);
+            LibraryLogging.AddListener(LibraryLogging.Level.Info, abstractionLogger.InfoFormat);
+            LibraryLogging.AddListener(LibraryLogging.Level.Warn, abstractionLogger.WarnFormat);
+
+
+            try
+            {
+                string pipeName = Core.Settings.Get.ServicePipeName;
+                PipeClient client = new PipeClient(pipeName);
+                client.Start(
+                    (Func<dynamic, dynamic>)
+                    ((m) =>
+                    {
+                        MessageType type = (MessageType) m.MessageType;
+                        
+                        // Acceptable server responses are Hello, and LoginResponse                        
+                        switch (type)
+                        {
+                            case MessageType.Hello:
+                                // Send our login request
+                                LoginRequestMessage requestMsg = new LoginRequestMessage()
+                                {
+                                    Username = m_username.Text,
+                                    Password = m_password.Text,
+                                };
+                                return requestMsg.ToExpando();                                
+                            case MessageType.LoginResponse:
+                                LoginResponseMessage responseMsg = new LoginResponseMessage(m);
+                                SetLabelStatus(m_lblAuthResult, responseMsg.Result);
+                                if (responseMsg.Message != null)
+                                {
+                                    m_message.Text += responseMsg.Message;
+                                    m_message.Text += "\r\n";
+                                }
+                                // Respond with a disconnect, we're done
+                                return (new EmptyMessage(MessageType.Disconnect).ToExpando());
+                            default:
+                                m_logger.ErrorFormat("Server responded with invalid message type: {0}", type);
+                                return null;                                
+                        }                                                
+                    }),
+                (new EmptyMessage(MessageType.Hello)).ToExpando(), 1000);
+            }
+            catch (Exception e)
+            {
+                m_logger.ErrorFormat("Error during service client simulation: {0}", e);
+            }
+
+            LibraryLogging.RemoveListener(LibraryLogging.Level.Debug, abstractionLogger.DebugFormat);
+            LibraryLogging.RemoveListener(LibraryLogging.Level.Error, abstractionLogger.ErrorFormat);
+            LibraryLogging.RemoveListener(LibraryLogging.Level.Info, abstractionLogger.InfoFormat);
+            LibraryLogging.RemoveListener(LibraryLogging.Level.Warn, abstractionLogger.WarnFormat);
+        }
+
+        private void DoInternalSimulation()
+        {            
+
             PluginDriver sessionDriver = new PluginDriver();
-            sessionDriver.UserInformation.Username = m_username.Text;            
+            sessionDriver.UserInformation.Username = m_username.Text;
             sessionDriver.UserInformation.Password = m_password.Text;
-            
+
             // We could use PerformLoginProcess, but we want to know what each
             // stage reports, so we basically duplicate it here to know whats goin on.
             bool authenticated = false;
@@ -777,11 +853,11 @@ namespace pGina.Configuration
                 {
                     m_message.Text += result.Message;
                     m_message.Text += "\r\n";
-                }                
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                m_logger.ErrorFormat("Exception during authenticate: {0}", ex);                                
+                m_logger.ErrorFormat("Exception during authenticate: {0}", ex);
             }
 
             if (authenticated || chkIgnoreAuthenticateError.Checked)
@@ -859,10 +935,9 @@ namespace pGina.Configuration
                         plugin.SessionEnding();
                     }
                 }
-            }
-
-            pGina.Shared.Logging.InProcAppender.RemoveListener(SimLogHandler);
+            }            
         }
+
 
         private void SetLabelStatus(Label lbl, bool success)
         {

@@ -100,21 +100,25 @@ namespace Abstractions.Pipes
             security.AddAccessRule(new PipeAccessRule(WindowsIdentity.GetCurrent().Owner, PipeAccessRights.FullControl, AccessControlType.Allow)); 
 
             using (NamedPipeServerStream pipeServer = new NamedPipeServerStream(Name, PipeDirection.InOut, MaxClients,
-                    PipeTransmissionMode.Byte, PipeOptions.WriteThrough, 0, 0, security, HandleInheritability.None, PipeAccessRights.FullControl))
+                    PipeTransmissionMode.Byte, PipeOptions.WriteThrough, 0, 0, security, HandleInheritability.None))
+                    //PipeAccessRights.ChangePermissions | PipeAccessRights.TakeOwnership | PipeAccessRights.AccessSystemSecurity))
+                    //PipeAccessRights.FullControl))
             {
                 while (Running)
                 {
                     try
                     {
                         pipeServer.WaitForConnection();
-                        // Handle this connection, note that we always expect client to initiate the
-                        //  flow of messages, so we do not include an initial message
-                        HandlePipeConnection(pipeServer, null);
                     }
                     catch (Exception e)
                     {
                         LibraryLogging.Error("Error in server connection handler: {0}", e);
+                        continue;
                     }
+                     
+                    // Handle this connection, note that we always expect client to initiate the
+                    //  flow of messages, so we do not include an initial message
+                    HandlePipeConnection(pipeServer, null);                    
                 }                
             }
         }

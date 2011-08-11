@@ -11,6 +11,7 @@ namespace pGina.Core.Messages
     {        
         public string Username { get; set; }
         public string Password { get; set; }
+        public string Domain { get; set; }
 
         public LoginRequestMessage(dynamic expandoVersion)
         {
@@ -24,7 +25,8 @@ namespace pGina.Core.Messages
         public override void FromExpando(dynamic expandoVersion)
         {
             Username = expandoVersion.Username;
-            Password = expandoVersion.Password;            
+            Password = expandoVersion.Password;
+            Domain = expandoVersion.Domain;
         }
 
         public override dynamic ToExpando()
@@ -32,6 +34,7 @@ namespace pGina.Core.Messages
             dynamic exp = new ExpandoObject();
             exp.Username = this.Username;
             exp.Password = this.Password;
+            exp.Domain = this.Domain;
             exp.MessageType = (byte) MessageType.LoginRequest;
             return exp;
         }

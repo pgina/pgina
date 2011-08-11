@@ -56,20 +56,24 @@ namespace Abstractions.Pipes
 
         public void Start(Func<BinaryReader, BinaryWriter, bool> action, dynamic initialMessage, int timeout)
         {
+            StreamAction = action;
+
             using (NamedPipeClientStream pipeClient = new NamedPipeClientStream(".", Name, PipeDirection.InOut,
                 PipeOptions.WriteThrough, TokenImpersonationLevel.None, HandleInheritability.None))
             {
                 try
                 {
                     pipeClient.Connect(timeout);
-
-                    // Write the initial message to get the pumps running
-                    HandlePipeConnection(pipeClient, initialMessage);
                 }
-                catch (Exception e)
+                catch(Exception e)
                 {
-                    LibraryLogging.Error("Error in client message processing: {0}", e);
+                    LibraryLogging.Error("Error connecting PipeClient: {0}", e);
+                    return;
                 }
+
+                // Write the initial message to get the pumps running,
+                //  not in a try/catch so that errors bubble up
+                HandlePipeConnection(pipeClient, initialMessage);                
             }                         
         }        
     }

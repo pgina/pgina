@@ -5,12 +5,14 @@ using System.Text;
 using System.IO;
 using System.IO.Pipes;
 
+using Abstractions.Logging;
+
 namespace Abstractions.Pipes
 {
     public abstract class Pipe
     {
         public string Name { get; private set; }
-        public Func<BinaryReader, BinaryWriter, bool> StreamAction { get; private set; }
+        public Func<BinaryReader, BinaryWriter, bool> StreamAction { get; protected set; }
 
         protected Pipe(string name)
         {
@@ -72,19 +74,33 @@ namespace Abstractions.Pipes
             BinaryReader reader = new BinaryReader(pipeStream);
             BinaryWriter writer = new BinaryWriter(pipeStream);
 
-            // If we should announce with a specific message, do so
-            if (initialMessage != null)
+            try
             {
-                WriteMessage(writer, initialMessage);
+                // If we should announce with a specific message, do so
+                if (initialMessage != null)
+                {
+                    WriteMessage(writer, initialMessage);
+                }
+
+                // So long as our Func<> returns true, we keep going.  When it returns false,
+                //  it is done and its time to closeup and look for another client.
+                while (StreamAction(reader, writer)) { }
+            }
+            catch(Exception e)
+            {
+                LibraryLogging.Error("Error while using pipe connection: {0}", e);
             }
 
-            // So long as our Func<> returns true, we keep going.  When it returns false,
-            //  it is done and its time to closeup and look for another client.
-            while (StreamAction(reader, writer)) { }
-
-            pipeStream.Flush();
-            pipeStream.WaitForPipeDrain();
-            pipeStream.Close();
+            try
+            {
+                pipeStream.Flush();
+                pipeStream.WaitForPipeDrain();
+                pipeStream.Close();
+            }
+            catch(Exception e)
+            {
+                LibraryLogging.Error("Error while flushing/closing pipe connection: {0}", e);
+            }
         }
     }
 }

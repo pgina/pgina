@@ -19,7 +19,8 @@ namespace Abstractions.Pipes
             Byte            = 0x00,
             Integer         = 0x01,
             Boolean         = 0x02,
-            String          = 0x03,            
+            String          = 0x03,
+            EmptyString     = 0x04,
         }
         
         public static dynamic Demarshal(byte[] data)
@@ -39,25 +40,31 @@ namespace Abstractions.Pipes
                 dynamic message = new ExpandoObject();
                 IDictionary<String, Object> messageDict = ((IDictionary<String, Object>)message);
 
-                string propertyName = br.ReadString();
-                DataType propertyType = (DataType) br.ReadByte();
-
-                switch (propertyType)
+                while (br.BaseStream.Position < br.BaseStream.Length)
                 {
-                    case DataType.Boolean:                        
-                        messageDict.Add(propertyName, br.ReadBoolean());
-                        break;
-                    case DataType.Byte:
-                        messageDict.Add(propertyName, br.ReadByte());
-                        break;
-                    case DataType.Integer:
-                        messageDict.Add(propertyName, br.ReadInt32());
-                        break;
-                    case DataType.String:
-                        messageDict.Add(propertyName, br.ReadString());
-                        break;                                            
-                    default:
-                        throw new InvalidDataException(string.Format("Message includes unknown data type: {0} for property: {1}", propertyType, propertyName));
+                    string propertyName = br.ReadString();
+                    DataType propertyType = (DataType)br.ReadByte();
+
+                    switch (propertyType)
+                    {
+                        case DataType.Boolean:
+                            messageDict.Add(propertyName, br.ReadBoolean());
+                            break;
+                        case DataType.Byte:
+                            messageDict.Add(propertyName, br.ReadByte());
+                            break;
+                        case DataType.Integer:
+                            messageDict.Add(propertyName, br.ReadInt32());
+                            break;
+                        case DataType.String:
+                            messageDict.Add(propertyName, br.ReadString());
+                            break;
+                        case DataType.EmptyString:
+                            messageDict.Add(propertyName, (string) null);
+                            break;
+                        default:
+                            throw new InvalidDataException(string.Format("Message includes unknown data type: {0} for property: {1}", propertyType, propertyName));
+                    }
                 }
 
                 return message;
@@ -75,8 +82,14 @@ namespace Abstractions.Pipes
     
                 // Now we just iterate properties and write them out
                 foreach (KeyValuePair<String, Object> property in (IDictionary<String, Object>) message)
-                {                    
-                    System.Type propType = property.GetType();
+                {
+                    if (property.Value == null)
+                    {
+                        writer.Write((byte)DataType.EmptyString);
+                        continue;
+                    }
+
+                    System.Type propType = property.Value.GetType();
 
                     writer.Write(property.Key);
 
