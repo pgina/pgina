@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using System.ServiceProcess;
 
 using log4net;
 
@@ -74,6 +75,25 @@ namespace pGina.Service.Impl
             DetachAbstractionsLibraryLogging();
             m_logger.InfoFormat("Stopping service");
             m_server.Stop();
+        }
+
+        public void SessionChange(SessionChangeDescription changeDescription)
+        {
+            m_logger.InfoFormat("SessionChange: {0} -> {1}", changeDescription.SessionId, changeDescription.Reason);
+
+            foreach (IPluginEventNotifications plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
+            {
+                try
+                {
+                    plugin.SessionChange(changeDescription);
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("Ignoring unhandled exception from {0}: {1}", plugin.Uuid, e);
+                }
+            }
+
+            // TBD: System and user session helper management here
         }
 
         // This will be called on seperate threads, 1 per client connection and
