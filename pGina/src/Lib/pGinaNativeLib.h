@@ -2,5 +2,5 @@
 
 #include <Windows.h>
 #include <Registry.h>
-#include <PipeMessage.h>
+#include <Message.h>
 

@@ -24,15 +24,16 @@
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="MessageProperty.h" />
     <ClInclude Include="MessageTypes.h" />
+    <ClInclude Include="NamedPipes.h" />
     <ClInclude Include="pGinaNativeLib.h" />
-    <ClInclude Include="PipeMessage.h" />
+    <ClInclude Include="Message.h" />
     <ClInclude Include="Registry.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BinaryReader.cpp" />
     <ClCompile Include="BinaryWriter.cpp" />
     <ClCompile Include="pGinaNativeLib.cpp" />
-    <ClCompile Include="PipeMessage.cpp" />
+    <ClCompile Include="Message.cpp" />
     <ClCompile Include="Registry.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

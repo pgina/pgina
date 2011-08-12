@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "PipeMessage.h"
+#include "Message.h"
 #include "MessageProperty.h"
 #include "BinaryReader.h"
 #include "BinaryWriter.h"
