@@ -1,4 +1,10 @@
+#include <assert.h>
 #include "PipeMessage.h"
+#include "MessageProperty.h"
+#include "BinaryReader.h"
+#include "BinaryWriter.h"
+
+#define CURRENT_MESSAGE_FORMAT_VERSION 0x01
 
 namespace pGina
 {
@@ -18,99 +24,122 @@ namespace pGina
 
 			m_properties.clear();
 		}
-					
-		int  Message::Integer(std::wstring const& propertyName)
-		{
-			return 0;
-		}
-
-		void Message::Integer(std::wstring const& propertyName, int value)
-		{
-		}
-
-		std::wstring Message::String(std::wstring const& propertyName)
-		{
-			return L"";
-		}
-
-		void Message::String(std::wstring const& propertyName, std::wstring const& value)
-		{
-		}
-
-		unsigned char Message::Byte(std::wstring const& propertyName)
-		{
-			return 0x00;
-		}
-
-		void          Message::Byte(std::wstring const& propertyName, unsigned char value)
-		{
-		}
-
-		bool		  Message::Bool(std::wstring const& propertyName)
-		{
-			return false;
-		}
-
-		void		  Message::Bool(std::wstring const& propertyName, bool value)
-		{
-		}
-
+							
 		/* static */
 		Message * Message::Demarshal(pGina::Memory::Buffer &buffer)
 		{
 			// Cannot be empty
 			if(buffer.Raw() == 0 || buffer.Length() == 0)
 				return 0;
+			
+			pGina::Memory::BinaryReader reader(buffer);
 
-			/*			
-            using (BinaryReader br = new BinaryReader(new MemoryStream(data, false)))
-            {
-                // For now we support only the one message version
-                byte messageFormatVersion = br.ReadByte();
-                if (messageFormatVersion != CurrentMessageFormatVersion)
-                    throw new InvalidDataException(string.Format("Message format: {0} is not support (library version: {1})", messageFormatVersion, CurrentMessageFormatVersion));
+			unsigned char messageFormatVersion = reader.ReadByte();
+			if(messageFormatVersion != CURRENT_MESSAGE_FORMAT_VERSION)
+				return 0;
 
-                // Create an expando object to represent this message
-                dynamic message = new ExpandoObject();
-                IDictionary<String, Object> messageDict = ((IDictionary<String, Object>)message);
-
-                while (br.BaseStream.Position < br.BaseStream.Length)
-                {
-                    string propertyName = br.ReadString();
-                    DataType propertyType = (DataType)br.ReadByte();
-
-                    switch (propertyType)
-                    {
-                        case DataType.Boolean:
-                            messageDict.Add(propertyName, br.ReadBoolean());
-                            break;
-                        case DataType.Byte:
-                            messageDict.Add(propertyName, br.ReadByte());
-                            break;
-                        case DataType.Integer:
-                            messageDict.Add(propertyName, br.ReadInt32());
-                            break;
-                        case DataType.String:
-                            messageDict.Add(propertyName, br.ReadString());
-                            break;
-                        case DataType.EmptyString:
-                            messageDict.Add(propertyName, (string) null);
-                            break;
-                        default:
-                            throw new InvalidDataException(string.Format("Message includes unknown data type: {0} for property: {1}", propertyType, propertyName));
-                    }
-                }
-
-                return message;
-            }
-			*/
-			return 0;
+			Message * msg = new Message();
+			while(!reader.EndOfBuffer())
+			{
+				std::wstring propertyName = reader.ReadUnicodeString();
+				PropertyType propertyType = static_cast<PropertyType>(reader.ReadByte());
+				
+				switch(propertyType)
+				{
+				case Boolean:
+					msg->Property<bool>(propertyName, reader.ReadBool(), Boolean);
+					break;
+				case Byte:
+					msg->Property<unsigned char>(propertyName, reader.ReadByte(), Byte);
+					break;
+				case EmptyString:
+					msg->Property<std::wstring>(propertyName, L"", String);
+					break;
+				case Integer:
+					msg->Property<int>(propertyName, reader.ReadInt32(), Integer);
+					break;
+				case String:
+					msg->Property<std::wstring>(propertyName, reader.ReadUnicodeString(), String);
+					break;
+				}
+			}			
+			return msg;
 		}
 		
 		/* static */
-		pGina::Memory::Buffer *  Message::Marshal(Message *)
+		pGina::Memory::Buffer *  Message::Marshal(Message *msg)
 		{
-			return 0;
+			int length = MarshalToBuffer(msg, 0);
+			pGina::Memory::Buffer * buffer = new pGina::Memory::Buffer(length);
+			
+			if(MarshalToBuffer(msg, buffer) != length)
+				assert(0);
+
+			return buffer;
+		}
+
+		/* static */
+		int Message::MarshalToBuffer(Message * msg, pGina::Memory::Buffer * buffer)
+		{
+			pGina::Memory::BinaryWriter writer(buffer);
+
+			writer.Write((unsigned char) CURRENT_MESSAGE_FORMAT_VERSION);
+
+			PropertyMap& properties = msg->Properties();
+
+			for(Message::PropertyMap::iterator itr = properties.begin(); itr != properties.end(); ++itr)
+			{
+				// Property name
+				writer.Write(itr->first);
+
+				PropertyBase * propBase = itr->second;
+
+				// Special case, if its a string, and its empty, we want to write
+				//	nothing for value
+				if(propBase->Type() == String)
+				{
+					pGina::Pipes::Property<std::wstring> * prop = static_cast<pGina::Pipes::Property<std::wstring> *>(propBase);
+					if(prop->Value().empty())
+						propBase->Type(EmptyString);
+				}
+
+				// Property type
+				writer.Write((unsigned char)propBase->Type());
+
+				// now work out type/value				
+				switch(propBase->Type())
+				{
+				case Boolean:				
+					{
+						pGina::Pipes::Property<bool> * prop = static_cast<pGina::Pipes::Property<bool> *>(propBase);
+						writer.Write(prop->Value());
+					}
+					break;
+				case Byte:
+					{
+						pGina::Pipes::Property<unsigned char> * prop = static_cast<pGina::Pipes::Property<unsigned char> *>(propBase);
+						writer.Write(prop->Value());
+					}
+					break;
+				case EmptyString:	
+					// Do nothing, no value here
+					break;
+				case Integer:					
+					{
+						pGina::Pipes::Property<int> * prop = static_cast<pGina::Pipes::Property<int> *>(propBase);
+						writer.Write(prop->Value());
+					}
+					break;
+				case String:					
+					{
+						pGina::Pipes::Property<std::wstring> * prop = static_cast<pGina::Pipes::Property<std::wstring> *>(propBase);
+						writer.Write(prop->Value());
+					}
+					break;
+				}
+			}
+
+			return writer.BytesWritten();			
 		}
 	}
 }

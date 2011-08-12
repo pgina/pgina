@@ -27,10 +27,15 @@ namespace pGina
 
 			int			  ReadInt32();
 			unsigned char ReadByte();
-			std::string   ReadString();
+			std::string   ReadUTF8String();
+			std::wstring  ReadUnicodeString();
 			bool		  ReadBool();
 
+			bool	      EndOfBuffer() { return (m_cursor - m_buffer >= m_bufferLength); }
+
 		private:
+			int Decode7bitLength();
+
 			unsigned char * m_buffer;
 			unsigned char * m_cursor;
 			int m_bufferLength;			

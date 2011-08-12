@@ -77,8 +77,8 @@ namespace Abstractions.Pipes
             //  with a double (or triple if we close the pipeServer stream ourselves)
             //  close.  Yay.  Instead we abandoned these to the GC knowing that they
             //  are only wrappers anyway and have/use little/no resources of their own.
-            BinaryReader reader = new BinaryReader(pipeStream);
-            BinaryWriter writer = new BinaryWriter(pipeStream);
+            BinaryReader reader = new BinaryReader(pipeStream, Encoding.Unicode);
+            BinaryWriter writer = new BinaryWriter(pipeStream, Encoding.Unicode);
 
             try
             {

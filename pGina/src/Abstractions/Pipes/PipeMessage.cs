@@ -29,7 +29,7 @@ namespace Abstractions.Pipes
             if (data.Length == 0)
                 throw new InvalidDataException(string.Format("Empty message provided, invalid format."));
             
-            using (BinaryReader br = new BinaryReader(new MemoryStream(data, false)))
+            using (BinaryReader br = new BinaryReader(new MemoryStream(data, false), Encoding.Unicode))
             {
                 // For now we support only the one message version
                 byte messageFormatVersion = br.ReadByte();
@@ -75,7 +75,7 @@ namespace Abstractions.Pipes
         {
             using (MemoryStream memory = new MemoryStream())
             {
-                BinaryWriter writer = new BinaryWriter(memory);
+                BinaryWriter writer = new BinaryWriter(memory, Encoding.Unicode);
                 
                 // Write the version
                 writer.Write(CurrentMessageFormatVersion);

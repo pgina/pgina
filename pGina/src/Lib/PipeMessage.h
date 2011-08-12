@@ -14,26 +14,63 @@ namespace pGina
 		class Message
 		{
 		public:	
+			typedef std::map<std::wstring, PropertyBase *> PropertyMap;
+
 			Message();
 			~Message();
 
 			static Message * Demarshal(pGina::Memory::Buffer &buffer);
 			static pGina::Memory::Buffer *  Marshal(Message *);
 
-			int  Integer(std::wstring const& propertyName);
-			void Integer(std::wstring const& propertyName, int value);
+			template<typename T>
+			bool Exists(std::wstring const& propertyName)
+			{
+				PropertyMap::iterator itr = m_properties.find(propertyName);
+				if(itr != m_properties.end())
+				{
+					Property<T> * prop = dynamic_cast<Property<T> *>(itr->second);
+					return prop != 0;
+				}
 
-			std::wstring String(std::wstring const& propertyName);
-			void         String(std::wstring const& propertyName, std::wstring const& value);
+				return false;
+			}
 
-			unsigned char Byte(std::wstring const& propertyName);
-			void          Byte(std::wstring const& propertyName, unsigned char value);
+			template<typename T>
+			T    Property(std::wstring const& propertyName)
+			{
+				PropertyMap::iterator itr = m_properties.find(propertyName);
+				if(itr != m_properties.end())
+				{
+					Property<T> * prop = static_cast<Property<T> *>(itr->second);
+					return prop->Value();
+				}
 
-			bool		  Bool(std::wstring const& propertyName);
-			void		  Bool(std::wstring const& propertyName, bool value);
+				return T();
+			}
+
+			template<typename T>
+			void Property(std::wstring const& propertyName, T const& value, PropertyType type)
+			{				
+				// Create a new property to be inserted
+				pGina::Pipes::Property<T> * prop = new pGina::Pipes::Property<T>(propertyName, value, type);
+
+				// If we already have a property by this name, we need to clean it up
+				PropertyMap::iterator itr = m_properties.find(propertyName);
+				if(itr != m_properties.end())
+				{
+					PropertyBase * base = itr->second;
+					delete base;
+					m_properties.erase(itr);
+				}
+
+				// Insert our new property
+				m_properties[propertyName] = prop;
+			}	
+
+			PropertyMap& Properties() { return m_properties; }
 						
 		private:			
-			typedef std::map<std::wstring, PropertyBase *> PropertyMap;
+			static int MarshalToBuffer(Message *msg, pGina::Memory::Buffer * buffer);			
 			PropertyMap m_properties;			
 		};
 	}

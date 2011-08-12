@@ -22,11 +22,11 @@ namespace pGina
 			std::wstring const& Name() { return m_name; }
 			void                Name(std::wstring const& v) { m_name = v; }
 
-			PropertyType Type() { return m_type; }
-			void		 Type(PropertyType t) { m_type = t; }
-
+			PropertyType        Type() { return m_type; }
+			void				Type(PropertyType t) { m_type = t; }
+			
 		protected:
-			std::wstring m_name;		
+			std::wstring m_name;					
 			PropertyType m_type;
 
 			PropertyBase() {}	// Common folk shouldn't be creating me..		
@@ -36,16 +36,12 @@ namespace pGina
 		class Property : public PropertyBase
 		{
 		public:
-			Property() {}
-
-			Property(const wchar_t * name) :
-				m_name(name ? name : L"") {}
-
-			Property(std::wstring const& name, ValueType const& value) :
-				m_name(name), m_value(value) {}
-
 			Property(std::wstring const& name, ValueType const& value, PropertyType type) :
-				m_name(name), m_value(value), m_type(type) {}
+				m_value(value)
+				{
+					m_name = name;				
+					m_type = type;
+				}
 			  			
 			ValueType const&    Value() { return m_value; }
 			void			    Value(ValueType const& v) { m_value = v; }
