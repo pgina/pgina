@@ -5,6 +5,7 @@
 #include <map>
 
 #include "MessageProperty.h"
+#include "Buffer.h"
 
 namespace pGina
 {
@@ -16,8 +17,8 @@ namespace pGina
 			Message();
 			~Message();
 
-			static Message * Demarshal(const char * buffer, int length);
-			static void      Marshal(Message *, char **buffer, int& length);			
+			static Message * Demarshal(pGina::Memory::Buffer &buffer);
+			static pGina::Memory::Buffer *  Marshal(Message *);
 
 			int  Integer(std::wstring const& propertyName);
 			void Integer(std::wstring const& propertyName, int value);

@@ -19,6 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BinaryReader.h" />
+    <ClInclude Include="BinaryWriter.h" />
+    <ClInclude Include="Buffer.h" />
     <ClInclude Include="MessageProperty.h" />
     <ClInclude Include="MessageTypes.h" />
     <ClInclude Include="pGinaNativeLib.h" />
@@ -26,6 +29,8 @@
     <ClInclude Include="Registry.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BinaryReader.cpp" />
+    <ClCompile Include="BinaryWriter.cpp" />
     <ClCompile Include="pGinaNativeLib.cpp" />
     <ClCompile Include="PipeMessage.cpp" />
     <ClCompile Include="Registry.cpp" />
