@@ -1,14 +1,6 @@
 #pragma once
 
 #include <Windows.h>
+#include <Registry.h>
+#include <PipeMessage.h>
 
-namespace pGina
-{
-  namespace Native
-  {
-    namespace Lib
-    {
-      const wchar_t * Version();
-    }
-  }
-}
