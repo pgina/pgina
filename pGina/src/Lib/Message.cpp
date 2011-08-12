@@ -26,6 +26,15 @@ namespace pGina
 		}
 							
 		/* static */
+		Message * Message::Demarshal(pGina::Memory::Buffer *buffer)
+		{
+			if(buffer == 0)
+				return 0;
+
+			return Demarshal(*buffer);
+		}
+
+		/* static */
 		Message * Message::Demarshal(pGina::Memory::Buffer &buffer)
 		{
 			// Cannot be empty

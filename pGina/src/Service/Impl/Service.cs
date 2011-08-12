@@ -132,24 +132,24 @@ namespace pGina.Service.Impl
 
         private void HandleLogMessage(LogMessage msg)
         {
-            ILog logger = LogManager.GetLogger(msg.LoggerName);
+            ILog logger = LogManager.GetLogger(string.Format("RemoteLog[{0}]", msg.LoggerName));
 
             switch (msg.Level.ToLower())
             {
                 case "info":
-                    logger.InfoFormat("RemoteLog: {0}", msg.LoggedMessage);
+                    logger.InfoFormat("{0}", msg.LoggedMessage);
                     break;
                 case "debug":
-                    logger.DebugFormat("RemoteLog: {0}", msg.LoggedMessage);
+                    logger.DebugFormat("{0}", msg.LoggedMessage);
                     break;
                 case "error":
-                    logger.ErrorFormat("RemoteLog: {0}", msg.LoggedMessage);
+                    logger.ErrorFormat("{0}", msg.LoggedMessage);
                     break;
                 case "warn":
-                    logger.WarnFormat("RemoteLog: {0}", msg.LoggedMessage);
+                    logger.WarnFormat("{0}", msg.LoggedMessage);
                     break;
                 default:
-                    logger.DebugFormat("RemoteLog: {0}", msg.LoggedMessage);
+                    logger.DebugFormat("{0}", msg.LoggedMessage);
                     break;
             }
         }

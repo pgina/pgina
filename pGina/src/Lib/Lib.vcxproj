@@ -23,7 +23,8 @@
     <ClInclude Include="BinaryWriter.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="MessageProperty.h" />
-    <ClInclude Include="MessageTypes.h" />
+    <ClInclude Include="ObjectCleanupPool.h" />
+    <ClInclude Include="pGinaMessages.h" />
     <ClInclude Include="PipeClient.h" />
     <ClInclude Include="pGinaNativeLib.h" />
     <ClInclude Include="Message.h" />
@@ -32,6 +33,7 @@
   <ItemGroup>
     <ClCompile Include="BinaryReader.cpp" />
     <ClCompile Include="BinaryWriter.cpp" />
+    <ClCompile Include="pGinaMessages.cpp" />
     <ClCompile Include="pGinaNativeLib.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="PipeClient.cpp" />

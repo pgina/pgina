@@ -26,7 +26,7 @@ namespace pGina.Core.Messages
         {
             LoggerName = expandoVersion.LoggerName;
             Level = expandoVersion.Level;
-            LoggedMessage = expandoVersion.LoggedMessag;
+            LoggedMessage = expandoVersion.LoggedMessage;
         }
 
         public override dynamic ToExpando()

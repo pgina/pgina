@@ -20,6 +20,7 @@ namespace pGina
 			~Message();
 
 			static Message * Demarshal(pGina::Memory::Buffer &buffer);
+			static Message * Demarshal(pGina::Memory::Buffer *buffer);
 			static pGina::Memory::Buffer *  Marshal(Message *);
 
 			template<typename T>
@@ -28,7 +29,7 @@ namespace pGina
 				PropertyMap::iterator itr = m_properties.find(propertyName);
 				if(itr != m_properties.end())
 				{
-					Property<T> * prop = dynamic_cast<Property<T> *>(itr->second);
+					pGina::Messaging::Property<T> * prop = dynamic_cast<pGina::Messaging::Property<T> *>(itr->second);
 					return prop != 0;
 				}
 
@@ -41,7 +42,7 @@ namespace pGina
 				PropertyMap::iterator itr = m_properties.find(propertyName);
 				if(itr != m_properties.end())
 				{
-					Property<T> * prop = static_cast<Property<T> *>(itr->second);
+					pGina::Messaging::Property<T> * prop = static_cast<pGina::Messaging::Property<T> *>(itr->second);
 					return prop->Value();
 				}
 

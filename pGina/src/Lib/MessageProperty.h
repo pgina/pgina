@@ -30,6 +30,7 @@ namespace pGina
 			PropertyType m_type;
 
 			PropertyBase() {}	// Common folk shouldn't be creating me..		
+			virtual void DummyVirtualForDynamicCastRequirement() {}
 		};
 
 		template <typename ValueType>
