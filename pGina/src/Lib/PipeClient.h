@@ -19,8 +19,11 @@ namespace pGina
 			bool Connect();
 			bool Connect(int timeout);
 
-			pGina::Memory::Buffer * ReadBuffer();
-			void WriteBuffer(pGina::Memory::Buffer *buffer);
+			pGina::Memory::Buffer * ReadLengthEncodedBuffer();
+			bool WriteLengthEncodedBuffer(pGina::Memory::Buffer *buffer);
+
+			pGina::Memory::Buffer * ReadBuffer(int size);
+			bool WriteBuffer(pGina::Memory::Buffer *buffer);
 
 			int Read(unsigned char * buffer, int len);
 			int Write(unsigned char * buffer, int len);

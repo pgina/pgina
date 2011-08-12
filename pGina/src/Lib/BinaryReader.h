@@ -18,6 +18,13 @@ namespace pGina
 				m_cursor = m_buffer;
 			}
 
+			BinaryReader(Buffer *buffer)			  
+			{
+				m_buffer = buffer->Raw();
+				m_bufferLength = buffer->Length();
+				m_cursor = m_buffer;
+			}
+
 			BinaryReader(unsigned char * buffer, int length)
 			{
 				m_buffer = buffer;

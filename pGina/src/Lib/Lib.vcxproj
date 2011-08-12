@@ -24,7 +24,7 @@
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="MessageProperty.h" />
     <ClInclude Include="MessageTypes.h" />
-    <ClInclude Include="NamedPipes.h" />
+    <ClInclude Include="PipeClient.h" />
     <ClInclude Include="pGinaNativeLib.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="Registry.h" />
@@ -34,6 +34,7 @@
     <ClCompile Include="BinaryWriter.cpp" />
     <ClCompile Include="pGinaNativeLib.cpp" />
     <ClCompile Include="Message.cpp" />
+    <ClCompile Include="PipeClient.cpp" />
     <ClCompile Include="Registry.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
