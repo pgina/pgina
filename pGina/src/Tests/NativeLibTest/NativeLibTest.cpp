@@ -15,6 +15,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	
 	pGina::Memory::Buffer * buffer = pGina::Messaging::Message::Marshal(msg);
 
+	pGina::Messaging::Message * msg2 = pGina::Messaging::Message::Demarshal(*buffer);
+
 	return 0;
 }
 
