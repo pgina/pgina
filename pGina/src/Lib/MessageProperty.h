@@ -5,7 +5,7 @@
 
 namespace pGina
 {
-	namespace Pipes
+	namespace Messaging
 	{
 		typedef enum PropertyType
 		{

@@ -57,7 +57,7 @@ namespace pGina
 
 		void BinaryWriter::Write(std::wstring const& v)
 		{
-			int numchars = static_cast<int>(v.size());
+			int numchars = static_cast<int>(v.size()) * sizeof(wchar_t);
 			Encode7bitLength(numchars);
 
 			if(m_cursor)

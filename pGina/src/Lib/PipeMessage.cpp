@@ -8,7 +8,7 @@
 
 namespace pGina
 {
-	namespace Pipes
+	namespace Messaging
 	{
 		Message::Message()
 		{
@@ -98,7 +98,7 @@ namespace pGina
 				//	nothing for value
 				if(propBase->Type() == String)
 				{
-					pGina::Pipes::Property<std::wstring> * prop = static_cast<pGina::Pipes::Property<std::wstring> *>(propBase);
+					pGina::Messaging::Property<std::wstring> * prop = static_cast<pGina::Messaging::Property<std::wstring> *>(propBase);
 					if(prop->Value().empty())
 						propBase->Type(EmptyString);
 				}
@@ -111,13 +111,13 @@ namespace pGina
 				{
 				case Boolean:				
 					{
-						pGina::Pipes::Property<bool> * prop = static_cast<pGina::Pipes::Property<bool> *>(propBase);
+						pGina::Messaging::Property<bool> * prop = static_cast<pGina::Messaging::Property<bool> *>(propBase);
 						writer.Write(prop->Value());
 					}
 					break;
 				case Byte:
 					{
-						pGina::Pipes::Property<unsigned char> * prop = static_cast<pGina::Pipes::Property<unsigned char> *>(propBase);
+						pGina::Messaging::Property<unsigned char> * prop = static_cast<pGina::Messaging::Property<unsigned char> *>(propBase);
 						writer.Write(prop->Value());
 					}
 					break;
@@ -126,13 +126,13 @@ namespace pGina
 					break;
 				case Integer:					
 					{
-						pGina::Pipes::Property<int> * prop = static_cast<pGina::Pipes::Property<int> *>(propBase);
+						pGina::Messaging::Property<int> * prop = static_cast<pGina::Messaging::Property<int> *>(propBase);
 						writer.Write(prop->Value());
 					}
 					break;
 				case String:					
 					{
-						pGina::Pipes::Property<std::wstring> * prop = static_cast<pGina::Pipes::Property<std::wstring> *>(propBase);
+						pGina::Messaging::Property<std::wstring> * prop = static_cast<pGina::Messaging::Property<std::wstring> *>(propBase);
 						writer.Write(prop->Value());
 					}
 					break;

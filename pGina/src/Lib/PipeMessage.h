@@ -9,7 +9,7 @@
 
 namespace pGina
 {
-	namespace Pipes
+	namespace Messaging
 	{				
 		class Message
 		{
@@ -52,7 +52,7 @@ namespace pGina
 			void Property(std::wstring const& propertyName, T const& value, PropertyType type)
 			{				
 				// Create a new property to be inserted
-				pGina::Pipes::Property<T> * prop = new pGina::Pipes::Property<T>(propertyName, value, type);
+				pGina::Messaging::Property<T> * prop = new pGina::Messaging::Property<T>(propertyName, value, type);
 
 				// If we already have a property by this name, we need to clean it up
 				PropertyMap::iterator itr = m_properties.find(propertyName);
