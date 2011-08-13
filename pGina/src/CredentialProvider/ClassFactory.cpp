@@ -34,10 +34,10 @@ namespace pGina
 
 		IFACEMETHODIMP_(ULONG) CClassFactory::Release()
 		{
-			LONG cRef = InterlockedDecrement(&m_referenceCount);
-			if (!cRef)
+			LONG count = InterlockedDecrement(&m_referenceCount);
+			if (!count)
 				delete this;
-			return cRef;
+			return count;
 		}
 
 		// IClassFactory
@@ -48,7 +48,19 @@ namespace pGina
 
 			if (!pUnkOuter)
 			{
-				// TBD: hr = CSample_CreateInstance(riid, ppv);
+				/*
+				CSampleProvider* pProvider = new CSampleProvider();
+
+				if (pProvider)
+				{
+					hr = pProvider->QueryInterface(riid, ppv);
+					pProvider->Release();
+				}
+				else
+				{
+					hr = E_OUTOFMEMORY;
+				}
+				*/				
 			}
 			
 			return hr;
