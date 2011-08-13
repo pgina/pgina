@@ -30,6 +30,26 @@ namespace pGina
 			}
 
 			return result;
-		}		
+		}	
+
+		DWORD GetDword(const wchar_t * keyName, DWORD defaultValue)
+		{
+			DWORD result = defaultValue;
+			HKEY hKey = NULL;
+
+			if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"Software\\pGina3", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+			{
+				DWORD dataLength = 0;				
+				RegGetValue(hKey, NULL, keyName, RRF_RT_REG_DWORD, NULL, &result, &dataLength);				
+				RegCloseKey(hKey);
+			}
+
+			return result;
+		}
+
+		bool GetBool(const wchar_t * keyName, bool defaultValue)
+		{
+			return (GetDword(keyName, defaultValue ? (DWORD) 0x01 : (DWORD) 0x00) != (DWORD) 0x00);
+		}
 	}
 }

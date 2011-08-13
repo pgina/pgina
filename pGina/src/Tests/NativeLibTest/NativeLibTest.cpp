@@ -59,6 +59,16 @@ int _tmain(int argc, _TCHAR* argv[])
 		pipeClient.Close();		
 	}
 
+	// Put it all together, use the transactions log:
+	pGina::Transactions::Log::Debug(L"What the what? %s", L"What!");
+
+	// And auth, all in one...
+	if(pGina::Transactions::User::ProcessLoginForUser(L"puser", L"", L"foobar"))
+	{
+		pGina::Transactions::Log::Info(L"User: %s login successful!", pGina::Transactions::User::AuthenticatedUsername());
+	}
+	
+
 	return 0;
 }
 

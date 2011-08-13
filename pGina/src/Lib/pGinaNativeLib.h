@@ -6,3 +6,4 @@
 #include <PipeClient.h>
 #include <ObjectCleanupPool.h>
 #include <pGinaMessages.h>
+#include <pGinaTransactions.h>

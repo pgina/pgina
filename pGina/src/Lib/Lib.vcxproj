@@ -25,6 +25,7 @@
     <ClInclude Include="MessageProperty.h" />
     <ClInclude Include="ObjectCleanupPool.h" />
     <ClInclude Include="pGinaMessages.h" />
+    <ClInclude Include="pGinaTransactions.h" />
     <ClInclude Include="PipeClient.h" />
     <ClInclude Include="pGinaNativeLib.h" />
     <ClInclude Include="Message.h" />
@@ -34,8 +35,8 @@
     <ClCompile Include="BinaryReader.cpp" />
     <ClCompile Include="BinaryWriter.cpp" />
     <ClCompile Include="pGinaMessages.cpp" />
-    <ClCompile Include="pGinaNativeLib.cpp" />
     <ClCompile Include="Message.cpp" />
+    <ClCompile Include="pGinaTransactions.cpp" />
     <ClCompile Include="PipeClient.cpp" />
     <ClCompile Include="Registry.cpp" />
   </ItemGroup>

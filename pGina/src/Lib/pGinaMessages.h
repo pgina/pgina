@@ -84,6 +84,14 @@ namespace pGina
 				Type(Log);
 			}
 
+			LogMessage(std::wstring const& name, std::wstring const& level, std::wstring const& message)
+			{
+				Type(Log);
+				LoggerName(name);
+				LoggedMessage(message);
+				Level(level);
+			}
+
 			std::wstring const& LoggerName() { return m_loggerName; }
 			void				LoggerName(std::wstring const& v) { m_loggerName = v; }
 
@@ -122,12 +130,96 @@ namespace pGina
 			std::wstring m_level;
 		};
 
-		class LoginRequestMessage : MessageBase
+		class LoginRequestMessage : public MessageBase
 		{
+		public:
+			LoginRequestMessage()
+			{
+				Type(LoginRequest);
+			}
+
+			LoginRequestMessage(std::wstring const& username, std::wstring const& domain, std::wstring const& password)
+			{
+				Type(LoginRequest);
+				Username(username);
+				Domain(domain);
+				Password(password);
+			}
+
+			std::wstring const& Username() { return m_username; }
+			void				Username(std::wstring const& v) { m_username = v; }
+
+			std::wstring const& Password() { return m_password; }
+			void			    Password(std::wstring const& v) { m_password = v; }
+
+			std::wstring const& Domain() { return m_domain; }
+			void			    Domain(std::wstring const& v) { m_domain = v; }
+
+			virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
+			{
+				MessageBase::FromDynamicMessage(msg);
+
+				if(msg->Exists<std::wstring>(L"Username"))
+					Username(msg->Property<std::wstring>(L"Username"));
+
+				if(msg->Exists<std::wstring>(L"Domain"))
+					Domain(msg->Property<std::wstring>(L"Domain"));
+
+				if(msg->Exists<std::wstring>(L"Password"))
+					Password(msg->Property<std::wstring>(L"Password"));
+			}
+
+			virtual pGina::Messaging::Message * ToDynamicMessage()
+			{				
+				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();				
+				msg->Property<std::wstring>(L"Username", Username(), pGina::Messaging::String);
+				msg->Property<std::wstring>(L"Domain", Domain(), pGina::Messaging::String);
+				msg->Property<std::wstring>(L"Password", Password(), pGina::Messaging::String);
+				return msg;
+			}
+
+		protected:
+			std::wstring m_username;
+			std::wstring m_domain;
+			std::wstring m_password;
 		};
 
-		class LoginResponseMessage : LoginRequestMessage
+		class LoginResponseMessage : public LoginRequestMessage
 		{
+			public:
+				LoginResponseMessage()
+				{
+					Type(LoginResponse);
+				}
+
+				std::wstring Message() { return m_message; }
+				void		 Message(std::wstring const& v) { m_message = v; }
+
+				bool         Result() { return m_result; }
+				void		 Result(bool v) { m_result = v; }
+
+				virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
+				{
+					LoginRequestMessage::FromDynamicMessage(msg);
+
+					if(msg->Exists<std::wstring>(L"Message"))
+						Message(msg->Property<std::wstring>(L"Message"));
+
+					if(msg->Exists<bool>(L"Result"))
+						Result(msg->Property<bool>(L"Result"));
+				}
+
+				virtual pGina::Messaging::Message * ToDynamicMessage()
+				{				
+					pGina::Messaging::Message * msg = LoginRequestMessage::ToDynamicMessage();				
+					msg->Property<std::wstring>(L"Message", Message(), pGina::Messaging::String);
+					msg->Property<bool>(L"Result", Result(), pGina::Messaging::Boolean);					
+					return msg;
+				}
+
+			private:
+				bool m_result;
+				std::wstring m_message;
 		};
 	}
 }
