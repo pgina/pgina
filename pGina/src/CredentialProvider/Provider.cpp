@@ -12,8 +12,7 @@ namespace pGina
 	{
 		IFACEMETHODIMP CredProv::QueryInterface(__in REFIID riid, __deref_out void **ppv)
 		{
-			// TBD: This is magic I do not understand, but it works, based on the CredentialProvider samples,
-			//	stupid COM :/
+			// And more crazy ass v-table madness, yay COM again!
 			static const QITAB qit[] =
 			{
 				QITABENT(CredProv, ICredentialProvider), 

@@ -17,8 +17,7 @@ namespace pGina
 		// IUnknown
 		IFACEMETHODIMP CClassFactory::QueryInterface(__in REFIID riid, __deref_out void **ppv)
 		{
-			// TBD: This is magic I do not understand, but it works, based on the CredentialProvider samples,
-			//	stupid COM :/
+			// Crazy ass v-table madness, yay COM!
 			static const QITAB qit[] = 
 			{
 	            QITABENT(CClassFactory, IClassFactory),
