@@ -34,6 +34,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service\Service.csproj", "{F849E505-2687-4D1E-9790-034A31340688}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeLibTest", "Tests\NativeLibTest\NativeLibTest.vcxproj", "{FF5B12FA-22AD-47AA-8A33-9B27A883904F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{67E7117F-1F42-4B2C-B2F9-7457C04F1240} = {67E7117F-1F42-4B2C-B2F9-7457C04F1240}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
