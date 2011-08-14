@@ -54,7 +54,7 @@ namespace pGina.Shared.Settings
 
         public DynamicSetting GetSetting(string name)
         {
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(m_rootKey))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_rootKey))
             {
                 if (key.GetValueNames().Contains(name))
                 {
