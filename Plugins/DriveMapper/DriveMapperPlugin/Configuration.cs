@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using pGina.Shared.Settings;
 
 namespace pGina.Plugin.DriveMapper
 {
@@ -25,7 +26,7 @@ namespace pGina.Plugin.DriveMapper
         public Configuration()
         {
             InitializeComponent();
-            driveList = new BindingList<DriveEntry>();
+            driveList = new BindingList<DriveEntry>(Settings.Load());
             InitUI();
         }
 
@@ -196,7 +197,8 @@ namespace pGina.Plugin.DriveMapper
 
         private void okBtn_Click(object sender, EventArgs e)
         {
-
+            Settings.Save(driveList.ToList());
+            this.Close();
         }
 
         private void addBtn_Click(object sender, EventArgs e)
@@ -296,15 +298,6 @@ namespace pGina.Plugin.DriveMapper
                     row.Cells[USE_ALTERNATE_CREDENTIALS_COLUMN].Value = useAltCreds;
                 }
             }        
-        }
-
-        class DriveEntry
-        {
-            public string Drive { get; set; }
-            public string UncPath { get; set; }
-            public bool UseAltCreds { get; set; }
-            public string UserName { get; set; }
-            public string Password { get; set; }
         }
 
         private void removeBtn_Click(object sender, EventArgs e)
