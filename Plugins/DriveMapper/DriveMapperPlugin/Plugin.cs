@@ -9,7 +9,7 @@ using log4net;
 
 namespace pGina.Plugin.DriveMapper
 {
-    public class DriveMapperPlugin : IPluginUserSessionHelper
+    public class DriveMapperPlugin : IPluginUserSessionHelper, IPluginConfiguration
     {
         public static readonly Guid DriveMapperPluginUuid = new Guid("989C0EC5-B025-431B-8966-E276864A97A9");
         private ILog m_logger = LogManager.GetLogger("DriveMapperPlugin");
@@ -43,6 +43,12 @@ namespace pGina.Plugin.DriveMapper
         public string Version
         {
             get { return "1.0.0"; }
+        }
+
+        public void Configure()
+        {
+            Configuration conf = new Configuration();
+            conf.ShowDialog();
         }
     }
 }
