@@ -159,9 +159,18 @@ namespace pGina.Plugin.DriveMapper
                 this.driveComboBox.Enabled = true;
                 this.uncTextBox.Enabled = true;
                 this.useAltCredsCB.Enabled = true;
-                // Enabling of unameTextBox and passwordTextBox is managed in the
-                // checkbox callback.
                 PushAllFromDGV();
+                // Enable the username/password fields (if necessary)
+                if (this.useAltCredsCB.Checked)
+                {
+                    this.unameTextBox.Enabled = true;
+                    this.passwordTextBox.Enabled = true;
+                }
+                else
+                {
+                    this.unameTextBox.Enabled = false;
+                    this.passwordTextBox.Enabled = false;
+                }
             }
             else
             {

@@ -6,6 +6,8 @@ using System.Text;
 using pGina.Shared.Interfaces;
 using Abstractions;
 using log4net;
+using System.Text.RegularExpressions;
+using Abstractions.WindowsApi;
 
 namespace pGina.Plugin.DriveMapper
 {
@@ -17,12 +19,59 @@ namespace pGina.Plugin.DriveMapper
         public void SessionEnding()
         {
             m_logger.Debug("SessionEnding( ... )");
+
         }
 
         public void SessionStarted(Shared.Types.UserInformation userInformation)
         {
             m_logger.Debug("SessionStarted( ... )");
+            MapDrives(Settings.Load(), userInformation);
+        }
 
+        private void MapDrives(List<DriveEntry> drives, Shared.Types.UserInformation userInfo)
+        {
+            foreach (DriveEntry drive in drives)
+            {
+                string unc = Regex.Replace(drive.UncPath, @"\%u", userInfo.Username);
+                m_logger.DebugFormat("Attempting to map {0} to {1}", unc, drive.Drive);
+                string user = null;
+                string password = null;
+                if (drive.UseAltCreds)
+                {
+                    user = drive.UserName;
+                    password = drive.Password;
+                }
+
+                int result = WindowsApi.MapNetworkDrive(unc, drive.Drive, user, password);
+                if (0 == result)
+                {
+                    m_logger.InfoFormat("Drive {0} mapped successfully to drive letter {1}", unc, drive.Drive);
+                }
+                else
+                {
+                    m_logger.ErrorFormat("Drive mapping failed for {0} to letter {1}.  Message: {2}",
+                        unc, drive.Drive, GetMappingErrorMessage(result));
+                }
+            }
+        }
+
+        private string GetMappingErrorMessage(int result)
+        {
+            switch (result)
+            {
+                case 5:
+                    return "Access denied.";
+                case 66:
+                    return "The network resource type is not correct.";
+                case 67:
+                    return "The network name cannot be found.";
+                case 85:
+                    return "Drive letter is already assigned";
+                case 86:
+                    return "The password is incorrect.";
+                default:
+                    return "Unkown (" + result + ")";
+            }
         }
 
         public string Description

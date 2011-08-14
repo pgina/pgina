@@ -32,17 +32,18 @@
             this.okBtn = new System.Windows.Forms.Button();
             this.cancelBtn = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.useAltCredsCB = new System.Windows.Forms.CheckBox();
+            this.passLabel = new System.Windows.Forms.Label();
+            this.passwordTextBox = new System.Windows.Forms.TextBox();
+            this.unameTextBox = new System.Windows.Forms.TextBox();
+            this.unameLabel = new System.Windows.Forms.Label();
+            this.driveComboBox = new System.Windows.Forms.ComboBox();
+            this.driveLetterLabel = new System.Windows.Forms.Label();
+            this.uncTextBox = new System.Windows.Forms.TextBox();
+            this.uncPathLabel = new System.Windows.Forms.Label();
             this.removeBtn = new System.Windows.Forms.Button();
             this.addBtn = new System.Windows.Forms.Button();
-            this.uncPathLabel = new System.Windows.Forms.Label();
-            this.uncTextBox = new System.Windows.Forms.TextBox();
-            this.driveLetterLabel = new System.Windows.Forms.Label();
-            this.driveComboBox = new System.Windows.Forms.ComboBox();
-            this.unameLabel = new System.Windows.Forms.Label();
-            this.unameTextBox = new System.Windows.Forms.TextBox();
-            this.passwordTextBox = new System.Windows.Forms.TextBox();
-            this.passLabel = new System.Windows.Forms.Label();
-            this.useAltCredsCB = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.driveListDGV)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -80,6 +81,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.useAltCredsCB);
             this.groupBox1.Controls.Add(this.passLabel);
             this.groupBox1.Controls.Add(this.passwordTextBox);
@@ -95,6 +97,82 @@
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Drive Details";
+            // 
+            // useAltCredsCB
+            // 
+            this.useAltCredsCB.AutoSize = true;
+            this.useAltCredsCB.Location = new System.Drawing.Point(75, 89);
+            this.useAltCredsCB.Name = "useAltCredsCB";
+            this.useAltCredsCB.Size = new System.Drawing.Size(140, 17);
+            this.useAltCredsCB.TabIndex = 8;
+            this.useAltCredsCB.Text = "Use different credentials";
+            this.useAltCredsCB.UseVisualStyleBackColor = true;
+            this.useAltCredsCB.CheckedChanged += new System.EventHandler(this.useAltCredsCB_CheckedChanged);
+            // 
+            // passLabel
+            // 
+            this.passLabel.AutoSize = true;
+            this.passLabel.Location = new System.Drawing.Point(8, 141);
+            this.passLabel.Name = "passLabel";
+            this.passLabel.Size = new System.Drawing.Size(56, 13);
+            this.passLabel.TabIndex = 7;
+            this.passLabel.Text = "Password:";
+            // 
+            // passwordTextBox
+            // 
+            this.passwordTextBox.Location = new System.Drawing.Point(75, 138);
+            this.passwordTextBox.Name = "passwordTextBox";
+            this.passwordTextBox.Size = new System.Drawing.Size(354, 20);
+            this.passwordTextBox.TabIndex = 6;
+            // 
+            // unameTextBox
+            // 
+            this.unameTextBox.Location = new System.Drawing.Point(75, 112);
+            this.unameTextBox.Name = "unameTextBox";
+            this.unameTextBox.Size = new System.Drawing.Size(354, 20);
+            this.unameTextBox.TabIndex = 5;
+            // 
+            // unameLabel
+            // 
+            this.unameLabel.AutoSize = true;
+            this.unameLabel.Location = new System.Drawing.Point(6, 115);
+            this.unameLabel.Name = "unameLabel";
+            this.unameLabel.Size = new System.Drawing.Size(58, 13);
+            this.unameLabel.TabIndex = 4;
+            this.unameLabel.Text = "Username:";
+            // 
+            // driveComboBox
+            // 
+            this.driveComboBox.FormattingEnabled = true;
+            this.driveComboBox.Location = new System.Drawing.Point(75, 19);
+            this.driveComboBox.Name = "driveComboBox";
+            this.driveComboBox.Size = new System.Drawing.Size(141, 21);
+            this.driveComboBox.TabIndex = 3;
+            // 
+            // driveLetterLabel
+            // 
+            this.driveLetterLabel.AutoSize = true;
+            this.driveLetterLabel.Location = new System.Drawing.Point(6, 22);
+            this.driveLetterLabel.Name = "driveLetterLabel";
+            this.driveLetterLabel.Size = new System.Drawing.Size(35, 13);
+            this.driveLetterLabel.TabIndex = 2;
+            this.driveLetterLabel.Text = "Drive:";
+            // 
+            // uncTextBox
+            // 
+            this.uncTextBox.Location = new System.Drawing.Point(75, 46);
+            this.uncTextBox.Name = "uncTextBox";
+            this.uncTextBox.Size = new System.Drawing.Size(405, 20);
+            this.uncTextBox.TabIndex = 1;
+            // 
+            // uncPathLabel
+            // 
+            this.uncPathLabel.AutoSize = true;
+            this.uncPathLabel.Location = new System.Drawing.Point(6, 53);
+            this.uncPathLabel.Name = "uncPathLabel";
+            this.uncPathLabel.Size = new System.Drawing.Size(58, 13);
+            this.uncPathLabel.TabIndex = 0;
+            this.uncPathLabel.Text = "UNC Path:";
             // 
             // removeBtn
             // 
@@ -116,81 +194,15 @@
             this.addBtn.UseVisualStyleBackColor = true;
             this.addBtn.Click += new System.EventHandler(this.addBtn_Click);
             // 
-            // uncPathLabel
+            // label1
             // 
-            this.uncPathLabel.AutoSize = true;
-            this.uncPathLabel.Location = new System.Drawing.Point(6, 53);
-            this.uncPathLabel.Name = "uncPathLabel";
-            this.uncPathLabel.Size = new System.Drawing.Size(58, 13);
-            this.uncPathLabel.TabIndex = 0;
-            this.uncPathLabel.Text = "UNC Path:";
-            // 
-            // uncTextBox
-            // 
-            this.uncTextBox.Location = new System.Drawing.Point(75, 46);
-            this.uncTextBox.Name = "uncTextBox";
-            this.uncTextBox.Size = new System.Drawing.Size(405, 20);
-            this.uncTextBox.TabIndex = 1;
-            // 
-            // driveLetterLabel
-            // 
-            this.driveLetterLabel.AutoSize = true;
-            this.driveLetterLabel.Location = new System.Drawing.Point(6, 22);
-            this.driveLetterLabel.Name = "driveLetterLabel";
-            this.driveLetterLabel.Size = new System.Drawing.Size(35, 13);
-            this.driveLetterLabel.TabIndex = 2;
-            this.driveLetterLabel.Text = "Drive:";
-            // 
-            // driveComboBox
-            // 
-            this.driveComboBox.FormattingEnabled = true;
-            this.driveComboBox.Location = new System.Drawing.Point(75, 19);
-            this.driveComboBox.Name = "driveComboBox";
-            this.driveComboBox.Size = new System.Drawing.Size(141, 21);
-            this.driveComboBox.TabIndex = 3;
-            // 
-            // unameLabel
-            // 
-            this.unameLabel.AutoSize = true;
-            this.unameLabel.Location = new System.Drawing.Point(6, 115);
-            this.unameLabel.Name = "unameLabel";
-            this.unameLabel.Size = new System.Drawing.Size(58, 13);
-            this.unameLabel.TabIndex = 4;
-            this.unameLabel.Text = "Username:";
-            // 
-            // unameTextBox
-            // 
-            this.unameTextBox.Location = new System.Drawing.Point(75, 112);
-            this.unameTextBox.Name = "unameTextBox";
-            this.unameTextBox.Size = new System.Drawing.Size(354, 20);
-            this.unameTextBox.TabIndex = 5;
-            // 
-            // passwordTextBox
-            // 
-            this.passwordTextBox.Location = new System.Drawing.Point(75, 138);
-            this.passwordTextBox.Name = "passwordTextBox";
-            this.passwordTextBox.Size = new System.Drawing.Size(354, 20);
-            this.passwordTextBox.TabIndex = 6;
-            // 
-            // passLabel
-            // 
-            this.passLabel.AutoSize = true;
-            this.passLabel.Location = new System.Drawing.Point(8, 141);
-            this.passLabel.Name = "passLabel";
-            this.passLabel.Size = new System.Drawing.Size(56, 13);
-            this.passLabel.TabIndex = 7;
-            this.passLabel.Text = "Password:";
-            // 
-            // useAltCredsCB
-            // 
-            this.useAltCredsCB.AutoSize = true;
-            this.useAltCredsCB.Location = new System.Drawing.Point(75, 89);
-            this.useAltCredsCB.Name = "useAltCredsCB";
-            this.useAltCredsCB.Size = new System.Drawing.Size(140, 17);
-            this.useAltCredsCB.TabIndex = 8;
-            this.useAltCredsCB.Text = "Use different credentials";
-            this.useAltCredsCB.UseVisualStyleBackColor = true;
-            this.useAltCredsCB.CheckedChanged += new System.EventHandler(this.useAltCredsCB_CheckedChanged);
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(492, 46);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(122, 26);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "%u will be replaced with \r\nthe username.";
             // 
             // Configuration
             // 
@@ -229,5 +241,6 @@
         private System.Windows.Forms.Label driveLetterLabel;
         private System.Windows.Forms.TextBox uncTextBox;
         private System.Windows.Forms.Label uncPathLabel;
+        private System.Windows.Forms.Label label1;
     }
 }
