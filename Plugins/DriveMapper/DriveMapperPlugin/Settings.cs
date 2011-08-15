@@ -17,7 +17,6 @@ namespace pGina.Plugin.DriveMapper
 
     class Settings
     {
-
         private static dynamic m_settings = new DynamicSettings(DriveMapperPlugin.DriveMapperPluginUuid);
 
         public static List<DriveEntry> Load()
@@ -36,7 +35,7 @@ namespace pGina.Plugin.DriveMapper
                 {
                     Drive = drives[i],
                     UncPath = paths[i],
-                    UseAltCreds = useCreds[i] == "0" ? false : true,
+                    UseAltCreds = useCreds[i] != "0",
                     UserName = usernameList[i],
                     Password = passList[i]
                 });

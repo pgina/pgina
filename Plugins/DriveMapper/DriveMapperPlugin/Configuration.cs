@@ -17,16 +17,22 @@ namespace pGina.Plugin.DriveMapper
         private static readonly string USE_ALTERNATE_CREDENTIALS_COLUMN = "UseAltCreds";
         private static readonly string USERNAME_COLUMN = "Username";
         private static readonly string PASS_COLUMN = "Password";
+
         private static readonly string[] DRIVES = {
                               "Z:", "Y:", "X:", "W:", "V:", "U:", "T:", "S:", "R:", "Q:",
                               "P:", "O:", "N:", "M:", "L:", "K:", "J:", "I:", "H:", "G:", "F:",
                               "D:", "B:", "A:"};
+        
         private BindingList<DriveEntry> driveList;
 
         public Configuration()
         {
             InitializeComponent();
+
+            // Load the drive list from registry
             driveList = new BindingList<DriveEntry>(Settings.Load());
+        
+            // Initalize the UI
             InitUI();
         }
 
@@ -94,8 +100,7 @@ namespace pGina.Plugin.DriveMapper
                 Name = USE_ALTERNATE_CREDENTIALS_COLUMN,
                 DataPropertyName = "UseAltCreds",
                 HeaderText = "Use Different Creds",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
-                ReadOnly = true
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
             dgv.Columns.Add(new DataGridViewTextBoxColumn()
             {
@@ -112,6 +117,7 @@ namespace pGina.Plugin.DriveMapper
 
             dgv.SelectionChanged += new EventHandler(driveListDGV_SelectionChanged);
             dgv.CellValueChanged += new DataGridViewCellEventHandler(driveListDGV_CellValueChanged);
+            dgv.CurrentCellDirtyStateChanged += new EventHandler(driveListDGV_CurrentCellDirtyStateChanged);
             dgv.DataSource = this.driveList;
         }
 
@@ -143,11 +149,27 @@ namespace pGina.Plugin.DriveMapper
             }
         }
 
+        void driveListDGV_CurrentCellDirtyStateChanged(object sender, EventArgs e)
+        {
+            if (driveListDGV.IsCurrentCellDirty && driveListDGV.CurrentCell is DataGridViewCheckBoxCell)
+            {
+                driveListDGV.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        }
+
         void driveListDGV_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             if (this.driveListDGV.Columns[e.ColumnIndex].Name == DRIVE_UNC_COLUMN)
             {
                 this.uncTextBox.Text = this.driveListDGV[e.ColumnIndex, e.RowIndex].Value as string;
+            }
+            else if (this.driveListDGV.Columns[e.ColumnIndex].Name == USE_ALTERNATE_CREDENTIALS_COLUMN)
+            {
+                // Need to check the value before setting, otherwise there will be a short
+                // loop of events between the two checkboxes.
+                bool value = (bool)this.driveListDGV[e.ColumnIndex, e.RowIndex].Value;
+                if (this.useAltCredsCB.Checked != value)
+                    this.useAltCredsCB.Checked = value;
             }
         }
 
@@ -304,7 +326,10 @@ namespace pGina.Plugin.DriveMapper
                 if (nSelectedRows > 0)
                 {
                     DataGridViewRow row = this.driveListDGV.SelectedRows[0];
-                    row.Cells[USE_ALTERNATE_CREDENTIALS_COLUMN].Value = useAltCreds;
+                    // Need to check the value before setting, otherwise there will be a short
+                    // loop of events between the two checkboxes.
+                    if( (bool)row.Cells[USE_ALTERNATE_CREDENTIALS_COLUMN].Value != useAltCreds )
+                        row.Cells[USE_ALTERNATE_CREDENTIALS_COLUMN].Value = useAltCreds;
                 }
             }        
         }

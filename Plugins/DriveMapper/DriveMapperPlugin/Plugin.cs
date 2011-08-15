@@ -19,7 +19,6 @@ namespace pGina.Plugin.DriveMapper
         public void SessionEnding()
         {
             m_logger.Debug("SessionEnding( ... )");
-
         }
 
         public void SessionStarted(Shared.Types.UserInformation userInformation)
