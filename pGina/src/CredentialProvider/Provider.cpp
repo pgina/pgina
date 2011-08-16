@@ -8,25 +8,25 @@
 
 namespace pGina
 {
-	namespace Provider
+	namespace CredProv
 	{
-		IFACEMETHODIMP CredProv::QueryInterface(__in REFIID riid, __deref_out void **ppv)
+		IFACEMETHODIMP Provider::QueryInterface(__in REFIID riid, __deref_out void **ppv)
 		{
 			// And more crazy ass v-table madness, yay COM again!
 			static const QITAB qit[] =
 			{
-				QITABENT(CredProv, ICredentialProvider), 
+				QITABENT(Provider, ICredentialProvider), 
 				{0},
 			};
 			return QISearch(this, qit, riid, ppv);
 		}
 
-		IFACEMETHODIMP_(ULONG) CredProv::AddRef()
+		IFACEMETHODIMP_(ULONG) Provider::AddRef()
 		{
 	        return InterlockedIncrement(&m_referenceCount);
 		}
 
-		IFACEMETHODIMP_(ULONG) CredProv::Release()
+		IFACEMETHODIMP_(ULONG) Provider::Release()
 		{
 			LONG count = InterlockedDecrement(&m_referenceCount);
 			if (!count)
@@ -34,52 +34,53 @@ namespace pGina
 			return count;
 		}
 
-		CredProv::CredProv()
-		{
+		Provider::Provider() :
+			m_referenceCount(1)
+		{		
 			AddDllReference();
 		}
 
-		CredProv::~CredProv()
+		Provider::~Provider()
 		{
 			ReleaseDllReference();
 		}
 
-		IFACEMETHODIMP CredProv::SetUsageScenario(__in CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, __in DWORD dwFlags)
+		IFACEMETHODIMP Provider::SetUsageScenario(__in CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, __in DWORD dwFlags)
 		{
 			return S_FALSE;
 		}
 
-		IFACEMETHODIMP CredProv::SetSerialization(__in const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs)
+		IFACEMETHODIMP Provider::SetSerialization(__in const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs)
 		{
 			return S_FALSE;
 		}
 
-		IFACEMETHODIMP CredProv::Advise(__in ICredentialProviderEvents* pcpe, __in UINT_PTR upAdviseContext)
+		IFACEMETHODIMP Provider::Advise(__in ICredentialProviderEvents* pcpe, __in UINT_PTR upAdviseContext)
 		{
 			return S_FALSE;
 		}
 
-		IFACEMETHODIMP CredProv::UnAdvise()
+		IFACEMETHODIMP Provider::UnAdvise()
 		{
 			return S_FALSE;
 		}
 
-		IFACEMETHODIMP CredProv::GetFieldDescriptorCount(__out DWORD* pdwCount)
+		IFACEMETHODIMP Provider::GetFieldDescriptorCount(__out DWORD* pdwCount)
 		{
 			return S_FALSE;
 		}
 
-		IFACEMETHODIMP CredProv::GetFieldDescriptorAt(__in DWORD dwIndex,  __deref_out CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR** ppcpfd)
+		IFACEMETHODIMP Provider::GetFieldDescriptorAt(__in DWORD dwIndex,  __deref_out CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR** ppcpfd)
 		{
 			return S_FALSE;
 		}
 
-		IFACEMETHODIMP CredProv::GetCredentialCount(__out DWORD* pdwCount, __out_range(<,*pdwCount) DWORD* pdwDefault, __out BOOL* pbAutoLogonWithDefault)
+		IFACEMETHODIMP Provider::GetCredentialCount(__out DWORD* pdwCount, __out_range(<,*pdwCount) DWORD* pdwDefault, __out BOOL* pbAutoLogonWithDefault)
 		{
 			return S_FALSE;
 		}
 
-		IFACEMETHODIMP CredProv::GetCredentialAt(__in DWORD dwIndex, __deref_out ICredentialProviderCredential** ppcpc)
+		IFACEMETHODIMP Provider::GetCredentialAt(__in DWORD dwIndex, __deref_out ICredentialProviderCredential** ppcpc)
 		{
 			return S_FALSE;
 		}
