@@ -23,6 +23,14 @@ namespace pGina.Plugin.DriveMapper
         {
             List<DriveEntry> driveList = new List<DriveEntry>();
 
+            // Set defaults in case the data is not there yet.
+            m_settings.SetDefault("Drives", new string[] { });
+            m_settings.SetDefault("UncPaths", new string[] { });
+            m_settings.SetDefault("UseAlternateCreds", new string[] { });
+            m_settings.SetDefault("Usernames", new string[] { });
+            m_settings.SetDefault("Passwords", new string[] { });
+
+            // Load the settings
             string[] drives = m_settings.Drives;
             string[] paths = m_settings.UncPaths;
             string[] useCreds = m_settings.UseAlternateCreds;

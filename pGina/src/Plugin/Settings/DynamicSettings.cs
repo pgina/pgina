@@ -26,6 +26,13 @@ namespace pGina.Shared.Settings
             m_rootKey = root;
         }
 
+        /// <summary>
+        /// Sets the default value for a setting.  Checks to see if the setting
+        /// is already defined in the registry.  If so, the method does nothing.
+        /// Otherwise the setting is initialized to value.
+        /// </summary>
+        /// <param name="name">The name of the setting</param>
+        /// <param name="value">The default value for the setting</param>
         public void SetDefault(string name, object value)
         {
             try
