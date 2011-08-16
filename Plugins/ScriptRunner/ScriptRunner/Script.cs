@@ -23,6 +23,12 @@ namespace pGina.Plugin.ScriptRunner
         {
             if (File == null) return;
 
+            if (! System.IO.File.Exists(this.File))
+            {
+                m_logger.ErrorFormat("Script {0} not found, skipping.", this.File);
+                return;
+            }
+
             m_logger.InfoFormat("Executing script: {0}", File);
             System.Diagnostics.ProcessStartInfo startInfo = 
                 new System.Diagnostics.ProcessStartInfo()
@@ -30,40 +36,52 @@ namespace pGina.Plugin.ScriptRunner
                     FileName = File,
                     RedirectStandardError = true,
                     RedirectStandardOutput = true,
-                    UseShellExecute = false
+                    UseShellExecute = false,
+                    CreateNoWindow = true
                 };
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            p.StartInfo = startInfo;
-            p.EnableRaisingEvents = true;
-            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_OutputDataReceived);
-            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_ErrorDataReceived);
-            p.Exited += new EventHandler(p_Exited);
-
-            p.Start();
-            if (p.WaitForExit(Timeout))
+            using (System.Diagnostics.Process p = new System.Diagnostics.Process())
             {
-                m_logger.DebugFormat("Script finished execution successfully.");                
+                p.StartInfo = startInfo;
+                p.EnableRaisingEvents = true;
+                p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_OutputDataReceived);
+                p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_ErrorDataReceived);
+                p.Exited += new EventHandler(p_Exited);
+                
+                p.Start();
+                p.BeginOutputReadLine();
+                p.BeginErrorReadLine();
+                if (p.WaitForExit(Timeout))
+                {
+                    // Do this again to make sure that all output has been flushed.
+                    p.WaitForExit();
+                    m_logger.DebugFormat("Script finished execution successfully.");
+                }
+                else
+                {
+                    m_logger.ErrorFormat("Timeout reached before script finished executing.");
+                }
             }
-            else
-            {
-                m_logger.ErrorFormat("Timeout reached before script finished executing.");
-            }
-            p.Close();
         }
 
         void p_Exited(object sender, EventArgs e)
         {
-            m_logger.DebugFormat("p_Exited");
+            m_logger.Debug("Process finished.");
         }
 
         void p_ErrorDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
         {
-            m_logger.ErrorFormat(e.Data);
+            if (!String.IsNullOrEmpty(e.Data))
+            {
+                m_logger.Error(e.Data);
+            }
         }
 
         void p_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
         {
-            m_logger.InfoFormat(e.Data);
+            if (!String.IsNullOrEmpty(e.Data))
+            {
+                m_logger.Info(e.Data);
+            }
         }
     }
 }
