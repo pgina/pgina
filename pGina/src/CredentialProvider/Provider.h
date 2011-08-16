@@ -7,9 +7,9 @@
 
 namespace pGina
 {
-	namespace Provider
+	namespace CredProv
 	{
-		class CredProv : public ICredentialProvider
+		class Provider : public ICredentialProvider
 		{
 		public:
 			// IUnknown
@@ -27,10 +27,10 @@ namespace pGina
 			IFACEMETHODIMP GetCredentialCount(__out DWORD* pdwCount, __out_range(<,*pdwCount) DWORD* pdwDefault, __out BOOL* pbAutoLogonWithDefault);
 			IFACEMETHODIMP GetCredentialAt(__in DWORD dwIndex, __deref_out ICredentialProviderCredential** ppcpc);
 
-			friend class CClassFactory;
+			friend class pGina::COM::CClassFactory;
 		protected:
-			CredProv();
-			__override ~CredProv();
+			Provider();
+			__override ~Provider();
 
 		private:
 			long m_referenceCount;

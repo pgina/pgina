@@ -1,6 +1,8 @@
 #include "ClassFactory.h"
 #include "Dll.h"
 
+#include "Provider.h"
+
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <shlwapi.h>
@@ -46,9 +48,8 @@ namespace pGina
 			*ppv = NULL;
 
 			if (!pUnkOuter)
-			{
-				/*
-				CSampleProvider* pProvider = new CSampleProvider();
+			{				
+				pGina::CredProv::Provider* pProvider = new pGina::CredProv::Provider();
 
 				if (pProvider)
 				{
@@ -58,8 +59,7 @@ namespace pGina
 				else
 				{
 					hr = E_OUTOFMEMORY;
-				}
-				*/				
+				}				
 			}
 			
 			return hr;
