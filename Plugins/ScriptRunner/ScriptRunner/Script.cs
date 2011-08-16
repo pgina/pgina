@@ -21,7 +21,11 @@ namespace pGina.Plugin.ScriptRunner
 
         public void Run()
         {
-            if (File == null) return;
+            if (String.IsNullOrEmpty(File))
+            {
+                m_logger.DebugFormat("No script file specified.");
+                return;
+            }
 
             if (! System.IO.File.Exists(this.File))
             {
@@ -54,7 +58,7 @@ namespace pGina.Plugin.ScriptRunner
                 {
                     // Do this again to make sure that all output has been flushed.
                     p.WaitForExit();
-                    m_logger.DebugFormat("Script finished execution successfully.");
+                    m_logger.DebugFormat("Script finished execution.  Exit code: {0}", p.ExitCode);
                 }
                 else
                 {
