@@ -55,6 +55,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddScript.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddScript.Designer.cs">
+      <DependentUpon>AddScript.cs</DependentUpon>
+    </Compile>
     <Compile Include="Configuration.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -67,6 +73,9 @@
     <Compile Include="Script.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AddScript.resx">
+      <DependentUpon>AddScript.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Configuration.resx">
       <DependentUpon>Configuration.cs</DependentUpon>
     </EmbeddedResource>

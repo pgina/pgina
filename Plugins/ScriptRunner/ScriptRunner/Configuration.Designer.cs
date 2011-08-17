@@ -88,6 +88,7 @@
             this.addBtn.TabIndex = 5;
             this.addBtn.Text = "Add...";
             this.addBtn.UseVisualStyleBackColor = true;
+            this.addBtn.Click += new System.EventHandler(this.addBtn_Click);
             // 
             // removeBtn
             // 
@@ -111,7 +112,7 @@
             this.Controls.Add(this.timeoutTB);
             this.Controls.Add(this.timeoutLabel);
             this.Name = "Configuration";
-            this.Text = "Configuration";
+            this.Text = "ScriptRunner Plugin Configuration";
             ((System.ComponentModel.ISupportInitialize)(this.scriptListDGV)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

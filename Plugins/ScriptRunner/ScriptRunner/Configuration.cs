@@ -15,5 +15,11 @@ namespace pGina.Plugin.ScriptRunner
         {
             InitializeComponent();
         }
+
+        private void addBtn_Click(object sender, EventArgs e)
+        {
+            AddScript dlg = new AddScript();
+            dlg.ShowDialog();
+        }
     }
 }

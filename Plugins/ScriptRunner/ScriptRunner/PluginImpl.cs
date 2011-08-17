@@ -31,9 +31,6 @@ namespace pGina.Plugin.ScriptRunner
         void IPluginUserSessionHelper.SessionStarted(Shared.Types.UserInformation userInformation)
         {
             m_logger.DebugFormat("IPluginUserSessionHelper.SessionStarted");
-            Script s = new Script();
-            s.File = @"C:\test.bat";
-            s.Run();
         }
 
         public string Description
@@ -58,7 +55,8 @@ namespace pGina.Plugin.ScriptRunner
 
         public void Configure()
         {
-            throw new NotImplementedException();
+            Configuration dlg = new Configuration();
+            dlg.ShowDialog();
         }
     }
 }
