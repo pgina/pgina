@@ -39,19 +39,23 @@ namespace pGina.Plugin.ScriptRunner
             {
                 try
                 {
+                    Collection<PSObject> results = null;
                     rSpace.Open();
-                    Pipeline pipeline = rSpace.CreatePipeline();
-
-                    m_logger.DebugFormat("Loading script {0}", this.File);
-                    pipeline.Commands.AddScript(System.IO.File.ReadAllText(this.File));
-
-                    m_logger.InfoFormat("Executing script {0}", this.File);
-                    Collection<PSObject> results = pipeline.Invoke();
-                    rSpace.Close();
-
-                    foreach (PSObject obj in results)
+                    using (Pipeline pipeline = rSpace.CreatePipeline())
                     {
-                        m_logger.InfoFormat(obj.ToString());
+                        m_logger.DebugFormat("Loading script {0}", this.File);
+                        pipeline.Commands.AddScript(System.IO.File.ReadAllText(this.File));
+
+                        m_logger.InfoFormat("Executing script {0}", this.File);
+                        results = pipeline.Invoke();
+                    }
+
+                    if (results != null)
+                    {
+                        foreach (PSObject obj in results)
+                        {
+                            m_logger.InfoFormat(obj.ToString());
+                        }
                     }
                     m_logger.InfoFormat("Script {0} finished", this.File);
                 }
