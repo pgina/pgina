@@ -10,7 +10,10 @@
 
 #include "ClassFactory.h"
 #include "TileUiTypes.h"
+#include "TileUiLogonUnlock.h"
 #include "Macros.h"
+#include "SerializationHelpers.h"
+#include "ProviderGuid.h"
 
 namespace pGina
 {
@@ -188,17 +191,79 @@ namespace pGina
 		IFACEMETHODIMP Credential::GetSerialization(__out CREDENTIAL_PROVIDER_GET_SERIALIZATION_RESPONSE* pcpgsr, __out CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs,
 													__deref_out_opt PWSTR* ppwszOptionalStatusText, __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
 		{
-			return S_FALSE;
-		}
+			// Workout what our username, and password are.  Plugins are responsible for parsing out domain\machine name if needed
+			PWSTR username = FindUsernameValue();			
+			PWSTR password = FindPasswordValue();
+			PWSTR domain = NULL;
+						
+			pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);
+			if(!pGina::Transactions::User::ProcessLoginForUser(username, NULL, password))
+			{
+				pERROR(L"Credential::GetSerialization: Failed login");
+				if(pGina::Transactions::User::AuthenticationMessage() != NULL)
+				{
+					SHStrDupW(pGina::Transactions::User::AuthenticationMessage(), ppwszOptionalStatusText);					
+				}
+				else
+				{
+					SHStrDupW(L"ProcessLoginForUser failed, but a specific error message was not provided", ppwszOptionalStatusText);
+				}
+				
+				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
+				*pcpsiOptionalStatusIcon = CPSI_ERROR;
+				return S_OK;
+			}
 
+			// At this point the info has passed to the service and been validated, so now we have to pack it up and provide it back to
+			// LogonUI/Winlogon as a serialized/packed logon structure.
+
+			pGina::Memory::ObjectCleanupPool cleanup;
+
+			username = _wcsdup(pGina::Transactions::User::AuthenticatedUsername());
+			password = _wcsdup(pGina::Transactions::User::AuthenticatedPassword());
+			domain = _wcsdup(pGina::Transactions::User::AuthenticatedDomain());			
+
+			cleanup.Add(username, free);
+			cleanup.Add(password, free);
+			cleanup.Add(domain, free);
+
+			PWSTR protectedPassword = NULL;			
+			HRESULT result = Microsoft::Sample::ProtectIfNecessaryAndCopyPassword(password, m_usageScenario, &protectedPassword);			
+			if(!SUCCEEDED(result))
+				return result;
+
+			cleanup.Add(static_cast<void *>(protectedPassword), (void (*)(void *))(CoTaskMemFree));
+
+			// Init kiul
+			KERB_INTERACTIVE_UNLOCK_LOGON kiul;
+			result = Microsoft::Sample::KerbInteractiveUnlockLogonInit(domain, username, password, m_usageScenario, &kiul);
+			if(!SUCCEEDED(result))
+				return result;
+
+			// Pack for the negotiate package and include our CLSID
+			result = Microsoft::Sample::KerbInteractiveUnlockLogonPack(kiul, &pcpcs->rgbSerialization, &pcpcs->cbSerialization);
+			if(!SUCCEEDED(result))
+				return result;
+            
+			ULONG authPackage = 0;
+			result = Microsoft::Sample::RetrieveNegotiateAuthPackage(&authPackage);
+			if(!SUCCEEDED(result))
+				return result;
+
+			pcpcs->ulAuthenticationPackage = authPackage;
+			pcpcs->clsidCredentialProvider = CLSID_CpGinaProvider;
+			*pcpgsr = CPGSR_RETURN_CREDENTIAL_FINISHED;            
+            
+			return S_OK;
+        }
+    
 		IFACEMETHODIMP Credential::ReportResult(__in NTSTATUS ntsStatus, __in NTSTATUS ntsSubstatus, __deref_out_opt PWSTR* ppwszOptionalStatusText, 
 												__out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
 		{
 			pDEBUG(L"Credential::ReportResult(0x%08x, 0x%08x) called", ntsStatus, ntsSubstatus);
-
-			*ppwszOptionalStatusText = NULL;
-			*pcpsiOptionalStatusIcon = CPSI_NONE;
-			return S_OK;
+			/**ppwszOptionalStatusText = NULL;
+			*pcpsiOptionalStatusIcon = CPSI_NONE;*/
+			return E_NOTIMPL;
 		}
 
 		Credential::Credential() :
@@ -270,6 +335,18 @@ namespace pGina
 					}
 				}
 			}	
+		}
+
+		PWSTR Credential::FindUsernameValue()
+		{
+			if(!m_fields) return NULL;
+			return m_fields->fields[LUIFI_USERNAME].wstr;
+		}
+
+		PWSTR Credential::FindPasswordValue()
+		{
+			if(!m_fields) return NULL;
+			return m_fields->fields[LUIFI_PASSWORD].wstr;
 		}
 	}
 }

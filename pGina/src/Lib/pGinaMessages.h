@@ -146,6 +146,14 @@ namespace pGina
 				Password(password);
 			}
 
+			LoginRequestMessage(const wchar_t * username, const wchar_t * domain, const wchar_t *password)
+			{
+				Type(LoginRequest);
+				Username(username ? username : L"");
+				Domain(domain ? domain : L"");
+				Password(password ? password : L"");
+			}
+
 			std::wstring const& Username() { return m_username; }
 			void				Username(std::wstring const& v) { m_username = v; }
 

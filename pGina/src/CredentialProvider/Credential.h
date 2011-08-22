@@ -48,6 +48,8 @@ namespace pGina
 			void	ClearZeroAndFreeAnyPasswordFields(bool updateUi);
 			void	ClearZeroAndFreeAnyTextFields(bool updateUi);
 			void	ClearZeroAndFreeFields(CREDENTIAL_PROVIDER_FIELD_TYPE type, bool updateUi);
+			PWSTR   FindUsernameValue();
+			PWSTR   FindPasswordValue();
 
 		private:
 			long m_referenceCount;
