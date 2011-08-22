@@ -21,15 +21,21 @@ namespace pGina
 		};
 
 		// Describes the field overall, both its state pair and its field descriptor
+		//  as well as a union representing the fields current value
 		struct UI_FIELD
 		{
 			FIELD_STATE_PAIR fieldStatePair;
 			CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR fieldDescriptor;
+			union
+			{
+				PWSTR wstr;				
+			};
 		};		
 
 		struct UI_FIELDS
 		{
 			DWORD fieldCount;
+			DWORD submitAdjacentTo;
 			UI_FIELD fields[];	// Note: Warning 4200 - compiler cannot generate copy ctor, no doing UI_FIELDS x = UI_FIELDS y!
 		};
 	}

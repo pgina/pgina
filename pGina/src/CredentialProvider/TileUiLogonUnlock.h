@@ -18,7 +18,8 @@ namespace pGina
 
 		static const UI_FIELDS s_logonFields =
 		{
-			LUIFI_NUM_FIELDS,
+			LUIFI_NUM_FIELDS,		// Number of fields total
+			LUIFI_PASSWORD,			// Field index which submit button should be adjacent to
 			{
 				//  when to display,               style,             field id,        type,               name
 				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LUIFI_TILEIMAGE, CPFT_TILE_IMAGE,    L"Image" } },	// LUIFI_TILEIMAGE

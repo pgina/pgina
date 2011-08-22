@@ -4,7 +4,7 @@
 #include <credentialprovider.h>
 
 #include "ClassFactory.h"
-
+#include "TileUiTypes.h"
 
 namespace pGina
 {
@@ -42,11 +42,19 @@ namespace pGina
 			Credential();
 			virtual ~Credential();
 
-			void	Initialize(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus);
+			void	Initialize(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, UI_FIELDS const& fields);
+
+		private:
+			void	ClearZeroAndFreeAnyPasswordFields(bool updateUi);
+			void	ClearZeroAndFreeAnyTextFields(bool updateUi);
+			void	ClearZeroAndFreeFields(CREDENTIAL_PROVIDER_FIELD_TYPE type, bool updateUi);
 
 		private:
 			long m_referenceCount;
 			CREDENTIAL_PROVIDER_USAGE_SCENARIO	m_usageScenario;
+			ICredentialProviderCredentialEvents * m_logonUiCallback;
+			UI_FIELDS *m_fields;
+			HBITMAP m_bitmap;
 		};
 	}
 }

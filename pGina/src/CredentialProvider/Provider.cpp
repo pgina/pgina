@@ -176,7 +176,16 @@ namespace pGina
 			if(!m_credential)
 			{
 				m_credential = new Credential();
-				m_credential->Initialize(m_usageScenario);
+
+				switch(m_usageScenario)
+				{
+				case CPUS_LOGON:
+				case CPUS_UNLOCK_WORKSTATION:
+					m_credential->Initialize(m_usageScenario, s_logonFields);
+					break;
+				default:
+					return E_INVALIDARG;
+				}
 			}
 
 			// Did we fail to create it? OOM
