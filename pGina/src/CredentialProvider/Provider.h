@@ -7,6 +7,8 @@
 #include "TileUiTypes.h"
 #include "Credential.h"
 
+#include <ntsecapi.h>
+
 namespace pGina
 {
 	namespace CredProv
@@ -35,6 +37,8 @@ namespace pGina
 			__override ~Provider();
 
 			IFACEMETHODIMP GetFieldDescriptorForUi(UI_FIELDS const& fields, DWORD index, CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR **ppcpfd);
+			bool SerializedCredsAppearComplete();
+			void GetSerializedCredentials(PWSTR *username, PWSTR *password, PWSTR *domain);			
 
 		private:
 			long m_referenceCount;
@@ -42,6 +46,8 @@ namespace pGina
 			ICredentialProviderEvents *			m_logonUiCallbackEvents;
 			UINT_PTR							m_logonUiCallbackContext;
 			Credential *						m_credential;
+			DWORD								m_usageFlags;
+			KERB_INTERACTIVE_UNLOCK_LOGON *		m_setSerialization;
 		};
 	}
 }

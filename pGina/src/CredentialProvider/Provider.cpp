@@ -10,6 +10,10 @@
 
 #include "Macros.h"
 #include "TileUiLogonUnlock.h"
+#include "ProviderGuid.h"
+#include "SerializationHelpers.h"
+
+#include <wincred.h>
 
 namespace pGina
 {
@@ -44,7 +48,9 @@ namespace pGina
 			m_usageScenario(CPUS_INVALID),
 			m_logonUiCallbackEvents(NULL),
 			m_logonUiCallbackContext(0),
-			m_credential(NULL)
+			m_credential(NULL),
+			m_usageFlags(0),
+			m_setSerialization(NULL)
 		{		
 			AddDllReference();			
 		}
@@ -58,6 +64,12 @@ namespace pGina
 			{
 				m_credential->Release();
 				m_credential = NULL;
+			}
+
+			if(m_setSerialization)
+			{
+				LocalFree(m_setSerialization);
+				m_setSerialization = NULL;
 			}
 		}
 
@@ -73,12 +85,13 @@ namespace pGina
 			{
 			case CPUS_LOGON:
 			case CPUS_UNLOCK_WORKSTATION:
+			case CPUS_CREDUI:
 				m_usageScenario = cpus;
+				m_usageFlags = dwFlags;
 				return S_OK;
 			
-			case CPUS_CHANGE_PASSWORD:
-			case CPUS_CREDUI:
-				return E_NOTIMPL;	// Todo: Support these
+			case CPUS_CHANGE_PASSWORD:			
+				return E_NOTIMPL;	// Todo: Support this
 
 			case CPUS_PLAP:
 			case CPUS_INVALID:
@@ -90,9 +103,74 @@ namespace pGina
 		}
 
 		IFACEMETHODIMP Provider::SetSerialization(__in const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs)
-		{
-			return S_OK;	// Todo: Implement me!
-		}
+		{			
+			if ((CLSID_CpGinaProvider != pcpcs->clsidCredentialProvider) && (m_usageScenario == CPUS_CREDUI))
+				return E_INVALIDARG;
+
+			HRESULT result = E_NOTIMPL;
+
+			// Must match our auth package (negotiate)			
+			ULONG authPackage = 0;
+			result = Microsoft::Sample::RetrieveNegotiateAuthPackage(&authPackage);
+			if(!SUCCEEDED(result))
+				return result;
+
+			// Slightly modified behavior depending on flags provided to SetUsageScenario
+			if(m_usageScenario == CPUS_CREDUI)
+			{
+				// Must support the auth package specified in CREDUIWIN_IN_CRED_ONLY and CREDUIWIN_AUTHPACKAGE_ONLY				
+				if( ((m_usageFlags & CREDUIWIN_IN_CRED_ONLY) || (m_usageFlags & CREDUIWIN_AUTHPACKAGE_ONLY)) 
+					&& authPackage != pcpcs->ulAuthenticationPackage)
+					return E_INVALIDARG;
+				
+				// CREDUIWIN_AUTHPACKAGE_ONLY should NOT return S_OK unless we can serialize correctly,
+				//  so we default to S_FALSE here and change to S_OK on success.
+				if(m_usageFlags & CREDUIWIN_AUTHPACKAGE_ONLY)
+					result = S_FALSE;				
+			}
+
+			// As long as the package matches, and there is something to read from
+			if(authPackage == pcpcs->ulAuthenticationPackage && pcpcs->cbSerialization > 0 && pcpcs->rgbSerialization)
+			{
+				KERB_INTERACTIVE_UNLOCK_LOGON* pkil = (KERB_INTERACTIVE_UNLOCK_LOGON*) pcpcs->rgbSerialization;
+				if(pkil->Logon.MessageType == KerbInteractiveLogon)
+				{
+					// Must have a username
+					if(pkil->Logon.UserName.Length && pkil->Logon.UserName.Buffer)
+					{
+						BYTE * nativeSerialization = NULL;
+						DWORD nativeSerializationSize = 0;
+							
+						// Do we need to repack in native format? (32 bit client talking to 64 bit host or vice versa)
+						if(m_usageScenario == CPUS_CREDUI && (CREDUIWIN_PACK_32_WOW & m_usageFlags))
+						{
+							if(!SUCCEEDED(Microsoft::Sample::KerbInteractiveUnlockLogonRepackNative(pcpcs->rgbSerialization, pcpcs->cbSerialization, 
+								&nativeSerialization, &nativeSerializationSize)))
+							{
+								return result;								
+							}
+						}
+						else
+						{
+							nativeSerialization = (BYTE*) LocalAlloc(LMEM_ZEROINIT, pcpcs->cbSerialization);
+							nativeSerializationSize = pcpcs->cbSerialization;
+
+							if(!nativeSerialization)
+								return E_OUTOFMEMORY;
+							
+							CopyMemory(nativeSerialization, pcpcs->rgbSerialization, pcpcs->cbSerialization);															
+						}
+
+						Microsoft::Sample::KerbInteractiveUnlockLogonUnpackInPlace((KERB_INTERACTIVE_UNLOCK_LOGON *) nativeSerialization, nativeSerializationSize);
+						if(m_setSerialization) LocalFree(m_setSerialization);								
+						m_setSerialization = (KERB_INTERACTIVE_UNLOCK_LOGON *) nativeSerialization;
+						result = S_OK;	// All is well!                                                                                            								
+					}
+				}
+			}
+
+			return result;		
+    	}
 
 		IFACEMETHODIMP Provider::Advise(__in ICredentialProviderEvents* pcpe, __in UINT_PTR upAdviseContext)
 		{
@@ -163,10 +241,18 @@ namespace pGina
 
 		IFACEMETHODIMP Provider::GetCredentialCount(__out DWORD* pdwCount, __out_range(<,*pdwCount) DWORD* pdwDefault, __out BOOL* pbAutoLogonWithDefault)
 		{
-			// Currently we only support a single tile, no default tile, and no autologin scenario			
+			// We currently always support only a single tile
 			*pdwCount = 1;
 			*pdwDefault = CREDENTIAL_PROVIDER_NO_DEFAULT;
 			*pbAutoLogonWithDefault = FALSE;
+			
+			// If we were given creds via SetSerialization, and they appear complete, then we can 
+			//  make that credential our default and attempt an autologon.
+			if(SerializedCredsAppearComplete())
+			{
+				*pdwDefault = 0;
+				*pbAutoLogonWithDefault = TRUE;
+			}
 			return S_OK;
 		}
 
@@ -177,11 +263,21 @@ namespace pGina
 			{
 				m_credential = new Credential();
 
+				pGina::Memory::ObjectCleanupPool cleanup;
+				
+				PWSTR serializedUser = NULL, serializedPass = NULL;
+				if(SerializedCredsAppearComplete())
+				{
+					GetSerializedCredentials(&serializedUser, &serializedPass, NULL);
+					cleanup.Add(serializedUser, (void (*)(void *)) LocalFree);
+					cleanup.Add(serializedPass, (void (*)(void *)) LocalFree);
+				}
+
 				switch(m_usageScenario)
 				{
 				case CPUS_LOGON:
 				case CPUS_UNLOCK_WORKSTATION:
-					m_credential->Initialize(m_usageScenario, s_logonFields);
+					m_credential->Initialize(m_usageScenario, s_logonFields, m_usageFlags, serializedUser, serializedPass);
 					break;
 				default:
 					return E_INVALIDARG;
@@ -230,5 +326,46 @@ namespace pGina
 			*ppcpfd = pcpfd;
 			return S_OK;    
 		}
+
+		bool Provider::SerializedCredsAppearComplete()
+		{
+			// Did we get any creds?
+			if(!m_setSerialization) return false;
+
+			// Can we work out a username and a password at a minimum?
+			if(m_setSerialization->Logon.UserName.Length && m_setSerialization->Logon.UserName.Buffer &&
+				m_setSerialization->Logon.Password.Length && m_setSerialization->Logon.Password.Buffer)
+				return true;
+
+			return false;
+		}
+
+		void Provider::GetSerializedCredentials(PWSTR *username, PWSTR *password, PWSTR *domain)
+		{							
+			if(!SerializedCredsAppearComplete()) return;
+
+			if(username)
+			{
+				*username = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.UserName.Length + sizeof(wchar_t));
+				CopyMemory(*username, m_setSerialization->Logon.UserName.Buffer, m_setSerialization->Logon.UserName.Length);
+			}
+
+			if(password)
+			{
+				*password = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.Password.Length + sizeof(wchar_t));
+				CopyMemory(*password, m_setSerialization->Logon.Password.Buffer, m_setSerialization->Logon.Password.Length);
+			}
+
+			if(domain)
+			{
+				if(m_setSerialization->Logon.LogonDomainName.Length && m_setSerialization->Logon.LogonDomainName.Buffer)
+				{
+					*domain = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.LogonDomainName.Length + sizeof(wchar_t));
+					CopyMemory(*domain, m_setSerialization->Logon.LogonDomainName.Buffer, m_setSerialization->Logon.LogonDomainName.Length);
+				}
+			}
+		}
+
+				
 	}
 }

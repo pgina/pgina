@@ -42,7 +42,8 @@ namespace pGina
 			Credential();
 			virtual ~Credential();
 
-			void	Initialize(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, UI_FIELDS const& fields);
+			void	Initialize(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, UI_FIELDS const& fields, 
+							   DWORD usageFlags, const wchar_t *username, const wchar_t *password);
 
 		private:
 			void	ClearZeroAndFreeAnyPasswordFields(bool updateUi);
@@ -57,6 +58,7 @@ namespace pGina
 			ICredentialProviderCredentialEvents * m_logonUiCallback;
 			UI_FIELDS *m_fields;
 			HBITMAP m_bitmap;
+			DWORD	m_usageFlags;
 		};
 	}
 }

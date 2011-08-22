@@ -15,6 +15,8 @@
 #include "SerializationHelpers.h"
 #include "ProviderGuid.h"
 
+#include <wincred.h>
+
 namespace pGina
 {
 	namespace CredProv
@@ -234,22 +236,59 @@ namespace pGina
 
 			cleanup.Add(static_cast<void *>(protectedPassword), (void (*)(void *))(CoTaskMemFree));
 
-			// Init kiul
-			KERB_INTERACTIVE_UNLOCK_LOGON kiul;
-			result = Microsoft::Sample::KerbInteractiveUnlockLogonInit(domain, username, password, m_usageScenario, &kiul);
-			if(!SUCCEEDED(result))
-				return result;
+			// CredUI we use CredPackAuthenticationBuffer
+			if(m_usageScenario == CPUS_CREDUI)
+			{
+				// Need username/domain as a single string
+				PWSTR domainUsername = NULL;
+				result = Microsoft::Sample::DomainUsernameStringAlloc(domain, username, &domainUsername);
+				if(SUCCEEDED(result))
+				{
+					DWORD size = 0;
+					BYTE* rawbits = NULL;
+					
+					if(!CredPackAuthenticationBufferW((CREDUIWIN_PACK_32_WOW & m_usageFlags) ? CRED_PACK_WOW_BUFFER : 0, domainUsername, protectedPassword, rawbits, &size))
+					{
+						if(GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+						{
+							rawbits = (BYTE *)HeapAlloc(GetProcessHeap(), 0, size);
+							if(!CredPackAuthenticationBufferW((CREDUIWIN_PACK_32_WOW & m_usageFlags) ? CRED_PACK_WOW_BUFFER : 0, domainUsername, protectedPassword, rawbits, &size))
+							{
+								HeapFree(GetProcessHeap(), 0, rawbits);
+								HeapFree(GetProcessHeap(), 0, domainUsername);
+								return HRESULT_FROM_WIN32(GetLastError());
+							}
 
-			// Pack for the negotiate package and include our CLSID
-			result = Microsoft::Sample::KerbInteractiveUnlockLogonPack(kiul, &pcpcs->rgbSerialization, &pcpcs->cbSerialization);
-			if(!SUCCEEDED(result))
-				return result;
-            
+							pcpcs->rgbSerialization = rawbits;
+							pcpcs->cbSerialization = size;
+						}
+						else
+						{
+							HeapFree(GetProcessHeap(), 0, domainUsername);
+							return E_FAIL;
+						}
+					}
+				}
+			}
+			else
+			{
+				// Init kiul
+				KERB_INTERACTIVE_UNLOCK_LOGON kiul;
+				result = Microsoft::Sample::KerbInteractiveUnlockLogonInit(domain, username, password, m_usageScenario, &kiul);
+				if(!SUCCEEDED(result))
+					return result;
+
+				// Pack for the negotiate package and include our CLSID
+				result = Microsoft::Sample::KerbInteractiveUnlockLogonPack(kiul, &pcpcs->rgbSerialization, &pcpcs->cbSerialization);
+				if(!SUCCEEDED(result))
+					return result;
+			}
+			
 			ULONG authPackage = 0;
 			result = Microsoft::Sample::RetrieveNegotiateAuthPackage(&authPackage);
 			if(!SUCCEEDED(result))
 				return result;
-
+						
 			pcpcs->ulAuthenticationPackage = authPackage;
 			pcpcs->clsidCredentialProvider = CLSID_CpGinaProvider;
 			*pcpgsr = CPGSR_RETURN_CREDENTIAL_FINISHED;            
@@ -271,7 +310,8 @@ namespace pGina
 			m_usageScenario(CPUS_INVALID),
 			m_logonUiCallback(NULL),
 			m_fields(NULL),
-			m_bitmap(NULL)
+			m_bitmap(NULL),
+			m_usageFlags(0)
 		{
 			AddDllReference();
 		}
@@ -284,9 +324,10 @@ namespace pGina
 			ReleaseDllReference();
 		}
 
-		void Credential::Initialize(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, UI_FIELDS const& fields)
+		void Credential::Initialize(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, UI_FIELDS const& fields, DWORD usageFlags, const wchar_t *username, const wchar_t *password)
 		{
 			m_usageScenario = cpus;
+			m_usageFlags = usageFlags;
 
 			// Allocate and copy our UI_FIELDS struct, we need our own copy to set/track the state of
 			//  our fields over time
@@ -298,6 +339,12 @@ namespace pGina
 				m_fields->fields[x].fieldDescriptor = fields.fields[x].fieldDescriptor;
 				m_fields->fields[x].fieldStatePair = fields.fields[x].fieldStatePair;
 				m_fields->fields[x].wstr = NULL;
+
+				if(&fields == &s_logonFields && x == LUIFI_USERNAME && username != NULL)
+					SHStrDupW(username, &m_fields->fields[x].wstr);
+
+				if(&fields == &s_logonFields && x == LUIFI_PASSWORD && password != NULL)
+					SHStrDupW(username, &m_fields->fields[x].wstr);
 			}
 		}
 
