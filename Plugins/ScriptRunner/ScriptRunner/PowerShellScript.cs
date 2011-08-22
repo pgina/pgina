@@ -11,9 +11,8 @@ using System.Collections.ObjectModel;
 
 namespace pGina.Plugin.ScriptRunner
 {
-    class PowerShellScript
+    class PowerShellScript : Script
     {
-        public string File { get; set; }
         private ILog m_logger = LogManager.GetLogger("PowerShellScript");
 
         public PowerShellScript()
@@ -21,7 +20,12 @@ namespace pGina.Plugin.ScriptRunner
             this.File = null;
         }
 
-        public void Run()
+        public PowerShellScript(string fileName)
+        {
+            this.File = fileName;
+        }
+
+        public override void Run()
         {
             if (String.IsNullOrEmpty(File))
             {
@@ -54,7 +58,7 @@ namespace pGina.Plugin.ScriptRunner
                     {
                         foreach (PSObject obj in results)
                         {
-                            m_logger.InfoFormat(obj.ToString());
+                            m_logger.Info(obj.ToString());
                         }
                     }
                     m_logger.InfoFormat("Script {0} finished", this.File);

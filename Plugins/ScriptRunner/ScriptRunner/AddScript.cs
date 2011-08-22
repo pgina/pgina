@@ -11,6 +11,8 @@ namespace pGina.Plugin.ScriptRunner
 {
     public partial class AddScript : Form
     {
+        internal Script ScriptData { get; set; }
+
         public AddScript()
         {
             InitializeComponent();
@@ -41,6 +43,31 @@ namespace pGina.Plugin.ScriptRunner
             {
                 this.fileTB.Text = dlg.FileName;
             }
+        }
+
+        private void cancelBtn_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.Close();
+        }
+
+        private void okBtn_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = System.Windows.Forms.DialogResult.OK;
+
+            string fn = this.fileTB.Text.Trim();
+            if (this.batchRB.Checked)
+            {
+                this.ScriptData = new BatchScript(fn);
+            }
+            else
+            {
+                this.ScriptData = new PowerShellScript(fn);
+            }
+
+            this.ScriptData.UserSession = this.userSessionCB.Checked;
+            this.ScriptData.SystemSession = this.systemSessionCB.Checked;
+            this.Close();
         }
     }
 }

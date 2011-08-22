@@ -43,9 +43,9 @@
             this.timeoutLabel.AutoSize = true;
             this.timeoutLabel.Location = new System.Drawing.Point(12, 15);
             this.timeoutLabel.Name = "timeoutLabel";
-            this.timeoutLabel.Size = new System.Drawing.Size(62, 13);
+            this.timeoutLabel.Size = new System.Drawing.Size(70, 13);
             this.timeoutLabel.TabIndex = 0;
-            this.timeoutLabel.Text = "Timeout (s):";
+            this.timeoutLabel.Text = "Timeout (ms):";
             // 
             // timeoutTB
             // 
@@ -70,6 +70,7 @@
             this.okBtn.TabIndex = 3;
             this.okBtn.Text = "OK";
             this.okBtn.UseVisualStyleBackColor = true;
+            this.okBtn.Click += new System.EventHandler(this.okBtn_Click);
             // 
             // cancelBtn
             // 
@@ -79,6 +80,7 @@
             this.cancelBtn.TabIndex = 4;
             this.cancelBtn.Text = "Cancel";
             this.cancelBtn.UseVisualStyleBackColor = true;
+            this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
             // 
             // addBtn
             // 
@@ -98,6 +100,7 @@
             this.removeBtn.TabIndex = 6;
             this.removeBtn.Text = "Remove";
             this.removeBtn.UseVisualStyleBackColor = true;
+            this.removeBtn.Click += new System.EventHandler(this.removeBtn_Click);
             // 
             // Configuration
             // 

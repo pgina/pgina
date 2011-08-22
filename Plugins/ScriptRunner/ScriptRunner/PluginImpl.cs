@@ -15,12 +15,19 @@ namespace pGina.Plugin.ScriptRunner
 
         void IPluginSystemSessionHelper.SessionEnding()
         {
-            throw new NotImplementedException();
+            m_logger.DebugFormat("IPluginSystemSessionHelper.SessionEnding");
         }
 
         void IPluginSystemSessionHelper.SessionStarted(Shared.Types.UserInformation userInformation)
         {
-            throw new NotImplementedException();
+            m_logger.DebugFormat("IPluginSystemSessionHelper.SessionStarted");
+
+            List<Script> scriptList = Settings.Load();
+            foreach (Script scr in scriptList)
+            {
+                if (scr.SystemSession)
+                    scr.Run();
+            }
         }
 
         void IPluginUserSessionHelper.SessionEnding()
@@ -31,6 +38,13 @@ namespace pGina.Plugin.ScriptRunner
         void IPluginUserSessionHelper.SessionStarted(Shared.Types.UserInformation userInformation)
         {
             m_logger.DebugFormat("IPluginUserSessionHelper.SessionStarted");
+
+            List<Script> scriptList = Settings.Load();
+            foreach (Script scr in scriptList)
+            {
+                if (scr.UserSession)
+                    scr.Run();
+            }
         }
 
         public string Description
