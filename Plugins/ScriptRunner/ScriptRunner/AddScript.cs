@@ -36,7 +36,7 @@ namespace pGina.Plugin.ScriptRunner
             }
             else
             {
-                dlg.Filter = "PowerShell scripts (*.ps)|*.ps";
+                dlg.Filter = "PowerShell scripts (*.ps1)|*.ps1";
             }
 
             if (dlg.ShowDialog() == DialogResult.OK)
