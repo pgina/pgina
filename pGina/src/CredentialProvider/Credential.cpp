@@ -124,7 +124,8 @@ namespace pGina
 		}
 
 		Credential::Credential() :
-			m_referenceCount(1)
+			m_referenceCount(1),
+			m_usageScenario(CPUS_INVALID)
 		{
 			AddDllReference();
 		}
@@ -132,6 +133,11 @@ namespace pGina
 		Credential::~Credential()
 		{
 			ReleaseDllReference();
+		}
+
+		void Credential::Initialize(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus)
+		{
+			m_usageScenario = cpus;
 		}
 	}
 }

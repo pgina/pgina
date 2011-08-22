@@ -12,6 +12,7 @@ namespace pGina
 	{
 		class Credential : public ICredentialProviderCredential
 		{
+		public:
 			// IUnknown
 			IFACEMETHODIMP_(ULONG) AddRef();    
 			IFACEMETHODIMP_(ULONG) Release();    
@@ -41,8 +42,11 @@ namespace pGina
 			Credential();
 			virtual ~Credential();
 
+			void	Initialize(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus);
+
 		private:
 			long m_referenceCount;
+			CREDENTIAL_PROVIDER_USAGE_SCENARIO	m_usageScenario;
 		};
 	}
 }

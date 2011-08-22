@@ -4,6 +4,8 @@
 #include <credentialprovider.h>
 
 #include "ClassFactory.h"
+#include "TileUiTypes.h"
+#include "Credential.h"
 
 namespace pGina
 {
@@ -32,8 +34,14 @@ namespace pGina
 			Provider();
 			__override ~Provider();
 
+			IFACEMETHODIMP GetFieldDescriptorForUi(UI_FIELDS const& fields, DWORD index, CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR **ppcpfd);
+
 		private:
 			long m_referenceCount;
+			CREDENTIAL_PROVIDER_USAGE_SCENARIO	m_usageScenario;
+			ICredentialProviderEvents *			m_logonUiCallbackEvents;
+			UINT_PTR							m_logonUiCallbackContext;
+			Credential *						m_credential;
 		};
 	}
 }
