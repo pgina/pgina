@@ -1,3 +1,5 @@
+#include <Windows.h>
+
 #include "Credential.h"
 #include "Dll.h"
 
@@ -15,6 +17,7 @@
 #include "Macros.h"
 #include "SerializationHelpers.h"
 #include "ProviderGuid.h"
+#include "resource.h"
 
 #include <wincred.h>
 
@@ -120,8 +123,16 @@ namespace pGina
 			if(m_bitmap == NULL)
 			{
 				std::wstring tileImage = pGina::Registry::GetString(L"TileImage", L"");
-				pDEBUG(L"Credential::GetBitmapValue: Loading image from: %s", tileImage.c_str());
-				m_bitmap = (HBITMAP) LoadImageW((HINSTANCE) NULL, tileImage.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);			
+				if(tileImage.empty() || tileImage.length() == 1)
+				{
+					// Use builtin
+					m_bitmap = LoadBitmap(g_dllHandle, MAKEINTRESOURCE(IDB_PGINA_LOGO));
+				}
+				else
+				{
+					pDEBUG(L"Credential::GetBitmapValue: Loading image from: %s", tileImage.c_str());
+					m_bitmap = (HBITMAP) LoadImageW((HINSTANCE) NULL, tileImage.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);			
+				}
 				if(!m_bitmap)
 					return HRESULT_FROM_WIN32(GetLastError());
 			}
