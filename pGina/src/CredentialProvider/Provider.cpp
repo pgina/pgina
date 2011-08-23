@@ -104,8 +104,8 @@ namespace pGina
 
 		IFACEMETHODIMP Provider::SetSerialization(__in const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs)
 		{			
-			if ((CLSID_CpGinaProvider != pcpcs->clsidCredentialProvider) && (m_usageScenario == CPUS_CREDUI))
-				return E_INVALIDARG;
+			/*if ((CLSID_CpGinaProvider != pcpcs->clsidCredentialProvider) && (m_usageScenario == CPUS_CREDUI))
+				return E_INVALIDARG;*/
 
 			HRESULT result = E_NOTIMPL;
 
@@ -211,6 +211,7 @@ namespace pGina
 			{
 			case CPUS_LOGON:
 			case CPUS_UNLOCK_WORKSTATION:
+			case CPUS_CREDUI:
 				*pdwCount = LUIFI_NUM_FIELDS;
 				return S_OK;				
 			default:
@@ -229,6 +230,7 @@ namespace pGina
 			{
 			case CPUS_LOGON:
 			case CPUS_UNLOCK_WORKSTATION:
+			case CPUS_CREDUI:
 				return GetFieldDescriptorForUi(s_logonFields, dwIndex, ppcpfd);
 			default:
 				return E_INVALIDARG;
@@ -277,6 +279,7 @@ namespace pGina
 				{
 				case CPUS_LOGON:
 				case CPUS_UNLOCK_WORKSTATION:
+				case CPUS_CREDUI:
 					m_credential->Initialize(m_usageScenario, s_logonFields, m_usageFlags, serializedUser, serializedPass);
 					break;
 				default:

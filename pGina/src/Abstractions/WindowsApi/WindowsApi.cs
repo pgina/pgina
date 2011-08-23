@@ -167,8 +167,8 @@ namespace Abstractions.WindowsApi
             uint outCredSize;
             bool save = false;
             int result = SafeNativeMethods.CredUIPromptForWindowsCredentials(ref uiInfo, 0, ref authPackage,
-                                                           IntPtr.Zero, 0, out outCredBuffer, out outCredSize, ref save,
-                                                           SafeNativeMethods.PromptForWindowsCredentialsFlags.CREDUIWIN_GENERIC);                                                           
+                                                           IntPtr.Zero, 0, out outCredBuffer, out outCredSize, ref save, 0);
+                                                            
 
             var usernameBuf = new StringBuilder(100);
             var passwordBuf = new StringBuilder(100);
