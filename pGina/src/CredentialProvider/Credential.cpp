@@ -10,7 +10,8 @@
 
 #include "ClassFactory.h"
 #include "TileUiTypes.h"
-#include "TileUiLogonUnlock.h"
+#include "TileUiLogon.h"
+#include "TileUiUnlock.h"
 #include "Macros.h"
 #include "SerializationHelpers.h"
 #include "ProviderGuid.h"
@@ -334,17 +335,29 @@ namespace pGina
 			m_fields = (UI_FIELDS *) (malloc(sizeof(UI_FIELDS) + (sizeof(UI_FIELD) * fields.fieldCount)));
 			m_fields->fieldCount = fields.fieldCount;
 			m_fields->submitAdjacentTo = fields.submitAdjacentTo;
+			m_fields->usernameFieldIdx = fields.usernameFieldIdx;
+			m_fields->passwordFieldIdx = fields.passwordFieldIdx;
 			for(DWORD x = 0; x < fields.fieldCount; x++)
 			{
 				m_fields->fields[x].fieldDescriptor = fields.fields[x].fieldDescriptor;
 				m_fields->fields[x].fieldStatePair = fields.fields[x].fieldStatePair;
 				m_fields->fields[x].wstr = NULL;
+				if(fields.fields[x].wstr)
+				{
+					SHStrDup(fields.fields[x].wstr, &m_fields->fields[x].wstr);
+				}								
+			}			
 
-				if(&fields == &s_logonFields && x == LUIFI_USERNAME && username != NULL)
-					SHStrDupW(username, &m_fields->fields[x].wstr);
+			if(username != NULL)
+			{
+				PWSTR dest = FindUsernameValue();
+				SHStrDupW(username, &(dest));
+			}
 
-				if(&fields == &s_logonFields && x == LUIFI_PASSWORD && password != NULL)
-					SHStrDupW(username, &m_fields->fields[x].wstr);
+			if(password != NULL)
+			{
+				PWSTR dest = FindPasswordValue();
+				SHStrDupW(password, &(dest));
 			}
 		}
 
@@ -387,13 +400,13 @@ namespace pGina
 		PWSTR Credential::FindUsernameValue()
 		{
 			if(!m_fields) return NULL;
-			return m_fields->fields[LUIFI_USERNAME].wstr;
+			return m_fields->fields[m_fields->usernameFieldIdx].wstr;
 		}
 
 		PWSTR Credential::FindPasswordValue()
 		{
-			if(!m_fields) return NULL;
-			return m_fields->fields[LUIFI_PASSWORD].wstr;
+			if(!m_fields) return NULL;			
+			return m_fields->fields[m_fields->passwordFieldIdx].wstr;
 		}
 	}
 }

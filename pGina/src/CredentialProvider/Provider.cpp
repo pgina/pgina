@@ -9,7 +9,8 @@
 #pragma warning(pop)
 
 #include "Macros.h"
-#include "TileUiLogonUnlock.h"
+#include "TileUiLogon.h"
+#include "TileUiUnlock.h"
 #include "ProviderGuid.h"
 #include "SerializationHelpers.h"
 
@@ -228,10 +229,11 @@ namespace pGina
 		{
 			switch(m_usageScenario)
 			{
-			case CPUS_LOGON:
-			case CPUS_UNLOCK_WORKSTATION:
+			case CPUS_LOGON:			
 			case CPUS_CREDUI:
 				return GetFieldDescriptorForUi(s_logonFields, dwIndex, ppcpfd);
+			case CPUS_UNLOCK_WORKSTATION:
+				return GetFieldDescriptorForUi(s_unlockFields, dwIndex, ppcpfd);
 			default:
 				return E_INVALIDARG;
 			}
@@ -277,10 +279,12 @@ namespace pGina
 
 				switch(m_usageScenario)
 				{
-				case CPUS_LOGON:
-				case CPUS_UNLOCK_WORKSTATION:
+				case CPUS_LOGON:				
 				case CPUS_CREDUI:
 					m_credential->Initialize(m_usageScenario, s_logonFields, m_usageFlags, serializedUser, serializedPass);
+					break;
+				case CPUS_UNLOCK_WORKSTATION:
+					m_credential->Initialize(m_usageScenario, s_unlockFields, m_usageFlags, serializedUser, serializedPass);
 					break;
 				default:
 					return E_INVALIDARG;

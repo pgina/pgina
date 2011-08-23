@@ -20,6 +20,8 @@ namespace pGina
 		{
 			LUIFI_NUM_FIELDS,		// Number of fields total
 			LUIFI_PASSWORD,			// Field index which submit button should be adjacent to
+			LUIFI_USERNAME,			// Username field index value
+			LUIFI_PASSWORD,			// Password field index value
 			{
 				//  when to display,               style,             field id,        type,               name
 				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LUIFI_TILEIMAGE, CPFT_TILE_IMAGE,    L"Image" } },	// LUIFI_TILEIMAGE
