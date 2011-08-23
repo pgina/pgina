@@ -120,13 +120,13 @@ namespace pGina
 			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
 			std::wstring pipePath = L"\\\\.\\pipe\\";
 			pipePath += pipeName;
-						
-			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);
-			if(pipeClient.Connect())
-			{
-				// Start a cleanup pool for messages we collect along the way
-				pGina::Memory::ObjectCleanupPool cleanup;
+			
+			// Start a cleanup pool for messages we collect along the way
+			pGina::Memory::ObjectCleanupPool cleanup;
 
+			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);			
+			if(pipeClient.Connect())
+			{				
 				// Always send hello first, expect hello in return
 				pGina::Protocol::HelloMessage hello;
 				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);		
@@ -161,6 +161,29 @@ namespace pGina
 
 				// We close regardless, no need to check reply type..
 				pipeClient.Close();		
+			}
+			else
+			{
+				Log::Warn(L"Unable to connect to pGina service pipe - LastError: 0x%08x, falling back on LogonUser()", GetLastError());
+				WCHAR computerName[MAX_COMPUTERNAME_LENGTH+1];
+				DWORD computerNameLen = ARRAYSIZE(computerName);
+				std::wstring domainName;
+
+				if (!GetComputerNameW(computerName, &computerNameLen))
+					domainName = L".";
+				else
+					domainName = computerName;
+
+				Log::Debug(L"Using LogonUser(%s, %s, *****)", username, domainName.c_str());
+				HANDLE token = NULL;
+				result = LogonUser(username, domainName.c_str(), password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &token);
+				if(result)
+				{
+					CloseHandle(token);
+					s_authenticatedUsername = username;
+					s_authenticatedPassword = password ? password : L"";
+					s_authenticatedDomain = domainName;
+				}				
 			}
 
 			return result;
