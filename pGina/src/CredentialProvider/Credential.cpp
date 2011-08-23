@@ -26,7 +26,7 @@ namespace pGina
 			// And more crazy ass v-table madness, yay COM again!
 			static const QITAB qit[] =
 			{
-				QITABENT(Credential, ICredentialProvider), 
+				QITABENT(Credential, ICredentialProviderCredential), 
 				{0},
 			};
 			return QISearch(this, qit, riid, ppv);
