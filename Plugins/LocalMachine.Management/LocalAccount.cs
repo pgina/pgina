@@ -12,7 +12,7 @@ namespace pGina.Plugin.LocalMachine.Management
     {
         static ILog m_logger = LogManager.GetLogger("LocalAccount");
 
-        public static void Create(string userName)
+        public static void Create(pGina.Shared.Types.UserInformation userInfo)
         {
             // Local machine
             using (DirectoryEntry local = new DirectoryEntry("WinNT://localhost"))
@@ -21,18 +21,18 @@ namespace pGina.Plugin.LocalMachine.Management
 
                 foreach (DirectoryEntry ent in local.Children)
                 {
-                    userExists = ent.Name.Equals(userName, StringComparison.CurrentCultureIgnoreCase);
+                    userExists = ent.Name.Equals(userInfo.Username, StringComparison.CurrentCultureIgnoreCase);
                     if (userExists)
                         break;
                 }
 
                 if (!userExists)
                 {
-                    m_logger.InfoFormat("Creating local user {0}", userName);
-                    using (DirectoryEntry user = local.Children.Add(userName, "User"))
+                    m_logger.InfoFormat("Creating local user {0}", userInfo.Username);
+                    using (DirectoryEntry user = local.Children.Add(userInfo.Username, "User"))
                     {
-                        user.Properties["FullName"].Add(String.Format("{0} (pGina)", userName));
-                        user.Invoke("SetPassword", "");
+                        user.Properties["FullName"].Add(String.Format("{0} (pGina)", userInfo.Username));
+                        user.Invoke("SetPassword", userInfo.Password);
                         // Possibly set some flags here...
                         // user.Invoke("Put", new object[] {"UserFlags", ...});
                         user.CommitChanges();
