@@ -23,6 +23,7 @@ namespace pGina.Core
             s_settings.SetDefault("PluginDirectories", new string[] { string.Format("{0}\\Plugins", curPath) });
             s_settings.SetDefault("ServicePipeName", "pGinaPipe");
             s_settings.SetDefault("MaxClients", 25);
+            s_settings.SetDefault("TraceMsgTraffic", false);
         }
     }
 }

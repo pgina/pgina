@@ -3,7 +3,7 @@
 #include <pGinaNativeLib.h>
 #include <pGinaTransactions.h>
 
-#define ADDL_FORMAT L"[%s:%d]"
+#define ADDL_FORMAT L"[%S:%d] "
 #define ADDL_ARGS __FILE__, __LINE__
 
 #define pDEBUG(format, ...) pGina::Transactions::Log::Debug(ADDL_FORMAT format, ADDL_ARGS, ##__VA_ARGS__)

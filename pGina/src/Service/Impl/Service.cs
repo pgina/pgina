@@ -108,7 +108,12 @@ namespace pGina.Service.Impl
 
             MessageType type = (MessageType)msg.MessageType;
 
-            logger.DebugFormat("{0} message received", type);
+            // Very noisy, not usually worth having on, configurable via "TraceMsgTraffic" boolean
+            bool traceMsgTraffic = pGina.Core.Settings.Get.GetSetting("TraceMsgTraffic", false);
+            if (traceMsgTraffic)
+            {
+                logger.DebugFormat("{0} message received", type);
+            }
             
             switch (type)
             {

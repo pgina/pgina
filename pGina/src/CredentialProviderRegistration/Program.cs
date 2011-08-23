@@ -38,7 +38,7 @@ namespace pGina.CredentialProvider.Registration
                 string clsidInProc = string.Format(@"CLSID\{{{0}}}\InprocServer32", m_providerGuid.ToString());
 
                 string name = new FileInfo("x64\\pGinaCredentialProvider.dll").FullName;
-                string shortName = "pGinaCredentialProvider";
+                string shortName = "pGinaCredentialProvider";                
                 File.Copy(name, @"C:\Windows\System32\pGinaCredentialProvider.dll", true);
 
                 using (RegistryKey key = Registry.LocalMachine.CreateSubKey(providerKey))

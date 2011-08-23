@@ -213,7 +213,7 @@ namespace pGina
 				
 				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
 				*pcpsiOptionalStatusIcon = CPSI_ERROR;
-				return S_OK;
+				return S_FALSE;
 			}
 
 			// At this point the info has passed to the service and been validated, so now we have to pack it up and provide it back to

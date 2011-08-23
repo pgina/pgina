@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 
+using System.DirectoryServices.AccountManagement;
+
 using log4net;
 
 using pGina.Shared.Interfaces;
@@ -11,7 +13,7 @@ using pGina.Shared.Types;
 
 namespace pGina.Plugin.LocalMachine.Management
 {
-    public class LocalMachineManager : IPluginAuthenticationGateway
+    public class LocalMachineManager : IPluginAuthenticationGateway, IPluginAuthentication
     {
         private ILog m_logger = LogManager.GetLogger("LocalMachineManager");
 
@@ -46,6 +48,37 @@ namespace pGina.Plugin.LocalMachine.Management
         public BooleanResult AuthenticatedUserGateway(SessionProperties properties)
         {
             throw new NotImplementedException();
-        }        
+        }
+
+        public BooleanResult AuthenticateUser(SessionProperties properties)
+        {
+            try
+            {                
+                m_logger.DebugFormat("AuthenticateUser({0})", properties.Id.ToString());
+
+                // Get user info
+                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+
+                m_logger.DebugFormat("Found username: {0}", userInfo.Username);
+
+                using(PrincipalContext pc = new PrincipalContext(ContextType.Machine, Environment.MachineName))
+                {
+                    if(pc.ValidateCredentials(userInfo.Username, userInfo.Password))
+                    {
+                        m_logger.InfoFormat("Authenticated user: {0}", userInfo.Username);
+                        userInfo.Domain = Environment.MachineName;
+                        return new BooleanResult() { Success = true };
+                    }
+                }                                
+
+                m_logger.ErrorFormat("Failed to authenticate user: {0}", userInfo.Username);
+                return new BooleanResult() { Success = false, Message = string.Format("Local account validation failed.") };
+            }
+            catch (Exception e)
+            {
+                m_logger.ErrorFormat("AuthenticateUser exception: {0}", e);
+                throw;  // Allow pGina service to catch and handle exception
+            }
+        }
     }
 }

@@ -41,7 +41,7 @@ namespace pGina
 				if(object)
 				{
 					DestroyerType foo;
-					foo.cleanupArg = func;
+					foo.cleanupFunc = func;
 					foo.cleanupArg = object;
 					m_destroyers.push_back(foo);
 				}
