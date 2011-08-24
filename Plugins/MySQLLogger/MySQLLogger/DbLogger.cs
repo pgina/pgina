@@ -15,7 +15,7 @@ namespace pGina.Plugin.MySqlLogger
         private static string m_ip;
         private static string m_hostName;
 
-        private static DbLogger()
+        static DbLogger()
         {
             string m_hostName = Dns.GetHostName();
             IPHostEntry ipList = Dns.GetHostEntry(m_hostName);
