@@ -14,5 +14,7 @@ namespace pGina.Core.Messages
         Log             = 0x04,
         LoginRequest    = 0x05,
         LoginResponse   = 0x06,
+        InfoRequest     = 0x07,
+        InfoResponse    = 0x08,
     }
 }

@@ -176,7 +176,7 @@ namespace pGina
 
 				Log::Debug(L"Using LogonUser(%s, %s, *****)", username, domainName.c_str());
 				HANDLE token = NULL;
-				result = LogonUser(username, domainName.c_str(), password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &token);
+				result = LogonUser(username, domainName.c_str(), password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &token) == TRUE;
 				if(result)
 				{
 					CloseHandle(token);

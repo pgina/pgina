@@ -920,27 +920,19 @@ namespace pGina.Configuration
                 if (chkInvokeSystem.Checked)
                 {
                     // TBD: Work out how to actually invoke these as SYSTEM in the current session, for now
-                    // we settle for at least invoking them, this should probably move into PluginDriver once
-                    // process model is worked out.
+                    // we settle for at least invoking them
                     m_logger.DebugFormat("Running system session plugins notification");
-                    foreach (IPluginSystemSessionHelper plugin in PluginLoader.GetOrderedPluginsOfType<IPluginSystemSessionHelper>())
-                    {
-                        plugin.SessionStarted(sessionDriver.UserInformation);
-                        plugin.SessionEnding();
-                    }
+                    sessionDriver.InvokeSystemSessionHelpers();
+                    sessionDriver.EndSystemSessionHelpers();
                 }
 
                 if (chkInvokeUser.Checked)
                 {
                     // TBD: Work out how to actually invoke these as the user who auth'd, but in the current session, for now
-                    // we settle for at least invoking them, this should probably move into PluginDriver once
-                    // process model is worked out.
+                    // we settle for at least invoking them
                     m_logger.DebugFormat("Running user session plugins notification");
-                    foreach (IPluginUserSessionHelper plugin in PluginLoader.GetOrderedPluginsOfType<IPluginUserSessionHelper>())
-                    {
-                        plugin.SessionStarted(sessionDriver.UserInformation);
-                        plugin.SessionEnding();
-                    }
+                    sessionDriver.InvokeUserSessionHelpers();
+                    sessionDriver.EndUserSessionHelpers();
                 }
             }            
         }

@@ -16,6 +16,17 @@ namespace pGina.Core
         private SessionProperties m_properties = null;
         private ILog m_logger = null;
 
+        public Guid SessionId
+        {
+            get { return m_sessionId; }
+            set 
+            { 
+                m_sessionId = value;
+                m_properties.Id = value;
+                m_properties.AddTrackedObject("SessionId", new Guid(m_sessionId.ToString()));
+            }
+        }
+
         public PluginDriver()
         {
             m_logger = LogManager.GetLogger(string.Format("PluginDriver:{0}", m_sessionId));            
@@ -190,6 +201,98 @@ namespace pGina.Core
 
             m_logger.InfoFormat("Successfully processed gateways for {0}", m_properties.GetTrackedSingle<UserInformation>().Username);
             return new BooleanResult() { Success = true };
-        }        
+        }
+
+        public void InvokeUserSessionHelpers()
+        {
+            List<IPluginUserSessionHelper> plugins = PluginLoader.GetOrderedPluginsOfType<IPluginUserSessionHelper>();
+
+            m_logger.DebugFormat("Processing user session helpers for user {0}, {1} plugins available", m_properties.GetTrackedSingle<UserInformation>().Username, plugins.Count);
+
+            foreach (IPluginUserSessionHelper plugin in plugins)
+            {
+                m_logger.DebugFormat("Calling {0}", plugin.Uuid);
+
+                try
+                {
+                    plugin.SessionStarted(m_properties);
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("{0} Threw an unexpected exception, skipping plugin: {1}", plugin.Uuid, e);
+                }
+            }
+
+            m_logger.InfoFormat("Successfully processed user session helpers for {0}", m_properties.GetTrackedSingle<UserInformation>().Username);                                
+        }
+
+        public void InvokeSystemSessionHelpers()
+        {
+            List<IPluginSystemSessionHelper> plugins = PluginLoader.GetOrderedPluginsOfType<IPluginSystemSessionHelper>();
+
+            m_logger.DebugFormat("Processing system session helpers for user {0}, {1} plugins available", m_properties.GetTrackedSingle<UserInformation>().Username, plugins.Count);
+
+            foreach (IPluginSystemSessionHelper plugin in plugins)
+            {
+                m_logger.DebugFormat("Calling {0}", plugin.Uuid);
+
+                try
+                {
+                    plugin.SessionStarted(m_properties);
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("{0} Threw an unexpected exception, skipping plugin: {1}", plugin.Uuid, e);
+                }
+            }
+
+            m_logger.InfoFormat("Successfully processed system session helpers for {0}", m_properties.GetTrackedSingle<UserInformation>().Username);
+        }
+
+        public void EndUserSessionHelpers()
+        {
+            List<IPluginUserSessionHelper> plugins = PluginLoader.GetOrderedPluginsOfType<IPluginUserSessionHelper>();
+
+            m_logger.DebugFormat("Processing end user session helpers for user {0}, {1} plugins available", m_properties.GetTrackedSingle<UserInformation>().Username, plugins.Count);
+
+            foreach (IPluginUserSessionHelper plugin in plugins)
+            {
+                m_logger.DebugFormat("Calling {0}", plugin.Uuid);
+
+                try
+                {
+                    plugin.SessionEnding(m_properties);
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("{0} Threw an unexpected exception, skipping plugin: {1}", plugin.Uuid, e);
+                }
+            }
+
+            m_logger.InfoFormat("Successfully processed end user session helpers for {0}", m_properties.GetTrackedSingle<UserInformation>().Username);
+        }
+
+        public void EndSystemSessionHelpers()
+        {
+            List<IPluginSystemSessionHelper> plugins = PluginLoader.GetOrderedPluginsOfType<IPluginSystemSessionHelper>();
+
+            m_logger.DebugFormat("Processing end system session helpers for user {0}, {1} plugins available", m_properties.GetTrackedSingle<UserInformation>().Username, plugins.Count);
+
+            foreach (IPluginSystemSessionHelper plugin in plugins)
+            {
+                m_logger.DebugFormat("Calling {0}", plugin.Uuid);
+
+                try
+                {
+                    plugin.SessionEnding(m_properties);
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("{0} Threw an unexpected exception, skipping plugin: {1}", plugin.Uuid, e);
+                }
+            }
+
+            m_logger.InfoFormat("Successfully processed end system session helpers for {0}", m_properties.GetTrackedSingle<UserInformation>().Username);
+        }      
     }
 }

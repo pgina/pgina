@@ -136,6 +136,7 @@ namespace pGina
 			LoginRequestMessage()
 			{
 				Type(LoginRequest);
+				SessionFromProcessId();
 			}
 
 			LoginRequestMessage(std::wstring const& username, std::wstring const& domain, std::wstring const& password)
@@ -144,6 +145,7 @@ namespace pGina
 				Username(username);
 				Domain(domain);
 				Password(password);
+				SessionFromProcessId();
 			}
 
 			LoginRequestMessage(const wchar_t * username, const wchar_t * domain, const wchar_t *password)
@@ -152,6 +154,7 @@ namespace pGina
 				Username(username ? username : L"");
 				Domain(domain ? domain : L"");
 				Password(password ? password : L"");
+				SessionFromProcessId();
 			}
 
 			std::wstring const& Username() { return m_username; }
@@ -162,6 +165,9 @@ namespace pGina
 
 			std::wstring const& Domain() { return m_domain; }
 			void			    Domain(std::wstring const& v) { m_domain = v; }
+
+			DWORD				Session() { return m_session; }
+			void				Session(DWORD const& v) { m_session = v; }
 
 			virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
 			{
@@ -175,6 +181,9 @@ namespace pGina
 
 				if(msg->Exists<std::wstring>(L"Password"))
 					Password(msg->Property<std::wstring>(L"Password"));
+
+				if(msg->Exists<int>(L"Session"))
+					Session(msg->Property<int>(L"Session"));
 			}
 
 			virtual pGina::Messaging::Message * ToDynamicMessage()
@@ -183,6 +192,7 @@ namespace pGina
 				msg->Property<std::wstring>(L"Username", Username(), pGina::Messaging::String);
 				msg->Property<std::wstring>(L"Domain", Domain(), pGina::Messaging::String);
 				msg->Property<std::wstring>(L"Password", Password(), pGina::Messaging::String);
+				msg->Property<int>(L"Session", Session(), pGina::Messaging::Integer);
 				return msg;
 			}
 
@@ -190,6 +200,15 @@ namespace pGina
 			std::wstring m_username;
 			std::wstring m_domain;
 			std::wstring m_password;
+			int m_session;
+
+		protected:
+			void SessionFromProcessId()
+			{
+				DWORD sessionId = -1;
+				if(ProcessIdToSessionId(GetCurrentProcessId(), &sessionId))
+					Session(sessionId);
+			}
 		};
 
 		class LoginResponseMessage : public LoginRequestMessage

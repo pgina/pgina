@@ -12,6 +12,7 @@ namespace pGina.Shared.Types
         public Guid Id
         {
             get { return m_sessionId; }
+            set { m_sessionId = value; }
         }
 
         public SessionProperties(Guid sessionId)

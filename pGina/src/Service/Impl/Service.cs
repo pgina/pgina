@@ -19,6 +19,7 @@ using pGina.Shared.Types;
 
 using Abstractions.Pipes;
 using Abstractions.Logging;
+using Abstractions.Helpers;
 
 namespace pGina.Service.Impl
 {
@@ -27,6 +28,7 @@ namespace pGina.Service.Impl
         private ILog m_logger = LogManager.GetLogger("pGina.Service.Impl");
         private ILog m_abstractLogger = LogManager.GetLogger("Abstractions");
         private PipeServer m_server = null;
+        private TimedCache<int, UserInformation> m_sessionInfoCache = null;
 
         static Service()
         {
@@ -58,8 +60,10 @@ namespace pGina.Service.Impl
         {
             string pipeName = Core.Settings.Get.ServicePipeName;
             int maxClients = Core.Settings.Get.MaxClients;
-
-            m_logger.DebugFormat("Service created - PipeName: {0} MaxClients: {1}", pipeName, maxClients);                
+            int cacheTimeoutInSeconds = Core.Settings.Get.SessionInfoCacheTimeout;
+            
+            m_logger.DebugFormat("Service created - PipeName: {0} MaxClients: {1} Cache Timeout (secs): {2}", pipeName, maxClients, cacheTimeoutInSeconds);                
+            m_sessionInfoCache = new TimedCache<int,UserInformation>(TimeSpan.FromSeconds(cacheTimeoutInSeconds));            
             m_server = new PipeServer(pipeName, maxClients, (Func<dynamic, dynamic>) HandleMessage);                
         }
 
@@ -92,8 +96,21 @@ namespace pGina.Service.Impl
                     m_logger.ErrorFormat("Ignoring unhandled exception from {0}: {1}", plugin.Uuid, e);
                 }
             }
-
-            // TBD: System and user session helper management here
+            
+            if (changeDescription.Reason == SessionChangeReason.SessionLogon)
+            {
+                // We start our helpers in all sessions on login.  They will then phone home
+                //  and ask for user information keyed on session id.  When our CredProv 
+                //  authenticates, it indicates what it's session is.  We stash the authenticated
+                //  user info in our timed cache keyed on that session id.  Sessions we did 
+                //  not authenticate, or those that are re-connecting, wont exist or will timeout
+                //  eventually.
+                
+                // TBD:
+                // string process = pGina.Core.Settings.Get.GetSetting("SessionHelperExe", "pGina.Service.SessionHelper.exe");
+                // Abstractions.Process.ExecuteInSession(sessionId, process, true);
+                // Abstractions.Process.ExecuteInSession(sessionId, process, false);
+            }
         }
 
         // This will be called on seperate threads, 1 per client connection and
@@ -130,6 +147,8 @@ namespace pGina.Service.Impl
                     return new EmptyMessage(MessageType.Ack).ToExpando();  // Ack
                 case MessageType.LoginRequest:
                     return HandleLoginRequest(new LoginRequestMessage(msg)).ToExpando();
+                case MessageType.InfoRequest:
+                    return HandleInfoRequest(new HelperInfoRequestMessage(msg)).ToExpando();
                 default:
                     return null;                // Unknowns get disconnected
             }
@@ -158,6 +177,27 @@ namespace pGina.Service.Impl
                     break;
             }
         }
+                
+        private HelperInfoResponseMessage HandleInfoRequest(HelperInfoRequestMessage msg)
+        {
+            HelperInfoResponseMessage response = new HelperInfoResponseMessage()
+            {
+                Success = m_sessionInfoCache.Exists(msg.Key)
+            };
+            
+            if(response.Success)
+            {
+                UserInformation info = m_sessionInfoCache.Get(msg.Key);
+                response.Username = info.Username;
+                response.Password = info.Password;
+                response.Domain = info.Domain;
+
+                // We're done with this, lets avoid letting folks spoof and just remove this info now
+                m_sessionInfoCache.Remove(msg.Key);
+            }
+
+            return response;
+        }
 
         private LoginResponseMessage HandleLoginRequest(LoginRequestMessage msg)
         {
@@ -167,7 +207,10 @@ namespace pGina.Service.Impl
                 sessionDriver.UserInformation.Username = msg.Username;
                 sessionDriver.UserInformation.Password = msg.Password;
 
+                m_logger.DebugFormat("Processing LoginRequest for {0} in session {1}", msg.Username, msg.Session);
                 BooleanResult result = sessionDriver.PerformLoginProcess();
+                
+                m_sessionInfoCache.Add(msg.Session, sessionDriver.UserInformation);
 
                 return new LoginResponseMessage()
                 {

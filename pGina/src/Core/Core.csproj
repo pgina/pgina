@@ -45,6 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Messages\EmptyMessage.cs" />
+    <Compile Include="Messages\HelperInfoRequestMessage.cs" />
+    <Compile Include="Messages\HelperInfoResponseMessage.cs" />
     <Compile Include="Messages\LoginRequestMessage.cs" />
     <Compile Include="Messages\LoginResponseMessage.cs" />
     <Compile Include="Messages\LogMessage.cs" />

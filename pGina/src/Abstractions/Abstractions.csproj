@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\TimedCache.cs" />
     <Compile Include="Logging\LibraryLogging.cs" />
     <Compile Include="Pipes\PipeMessage.cs" />
     <Compile Include="Pipes\Pipe.cs" />
