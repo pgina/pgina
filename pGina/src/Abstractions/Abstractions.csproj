@@ -46,8 +46,9 @@
     <Compile Include="Pipes\Pipe.cs" />
     <Compile Include="Pipes\PipeClient.cs" />
     <Compile Include="Pipes\PipeServer.cs" />
+    <Compile Include="Process\Execution.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WindowsApi\WindowsApi.cs" />
+    <Compile Include="WindowsApi\pInvokes.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

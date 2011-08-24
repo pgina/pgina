@@ -708,7 +708,7 @@ namespace pGina.Configuration
         private void btnLaunchCredUI_Click(object sender, EventArgs e)
         {
             ResetSimUI();
-            System.Net.NetworkCredential credential = WindowsApi.GetCredentials("Simulated Login", "Please enter your credentials...");
+            System.Net.NetworkCredential credential = pInvokes.GetCredentials("Simulated Login", "Please enter your credentials...");
             if (credential != null)
             {
                 m_lblAuthResult.Text = "Success";

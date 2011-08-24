@@ -107,9 +107,9 @@ namespace pGina.Service.Impl
                 //  eventually.
                 
                 // TBD:
-                // string process = pGina.Core.Settings.Get.GetSetting("SessionHelperExe", "pGina.Service.SessionHelper.exe");
-                // Abstractions.Process.ExecuteInSession(sessionId, process, true);
-                // Abstractions.Process.ExecuteInSession(sessionId, process, false);
+                string helperApp = pGina.Core.Settings.Get.GetSetting("SessionHelperExe", "pGina.Service.SessionHelper.exe");
+                // Abstractions.Process.ExecuteInSession(changeDescription.SessionId, helperApp, true);
+                // Abstractions.Process.ExecuteInSession(changeDescription.SessionId, helperApp, false);
             }
         }
 

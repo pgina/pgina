@@ -10,7 +10,7 @@ using System.Net.Security;
 
 namespace Abstractions.WindowsApi
 {
-    public class WindowsApi
+    public class pInvokes
     {
         internal class SafeNativeMethods
         {
@@ -65,8 +65,7 @@ namespace Abstractions.WindowsApi
                 /// </summary>
                 CREDUIWIN_PACK_32_WOW = 0x10000000,
             }
-
-            #region mpr.dll enums
+            
             public enum ResourceScope
             {
                 RESOURCE_CONNECTED = 1,
@@ -122,8 +121,36 @@ namespace Abstractions.WindowsApi
                 public string lpComment = "";  // Ignored by WNetAddConnection2
                 public string lpProvider = null;
             }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct SECURITY_ATTRIBUTES
+            {
+                public int nLength;
+                public IntPtr lpSecurityDescriptor;
+                public int bInheritHandle;
+            }
+
+            public enum SECURITY_IMPERSONATION_LEVEL
+            {
+                SecurityAnonymous,
+                SecurityIdentification,
+                SecurityImpersonation,
+                SecurityDelegation
+            }
+
+            public enum TOKEN_TYPE
+            {
+                TokenPrimary = 1,
+                TokenImpersonation
+            }
+
+            public enum LogonFlags
+            {
+                LOGON_WITH_PROFILE = 1,
+                LOGON_NETCREDENTIALS_ONLY = 2,
+            }
             #endregion
-            #endregion
+            
 
             #region credui.dll
             [DllImport("credui.dll", CharSet = CharSet.Auto)]
@@ -153,7 +180,38 @@ namespace Abstractions.WindowsApi
             public static extern int WNetCancelConnection2(string name, int flags,
                             bool force);
             #endregion
+
+            #region wtsapi32.dll
+            [DllImport("wtsapi32.dll", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool WTSQueryUserToken(int sessionId, out IntPtr Token);
+            #endregion
+
+            #region kernel32.dll
+            [DllImport("kernel32.dll", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool CloseHandle(IntPtr hObject);
+            #endregion
+
+            #region advapi32.dll
+            [DllImport("advapi32.dll", SetLastError = true)]
+            public extern static bool DuplicateTokenEx(IntPtr hExistingToken, uint dwDesiredAccess, ref SECURITY_ATTRIBUTES lpTokenAttributes, 
+                SECURITY_IMPERSONATION_LEVEL ImpersonationLevel, TOKEN_TYPE TokenType, out IntPtr phNewToken);            
+            #endregion
         }
+
+        public static IntPtr WTSQueryUserToken(int sessionId)
+        {
+            IntPtr result = IntPtr.Zero;
+            if (SafeNativeMethods.WTSQueryUserToken(sessionId, out result))
+                return result;
+            return IntPtr.Zero;
+        }
+
+        public static bool CloseHandle(IntPtr handle)
+        {
+            return SafeNativeMethods.CloseHandle(handle);
+        }      
 
         public static NetworkCredential GetCredentials(string caption, string message)
         {
