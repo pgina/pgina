@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
 
 using log4net;
 using log4net.Config;
@@ -25,6 +26,11 @@ namespace pGina.Shared.Logging
 
             XmlConfigurator.ConfigureAndWatch(new FileInfo(l4nConfig));
             LogManager.GetLogger("Startup").InfoFormat("Starting up, log4net configured from: {0}", l4nConfig);
+
+            using (Process me = Process.GetCurrentProcess())
+            {
+                log4net.GlobalContext.Properties["pid"] = me.Id;
+            }
         }
     }
 }

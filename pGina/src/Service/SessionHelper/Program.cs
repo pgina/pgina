@@ -32,7 +32,12 @@ namespace SessionHelper
             LibraryLogging.AddListener(LibraryLogging.Level.Error, m_abstractLogger.ErrorFormat);
             LibraryLogging.AddListener(LibraryLogging.Level.Info, m_abstractLogger.InfoFormat);
             LibraryLogging.AddListener(LibraryLogging.Level.Warn, m_abstractLogger.WarnFormat);
-            
+
+            using (Process me = Process.GetCurrentProcess())
+            {
+                m_logger.DebugFormat("Session helper {0} started in session {1}", me.Id, me.SessionId);
+            }
+
             foreach (string arg in args)
             {
                 switch(arg)
@@ -95,6 +100,7 @@ namespace SessionHelper
                                     m_driver.UserInformation.Username = responseMsg.Username;
                                     m_driver.UserInformation.Domain = responseMsg.Domain;
                                     m_driver.UserInformation.Password = responseMsg.Password;
+                                    m_logger.DebugFormat("Server responded with user '{0}' info", m_driver.UserInformation.Username);
                                 }                                
                                 // Respond with a disconnect, we're done
                                 return (new EmptyMessage(MessageType.Disconnect).ToExpando());

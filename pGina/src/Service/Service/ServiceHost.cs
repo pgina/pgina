@@ -41,6 +41,7 @@ namespace Service
         protected override void OnSessionChange(SessionChangeDescription changeDescription)
         {
             base.OnSessionChange(changeDescription);
+            m_service.SessionChange(changeDescription);
         }
     }
 }
