@@ -101,13 +101,12 @@ namespace pGina.Service.Impl
             
             if (changeDescription.Reason == SessionChangeReason.SessionLogon)
             {
-                // We start our helpers in all sessions on login.  They will then phone home
-                //  and ask for user information keyed on session id.  When our CredProv 
-                //  authenticates, it indicates what it's session is.  We stash the authenticated
-                //  user info in our timed cache keyed on that session id.  Sessions we did 
-                //  not authenticate, or those that are re-connecting, wont exist or will timeout
-                //  eventually.
-                ThreadPool.QueueUserWorkItem(new WaitCallback(KickoffSessionHelperThread), changeDescription.SessionId);                
+                // We only start session helpers in sessions we know have recently (within our timed cache
+                // timeframe that is) authenticated with our provider.  We could run them for everyone...
+                if (m_sessionInfoCache.Exists(changeDescription.SessionId))
+                {
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(KickoffSessionHelperThread), changeDescription.SessionId);
+                }
             }
         }
 
