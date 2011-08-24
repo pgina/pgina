@@ -17,7 +17,8 @@ namespace pGina.Plugin.MySqlLogger
         public static readonly string TABLE_NAME = "pGinaLog";
 
         private static dynamic m_settings = null;
-        internal static dynamic Settings {
+        internal static dynamic Settings
+        {
             get { return m_settings; }
         }
 
@@ -32,20 +33,21 @@ namespace pGina.Plugin.MySqlLogger
             m_settings.SetDefault("Database", "pGinaDB");
         }
 
-        public void SessionEnding()
+        public void SessionEnding(Shared.Types.SessionProperties properties)
         {
             m_logger.Debug("SessionEnding()");
         }
 
-        public void SessionStarted(Shared.Types.UserInformation userInformation)
+        public void SessionStarted(Shared.Types.SessionProperties properties)
         {
             m_logger.Debug("SessionStarted()");
 
+            Shared.Types.UserInformation userInfo = properties.GetTrackedSingle<Shared.Types.UserInformation>();
             try
             {
                 using (DbLogger db = DbLogger.Connect())
                 {
-                    db.Log(String.Format("Login: user={0}", userInformation.Username));
+                    db.Log(String.Format("Login: user={0}", userInfo.Username));
                 }
             }
             catch (Exception e)
