@@ -26,6 +26,7 @@ namespace pGina.Plugin.MySqlLogger
             m_hostName = Dns.GetHostName();
             IPAddress[] ipList = Dns.GetHostAddresses("");
             m_ip = "";
+            // Grab the first IPv4 address in the list
             foreach (IPAddress addr in ipList)
             {
                 if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)

@@ -53,7 +53,7 @@ namespace pGina.Plugin.MySqlLogger
             try
             {
                 int port = Convert.ToInt32(this.portTB.Text);
-                PluginImpl.Settings.Port = Convert.ToInt32(this.portTB.Text);
+                PluginImpl.Settings.Port = port;
             }
             catch (FormatException)
             {
@@ -75,7 +75,6 @@ namespace pGina.Plugin.MySqlLogger
             try
             {
                 port = Convert.ToInt32(this.portTB.Text);
-                PluginImpl.Settings.Port = Convert.ToInt32(this.portTB.Text);
             }
             catch (FormatException)
             {
@@ -125,7 +124,6 @@ namespace pGina.Plugin.MySqlLogger
             try
             {
                 port = Convert.ToInt32(this.portTB.Text);
-                PluginImpl.Settings.Port = Convert.ToInt32(this.portTB.Text);
             }
             catch (FormatException)
             {
