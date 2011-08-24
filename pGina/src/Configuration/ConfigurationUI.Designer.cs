@@ -74,6 +74,9 @@
             this.authenticateDGV = new System.Windows.Forms.DataGridView();
             this.m_simTab = new System.Windows.Forms.TabPage();
             this.groupBox13 = new System.Windows.Forms.GroupBox();
+            this.chkIgnoreGateway = new System.Windows.Forms.CheckBox();
+            this.chkInvokeUser = new System.Windows.Forms.CheckBox();
+            this.chkInvokeSystem = new System.Windows.Forms.CheckBox();
             this.chkIgnoreAuthzError = new System.Windows.Forms.CheckBox();
             this.chkIgnoreAuthenticateError = new System.Windows.Forms.CheckBox();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
@@ -108,9 +111,6 @@
             this.m_radioUseService = new System.Windows.Forms.RadioButton();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnOkay = new System.Windows.Forms.Button();
-            this.chkInvokeSystem = new System.Windows.Forms.CheckBox();
-            this.chkInvokeUser = new System.Windows.Forms.CheckBox();
-            this.chkIgnoreGateway = new System.Windows.Forms.CheckBox();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
             this.groupBox12.SuspendLayout();
@@ -203,6 +203,7 @@
             // 
             // m_tileImagePreview
             // 
+            this.m_tileImagePreview.Image = global::pGina.Configuration.Properties.Resources.pginalogo;
             this.m_tileImagePreview.Location = new System.Drawing.Point(591, 17);
             this.m_tileImagePreview.Name = "m_tileImagePreview";
             this.m_tileImagePreview.Size = new System.Drawing.Size(130, 130);
@@ -657,6 +658,36 @@
             this.groupBox13.TabStop = false;
             this.groupBox13.Text = "Simulation Options";
             // 
+            // chkIgnoreGateway
+            // 
+            this.chkIgnoreGateway.AutoSize = true;
+            this.chkIgnoreGateway.Location = new System.Drawing.Point(19, 79);
+            this.chkIgnoreGateway.Name = "chkIgnoreGateway";
+            this.chkIgnoreGateway.Size = new System.Drawing.Size(131, 17);
+            this.chkIgnoreGateway.TabIndex = 4;
+            this.chkIgnoreGateway.Text = "Ignore Gateway Errors";
+            this.chkIgnoreGateway.UseVisualStyleBackColor = true;
+            // 
+            // chkInvokeUser
+            // 
+            this.chkInvokeUser.AutoSize = true;
+            this.chkInvokeUser.Location = new System.Drawing.Point(207, 29);
+            this.chkInvokeUser.Name = "chkInvokeUser";
+            this.chkInvokeUser.Size = new System.Drawing.Size(163, 17);
+            this.chkInvokeUser.TabIndex = 3;
+            this.chkInvokeUser.Text = "Invoke User Session Helpers";
+            this.chkInvokeUser.UseVisualStyleBackColor = true;
+            // 
+            // chkInvokeSystem
+            // 
+            this.chkInvokeSystem.AutoSize = true;
+            this.chkInvokeSystem.Location = new System.Drawing.Point(207, 54);
+            this.chkInvokeSystem.Name = "chkInvokeSystem";
+            this.chkInvokeSystem.Size = new System.Drawing.Size(175, 17);
+            this.chkInvokeSystem.TabIndex = 2;
+            this.chkInvokeSystem.Text = "Invoke System Session Helpers";
+            this.chkInvokeSystem.UseVisualStyleBackColor = true;
+            // 
             // chkIgnoreAuthzError
             // 
             this.chkIgnoreAuthzError.AutoSize = true;
@@ -1003,36 +1034,6 @@
             this.btnOkay.Text = "Close";
             this.btnOkay.UseVisualStyleBackColor = true;
             this.btnOkay.Click += new System.EventHandler(this.btnOkay_Click);
-            // 
-            // chkInvokeSystem
-            // 
-            this.chkInvokeSystem.AutoSize = true;
-            this.chkInvokeSystem.Location = new System.Drawing.Point(207, 54);
-            this.chkInvokeSystem.Name = "chkInvokeSystem";
-            this.chkInvokeSystem.Size = new System.Drawing.Size(175, 17);
-            this.chkInvokeSystem.TabIndex = 2;
-            this.chkInvokeSystem.Text = "Invoke System Session Helpers";
-            this.chkInvokeSystem.UseVisualStyleBackColor = true;
-            // 
-            // chkInvokeUser
-            // 
-            this.chkInvokeUser.AutoSize = true;
-            this.chkInvokeUser.Location = new System.Drawing.Point(207, 29);
-            this.chkInvokeUser.Name = "chkInvokeUser";
-            this.chkInvokeUser.Size = new System.Drawing.Size(163, 17);
-            this.chkInvokeUser.TabIndex = 3;
-            this.chkInvokeUser.Text = "Invoke User Session Helpers";
-            this.chkInvokeUser.UseVisualStyleBackColor = true;
-            // 
-            // chkIgnoreGateway
-            // 
-            this.chkIgnoreGateway.AutoSize = true;
-            this.chkIgnoreGateway.Location = new System.Drawing.Point(19, 79);
-            this.chkIgnoreGateway.Name = "chkIgnoreGateway";
-            this.chkIgnoreGateway.Size = new System.Drawing.Size(131, 17);
-            this.chkIgnoreGateway.TabIndex = 4;
-            this.chkIgnoreGateway.Text = "Ignore Gateway Errors";
-            this.chkIgnoreGateway.UseVisualStyleBackColor = true;
             // 
             // ConfigurationUI
             // 

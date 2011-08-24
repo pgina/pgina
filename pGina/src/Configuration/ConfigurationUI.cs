@@ -59,15 +59,18 @@ namespace pGina.Configuration
 
         private void LoadTileImagePreview()
         {
-            try
+            if (!string.IsNullOrEmpty(m_tileImageTxt.Text))
             {
-                m_tileImagePreview.Image = new Bitmap(m_tileImageTxt.Text);                
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Unable to load a preview image for the selected file, pGina may not be able to show this image at login time.\n", "Error", MessageBoxButtons.OK);
-                m_logger.ErrorFormat("User chose {0} as image file, but we failed to load it? Exception: {1}", m_tileImageTxt.Text, ex);
-                m_tileImagePreview.Image = null;
+                try
+                {
+                    m_tileImagePreview.Image = new Bitmap(m_tileImageTxt.Text);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Unable to load a preview image for the selected file, pGina may not be able to show this image at login time.\n", "Error", MessageBoxButtons.OK);
+                    m_logger.ErrorFormat("User chose {0} as image file, but we failed to load it? Exception: {1}", m_tileImageTxt.Text, ex);
+                    m_tileImagePreview.Image = null;
+                }
             }
         }
 
