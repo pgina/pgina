@@ -16,15 +16,15 @@ namespace pGina.Plugin.DriveMapper
         public static readonly Guid DriveMapperPluginUuid = new Guid("989C0EC5-B025-431B-8966-E276864A97A9");
         private ILog m_logger = LogManager.GetLogger("DriveMapperPlugin");
 
-        public void SessionEnding()
+        public void SessionEnding(Shared.Types.SessionProperties properties)
         {
             m_logger.Debug("SessionEnding( ... )");
         }
 
-        public void SessionStarted(Shared.Types.UserInformation userInformation)
+        public void SessionStarted(Shared.Types.SessionProperties properties)
         {
             m_logger.Debug("SessionStarted( ... )");
-            MapDrives(Settings.Load(), userInformation);
+            MapDrives(Settings.Load(), properties.GetTrackedSingle<Shared.Types.UserInformation>());
         }
 
         private void MapDrives(List<DriveEntry> drives, Shared.Types.UserInformation userInfo)
@@ -41,7 +41,7 @@ namespace pGina.Plugin.DriveMapper
                     password = drive.Password;
                 }
 
-                int result = WindowsApi.MapNetworkDrive(unc, drive.Drive, user, password);
+                int result = pInvokes.MapNetworkDrive(unc, drive.Drive, user, password);
                 if (0 == result)
                 {
                     m_logger.InfoFormat("Drive {0} mapped successfully to drive letter {1}", unc, drive.Drive);

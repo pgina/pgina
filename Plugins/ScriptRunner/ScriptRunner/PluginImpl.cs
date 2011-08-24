@@ -13,12 +13,12 @@ namespace pGina.Plugin.ScriptRunner
         public static readonly Guid ScriptRunnerPluginUuid = new Guid("1632D7AB-858F-4D88-9603-AADD4DEEA847");
         private ILog m_logger = LogManager.GetLogger("ScriptRunnerPlugin");
 
-        void IPluginSystemSessionHelper.SessionEnding()
+        void IPluginSystemSessionHelper.SessionEnding(Shared.Types.SessionProperties properties)
         {
             m_logger.DebugFormat("IPluginSystemSessionHelper.SessionEnding");
         }
 
-        void IPluginSystemSessionHelper.SessionStarted(Shared.Types.UserInformation userInformation)
+        void IPluginSystemSessionHelper.SessionStarted(Shared.Types.SessionProperties properties)
         {
             m_logger.DebugFormat("IPluginSystemSessionHelper.SessionStarted");
 
@@ -30,12 +30,12 @@ namespace pGina.Plugin.ScriptRunner
             }
         }
 
-        void IPluginUserSessionHelper.SessionEnding()
+        void IPluginUserSessionHelper.SessionEnding(Shared.Types.SessionProperties properties)
         {
             m_logger.DebugFormat("IPluginUserSessionHelper.SessionEnding");
         }
 
-        void IPluginUserSessionHelper.SessionStarted(Shared.Types.UserInformation userInformation)
+        void IPluginUserSessionHelper.SessionStarted(Shared.Types.SessionProperties properties)
         {
             m_logger.DebugFormat("IPluginUserSessionHelper.SessionStarted");
 

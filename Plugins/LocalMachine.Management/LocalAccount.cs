@@ -40,7 +40,7 @@ namespace pGina.Plugin.LocalMachine.Management
                 }
                 else
                 {
-                    m_logger.InfoFormat("Account {0} already exists, skipping.", userName);
+                    m_logger.InfoFormat("Account {0} already exists, skipping.", userInfo.Username);
                 }
             }
 
