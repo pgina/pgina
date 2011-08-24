@@ -50,7 +50,7 @@
             this.label1.Location = new System.Drawing.Point(12, 15);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(32, 13);
-            this.label1.TabIndex = 0;
+            this.label1.TabIndex = 10;
             this.label1.Text = "Host:";
             // 
             // hostTB
@@ -65,7 +65,7 @@
             this.okBtn.Location = new System.Drawing.Point(306, 173);
             this.okBtn.Name = "okBtn";
             this.okBtn.Size = new System.Drawing.Size(70, 28);
-            this.okBtn.TabIndex = 2;
+            this.okBtn.TabIndex = 9;
             this.okBtn.Text = "OK";
             this.okBtn.UseVisualStyleBackColor = true;
             this.okBtn.Click += new System.EventHandler(this.okBtn_Click);
@@ -75,7 +75,7 @@
             this.cancelBtn.Location = new System.Drawing.Point(230, 173);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(70, 28);
-            this.cancelBtn.TabIndex = 3;
+            this.cancelBtn.TabIndex = 8;
             this.cancelBtn.Text = "Cancel";
             this.cancelBtn.UseVisualStyleBackColor = true;
             this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
@@ -86,7 +86,7 @@
             this.portLabel.Location = new System.Drawing.Point(12, 41);
             this.portLabel.Name = "portLabel";
             this.portLabel.Size = new System.Drawing.Size(29, 13);
-            this.portLabel.TabIndex = 4;
+            this.portLabel.TabIndex = 11;
             this.portLabel.Text = "Port:";
             // 
             // portTB
@@ -94,7 +94,7 @@
             this.portTB.Location = new System.Drawing.Point(84, 38);
             this.portTB.Name = "portTB";
             this.portTB.Size = new System.Drawing.Size(105, 20);
-            this.portTB.TabIndex = 5;
+            this.portTB.TabIndex = 2;
             // 
             // dbLabel
             // 
@@ -102,7 +102,7 @@
             this.dbLabel.Location = new System.Drawing.Point(12, 67);
             this.dbLabel.Name = "dbLabel";
             this.dbLabel.Size = new System.Drawing.Size(56, 13);
-            this.dbLabel.TabIndex = 6;
+            this.dbLabel.TabIndex = 12;
             this.dbLabel.Text = "Database:";
             // 
             // dbTB
@@ -110,7 +110,7 @@
             this.dbTB.Location = new System.Drawing.Point(84, 64);
             this.dbTB.Name = "dbTB";
             this.dbTB.Size = new System.Drawing.Size(291, 20);
-            this.dbTB.TabIndex = 7;
+            this.dbTB.TabIndex = 3;
             // 
             // userLabel
             // 
@@ -118,7 +118,7 @@
             this.userLabel.Location = new System.Drawing.Point(12, 110);
             this.userLabel.Name = "userLabel";
             this.userLabel.Size = new System.Drawing.Size(32, 13);
-            this.userLabel.TabIndex = 8;
+            this.userLabel.TabIndex = 13;
             this.userLabel.Text = "User:";
             // 
             // userTB
@@ -126,7 +126,7 @@
             this.userTB.Location = new System.Drawing.Point(84, 107);
             this.userTB.Name = "userTB";
             this.userTB.Size = new System.Drawing.Size(289, 20);
-            this.userTB.TabIndex = 9;
+            this.userTB.TabIndex = 4;
             // 
             // passwdLabel
             // 
@@ -134,7 +134,7 @@
             this.passwdLabel.Location = new System.Drawing.Point(12, 136);
             this.passwdLabel.Name = "passwdLabel";
             this.passwdLabel.Size = new System.Drawing.Size(56, 13);
-            this.passwdLabel.TabIndex = 10;
+            this.passwdLabel.TabIndex = 14;
             this.passwdLabel.Text = "Password:";
             // 
             // passwdTB
@@ -142,14 +142,14 @@
             this.passwdTB.Location = new System.Drawing.Point(84, 133);
             this.passwdTB.Name = "passwdTB";
             this.passwdTB.Size = new System.Drawing.Size(288, 20);
-            this.passwdTB.TabIndex = 11;
+            this.passwdTB.TabIndex = 5;
             // 
             // testButton
             // 
             this.testButton.Location = new System.Drawing.Point(12, 172);
             this.testButton.Name = "testButton";
             this.testButton.Size = new System.Drawing.Size(67, 27);
-            this.testButton.TabIndex = 12;
+            this.testButton.TabIndex = 6;
             this.testButton.Text = "Test...";
             this.testButton.UseVisualStyleBackColor = true;
             this.testButton.Click += new System.EventHandler(this.testButton_Click);
@@ -159,7 +159,7 @@
             this.createTableBtn.Location = new System.Drawing.Point(85, 173);
             this.createTableBtn.Name = "createTableBtn";
             this.createTableBtn.Size = new System.Drawing.Size(91, 26);
-            this.createTableBtn.TabIndex = 13;
+            this.createTableBtn.TabIndex = 7;
             this.createTableBtn.Text = "Create Table...";
             this.createTableBtn.UseVisualStyleBackColor = true;
             this.createTableBtn.Click += new System.EventHandler(this.createTableBtn_Click);

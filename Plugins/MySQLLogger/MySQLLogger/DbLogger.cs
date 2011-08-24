@@ -7,6 +7,8 @@ using System.Net;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 
+using log4net;
+
 namespace pGina.Plugin.MySqlLogger
 {
     class DbLogger : IDisposable
@@ -15,15 +17,28 @@ namespace pGina.Plugin.MySqlLogger
         private static string m_ip;
         private static string m_hostName;
 
+        private ILog m_logger = LogManager.GetLogger("DbLogger");
+
         static DbLogger()
         {
-            string m_hostName = Dns.GetHostName();
-            IPHostEntry ipList = Dns.GetHostEntry(m_hostName);
-            m_ip = ipList.AddressList[0].ToString();
+            m_hostName = Dns.GetHostName();
+            IPAddress[] ipList = Dns.GetHostAddresses("");
+            m_ip = "";
+            foreach (IPAddress addr in ipList)
+            {
+                if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    m_ip = addr.ToString();
+                    break;
+                }
+            }
         }
 
         private DbLogger()
         {
+            m_logger.DebugFormat("My Host name: {0}", m_hostName);
+            m_logger.DebugFormat("My IP: {0}", m_ip);
+
             string server = PluginImpl.Settings.Host;
             int port = PluginImpl.Settings.Port;
             string userName = PluginImpl.Settings.User;
@@ -32,6 +47,7 @@ namespace pGina.Plugin.MySqlLogger
 
             string connStr = String.Format("server={0}; port={1};user={2}; password={3}; database={4};",
                 server, port, userName, passwd, database);
+            m_logger.DebugFormat("Connecting to {0}:{1} as {2}, database: {3}", server, port, userName, database);
             m_conn = new MySqlConnection(connStr);
             m_conn.Open();
         }
@@ -43,17 +59,19 @@ namespace pGina.Plugin.MySqlLogger
 
         public void Log(string message)
         {
-            string tableName = PluginImpl.Settings.Table;
             string machine = Environment.MachineName;
 
-            MySqlCommand command = new MySqlCommand(
-                String.Format("INSERT INTO {0}(TimeStamp, Host, Ip, Machine, Message) VALUES (NOW(), {1}, {2}, {3}, {4})", 
-                    tableName, m_hostName, m_ip, machine, message) );
+            string sql = String.Format("INSERT INTO {0}(TimeStamp, Host, Ip, Machine, Message) " +
+                "VALUES (NOW(), '{1}', '{2}', '{3}', '{4}')",
+                PluginImpl.TABLE_NAME, m_hostName, m_ip, machine, message);
+
+            MySqlCommand command = new MySqlCommand(sql, m_conn);
             int rows = command.ExecuteNonQuery();
         }
 
         public void Dispose()
         {
+            m_logger.Debug("Closing connection to MySQL.");
             m_conn.Close();
         }
     }

@@ -14,6 +14,8 @@ namespace pGina.Plugin.MySqlLogger
         public static readonly Guid PluginUuid = new Guid("B68CF064-9299-4765-AC08-ACB49F93F892");
         private ILog m_logger = LogManager.GetLogger("MySqlLoggerPlugin");
 
+        public static readonly string TABLE_NAME = "pGinaLog";
+
         private static dynamic m_settings = null;
         internal static dynamic Settings {
             get { return m_settings; }
@@ -48,7 +50,7 @@ namespace pGina.Plugin.MySqlLogger
             }
             catch (Exception e)
             {
-                m_logger.ErrorFormat("{0}", e.Message);
+                m_logger.ErrorFormat("{0}: {1}", e.GetType().ToString(), e.Message);
             }
         }
 
