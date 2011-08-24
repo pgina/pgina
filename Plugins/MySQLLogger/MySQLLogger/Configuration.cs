@@ -150,7 +150,7 @@ namespace pGina.Plugin.MySqlLogger
                         "CREATE TABLE {0} (" +
                         "   TimeStamp DATETIME, " +
                         "   Host TINYTEXT, " +
-                        "   Ip CHAR(15), " +
+                        "   Ip VARCHAR(15), " +
                         "   Machine TINYTEXT, " +
                         "   Message TEXT )", PluginImpl.TABLE_NAME);
                     MySqlCommand cmd = new MySqlCommand(sql, conn);
