@@ -210,11 +210,13 @@ namespace pGina
 			// # of fields depends on our usage scenario:
 			switch(m_usageScenario)
 			{
-			case CPUS_LOGON:
-			case CPUS_UNLOCK_WORKSTATION:
+			case CPUS_LOGON:			
 			case CPUS_CREDUI:
 				*pdwCount = LUIFI_NUM_FIELDS;
-				return S_OK;				
+				return S_OK;		
+			case CPUS_UNLOCK_WORKSTATION:
+				*pdwCount = LOIFI_NUM_FIELDS;
+				return S_OK;
 			default:
 				pERROR(L"Provider::GetFieldDescriptorCount: No UI known for the usage scenario: 0x%08x", m_usageScenario);
 				return S_FALSE;
