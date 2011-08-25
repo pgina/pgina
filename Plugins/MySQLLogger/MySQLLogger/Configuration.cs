@@ -53,7 +53,7 @@ namespace pGina.Plugin.MySqlLogger
             try
             {
                 int port = Convert.ToInt32(this.portTB.Text);
-                PluginImpl.Settings.Port = Convert.ToInt32(this.portTB.Text);
+                PluginImpl.Settings.Port = port;
             }
             catch (FormatException)
             {
@@ -75,7 +75,6 @@ namespace pGina.Plugin.MySqlLogger
             try
             {
                 port = Convert.ToInt32(this.portTB.Text);
-                PluginImpl.Settings.Port = Convert.ToInt32(this.portTB.Text);
             }
             catch (FormatException)
             {
@@ -125,7 +124,6 @@ namespace pGina.Plugin.MySqlLogger
             try
             {
                 port = Convert.ToInt32(this.portTB.Text);
-                PluginImpl.Settings.Port = Convert.ToInt32(this.portTB.Text);
             }
             catch (FormatException)
             {
@@ -150,7 +148,7 @@ namespace pGina.Plugin.MySqlLogger
                         "CREATE TABLE {0} (" +
                         "   TimeStamp DATETIME, " +
                         "   Host TINYTEXT, " +
-                        "   Ip CHAR(15), " +
+                        "   Ip VARCHAR(15), " +
                         "   Machine TINYTEXT, " +
                         "   Message TEXT )", PluginImpl.TABLE_NAME);
                     MySqlCommand cmd = new MySqlCommand(sql, conn);

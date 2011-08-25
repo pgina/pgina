@@ -36,7 +36,7 @@
     </Reference>
     <Reference Include="MySql.Data, Version=6.4.3.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files (x86)\MySQL\MySQL Connector Net 6.4.3\Assemblies\v4.0\MySql.Data.dll</HintPath>
+      <HintPath>..\..\lib\mysql\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="pGina.Shared">
       <HintPath>..\..\SDK\pGina.Shared.dll</HintPath>
