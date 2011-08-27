@@ -198,6 +198,15 @@ namespace pGina
 			}
 
 			return LoginResult();
-		}								
+		}	
+
+		/* static */
+		std::wstring TileUi::GetDynamicLabel(const wchar_t *labelName)
+		{
+
+			// TODO: write this...
+
+			return std::wstring(L"");
+		}
 	}
 }

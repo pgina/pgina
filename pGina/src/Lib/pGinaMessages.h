@@ -45,6 +45,8 @@ namespace pGina
 			Log             = 0x04,
 			LoginRequest    = 0x05,
 			LoginResponse   = 0x06,
+			DynLabelRequest = 0x07,
+			DynLabelResponse= 0x08,
 		};
 				
 		class MessageBase 
@@ -273,6 +275,77 @@ namespace pGina
 			private:
 				bool m_result;
 				std::wstring m_message;
+		};
+
+		/* Request for text to be placed within a label in the UI. */
+		class DynamicLabelRequestMessage : public MessageBase
+		{
+		public:
+			DynamicLabelRequestMessage()
+			{
+				Type(DynLabelRequest);
+			}
+
+			DynamicLabelRequestMessage( std::wstring const& name )
+			{
+				Type(DynLabelRequest);
+				m_name = name;
+			}
+
+			std::wstring const& Name() { return m_name; }
+			void				Name(std::wstring const& v) { m_name = v; }
+
+			virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
+			{
+				MessageBase::FromDynamicMessage(msg);
+
+				if(msg->Exists<std::wstring>(L"Name"))
+					Name(msg->Property<std::wstring>(L"Name"));
+			}
+
+			virtual pGina::Messaging::Message * ToDynamicMessage()
+			{				
+				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();				
+				msg->Property<std::wstring>(L"Name", Name(), pGina::Messaging::String);
+				return msg;
+			}
+
+		private:
+			std::wstring m_name;
+		};
+
+		/* Response containing text for a label in the UI. */
+		class DynamicLabelResponseMessage : public DynamicLabelRequestMessage
+		{
+			DynamicLabelResponseMessage()
+			{
+				Type(DynLabelResponse);
+			}
+
+			std::wstring const& Text() { return m_text; }
+			void				Text(std::wstring const& v) { m_text = v; }
+
+			virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
+			{
+				MessageBase::FromDynamicMessage(msg);
+
+				if(msg->Exists<std::wstring>(L"Name"))
+					Name(msg->Property<std::wstring>(L"Name"));
+
+				if(msg->Exists<std::wstring>(L"Text"))
+					Name(msg->Property<std::wstring>(L"Text"));
+			}
+
+			virtual pGina::Messaging::Message * ToDynamicMessage()
+			{				
+				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();				
+				msg->Property<std::wstring>(L"Name", Name(), pGina::Messaging::String);
+				msg->Property<std::wstring>(L"Text", Text(), pGina::Messaging::String);
+				return msg;
+			}
+
+		private:
+			std::wstring m_text;
 		};
 	}
 }

@@ -80,6 +80,13 @@ namespace pGina
 			};			
 
 			static LoginResult ProcessLoginForUser(const wchar_t *username, const wchar_t *domain, const wchar_t *password);
-		};		
+		};
+
+		/* Generic transaction for receiving some text for a field in the UI. */
+		class TileUi
+		{
+		public:
+			static std::wstring GetDynamicLabel(const wchar_t *labelName);
+		};
 	}
 }
