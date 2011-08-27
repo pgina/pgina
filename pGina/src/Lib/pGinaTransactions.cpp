@@ -32,16 +32,12 @@
 #include "Message.h"
 #include "pGinaMessages.h"
 #include "Registry.h"
+#include "Helpers.h"
 
 namespace pGina
 {
 	namespace Transactions
-	{
-		std::wstring User::s_authenticatedUsername;
-		std::wstring User::s_authenticatedDomain;
-		std::wstring User::s_authenticatedPassword;
-		std::wstring User::s_authenticationMessage;
-			
+	{			
 		/* static */
 		void Log::Debug(const wchar_t *format, ...)
 		{
@@ -138,10 +134,8 @@ namespace pGina
 		}
 
 		/* static */
-		bool User::ProcessLoginForUser(const wchar_t *username, const wchar_t *domain, const wchar_t *password)
-		{
-			bool result = false;
-
+		User::LoginResult User::ProcessLoginForUser(const wchar_t *username, const wchar_t *domain, const wchar_t *password)
+		{			
 			// Write a log message to the service
 			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
 			std::wstring pipePath = L"\\\\.\\pipe\\";
@@ -159,7 +153,7 @@ namespace pGina
 				cleanup.Add(reply);
 
 				if(reply && reply->Type() != pGina::Protocol::Hello)
-					return false;
+					return LoginResult();
 				
 				// Then send a loging request message, expect a loginresult message
 				pGina::Protocol::LoginRequestMessage request(username, domain, password);
@@ -167,19 +161,11 @@ namespace pGina
 				cleanup.Add(reply);
 
 				if(reply && reply->Type() != pGina::Protocol::LoginResponse)
-					return false;
+					return LoginResult();
 
 				// Did they login?
 				pGina::Protocol::LoginResponseMessage * responseMsg = static_cast<pGina::Protocol::LoginResponseMessage *>(reply);
-				result = responseMsg->Result();
-				if(result)
-				{
-					s_authenticatedUsername = responseMsg->Username();
-					s_authenticatedDomain = responseMsg->Domain();
-					s_authenticatedPassword = responseMsg->Password();
-				}
-				s_authenticationMessage = responseMsg->Message();
-
+				
 				// Send disconnect, expect ack, then close
 				pGina::Protocol::DisconnectMessage disconnect;
 				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, disconnect);
@@ -187,42 +173,31 @@ namespace pGina
 
 				// We close regardless, no need to check reply type..
 				pipeClient.Close();		
+
+				// If a domain was not specified, we must set it to local machine else no u/p will work regardless
+				if(responseMsg->Domain().length() == 0)
+				{
+					Log::Warn(L"Plugins did not set a domain name, assuming local machine!");
+					responseMsg->Domain(pGina::Helpers::GetDomainName());
+				}
+
+				return LoginResult(responseMsg->Result(), responseMsg->Username(), responseMsg->Password(), responseMsg->Domain(), responseMsg->Message());				
 			}
 			else
 			{
 				Log::Warn(L"Unable to connect to pGina service pipe - LastError: 0x%08x, falling back on LogonUser()", GetLastError());
-				WCHAR computerName[MAX_COMPUTERNAME_LENGTH+1];
-				DWORD computerNameLen = ARRAYSIZE(computerName);
-				std::wstring domainName;
-
-				if (!GetComputerNameW(computerName, &computerNameLen))
-					domainName = L".";
-				else
-					domainName = computerName;
-
+				
+				std::wstring domainName = pGina::Helpers::GetDomainName();				
 				Log::Debug(L"Using LogonUser(%s, %s, *****)", username, domainName.c_str());
 				HANDLE token = NULL;
-				result = LogonUser(username, domainName.c_str(), password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &token) == TRUE;
-				if(result)
+				if(LogonUser(username, domainName.c_str(), password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &token) == TRUE)				
 				{
 					CloseHandle(token);
-					s_authenticatedUsername = username;
-					s_authenticatedPassword = password ? password : L"";
-					s_authenticatedDomain = domainName;
+					return LoginResult(true, username ? username : L"", password ? password : L"", domainName, L"");					
 				}				
 			}
 
-			return result;
-		}
-		
-		/* static */
-		const wchar_t * User::AuthenticatedUsername() { return s_authenticatedUsername.c_str(); }
-		/* static */
-		const wchar_t * User::AuthenticatedDomain() { return s_authenticatedDomain.c_str(); }
-		/* static */
-		const wchar_t * User::AuthenticatedPassword() { return s_authenticatedPassword.c_str(); }
-		/* static */
-		const wchar_t * User::AuthenticationMessage() { return s_authenticationMessage.c_str(); }
-				
+			return LoginResult();
+		}								
 	}
 }

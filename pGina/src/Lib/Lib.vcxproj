@@ -22,6 +22,7 @@
     <ClInclude Include="BinaryReader.h" />
     <ClInclude Include="BinaryWriter.h" />
     <ClInclude Include="Buffer.h" />
+    <ClInclude Include="Helpers.h" />
     <ClInclude Include="MessageProperty.h" />
     <ClInclude Include="ObjectCleanupPool.h" />
     <ClInclude Include="pGinaMessages.h" />
@@ -34,6 +35,7 @@
   <ItemGroup>
     <ClCompile Include="BinaryReader.cpp" />
     <ClCompile Include="BinaryWriter.cpp" />
+    <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="pGinaMessages.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="pGinaTransactions.cpp" />

@@ -87,12 +87,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	pGina::Transactions::Log::Debug(L"What the what? %s", L"What!");
 
 	// And auth, all in one...
-	if(pGina::Transactions::User::ProcessLoginForUser(L"puser", L"", L"foobar"))
+	pGina::Transactions::User::LoginResult result = pGina::Transactions::User::ProcessLoginForUser(L"puser", L"", L"foo");
+	if(result.Result())
 	{
-		pGina::Transactions::Log::Info(L"User: %s login successful!", pGina::Transactions::User::AuthenticatedUsername());
+		pGina::Transactions::Log::Info(L"User: %s login successful!", result.Username().c_str());
 	}
 	
-
 	return 0;
 }
 

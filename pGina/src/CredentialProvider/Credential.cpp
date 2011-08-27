@@ -237,12 +237,13 @@ namespace pGina
 			PWSTR domain = NULL;
 						
 			pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);
-			if(!pGina::Transactions::User::ProcessLoginForUser(username, NULL, password))
+			pGina::Transactions::User::LoginResult loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password);
+			if(!loginResult.Result())
 			{
 				pERROR(L"Credential::GetSerialization: Failed login");
-				if(pGina::Transactions::User::AuthenticationMessage() != NULL)
+				if(loginResult.Message().length() > 0)
 				{
-					SHStrDupW(pGina::Transactions::User::AuthenticationMessage(), ppwszOptionalStatusText);					
+					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);					
 				}
 				else
 				{
@@ -259,9 +260,9 @@ namespace pGina
 
 			pGina::Memory::ObjectCleanupPool cleanup;
 
-			username = _wcsdup(pGina::Transactions::User::AuthenticatedUsername());
-			password = _wcsdup(pGina::Transactions::User::AuthenticatedPassword());
-			domain = _wcsdup(pGina::Transactions::User::AuthenticatedDomain());			
+			username = loginResult.Username().length() > 0 ? _wcsdup(loginResult.Username().c_str()) : NULL;
+			password = loginResult.Password().length() > 0 ? _wcsdup(loginResult.Password().c_str()) : NULL;
+			domain = loginResult.Domain().length() > 0 ? _wcsdup(loginResult.Domain().c_str()) : NULL;			
 
 			cleanup.Add(username, free);
 			cleanup.Add(password, free);

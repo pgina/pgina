@@ -47,18 +47,39 @@ namespace pGina
 
 		class User
 		{
-		public:
-			static bool ProcessLoginForUser(const wchar_t *username, const wchar_t *domain, const wchar_t *password);
-			static const wchar_t * AuthenticatedUsername();
-			static const wchar_t * AuthenticatedDomain();
-			static const wchar_t * AuthenticatedPassword();
-			static const wchar_t * AuthenticationMessage();
+		public:			
+			class LoginResult
+			{
+				public:
+					LoginResult() 
+						: m_result(false) {}
+					LoginResult(bool result, std::wstring const& user, std::wstring const& pass, std::wstring const& domain, std::wstring const& msg)
+						: m_username(user), m_domain(domain), m_password(pass), m_message(msg), m_result(result) {}						
 
-		private:
-			static std::wstring s_authenticatedUsername;
-			static std::wstring s_authenticatedDomain;
-			static std::wstring s_authenticatedPassword;
-			static std::wstring s_authenticationMessage;
+					std::wstring Username() { return m_username; }
+					void Username(std::wstring const& v) { m_username = v; }
+
+					std::wstring Password() { return m_password; }
+					void Password(std::wstring const& v) { m_password = v; }
+
+					std::wstring Domain() { return m_domain; }
+					void Domain(std::wstring const& v) { m_domain = v; }
+			
+					bool Result() { return m_result; }
+					void Result(bool v) { m_result = v; }
+
+					std::wstring Message() { return m_message; }
+					void Message(std::wstring const& v) { m_message = v; }
+
+				private:
+					std::wstring m_username;
+					std::wstring m_domain;
+					std::wstring m_password;
+					std::wstring m_message;
+					bool m_result;
+			};			
+
+			static LoginResult ProcessLoginForUser(const wchar_t *username, const wchar_t *domain, const wchar_t *password);
 		};		
 	}
 }
