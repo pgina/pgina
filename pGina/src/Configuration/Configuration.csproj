@@ -133,7 +133,7 @@
       <Project>{56387F00-81DB-4449-93DD-7B8C4B44A725}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Plugin\Shared.csproj">
+    <ProjectReference Include="..\Shared\Shared.csproj">
       <Project>{0EEFBC3F-4DFD-42F6-888E-1A28F4EFEFE3}</Project>
       <Name>Shared</Name>
     </ProjectReference>
