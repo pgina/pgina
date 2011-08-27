@@ -8,8 +8,8 @@
     <ProjectGuid>{2D91C61D-C557-448D-92C0-389D08BF4DA0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>pGina.Plugin.LocalMachine.Management</RootNamespace>
-    <AssemblyName>pGina.Plugin.LocalMachine.Management</AssemblyName>
+    <RootNamespace>pGina.Plugin.LocalMachine</RootNamespace>
+    <AssemblyName>pGina.Plugin.LocalMachine</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

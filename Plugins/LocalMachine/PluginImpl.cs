@@ -37,7 +37,7 @@ using log4net;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 
-namespace pGina.Plugin.LocalMachine.Management
+namespace pGina.Plugin.LocalMachine
 {
     public class LocalMachineManager : IPluginAuthenticationGateway, IPluginAuthentication
     {
@@ -58,7 +58,7 @@ namespace pGina.Plugin.LocalMachine.Management
 
         public string Description
         {
-            get { return "Manages local machine accounts to match authenticated users"; }
+            get { return "Manages local machine accounts for authenticated users, and authenticates against the local SAM"; }
         }
 
         public string Version

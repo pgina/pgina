@@ -32,7 +32,7 @@ using System.Text;
 using log4net;
 using System.DirectoryServices;
 
-namespace pGina.Plugin.LocalMachine.Management
+namespace pGina.Plugin.LocalMachine
 {
     class LocalAccount
     {

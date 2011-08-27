@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalMachine.Management", "LocalMachine.Management.csproj", "{2D91C61D-C557-448D-92C0-389D08BF4DA0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalMachine", "LocalMachine.csproj", "{2D91C61D-C557-448D-92C0-389D08BF4DA0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
