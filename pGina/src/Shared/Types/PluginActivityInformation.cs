@@ -37,6 +37,10 @@ namespace pGina.Shared.Types
         private Dictionary<Guid, BooleanResult> m_authorization = new Dictionary<Guid, BooleanResult>();
         private Dictionary<Guid, BooleanResult> m_gateway = new Dictionary<Guid, BooleanResult>();
 
+        public List<Interfaces.IPluginAuthentication> LoadedAuthenticationPlugins { get; set; }
+        public List<Interfaces.IPluginAuthenticationGateway> LoadedAuthenticationGatewayPlugins { get; set; }
+        public List<Interfaces.IPluginAuthorization> LoadedAuthorizationPlugins { get; set; }        
+
         public void AddAuthenticateResult(Guid pluginId, BooleanResult result)
         {
             if(m_authentication.ContainsKey(pluginId))

@@ -36,6 +36,8 @@ namespace pGina.Shared.Types
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public SecurityIdentifier SID { get; set; }
+        public SecurityIdentifier SID { get; set; }        
     }    
+
+
 }

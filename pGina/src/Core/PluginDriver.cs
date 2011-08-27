@@ -65,6 +65,9 @@ namespace pGina.Core
             
             // Add the plugin tracking object we'll be using for this session
             PluginActivityInformation pluginInfo = new PluginActivityInformation();
+            pluginInfo.LoadedAuthenticationGatewayPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthenticationGateway>();
+            pluginInfo.LoadedAuthenticationPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthentication>();
+            pluginInfo.LoadedAuthorizationPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthorization>();
             m_properties.AddTrackedSingle<PluginActivityInformation>(pluginInfo);
 
             m_logger.DebugFormat("New PluginDriver created");

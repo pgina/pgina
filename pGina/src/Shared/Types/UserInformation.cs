@@ -41,10 +41,35 @@ namespace pGina.Shared.Types
         public string Domain { get; set; }      // Null == local machine
         public string Password { get; set; }
         public string Description { get; set; }
+        public string Fullname { get; set; }
 
         public UserInformation()
         {
             Groups = new List<GroupInformation>();
+        }
+
+        // Adds a group and checks for duplicates (returns duplicate
+        //  entry if found.
+        public GroupInformation AddGroup(GroupInformation group)
+        {
+            foreach (GroupInformation exGroup in Groups)
+            {
+                if (exGroup.Name == group.Name)
+                {
+                    // Copy new sid if old isn't set
+                    if (exGroup.SID == null && group.SID != null)
+                        exGroup.SID = group.SID;
+
+                    return exGroup;
+                }
+
+                if (exGroup.SID != null && group.SID != null && exGroup.SID == group.SID)
+                    return exGroup;
+            }
+
+            // No dupl
+            Groups.Add(group);
+            return null;
         }
     }
 }
