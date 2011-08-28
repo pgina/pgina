@@ -81,7 +81,7 @@ namespace pGina.Shared.Types
             return m_gateway[pluginGuid];
         }
 
-        public IEnumerable<Guid> GetAuthenticatedPlugins()
+        public IEnumerable<Guid> GetAuthenticationPlugins()
         {
             foreach (KeyValuePair<Guid, BooleanResult> kv in m_authentication)
             {
@@ -89,7 +89,7 @@ namespace pGina.Shared.Types
             }
         }
 
-        public IEnumerable<Guid> GetAuthorizedPlugins()
+        public IEnumerable<Guid> GetAuthorizationPlugins()
         {
             foreach (KeyValuePair<Guid, BooleanResult> kv in m_authorization)
             {

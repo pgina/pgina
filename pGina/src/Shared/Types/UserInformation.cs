@@ -48,9 +48,7 @@ namespace pGina.Shared.Types
             Groups = new List<GroupInformation>();
         }
 
-        // Adds a group and checks for duplicates (returns duplicate
-        //  entry if found.
-        public GroupInformation AddGroup(GroupInformation group)
+        public bool InGroup(GroupInformation group)
         {
             foreach (GroupInformation exGroup in Groups)
             {
@@ -60,16 +58,27 @@ namespace pGina.Shared.Types
                     if (exGroup.SID == null && group.SID != null)
                         exGroup.SID = group.SID;
 
-                    return exGroup;
+                    return true;
                 }
 
                 if (exGroup.SID != null && group.SID != null && exGroup.SID == group.SID)
-                    return exGroup;
+                    return true;
             }
 
-            // No dupl
-            Groups.Add(group);
-            return null;
+            return false;
+        }
+
+        // Adds a group and checks for duplicates (skips if dupl)        
+        public bool AddGroup(GroupInformation group)
+        {
+            if (!InGroup(group))
+            {
+                // No dupl
+                Groups.Add(group);
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -39,11 +39,12 @@ using pGina.Shared.Types;
 
 namespace pGina.Plugin.LocalMachine
 {
-    class LocalAccount
+    public class LocalAccount
     {
-        private static ILog m_logger = LogManager.GetLogger("LocalAccount");
-        private static DirectoryEntry m_sam = new DirectoryEntry("WinNT://" + Environment.MachineName + ",computer");
-
+        private ILog m_logger = null; 
+        private DirectoryEntry m_sam = new DirectoryEntry("WinNT://" + Environment.MachineName + ",computer");
+        private PrincipalContext m_machinePrincipal = new PrincipalContext(ContextType.Machine, Environment.MachineName);
+        
         public class GroupSyncException : Exception 
         {
             public GroupSyncException(Exception e)
@@ -54,175 +55,275 @@ namespace pGina.Plugin.LocalMachine
             public Exception RootException { get; private set; }
         };
 
-        public static DirectoryEntry GetUserEntry(string username)
+        private UserInformation m_userInfo = null;
+        public UserInformation UserInfo 
         {
-            try
+            get { return m_userInfo; }
+            set
             {
-                return m_sam.Children.Find(username, "User");
-            }
-            catch (Exception e)
-            {
-                m_logger.ErrorFormat("GetUserEntry({0}) failed: {1}", username, e);
-                return null;
+                m_userInfo = value;
+                m_logger = LogManager.GetLogger(string.Format("LocalAccount[{0}]", m_userInfo.Username));
             }
         }
-
-        public static DirectoryEntry GetGroupEntry(string groupName)
+        
+        public LocalAccount()
         {
-            try
-            {
-                return m_sam.Children.Find(groupName, "Group");
-            }
-            catch (Exception e)
-            {
-                m_logger.ErrorFormat("GetGroupEntry({0}) failed: {1}", groupName, e);
-                return null;
-            }
+            m_logger = LogManager.GetLogger("LocalAccount");
         }
 
-        public static bool IsUserInGroup(DirectoryEntry user, DirectoryEntry group)
+        public LocalAccount(UserInformation userInfo)
         {
-            try
-            {                                             
-                foreach (object member in (IEnumerable<object>) group.Invoke("Member", null))
-                {                 
-                    using (DirectoryEntry memberEntry = new DirectoryEntry(member))
+            UserInfo = userInfo;            
+        }        
+
+        private UserPrincipal GetUserPrincipal(string username)
+        {
+            if (string.IsNullOrEmpty(username)) return null;
+            return UserPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Name, username);
+        }
+
+        private UserPrincipal GetUserPrincipal(SecurityIdentifier sid)
+        {
+            return UserPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Sid, sid.ToString());
+        }
+
+        private GroupPrincipal GetGroupPrincipal(string groupname)
+        {
+            if (string.IsNullOrEmpty(groupname)) return null;
+            return GroupPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Name, groupname);
+        }
+
+        private GroupPrincipal GetGroupPrincipal(SecurityIdentifier sid)
+        {
+            return GroupPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Sid, sid.ToString());
+        }
+        
+        // Non recursive group check (immediate membership only currently)
+        private bool IsUserInGroup(string username, string groupname)
+        {
+            using(GroupPrincipal group = GetGroupPrincipal(groupname))
+            {
+                if (group == null) return false;
+
+                using(UserPrincipal user = GetUserPrincipal(username))
+                {
+                    if (user == null) return false;
+
+                    return IsUserInGroup(user, group);
+                }                
+            }            
+        }
+
+        // Non recursive group check (immediate membership only currently)
+        private bool IsUserInGroup(UserPrincipal user, GroupPrincipal group)
+        {
+            if (user == null || group == null) return false;
+
+            foreach (Principal principal in group.Members)
+            {
+                if (principal is UserPrincipal)
+                {
+                    if (principal.Sid == user.Sid)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsUserInGroup(UserInformation userInfo, GroupInformation groupInfo)
+        {
+            if (groupInfo.SID != null)
+            {
+                using (UserPrincipal user = GetUserPrincipal(userInfo.Username))
+                {
+                    using (GroupPrincipal group = GetGroupPrincipal(groupInfo.SID))
                     {
-                        if (user.Path == memberEntry.Path)
-                            return true;
+                        return IsUserInGroup(user, group);
                     }
                 }
-
-                return false;
             }
-            catch
+            else
             {
-                return false;
-            }                
+                using (UserPrincipal user = GetUserPrincipal(userInfo.Username))
+                {
+                    using (GroupPrincipal group = GetGroupPrincipal(groupInfo.Name))
+                    {
+                        return IsUserInGroup(user, group);
+                    }
+                }
+            }             
         }
 
-        public static DirectoryEntry CreateOrGetGroup(string groupname)
+        private GroupPrincipal CreateOrGetGroupPrincipal(GroupInformation groupInfo)
         {
-            DirectoryEntry group = GetGroupEntry(groupname);
+            GroupPrincipal group = null;
+
+            // If we have a SID, use that, otherwise name
+            if (groupInfo.SID != null)
+                group = GetGroupPrincipal(groupInfo.SID);
+            else
+                group = GetGroupPrincipal(groupInfo.Name);
+          
             if (group == null)
             {
-                group = m_sam.Children.Add(groupname, "Group");
-                m_sam.CommitChanges();
-            }
+                // We create the GroupPrincipal, but https://connect.microsoft.com/VisualStudio/feedback/details/525688/invalidoperationexception-with-groupprincipal-and-sam-principalcontext-for-setting-any-property-always
+                // prevents us from then setting stuff on it.. so we then have to locate its relative DE 
+                // and modify *that* instead.  Oi.
+                using (group = new GroupPrincipal(m_machinePrincipal))
+                {
+                    group.Name = groupInfo.Name;
+                    group.Save();
 
+                    using (DirectoryEntry newGroupDe = m_sam.Children.Add(groupInfo.Name, "Group"))
+                    {
+                        if (!string.IsNullOrEmpty(groupInfo.Description))
+                        {
+                            newGroupDe.Properties["Description"].Value = groupInfo.Description;
+                            newGroupDe.CommitChanges();
+                        }                        
+                    }
+
+                    // We have to re-fetch to get changes made via underlying DE
+                    return GetGroupPrincipal(group.Sid);
+                }
+            }
+            
             return group;
         }
 
-        public static DirectoryEntry CreateOrGetUser(pGina.Shared.Types.UserInformation userInfo)
+        private UserPrincipal CreateOrGetUserPrincipal(UserInformation userInfo)
         {
-            // Get the user's object, if we can
-            DirectoryEntry user = GetUserEntry(userInfo.Username);
-
-            // If non-existent, add it!
+            UserPrincipal user = GetUserPrincipal(userInfo.Username);
             if (user == null)
             {
-                user = m_sam.Children.Add(userInfo.Username, "User");
-                m_sam.CommitChanges();                
+                // See note about MS bug in CreateOrGetGroupPrincipal to understand the mix of DE/Principal here:
+                using (user = new UserPrincipal(m_machinePrincipal))
+                {
+                    user.Name = userInfo.Username;
+                    user.Save();
+
+                    // Sync via DE
+                    SyncUserPrincipalInfo(user, userInfo);
+                    
+                    // We have to re-fetch to get changes made via underlying DE
+                    return GetUserPrincipal(user.Name);
+                }
             }
 
             return user;
         }
 
-        public static void AddUserToGroup(DirectoryEntry user, GroupInformation groupInfo)
+        private void SyncUserPrincipalInfo(UserPrincipal user, UserInformation info)
         {
-            using (DirectoryEntry group = CreateOrGetGroup(groupInfo.Name))
+            using(DirectoryEntry userDe = m_sam.Children.Find(info.Username, "User"))
             {
-                string existingDescription = (string)group.Properties["Description"].Value;
-                if (!string.IsNullOrEmpty(groupInfo.Description) && existingDescription != groupInfo.Description)
-                {
-                    group.Properties["Description"].Value = groupInfo.Description;                    
-                    group.CommitChanges();
-                }
-
-                if (!IsUserInGroup(user, group))
-                {
-                    group.Invoke("Add", new object[] { user.Path.ToString() });
-                    group.CommitChanges();
-                }
+                if(!string.IsNullOrEmpty(info.Description)) userDe.Properties["Description"].Value = info.Description;
+                if(!string.IsNullOrEmpty(info.Fullname)) userDe.Properties["FullName"].Value = info.Fullname;
+                userDe.Invoke("SetPassword", new object[] { info.Password });
+                userDe.CommitChanges();                
             }
-        }        
+        }
 
-        public static void SyncUserInfoToLocalUser(UserInformation userInfo)
+        private void AddUserToGroup(UserPrincipal user, GroupPrincipal group)
         {
-            using (DirectoryEntry user = CreateOrGetUser(userInfo))
+            group.Members.Add(user);
+            group.Save();
+        }
+
+        private void RemoveUserFromGroup(UserPrincipal user, GroupPrincipal group)
+        {
+            group.Members.Remove(user);
+            group.Save();
+        }
+
+        public void SyncToLocalUser()
+        {
+            using (UserPrincipal user = CreateOrGetUserPrincipal(UserInfo))
             {
-                string fullname = userInfo.Fullname;
-                if (string.IsNullOrEmpty(fullname))
-                    fullname = string.Format("{0} (pGina)", userInfo.Username);
+                // Force password and fullname match (redundant if we just created, but oh well)
+                SyncUserPrincipalInfo(user, UserInfo);
 
-                if(string.IsNullOrEmpty((string) user.Properties["FullName"].Value))
-                    user.Properties["FullName"].Value = fullname;                
-
-                user.Invoke("SetPassword", new object[] { userInfo.Password });
-                user.CommitChanges();
-
-                // Sync groups
                 try
                 {
-                    foreach (GroupInformation group in userInfo.Groups)
+                    List<SecurityIdentifier> ignoredSids = new List<SecurityIdentifier>(new SecurityIdentifier[] {
+                        new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null),    // "Authenticated Users"
+                        new SecurityIdentifier("S-1-1-0"),                                      // "Everyone"                        
+                    });
+                    
+                    // First remove from any local groups they aren't supposed to be in
+                    foreach (GroupPrincipal group in user.GetAuthorizationGroups())
                     {
-                        AddUserToGroup(user, group);
-                    }
+                        // Skip ignored sids
+                        if (ignoredSids.Contains(group.Sid)) continue;
 
-                    // Always add to Users
-                    AddUserToGroup(user, new GroupInformation() { Name = "Users" });
-                }
-                catch(Exception e)
-                {
-                    throw new GroupSyncException(e);
-                }
-            }     
-        }
-                        
-        public static void Delete(string userName)
-        {
-            m_logger.DebugFormat("Deleting user {0}", userName);
-            using( DirectoryEntry local = new DirectoryEntry("WinNT://localhost"))
-            {
-                using (DirectoryEntry user = local.Children.Find(userName))
-                {
-                    if (user != null)
-                    {
-                        local.Children.Remove(user);
-                    }
-                }
-            }
-
-            // TODO: Delete local profile?
-        }
-
-        // Load userInfo.Username's group list and populate userInfo.Groups accordingly
-        public static void SyncLocalUserGroupsToUserInfo(UserInformation userInfo)
-        {
-            SecurityIdentifier EveryoneSid = new SecurityIdentifier("S-1-1-0");
-            SecurityIdentifier AuthenticatedUsersSid = new SecurityIdentifier("S-1-5-11");
-
-            using (PrincipalContext pc = new PrincipalContext(ContextType.Machine, Environment.MachineName))
-            {
-                using (UserPrincipal user = UserPrincipal.FindByIdentity(pc, IdentityType.Name, userInfo.Username))
-                {
-                    if (user != null)
-                    {
-                        foreach (GroupPrincipal group in user.GetAuthorizationGroups())
+                        GroupInformation gi = new GroupInformation() { Name = group.Name, SID = group.Sid, Description = group.Description };
+                        if (!UserInfo.InGroup(gi))
                         {
-                            // Skip "Authenticated Users" and "Everyone" as these are generated
-                            if (group.Sid == EveryoneSid || group.Sid == AuthenticatedUsersSid)
-                                continue;
+                            RemoveUserFromGroup(user, group);
+                        }
+                    }
 
-                            userInfo.AddGroup(new GroupInformation()
+                    // Now add to any they aren't already in that they should be
+                    foreach (GroupInformation groupInfo in UserInfo.Groups)
+                    {
+                        if (!IsUserInGroup(UserInfo, groupInfo))
+                        {
+                            using (GroupPrincipal group = CreateOrGetGroupPrincipal(groupInfo))
                             {
-                                Name = group.Name,
-                                Description = group.Description,
-                                SID = group.Sid
-                            });
+                                AddUserToGroup(user, group);
+                            }
                         }
                     }
                 }
+                catch (Exception e)
+                {
+                    throw new GroupSyncException(e);
+                }
+            }       
+        }
+
+        public static void SyncUserInfoToLocalUser(UserInformation userInfo)
+        {
+            LocalAccount la = new LocalAccount(userInfo);
+            la.SyncToLocalUser();
+        }
+                                
+        // Load userInfo.Username's group list and populate userInfo.Groups accordingly
+        public static void SyncLocalGroupsToUserInfo(UserInformation userInfo)
+        {
+            ILog logger = LogManager.GetLogger("LocalAccount.SyncLocalGroupsToUserInfo");
+            try
+            {
+                SecurityIdentifier EveryoneSid = new SecurityIdentifier("S-1-1-0");
+                SecurityIdentifier AuthenticatedUsersSid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
+
+                using (PrincipalContext pc = new PrincipalContext(ContextType.Machine, Environment.MachineName))
+                {
+                    using (UserPrincipal user = UserPrincipal.FindByIdentity(pc, IdentityType.Name, userInfo.Username))
+                    {
+                        if (user != null)
+                        {
+                            foreach (GroupPrincipal group in user.GetAuthorizationGroups())
+                            {
+                                // Skip "Authenticated Users" and "Everyone" as these are generated
+                                if (group.Sid == EveryoneSid || group.Sid == AuthenticatedUsersSid)
+                                    continue;
+
+                                userInfo.AddGroup(new GroupInformation()
+                                {
+                                    Name = group.Name,
+                                    Description = group.Description,
+                                    SID = group.Sid
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                logger.ErrorFormat("Unexpected error while syncing local groups, skipping rest: {0}", e);
             }
         }
     }

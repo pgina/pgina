@@ -85,13 +85,25 @@ namespace pGina.Plugin.LocalMachine
             //  1. Has a local account
             //  2. That account's password is set to the one they used to authenticate
             //  3. That account is a member of all groups listed, and not a member of any others
-            //  
+            
             // Is failure at #3 a total fail?
             bool failIfGroupSyncFails = Settings.Store.GroupCreateFailIsFAIL;
 
-            try
+            // Groups everyone is added to
+            string[] MandatoryGroups = Settings.Store.MandatoryGroups;
+
+            // user info
+            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+
+            // Add user to all mandatory groups
+            if (MandatoryGroups.Length > 0)
             {
-                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+                foreach (string group in MandatoryGroups)
+                    userInfo.AddGroup(new GroupInformation() { Name = group });
+            }
+
+            try
+            {                
                 m_logger.DebugFormat("AuthenticatedUserGateway({0}) for user: {1}", properties.Id.ToString(), userInfo.Username);
                 LocalAccount.SyncUserInfoToLocalUser(userInfo);
             }
@@ -108,31 +120,43 @@ namespace pGina.Plugin.LocalMachine
             return new BooleanResult() { Success = true };
         }
 
+        private bool HasUserAuthenticatedYet(SessionProperties properties)
+        {
+            PluginActivityInformation pluginInfo = properties.GetTrackedSingle<PluginActivityInformation>();
+            foreach (Guid uuid in pluginInfo.GetAuthenticationPlugins())
+            {
+                if (pluginInfo.GetAuthenticationResult(uuid).Success)
+                    return true;
+            }
+
+            return false;
+        }
+
         public BooleanResult AuthenticateUser(SessionProperties properties)
         {
             try
             {                
+                bool authAsFallback = Settings.Store.AuthenticateAsFallback;    // When true, only auth if nobody else has yet
+                
                 m_logger.DebugFormat("AuthenticateUser({0})", properties.Id.ToString());
 
                 // Get user info
-                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();                
+                m_logger.DebugFormat("Found username: {0}", userInfo.Username);                               
 
-                m_logger.DebugFormat("Found username: {0}", userInfo.Username);
-
-                using(PrincipalContext pc = new PrincipalContext(ContextType.Machine, Environment.MachineName))
+                // Should we authenticate? Only if user has not yet authenticated, or we are not in fallback mode                
+                if (!authAsFallback || !HasUserAuthenticatedYet(properties))
                 {
-                    if(pc.ValidateCredentials(userInfo.Username, userInfo.Password))
+                    using (PrincipalContext pc = new PrincipalContext(ContextType.Machine, Environment.MachineName))
                     {
-                        m_logger.InfoFormat("Authenticated user: {0}", userInfo.Username);                        
-                        userInfo.Domain = Environment.MachineName;                                             
-
-                        // Now fill out the users group membership list so it matches their local memberships
-                        LocalAccount.SyncLocalUserGroupsToUserInfo(userInfo);
-                        userInfo.AddGroup(new GroupInformation() { Name = "pGinaTest" });
-
-                        return new BooleanResult() { Success = true };
+                        if (pc.ValidateCredentials(userInfo.Username, userInfo.Password))
+                        {
+                            m_logger.InfoFormat("Authenticated user: {0}", userInfo.Username);
+                            userInfo.Domain = Environment.MachineName;
+                            return new BooleanResult() { Success = true };
+                        }
                     }
-                }                                
+                }        
 
                 m_logger.ErrorFormat("Failed to authenticate user: {0}", userInfo.Username);
                 return new BooleanResult() { Success = false, Message = string.Format("Local account validation failed.") };
@@ -146,6 +170,14 @@ namespace pGina.Plugin.LocalMachine
 
         public BooleanResult AuthorizeUser(SessionProperties properties)
         {
+            // Some things we always do,
+            bool mirrorGroups = Settings.Store.MirrorGroupsForAuthdUsers;   // Should we load users groups from SAM?
+            if (mirrorGroups)
+            {
+                m_logger.DebugFormat("AuthorizeUser: Mirroring users group membership from SAM");
+                LocalAccount.SyncLocalGroupsToUserInfo(properties.GetTrackedSingle<UserInformation>());
+            }
+
             // Do we need to do authorization?
             if (DoesAuthzApply(properties))
             {
@@ -237,10 +269,13 @@ namespace pGina.Plugin.LocalMachine
             if (authzAllUsers) return true; 
             
             // Did we auth this user?
-            PluginActivityInformation pluginInfo = properties.GetTrackedSingle<PluginActivityInformation>();                
-            return pluginInfo.GetAuthenticatedPlugins().Contains(PluginUuid);           
-        }
+            PluginActivityInformation pluginInfo = properties.GetTrackedSingle<PluginActivityInformation>();
+            if (pluginInfo.GetAuthorizationPlugins().Contains(PluginUuid))
+            {
+                return pluginInfo.GetAuthenticationResult(PluginUuid).Success;
+            }
 
-        
+            return false;
+        }        
     }
 }
