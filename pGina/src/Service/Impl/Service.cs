@@ -286,7 +286,9 @@ namespace pGina.Service.Impl
                 m_logger.DebugFormat("Info found, returning user data");
                 UserInformation info = m_sessionInfoCache.Get(msg.Key);
                 response.Username = info.Username;
-                response.Password = info.Password;
+                // We always send an empty string for password, see GH issue #30
+                // response.Password = info.Password;
+                response.Password = "";
                 response.Domain = info.Domain;                
             }
 
