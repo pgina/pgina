@@ -330,10 +330,7 @@ namespace pGina
 
 			virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
 			{
-				MessageBase::FromDynamicMessage(msg);
-
-				if(msg->Exists<std::wstring>(L"Name"))
-					Name(msg->Property<std::wstring>(L"Name"));
+				DynamicLabelRequestMessage::FromDynamicMessage(msg);
 
 				if(msg->Exists<std::wstring>(L"Text"))
 					Text(msg->Property<std::wstring>(L"Text"));
@@ -341,8 +338,7 @@ namespace pGina
 
 			virtual pGina::Messaging::Message * ToDynamicMessage()
 			{				
-				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();				
-				msg->Property<std::wstring>(L"Name", Name(), pGina::Messaging::String);
+				pGina::Messaging::Message * msg = DynamicLabelRequestMessage::ToDynamicMessage();				
 				msg->Property<std::wstring>(L"Text", Text(), pGina::Messaging::String);
 				return msg;
 			}
