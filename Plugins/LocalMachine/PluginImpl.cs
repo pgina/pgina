@@ -87,7 +87,7 @@ namespace pGina.Plugin.LocalMachine
             //  3. That account is a member of all groups listed, and not a member of any others
             
             // Is failure at #3 a total fail?
-            bool failIfGroupSyncFails = Settings.Store.GroupCreateFailIsFAIL;
+            bool failIfGroupSyncFails = Settings.Store.GroupCreateFailIsFail;
 
             // Groups everyone is added to
             string[] MandatoryGroups = Settings.Store.MandatoryGroups;
@@ -135,8 +135,8 @@ namespace pGina.Plugin.LocalMachine
         public BooleanResult AuthenticateUser(SessionProperties properties)
         {
             try
-            {                
-                bool authAsFallback = Settings.Store.AuthenticateAsFallback;    // When true, only auth if nobody else has yet
+            {
+                bool alwaysAuth = Settings.Store.AlwaysAuthenticate; 
                 
                 m_logger.DebugFormat("AuthenticateUser({0})", properties.Id.ToString());
 
@@ -145,7 +145,7 @@ namespace pGina.Plugin.LocalMachine
                 m_logger.DebugFormat("Found username: {0}", userInfo.Username);                               
 
                 // Should we authenticate? Only if user has not yet authenticated, or we are not in fallback mode                
-                if (!authAsFallback || !HasUserAuthenticatedYet(properties))
+                if (alwaysAuth || !HasUserAuthenticatedYet(properties))
                 {
                     using (PrincipalContext pc = new PrincipalContext(ContextType.Machine, Environment.MachineName))
                     {
@@ -182,8 +182,9 @@ namespace pGina.Plugin.LocalMachine
             if (DoesAuthzApply(properties))
             {
                 bool limitToLocalAdmins = Settings.Store.AuthzLocalAdminsOnly;
+                bool limitToLocalGroups = Settings.Store.AuthzLocalGroupsOnly;
                 string[] limitToGroupList = Settings.Store.AuthzLocalGroups;
-                bool restrictionsApply = limitToLocalAdmins || (limitToGroupList.Length > 0);
+                bool restrictionsApply = limitToLocalAdmins || limitToLocalGroups;
                 PluginActivityInformation pluginInfo = properties.GetTrackedSingle<PluginActivityInformation>();
 
                 if (!restrictionsApply)
@@ -220,17 +221,20 @@ namespace pGina.Plugin.LocalMachine
                 // The user must have one of the groups listed (by name) in their group list
                 // and we must be in the Gateway list of plugins (as we'll be the ones ensuring
                 //  this group membership is enforced).
-                if (limitToGroupList.Length > 0)
+                if (limitToLocalGroups)
                 {
-                    foreach (string group in limitToGroupList)
+                    if (limitToGroupList.Length > 0)
                     {
-                        if (!ListedInGroup(group, null, properties))
+                        foreach (string group in limitToGroupList)
                         {
-                            return new BooleanResult()
+                            if (!ListedInGroup(group, null, properties))
                             {
-                                Success = false,
-                                Message = string.Format("Users group list does not include the required group ({0}), denying access", group)
-                            };
+                                return new BooleanResult()
+                                {
+                                    Success = false,
+                                    Message = string.Format("Users group list does not include the required group ({0}), denying access", group)
+                                };
+                            }
                         }
                     }
                 }
@@ -266,7 +270,7 @@ namespace pGina.Plugin.LocalMachine
         {
             // Do we authorize all users?
             bool authzAllUsers = Settings.Store.AuthzApplyToAllUsers;
-            if (authzAllUsers) return true; 
+            if (authzAllUsers) return true;
             
             // Did we auth this user?
             PluginActivityInformation pluginInfo = properties.GetTrackedSingle<PluginActivityInformation>();

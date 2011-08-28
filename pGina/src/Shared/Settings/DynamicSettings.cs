@@ -34,7 +34,7 @@ using Microsoft.Win32;
 namespace pGina.Shared.Settings
 {
     public class DynamicSettings : DynamicObject
-    {
+    {        
         public static readonly string PGINA_KEY = @"SOFTWARE\pGina3";
         private string m_rootKey = PGINA_KEY;
         
@@ -89,14 +89,23 @@ namespace pGina.Shared.Settings
         {
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_rootKey))
             {
-                if (key != null && key.GetValueNames().Contains(name))
+                if (key != null)
                 {
-                    object value = key.GetValue(name);
-                    return new DynamicSetting(name, value);                    
+                    // Make sure key exists before requesting it                    
+                    foreach (string valueName in key.GetValueNames())
+                    {
+                        if (String.Compare(valueName, name, true) == 0)
+                        {
+                            object value = key.GetValue(name);
+                            return new DynamicSetting(name, value);
+                        }
+                    }
+
+                    throw new KeyNotFoundException(string.Format("Unable to find value for: {0}", name));
                 }
                 else
-                {
-                    throw new KeyNotFoundException(string.Format("Unable to find value for: {0}", name));                    
+                {                    
+                    throw new KeyNotFoundException(string.Format("Unable to open registry key"));
                 }
             }
         }
