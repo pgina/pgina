@@ -45,8 +45,10 @@ namespace pGina
 			Log             = 0x04,
 			LoginRequest    = 0x05,
 			LoginResponse   = 0x06,
-			DynLabelRequest = 0x07,
-			DynLabelResponse= 0x08,
+			InfoRequest     = 0x07,
+			InfoResponse    = 0x08,
+			DynLabelRequest = 0x09,
+			DynLabelResponse= 0x0a,
 		};
 				
 		class MessageBase 
@@ -317,6 +319,7 @@ namespace pGina
 		/* Response containing text for a label in the UI. */
 		class DynamicLabelResponseMessage : public DynamicLabelRequestMessage
 		{
+		public:
 			DynamicLabelResponseMessage()
 			{
 				Type(DynLabelResponse);
@@ -333,7 +336,7 @@ namespace pGina
 					Name(msg->Property<std::wstring>(L"Name"));
 
 				if(msg->Exists<std::wstring>(L"Text"))
-					Name(msg->Property<std::wstring>(L"Text"));
+					Text(msg->Property<std::wstring>(L"Text"));
 			}
 
 			virtual pGina::Messaging::Message * ToDynamicMessage()

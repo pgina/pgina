@@ -42,5 +42,7 @@ namespace pGina.Core.Messages
         LoginResponse   = 0x06,
         InfoRequest     = 0x07,
         InfoResponse    = 0x08,
+        DynLabelRequest = 0x09,
+        DynLabelResponse = 0x0a,
     }
 }

@@ -44,6 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Messages\DynamicLabelRequestMessage.cs" />
+    <Compile Include="Messages\DynamicLabelResponseMessage.cs" />
     <Compile Include="Messages\EmptyMessage.cs" />
     <Compile Include="Messages\HelperInfoRequestMessage.cs" />
     <Compile Include="Messages\HelperInfoResponseMessage.cs" />

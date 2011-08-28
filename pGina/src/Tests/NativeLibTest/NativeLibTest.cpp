@@ -93,6 +93,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		pGina::Transactions::Log::Info(L"User: %s login successful!", result.Username().c_str());
 	}
 	
+	std::wstring str = pGina::Transactions::TileUi::GetDynamicLabel(L"MOTD");
+	pGina::Transactions::Log::Info(L"TileUi::GetDynamicLabel(\"MOTD\") received: %s", str.c_str());
+
 	return 0;
 }
 

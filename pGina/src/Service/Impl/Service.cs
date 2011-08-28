@@ -242,6 +242,8 @@ namespace pGina.Service.Impl
                     return HandleLoginRequest(new LoginRequestMessage(msg)).ToExpando();
                 case MessageType.InfoRequest:
                     return HandleInfoRequest(new HelperInfoRequestMessage(msg)).ToExpando();
+                case MessageType.DynLabelRequest:
+                    return HandleDynamicLabelRequest(new DynamicLabelRequestMessage(msg)).ToExpando();
                 default:
                     return null;                // Unknowns get disconnected
             }
@@ -318,6 +320,18 @@ namespace pGina.Service.Impl
                 m_logger.ErrorFormat("Internal error, unexpected exception while handling login request: {0}", e);
                 return new LoginResponseMessage() { Result = false, Message = "Internal error" };
             }
+        }
+
+        private DynamicLabelResponseMessage HandleDynamicLabelRequest(DynamicLabelRequestMessage msg)
+        {
+            switch (msg.Name)
+            {
+                case "MOTD":
+                    string motd = Settings.Get.Motd;
+                    return new DynamicLabelResponseMessage() { Name = msg.Name, Text = motd };
+                // Others can be added here.
+            }
+            return null;
         }
     }
 }

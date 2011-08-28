@@ -203,10 +203,54 @@ namespace pGina
 		/* static */
 		std::wstring TileUi::GetDynamicLabel(const wchar_t *labelName)
 		{
+			// Write a log message to the service
+			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
+			std::wstring pipePath = L"\\\\.\\pipe\\";
+			pipePath += pipeName;
 
-			// TODO: write this...
+			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);	
+			std::wstring labelText = L"";
 
-			return std::wstring(L"");
+			if( pipeClient.Connect() )
+			{
+				// Start a cleanup pool for messages we collect along the way
+				pGina::Memory::ObjectCleanupPool cleanup;
+
+				// Always send hello first, expect hello in return
+				pGina::Protocol::HelloMessage hello;
+				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);		
+				cleanup.Add(reply);
+
+				if(reply && reply->Type() != pGina::Protocol::Hello)
+					return labelText;
+
+				// Then send a label request message, expect a labelresponse message
+				pGina::Protocol::DynamicLabelRequestMessage request(labelName);
+				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, request);
+				cleanup.Add(reply);
+
+				if(reply && reply->Type() != pGina::Protocol::DynLabelResponse)
+					return labelText;
+
+				// Get the reply
+				pGina::Protocol::DynamicLabelResponseMessage * responseMsg = 
+					static_cast<pGina::Protocol::DynamicLabelResponseMessage *>(reply);
+				labelText = responseMsg->Text();
+
+				// Send disconnect, expect ack, then close
+				pGina::Protocol::DisconnectMessage disconnect;
+				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, disconnect);
+				cleanup.Add(reply);		
+
+				// We close regardless, no need to check reply type..
+				pipeClient.Close();
+			}
+			else
+			{
+				Log::Warn(L"Unable to connect to pGina service pipe - LastError: 0x%08x, giving up.", GetLastError());
+			}
+
+			return labelText;
 		}
 	}
 }
