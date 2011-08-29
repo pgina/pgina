@@ -38,6 +38,13 @@ namespace pGina
 {
 	namespace CredProv
 	{		
+		// Whether or not the field text is to be determined
+		// by querying the service.
+		typedef enum PGINA_FIELD_DATA_SOURCE
+		{
+			SOURCE_NONE, SOURCE_DYNAMIC
+		};
+
 		// The first value indicates when the tile is displayed (selected, not selected)
 		// the second indicates things like whether the field is enabled, whether it has key focus, etc.
 		struct FIELD_STATE_PAIR
@@ -52,6 +59,7 @@ namespace pGina
 		{
 			FIELD_STATE_PAIR fieldStatePair;
 			CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR fieldDescriptor;
+			PGINA_FIELD_DATA_SOURCE fieldData;
 			union
 			{
 				PWSTR wstr;				

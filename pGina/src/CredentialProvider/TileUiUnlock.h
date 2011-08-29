@@ -50,12 +50,12 @@ namespace pGina
 			LOIFI_USERNAME,			// Username field index value
 			LOIFI_PASSWORD,			// Password field index value
 			{
-				//  when to display,               style,             field id,        type,               name
-				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LOIFI_TILEIMAGE, CPFT_TILE_IMAGE,    L"Image" } },	// LOIFI_TILEIMAGE
-				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LOIFI_LOCKED,    CPFT_LARGE_TEXT,    L"Locked" }, L"Locked" },   // LOIFI_LOCKED
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED }, { LOIFI_USERNAME,  CPFT_EDIT_TEXT,     L"Username" } },	// LOIFI_USERNAME
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },	{ LOIFI_PASSWORD,  CPFT_PASSWORD_TEXT, L"Password" } }, // LOIFI_PASSWORD
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },    { LOIFI_SUBMIT,    CPFT_SUBMIT_BUTTON, L"Submit" } },   // LOIFI_SUBMIT
+				//  when to display,               style,             field id,        type,               name           data source  value
+				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LOIFI_TILEIMAGE, CPFT_TILE_IMAGE,    L"Image" },    SOURCE_NONE, NULL },	// LOIFI_TILEIMAGE
+				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LOIFI_LOCKED,    CPFT_LARGE_TEXT,    L"Locked" },   SOURCE_NONE, L"Locked" },   // LOIFI_LOCKED
+				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED }, { LOIFI_USERNAME,  CPFT_EDIT_TEXT,     L"Username" }, SOURCE_NONE, NULL },	// LOIFI_USERNAME
+				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },	{ LOIFI_PASSWORD,  CPFT_PASSWORD_TEXT, L"Password" }, SOURCE_NONE, NULL }, // LOIFI_PASSWORD
+				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },    { LOIFI_SUBMIT,    CPFT_SUBMIT_BUTTON, L"Submit" },   SOURCE_NONE, NULL },   // LOIFI_SUBMIT
 			}
 		};
 	}
