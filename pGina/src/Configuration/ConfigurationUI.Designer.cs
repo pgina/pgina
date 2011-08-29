@@ -28,12 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigurationUI));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigurationUI));
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
+            this.motdGB = new System.Windows.Forms.GroupBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.motdTB = new System.Windows.Forms.TextBox();
+            this.motdLabel = new System.Windows.Forms.Label();
             this.groupBox12 = new System.Windows.Forms.GroupBox();
             this.btnImageBrowse = new System.Windows.Forms.Button();
             this.label11 = new System.Windows.Forms.Label();
@@ -112,12 +116,9 @@
             this.m_radioUseService = new System.Windows.Forms.RadioButton();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnOkay = new System.Windows.Forms.Button();
-            this.motdGB = new System.Windows.Forms.GroupBox();
-            this.motdLabel = new System.Windows.Forms.Label();
-            this.motdTB = new System.Windows.Forms.TextBox();
-            this.label12 = new System.Windows.Forms.Label();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
+            this.motdGB.SuspendLayout();
             this.groupBox12.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_tileImagePreview)).BeginInit();
             this.m_pluginConfigTab.SuspendLayout();
@@ -144,7 +145,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.m_tileImage)).BeginInit();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            this.motdGB.SuspendLayout();
             this.SuspendLayout();
             // 
             // m_tabs
@@ -174,6 +174,44 @@
             this.m_generalConfigTab.TabIndex = 1;
             this.m_generalConfigTab.Text = "General";
             this.m_generalConfigTab.UseVisualStyleBackColor = true;
+            // 
+            // motdGB
+            // 
+            this.motdGB.Controls.Add(this.label12);
+            this.motdGB.Controls.Add(this.motdTB);
+            this.motdGB.Controls.Add(this.motdLabel);
+            this.motdGB.Location = new System.Drawing.Point(17, 182);
+            this.motdGB.Name = "motdGB";
+            this.motdGB.Size = new System.Drawing.Size(749, 83);
+            this.motdGB.TabIndex = 1;
+            this.motdGB.TabStop = false;
+            this.motdGB.Text = "MOTD";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.Location = new System.Drawing.Point(53, 42);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(532, 26);
+            this.label12.TabIndex = 2;
+            this.label12.Text = resources.GetString("label12.Text");
+            // 
+            // motdTB
+            // 
+            this.motdTB.Location = new System.Drawing.Point(54, 19);
+            this.motdTB.Name = "motdTB";
+            this.motdTB.Size = new System.Drawing.Size(667, 20);
+            this.motdTB.TabIndex = 1;
+            // 
+            // motdLabel
+            // 
+            this.motdLabel.AutoSize = true;
+            this.motdLabel.Location = new System.Drawing.Point(6, 22);
+            this.motdLabel.Name = "motdLabel";
+            this.motdLabel.Size = new System.Drawing.Size(42, 13);
+            this.motdLabel.TabIndex = 0;
+            this.motdLabel.Text = "MOTD:";
             // 
             // groupBox12
             // 
@@ -1042,44 +1080,6 @@
             this.btnOkay.UseVisualStyleBackColor = true;
             this.btnOkay.Click += new System.EventHandler(this.btnOkay_Click);
             // 
-            // motdGB
-            // 
-            this.motdGB.Controls.Add(this.label12);
-            this.motdGB.Controls.Add(this.motdTB);
-            this.motdGB.Controls.Add(this.motdLabel);
-            this.motdGB.Location = new System.Drawing.Point(17, 182);
-            this.motdGB.Name = "motdGB";
-            this.motdGB.Size = new System.Drawing.Size(749, 83);
-            this.motdGB.TabIndex = 1;
-            this.motdGB.TabStop = false;
-            this.motdGB.Text = "MOTD";
-            // 
-            // motdLabel
-            // 
-            this.motdLabel.AutoSize = true;
-            this.motdLabel.Location = new System.Drawing.Point(6, 22);
-            this.motdLabel.Name = "motdLabel";
-            this.motdLabel.Size = new System.Drawing.Size(42, 13);
-            this.motdLabel.TabIndex = 0;
-            this.motdLabel.Text = "MOTD:";
-            // 
-            // motdTB
-            // 
-            this.motdTB.Location = new System.Drawing.Point(54, 19);
-            this.motdTB.Name = "motdTB";
-            this.motdTB.Size = new System.Drawing.Size(667, 20);
-            this.motdTB.TabIndex = 1;
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(53, 42);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(532, 26);
-            this.label12.TabIndex = 2;
-            this.label12.Text = resources.GetString("label12.Text");
-            // 
             // ConfigurationUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1092,6 +1092,8 @@
             this.Text = "pGina Configuration";
             this.m_tabs.ResumeLayout(false);
             this.m_generalConfigTab.ResumeLayout(false);
+            this.motdGB.ResumeLayout(false);
+            this.motdGB.PerformLayout();
             this.groupBox12.ResumeLayout(false);
             this.groupBox12.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_tileImagePreview)).EndInit();
@@ -1123,8 +1125,6 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            this.motdGB.ResumeLayout(false);
-            this.motdGB.PerformLayout();
             this.ResumeLayout(false);
 
         }

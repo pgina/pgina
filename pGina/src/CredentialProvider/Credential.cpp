@@ -379,12 +379,24 @@ namespace pGina
 			{
 				m_fields->fields[x].fieldDescriptor = fields.fields[x].fieldDescriptor;
 				m_fields->fields[x].fieldStatePair = fields.fields[x].fieldStatePair;
+				m_fields->fields[x].fieldDataSource = fields.fields[x].fieldDataSource;
 				m_fields->fields[x].wstr = NULL;
 				if(fields.fields[x].wstr)
 				{
 					SHStrDup(fields.fields[x].wstr, &m_fields->fields[x].wstr);
-				}								
+				}
+
+				// Retrieve data for dynamic fields
+				if( fields.fields[x].fieldDataSource == PGINA_FIELD_DATA_SOURCE::SOURCE_DYNAMIC )
+				{
+					std::wstring text = pGina::Transactions::TileUi::GetDynamicLabel( fields.fields[x].fieldDescriptor.pszLabel );
+					if( ! text.empty() )
+					{
+						SHStrDup( text.c_str(), &m_fields->fields[x].wstr );
+					}
+				}
 			}			
+
 
 			if(username != NULL)
 			{
