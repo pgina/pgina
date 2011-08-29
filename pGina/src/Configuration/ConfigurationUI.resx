@@ -117,4 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label12.Text" xml:space="preserve">
+    <value>Message of the Day (MOTD).   Displayed below the tile image and  above the username/password fields.  
+Valid substitutions:   %m - Machine name, %d - Today's date, %i - IP address, %d - DNS name, %v pGina version</value>
+  </data>
 </root>

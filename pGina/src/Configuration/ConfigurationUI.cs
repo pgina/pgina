@@ -81,6 +81,7 @@ namespace pGina.Configuration
         {
             m_tileImageTxt.Text = Settings.Get.GetSetting("TileImage", null);
             LoadTileImagePreview();
+            this.motdTB.Text = Settings.Get.GetSetting("Motd");
         }
 
         private void LoadTileImagePreview()
@@ -568,6 +569,7 @@ namespace pGina.Configuration
             this.SavePluginOrder();
 
             Core.Settings.Get.TileImage = m_tileImageTxt.Text;
+            Settings.Get.Motd = this.motdTB.Text.Trim();
         }
 
         private void MoveUp(DataGridView dgv, int index)
