@@ -163,7 +163,7 @@ namespace pGina.CredentialProvider.Registration
             }
 
             string guid = m_settings.ProviderGuid.ToString();
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(PROVIDER_KEY_BASE))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(PROVIDER_KEY_BASE,true))
             {
                 if (key != null)
                 {
@@ -172,7 +172,7 @@ namespace pGina.CredentialProvider.Registration
                 }
             }
 
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(CLSID_BASE))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(CLSID_BASE,true))
             {
                 if (key != null)
                 {
@@ -181,7 +181,7 @@ namespace pGina.CredentialProvider.Registration
                 }
             }
 
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(CLSID_BASE))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(CLSID_BASE, true))
             {
                 if (key != null)
                 {
@@ -190,7 +190,7 @@ namespace pGina.CredentialProvider.Registration
                 }
             }
 
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(PROVIDER_KEY_BASE_6432))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(PROVIDER_KEY_BASE_6432, true))
             {
                 if (key != null)
                 {
@@ -205,7 +205,7 @@ namespace pGina.CredentialProvider.Registration
             Console.WriteLine("Disabling credential provider: {0} {{{1}}}",
                 m_settings.ShortName,
                 m_settings.ProviderGuid.ToString());
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_providerKey))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_providerKey,true))
             {
                 if (key != null)
                 {
@@ -218,6 +218,23 @@ namespace pGina.CredentialProvider.Registration
                     return;
                 }
             }
+
+            if (IntPtr.Size == 8)
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_6432ProviderKey, true))
+                {
+                    if (key != null)
+                    {
+                        Console.WriteLine("Writing {0}: {1} => {2}", key.ToString(), "Disabled", 1);
+                        key.SetValue("Disabled", 1);
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine("32 bit Credential Provider is not installed.");
+                        return;
+                    }
+                }
+            }
         }
 
         private static void EnableCP()
@@ -225,7 +242,7 @@ namespace pGina.CredentialProvider.Registration
             Console.WriteLine("Enabling credential provider: {0} {{{1}}}", 
                 m_settings.ShortName,
                 m_settings.ProviderGuid.ToString());
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_providerKey))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_providerKey,true))
             {
                 if (key != null)
                 {
@@ -238,6 +255,25 @@ namespace pGina.CredentialProvider.Registration
                 {
                     Console.Error.WriteLine("Credential Provider is not installed.");
                     return;
+                }
+            }
+
+            if (IntPtr.Size == 8)
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_providerKey, true))
+                {
+                    if (key != null)
+                    {
+                        Console.WriteLine("Deleting {0}: {1}", key.ToString(), "Disabled");
+
+                        if (key.GetValue("Disabled") != null)
+                            key.DeleteValue("Disabled");
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine("32 bit Credential Provider is not installed.");
+                        return;
+                    }
                 }
             }
         }
