@@ -46,7 +46,6 @@ namespace pGina.CredentialProvider.Registration
         public Guid ProviderGuid { get; set; }
         public string ShortName { get; set; }
         public string Path { get; set; }
-        public bool DryRun { get; set; }
         public bool Verbose { get; set; }
 
         public static Settings ParseClArgs(string[] args)
@@ -58,7 +57,6 @@ namespace pGina.CredentialProvider.Registration
             settings.Path = ".";
             settings.ShortName = null;
             settings.OpMode = OperationMode.INSTALL;
-            settings.DryRun = false;
             settings.Verbose = false;
 
             int nArgs = args.Count();
@@ -98,9 +96,6 @@ namespace pGina.CredentialProvider.Registration
                         case "h":
                         case "?":
                             throw new Exception("pGina Registration App Help");
-                        case "d":
-                            settings.DryRun = true;
-                            break;
                         case "v":
                             settings.Verbose = true;
                             break;
@@ -158,8 +153,8 @@ namespace pGina.CredentialProvider.Registration
                 "  Options" + Environment.NewLine +
                 "     --guid <guid>     The Guid of the credential provider to be installed." + Environment.NewLine +
                 "                       Default is the pGina default Guid." + Environment.NewLine +
-                "     --path <path>     Full or relative path to a directory containing the " + Environment.NewLine + 
-                "                       CP DLL.  The DLL should be located within a" + Environment.NewLine +
+                "     --path <dir>      Full or relative path to a directory containing the " + Environment.NewLine + 
+                "                       CP DLL.  The DLL may be located within a" + Environment.NewLine +
                 "                       subdirectory named x64 or Win32 (64 or 32 bit)." + Environment.NewLine +
                 "                       Defaults to the current directory." + Environment.NewLine +
                 "     -h, -?            Show this help text." + Environment.NewLine +

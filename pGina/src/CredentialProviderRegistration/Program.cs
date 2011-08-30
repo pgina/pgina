@@ -72,6 +72,10 @@ namespace pGina.CredentialProvider.Registration
         */
 
         static Settings m_settings = null;
+        static readonly string PROVIDER_KEY_BASE =  @"SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers";
+        static readonly string CLSID_BASE = @"CLSID";
+        static readonly string PROVIDER_KEY_BASE_6432 = @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers";
+        
         static string m_providerKey = null;
         static string m_clsidRoot = null;
         static string m_clsidInProc = null;
@@ -101,14 +105,10 @@ namespace pGina.CredentialProvider.Registration
 
             // The registry keys
             string guid = m_settings.ProviderGuid.ToString();
-            m_providerKey = string.Format(
-                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers\{{{0}}}", 
-                guid);
-            m_clsidRoot = string.Format(@"CLSID\{{{0}}}", guid);
-            m_clsidInProc = string.Format(@"CLSID\{{{0}}}\InprocServer32", guid);
-            m_6432ProviderKey = string.Format(
-                @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers\{{{0}}}", 
-                guid);
+            m_providerKey = string.Format(@"{0}\{{{1}}}", PROVIDER_KEY_BASE, guid);
+            m_clsidRoot = string.Format(@"{0}\{{{1}}}", CLSID_BASE, guid);
+            m_clsidInProc = string.Format(@"{0}\InprocServer32", m_clsidRoot, guid);
+            m_6432ProviderKey = string.Format(@"{0}\{{{1}}}", PROVIDER_KEY_BASE_6432, guid);
                
             // Do the work...
             try
@@ -132,20 +132,122 @@ namespace pGina.CredentialProvider.Registration
                     InstallCP();
                     break;
                 case OperationMode.UNINSTALL:
-                    // TODO
+                    UninstallCP();
                     break;
                 case OperationMode.DISABLE:
-                    // TODO
-                    //  - Disable (set a DWORD "Disabled" = 1 in the CLSID key (ala: http://blogs.technet.com/b/ad/archive/2009/07/10/testing-a-credential-provider.aspx)
+                    DisableCP();
                     break;
                 case OperationMode.ENABLE:
-                    // TODO
+                    EnableCP();
                     break;
+            }
+        }
+
+        private static void UninstallCP()
+        {
+            Console.WriteLine("Uninstalling credential provider {0} {{{1}}}", 
+                m_settings.ShortName,
+                m_settings.ProviderGuid.ToString());
+            string dll = String.Format(@"C:\Windows\System32\{0}.dll", m_settings.ShortName);
+            string dll6432 = String.Format(@"C:\Windows\Syswow64\{0}.dll", m_settings.ShortName);
+
+            if (File.Exists(dll))
+            {
+                Console.WriteLine("Deleting: {0}", dll);
+                File.Delete(dll);
+            }
+            if (File.Exists(dll6432))
+            {
+                Console.WriteLine("Deleting: {0}", dll);
+                File.Delete(dll);
+            }
+
+            string guid = m_settings.ProviderGuid.ToString();
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(PROVIDER_KEY_BASE))
+            {
+                if (key != null)
+                {
+                    Console.WriteLine("Deleting {0}\\{1}", key.ToString(), guid );
+                    key.DeleteSubKey(guid);
+                }
+            }
+
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(CLSID_BASE))
+            {
+                if (key != null)
+                {
+                    Console.WriteLine("Deleting {0}\\{1}\\InprocServer32", key.ToString(), guid);
+                    key.DeleteSubKey(guid + "\\InprocServer32");
+                }
+            }
+
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(CLSID_BASE))
+            {
+                if (key != null)
+                {
+                    Console.WriteLine("Deleting {0}\\{1}", key.ToString(), guid);
+                    key.DeleteSubKey(guid);
+                }
+            }
+
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(PROVIDER_KEY_BASE_6432))
+            {
+                if (key != null)
+                {
+                    Console.WriteLine("Deleting {0}\\{1}", key.ToString(), guid);
+                    key.DeleteSubKey(guid);
+                }
+            }
+        }
+
+        private static void DisableCP()
+        {
+            Console.WriteLine("Disabling credential provider: {0} {{{1}}}",
+                m_settings.ShortName,
+                m_settings.ProviderGuid.ToString());
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_providerKey))
+            {
+                if (key != null)
+                {
+                    Console.WriteLine("Writing {0}: {1} => {2}", key.ToString(), "Disabled", 1);
+                    key.SetValue("Disabled", 1);
+                }
+                else
+                {
+                    Console.Error.WriteLine("Credential Provider is not installed.");
+                    return;
+                }
+            }
+        }
+
+        private static void EnableCP()
+        {
+            Console.WriteLine("Enabling credential provider: {0} {{{1}}}", 
+                m_settings.ShortName,
+                m_settings.ProviderGuid.ToString());
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_providerKey))
+            {
+                if (key != null)
+                {
+                    Console.WriteLine("Deleting {0}: {1}", key.ToString(), "Disabled");
+
+                    if( key.GetValue("Disabled") != null )
+                        key.DeleteValue("Disabled");
+                }
+                else
+                {
+                    Console.Error.WriteLine("Credential Provider is not installed.");
+                    return;
+                }
             }
         }
 
         private static void InstallCP()
         {
+            Console.WriteLine("Installing credential provider: {0} {{{1}}}", 
+                m_settings.ShortName,
+                m_settings.ProviderGuid.ToString());
+
             // This will throw if unsuccessful
             CopyDlls();
 
@@ -173,6 +275,10 @@ namespace pGina.CredentialProvider.Registration
                     Console.WriteLine("   copying to: {0}", destination64);
                     File.Copy(x64Dll.FullName, destination64, true);
                 }
+                else
+                {
+                    Console.Error.WriteLine("WARNING: No 64 bit DLL found.");
+                }
 
                 if (x32Dll != null)
                 {
@@ -180,9 +286,13 @@ namespace pGina.CredentialProvider.Registration
                     Console.WriteLine("   copying to: {0}", destination32);
 
                     File.Copy(x32Dll.FullName, destination32, true);
-                    
+
                     // Write registry key for 32 bit DLL
                     SetHKLMValue(m_6432ProviderKey, "", m_settings.ShortName);
+                }
+                else
+                {
+                    Console.Error.WriteLine("WARNING: No 32 bit DLL found.");
                 }
             }
             else
@@ -246,8 +356,8 @@ namespace pGina.CredentialProvider.Registration
                     return new FileInfo(path);
             }
 
-            // Check x86 subdirectory
-            path = String.Format(@"{0}\x86\{1}.dll", m_settings.Path, m_settings.ShortName);
+            // Check Win32 subdirectory
+            path = String.Format(@"{0}\Win32\{1}.dll", m_settings.Path, m_settings.ShortName);
             if (File.Exists(path))
             {
                 if (! Is64BitDll(path))
@@ -261,7 +371,7 @@ namespace pGina.CredentialProvider.Registration
         {
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(subKey))
             {
-                Console.WriteLine("Writing {0} => {1}", key.ToString(), value);
+                Console.WriteLine("Writing {0}: {1} => {2}", key.ToString(), name, value);
                 key.SetValue(name, value);
             }
         }
@@ -270,7 +380,7 @@ namespace pGina.CredentialProvider.Registration
         {
             using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(subKey))
             {
-                Console.WriteLine("Writing {0} => {1}", key.ToString(), value);
+                Console.WriteLine("Writing {0}: {1} => {2}", key.ToString(), name, value);
                 key.SetValue(name, value);
             }
         }
