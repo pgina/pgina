@@ -59,7 +59,7 @@ namespace pGina
 		{
 			FIELD_STATE_PAIR fieldStatePair;
 			CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR fieldDescriptor;
-			PGINA_FIELD_DATA_SOURCE fieldData;
+			PGINA_FIELD_DATA_SOURCE fieldDataSource;
 			union
 			{
 				PWSTR wstr;				

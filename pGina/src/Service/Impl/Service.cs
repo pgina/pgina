@@ -34,6 +34,8 @@ using System.Threading;
 using System.ServiceProcess;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
+using System.Net;
 
 using log4net;
 
@@ -329,11 +331,69 @@ namespace pGina.Service.Impl
             switch (msg.Name)
             {
                 case "MOTD":
-                    string motd = Settings.Get.Motd;
+                    string text = Settings.Get.Motd;
+                    string motd = FormatMotd(text);
                     return new DynamicLabelResponseMessage() { Name = msg.Name, Text = motd };
                 // Others can be added here.
             }
             return null;
+        }
+
+        private string FormatMotd(string text)
+        {
+            string motd = text;
+
+            // Version
+            string pattern = @"\%v";
+            if (Regex.IsMatch(motd, pattern))
+            {
+                // TODO get this value dynamically
+                motd = Regex.Replace(motd, pattern, "3.0.0.0");
+            }
+
+            // IP Address
+            pattern = @"\%i";
+            if (Regex.IsMatch(motd, pattern))
+            {
+                // Get IP address of this computer
+                IPAddress[] ipList = Dns.GetHostAddresses("");
+                string ip = "";
+                // Grab the first IPv4 address in the list
+                foreach (IPAddress addr in ipList)
+                {
+                    if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    {
+                        ip = addr.ToString();
+                        break;
+                    }
+                }
+                motd = Regex.Replace(motd, pattern, ip);
+            }
+
+            // machine name
+            pattern = @"\%m";
+            if (Regex.IsMatch(motd, pattern))
+            {
+                motd = Regex.Replace(motd, pattern, Environment.MachineName);
+            }
+
+            // Date
+            pattern = @"\%d";
+            if (Regex.IsMatch(motd, pattern))
+            {
+                string today = DateTime.Today.ToString("MMMM dd, yyyy");
+                motd = Regex.Replace(motd, pattern, today);
+            }
+
+            // DNS name
+            pattern = @"\%n";
+            if (Regex.IsMatch(motd, pattern))
+            {
+                string dns = Dns.GetHostName();
+                motd = Regex.Replace(motd, pattern, dns);
+            }
+
+            return motd;
         }
     }
 }

@@ -52,7 +52,7 @@ namespace pGina
 			{
 				//  when to display,               style,             field id,        type,               name           data source     value
 				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LUIFI_TILEIMAGE, CPFT_TILE_IMAGE,    L"Image" },    SOURCE_NONE,    NULL },	// LUIFI_TILEIMAGE
-			    { { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LUIFI_MOTD,      CPFT_LARGE_TEXT,    L"MOTD" },     SOURCE_DYNAMIC, L"pGina MOTD" }, // LUIFI_MOTD
+			    { { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LUIFI_MOTD,      CPFT_SMALL_TEXT,    L"MOTD" },     SOURCE_DYNAMIC, L"pGina MOTD" }, // LUIFI_MOTD
 				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED }, { LUIFI_USERNAME,  CPFT_EDIT_TEXT,     L"Username" }, SOURCE_NONE,    NULL },	// LUIFI_USERNAME
 				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },	{ LUIFI_PASSWORD,  CPFT_PASSWORD_TEXT, L"Password" }, SOURCE_NONE,    NULL }, // LUIFI_PASSWORD
 				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },    { LUIFI_SUBMIT,    CPFT_SUBMIT_BUTTON, L"Submit" },   SOURCE_NONE,    NULL },   // LUIFI_SUBMIT
