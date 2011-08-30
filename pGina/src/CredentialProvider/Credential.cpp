@@ -387,7 +387,7 @@ namespace pGina
 				}
 
 				// Retrieve data for dynamic fields
-				if( fields.fields[x].fieldDataSource == PGINA_FIELD_DATA_SOURCE::SOURCE_DYNAMIC )
+				if( fields.fields[x].fieldDataSource == SOURCE_DYNAMIC )
 				{
 					std::wstring text = pGina::Transactions::TileUi::GetDynamicLabel( fields.fields[x].fieldDescriptor.pszLabel );
 					if( ! text.empty() )
