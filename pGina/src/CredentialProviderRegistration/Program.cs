@@ -117,7 +117,7 @@ namespace pGina.CredentialProvider.Registration
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine("{0}" + Environment.NewLine, e.Message);
+                Console.Error.WriteLine("Error: {0}" + Environment.NewLine, e.Message);
                 return 1;
             }
             
@@ -162,31 +162,31 @@ namespace pGina.CredentialProvider.Registration
                 File.Delete(dll);
             }
 
-            string guid = m_settings.ProviderGuid.ToString();
+            string guid = "{" + m_settings.ProviderGuid.ToString() + "}";
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(PROVIDER_KEY_BASE,true))
             {
                 if (key != null)
                 {
                     Console.WriteLine("Deleting {0}\\{1}", key.ToString(), guid );
-                    key.DeleteSubKey(guid);
+                    key.DeleteSubKey(guid,false);
                 }
             }
 
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(CLSID_BASE,true))
+            using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(CLSID_BASE,true))
             {
                 if (key != null)
                 {
                     Console.WriteLine("Deleting {0}\\{1}\\InprocServer32", key.ToString(), guid);
-                    key.DeleteSubKey(guid + "\\InprocServer32");
+                    key.DeleteSubKey(guid + "\\InprocServer32", false);
                 }
             }
 
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(CLSID_BASE, true))
+            using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(CLSID_BASE, true))
             {
                 if (key != null)
                 {
                     Console.WriteLine("Deleting {0}\\{1}", key.ToString(), guid);
-                    key.DeleteSubKey(guid);
+                    key.DeleteSubKey(guid, false);
                 }
             }
 
@@ -195,7 +195,7 @@ namespace pGina.CredentialProvider.Registration
                 if (key != null)
                 {
                     Console.WriteLine("Deleting {0}\\{1}", key.ToString(), guid);
-                    key.DeleteSubKey(guid);
+                    key.DeleteSubKey(guid, false);
                 }
             }
         }
@@ -214,8 +214,7 @@ namespace pGina.CredentialProvider.Registration
                 }
                 else
                 {
-                    Console.Error.WriteLine("Credential Provider is not installed.");
-                    return;
+                    Console.Error.WriteLine("WARNING: No credential provider registry entry found for that GUID.");
                 }
             }
 
@@ -230,8 +229,7 @@ namespace pGina.CredentialProvider.Registration
                     }
                     else
                     {
-                        Console.Error.WriteLine("32 bit Credential Provider is not installed.");
-                        return;
+                        Console.Error.WriteLine("WARNING: No 32-bit registry entry found with that GUID.");
                     }
                 }
             }
@@ -253,8 +251,7 @@ namespace pGina.CredentialProvider.Registration
                 }
                 else
                 {
-                    Console.Error.WriteLine("Credential Provider is not installed.");
-                    return;
+                    Console.Error.WriteLine("WARNING: Did not find a registry entry for that GUID.");
                 }
             }
 
@@ -271,8 +268,7 @@ namespace pGina.CredentialProvider.Registration
                     }
                     else
                     {
-                        Console.Error.WriteLine("32 bit Credential Provider is not installed.");
-                        return;
+                        Console.Error.WriteLine("WARNING: Did not find a (32 bit) registry entry for that GUID.");
                     }
                 }
             }
