@@ -569,6 +569,7 @@ namespace pGina.Configuration
             this.SavePluginOrder();
 
             Core.Settings.Get.TileImage = m_tileImageTxt.Text;
+            this.LoadTileImagePreview();
             Settings.Get.Motd = this.motdTB.Text.Trim();
         }
 
