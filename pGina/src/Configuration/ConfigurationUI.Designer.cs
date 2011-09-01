@@ -248,7 +248,7 @@
             // 
             // m_tileImagePreview
             // 
-            this.m_tileImagePreview.Image = global::pGina.Configuration.Properties.Resources.pginalogo;
+            this.m_tileImagePreview.Image = ((System.Drawing.Image)(resources.GetObject("m_tileImagePreview.Image")));
             this.m_tileImagePreview.Location = new System.Drawing.Point(591, 17);
             this.m_tileImagePreview.Name = "m_tileImagePreview";
             this.m_tileImagePreview.Size = new System.Drawing.Size(130, 130);
@@ -963,6 +963,7 @@
             // 
             // m_tileImage
             // 
+            this.m_tileImage.Image = global::pGina.Configuration.Properties.Resources.pginalogo;
             this.m_tileImage.Location = new System.Drawing.Point(121, 21);
             this.m_tileImage.Name = "m_tileImage";
             this.m_tileImage.Size = new System.Drawing.Size(130, 130);

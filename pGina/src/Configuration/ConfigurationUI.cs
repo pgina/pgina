@@ -995,11 +995,18 @@ namespace pGina.Configuration
             {
                 try
                 {
-                    m_tileImage.Image = new Bitmap(m_tileImageTxt.Text);
+                    if (String.IsNullOrEmpty(m_tileImageTxt.Text.Trim()))
+                    {
+                        m_tileImage.Image = pGina.Configuration.Properties.Resources.pginalogo;
+                    }
+                    else
+                    {
+                        m_tileImage.Image = new Bitmap(m_tileImageTxt.Text);
+                    }
                 }
                 catch (Exception)
                 {
-                    m_tileImage.Image = null;
+                    m_tileImage.Image = pGina.Configuration.Properties.Resources.pginalogo;
                 }
 
                 m_lblAuthorizeResult.Text = null;
