@@ -30,11 +30,21 @@
 #include "ProviderGuid.h"
 #include "ClassFactory.h"
 
-// Handle to dll hinstance available for everyone globally
-HINSTANCE g_dllHandle = NULL; 
+// Handle to dll hinstance available for everyone globally via GetMy*()
+static HINSTANCE g_dllHandle = NULL; 
 
 // Internal refernce count for dll
 static long internal_dllRefCount = 0;   
+
+HINSTANCE GetMyInstance()
+{
+	return g_dllHandle;
+}
+
+HMODULE GetMyModule() 
+{
+	return (HMODULE) g_dllHandle;
+}
 
 // Dll loaded entry point
 BOOL WINAPI DllMain(__in HINSTANCE hDll, __in DWORD dwReason, __in void * reserved)
@@ -44,10 +54,13 @@ BOOL WINAPI DllMain(__in HINSTANCE hDll, __in DWORD dwReason, __in void * reserv
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hDll);
         break;
-    case DLL_PROCESS_DETACH:
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
+    case DLL_PROCESS_DETACH:    
         break;
+	// No thread attach/detach will be signaled, as we called DisableThreadLibraryCalls, 
+	// cases included here for completeness in enum values only!
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+		break;
     }
     
     g_dllHandle = hDll;

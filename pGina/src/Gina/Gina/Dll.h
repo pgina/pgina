@@ -28,10 +28,5 @@
 
 #include <Windows.h>
 
-// Instances of classes in this dll should inc/dec our
-//	reference count to avoid the dll being unloaded beneath them.
-void AddDllReference();
-void ReleaseDllReference();
-
 HINSTANCE GetMyInstance();
-HMODULE GetMyModule();
+HMODULE   GetMyModule();

@@ -24,14 +24,38 @@
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#pragma once
+#include <windows.h>
 
-#include <Windows.h>
+// Handle to dll hinstance available for everyone globally via GetMy*()
+static HINSTANCE g_dllHandle = NULL; 
 
-// Instances of classes in this dll should inc/dec our
-//	reference count to avoid the dll being unloaded beneath them.
-void AddDllReference();
-void ReleaseDllReference();
+HINSTANCE GetMyInstance()
+{
+	return g_dllHandle;
+}
 
-HINSTANCE GetMyInstance();
-HMODULE GetMyModule();
+HMODULE GetMyModule() 
+{
+	return (HMODULE) g_dllHandle;
+}
+
+// Dll loaded entry point
+BOOL WINAPI DllMain(__in HINSTANCE hDll, __in DWORD dwReason, __in void * reserved)
+{
+    switch (dwReason)
+    {
+    case DLL_PROCESS_ATTACH:
+        DisableThreadLibraryCalls(hDll);
+        break;
+    case DLL_PROCESS_DETACH:    
+        break;
+	// No thread attach/detach will be signaled, as we called DisableThreadLibraryCalls, 
+	// cases included here for completeness in enum values only!
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+		break;
+    }
+    
+    g_dllHandle = hDll;
+    return TRUE;
+}
