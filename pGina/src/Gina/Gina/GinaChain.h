@@ -29,19 +29,23 @@
 #include <Windows.h>
 
 #include "Gina.h"
+#include "Winlogon.h"
+#include "WinlogonProxy.h"
 
 namespace pGina
 {
 	namespace GINA
 	{
 		// Gina implementation that loads another gina dll that hooks 
-		//	(and stubs) msgina.dll for customization (ui etc).
-		class GinaChain : public Gina
+		//	(and stubs) msgina.dll for customization (ui etc).  We are both
+		//  a Gina() interface (for winlogon) and a WinlogonProxy (for our 
+		//  chained GINA).
+		class GinaChain : public Gina, public WinlogonProxy
 		{
 		public:
 			static bool Initialize(HANDLE hWlx, void * pWinlogonFunctions, Gina **context);
 
-			GinaChain(WinlogonInterface *pWinLogonIface) : Gina(pWinLogonIface) {}
+			GinaChain(WinlogonInterface *pWinLogonIface);
 
 			// Queries from winlogon
 			virtual bool IsLockOk();
@@ -72,9 +76,8 @@ namespace pGina
 			virtual bool ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOID pEnvironment);
 			virtual bool StartApplication(PWSTR pszDesktopName, PVOID pEnvironment, PWSTR pszCmdLine);
 			virtual bool NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo);		
-
+		
 		private:
-			WinlogonInterface * m_winlogon;
 		};
 	}
 }

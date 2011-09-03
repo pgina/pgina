@@ -58,5 +58,14 @@ namespace pGina
 			m_winlogon(pWinLogonIface)
 		{
 		}
+
+		Gina::~Gina()
+		{
+			if(m_winlogon)
+			{
+				delete m_winlogon;
+				m_winlogon = NULL;
+			}
+		}
 	}
 }

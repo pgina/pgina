@@ -30,6 +30,8 @@
 #include "Gina.h"
 #include "Winlogon.h"
 
+#define pGINA_FROM_CTX(context) pGina::GINA::Gina * pGina = static_cast<pGina::GINA::Gina *>(context)
+
 /**
   Winlogon and a GINA DLL use this function to determine which version of the interface each
   	was written for.
@@ -100,6 +102,8 @@ BOOL WINAPI WlxInitialize(LPWSTR lpWinsta, HANDLE hWlx, PVOID pvReserved, PVOID 
  */
 VOID WINAPI WlxDisplaySASNotice(PVOID pWlxContext) 
 {
+	pGINA_FROM_CTX(pWlxContext);
+	pGina->DisplaySASNotice();
 }
 
 /**
@@ -151,7 +155,8 @@ int WINAPI WlxLoggedOutSAS(PVOID pWlxContext, DWORD dwSasType, PLUID pAuthentica
 						   PDWORD pdwOptions, PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile) 
 {
 
-	return WLX_SAS_ACTION_NONE;
+	pGINA_FROM_CTX(pWlxContext);
+	return pGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);	
 }
 
 /**
@@ -182,7 +187,8 @@ int WINAPI WlxLoggedOutSAS(PVOID pWlxContext, DWORD dwSasType, PLUID pAuthentica
 */
 BOOL WINAPI WlxActivateUserShell(PVOID pWlxContext, PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOID pEnvironment) 
 {
-	return FALSE;
+	pGINA_FROM_CTX(pWlxContext);
+	return (pGina->ActivateUserShell(pszDesktopName, pszMprLogonScript, pEnvironment) ? TRUE : FALSE);	
 }
 
 /**
@@ -216,7 +222,8 @@ BOOL WINAPI WlxActivateUserShell(PVOID pWlxContext, PWSTR pszDesktopName, PWSTR 
 */
 int WINAPI WlxLoggedOnSAS(PVOID pWlxContext, DWORD dwSasType, PVOID pReserved) 
 {
-	return WLX_SAS_ACTION_NONE;
+	pGINA_FROM_CTX(pWlxContext);
+	return pGina->LoggedOnSAS(dwSasType, pReserved);
 }
 
 /**
@@ -231,6 +238,8 @@ int WINAPI WlxLoggedOnSAS(PVOID pWlxContext, DWORD dwSasType, PVOID pReserved)
 */
 VOID WINAPI WlxDisplayLockedNotice(PVOID pWlxContext) 
 {
+	pGINA_FROM_CTX(pWlxContext);
+	pGina->DisplayLockedNotice();
 }
 
 /**
@@ -245,7 +254,8 @@ VOID WINAPI WlxDisplayLockedNotice(PVOID pWlxContext)
 */
 BOOL WINAPI WlxIsLockOk(PVOID pWlxContext) 
 {	
-	return FALSE;
+	pGINA_FROM_CTX(pWlxContext);
+	return (pGina->IsLockOk() ? TRUE : FALSE);
 }
 
 /**
@@ -268,7 +278,8 @@ BOOL WINAPI WlxIsLockOk(PVOID pWlxContext)
 */
 int WINAPI WlxWkstaLockedSAS(PVOID pWlxContext, DWORD dwSasType) 
 {
-	return WLX_SAS_ACTION_NONE;
+	pGINA_FROM_CTX(pWlxContext);
+	return pGina->WkstaLockedSAS(dwSasType);
 }
 
 /**
@@ -283,7 +294,8 @@ int WINAPI WlxWkstaLockedSAS(PVOID pWlxContext, DWORD dwSasType)
 */
 BOOL WINAPI WlxIsLogoffOk(PVOID pWlxContext) 
 {
-	return FALSE;
+	pGINA_FROM_CTX(pWlxContext);
+	return (pGina->IsLogoffOk() ? TRUE : FALSE);
 }
 
 /**
@@ -299,6 +311,8 @@ BOOL WINAPI WlxIsLogoffOk(PVOID pWlxContext)
 */
 VOID WINAPI WlxLogoff(PVOID pWlxContext) 
 {
+	pGINA_FROM_CTX(pWlxContext);
+	pGina->Logoff();
 }
 
 /**
@@ -316,6 +330,8 @@ VOID WINAPI WlxLogoff(PVOID pWlxContext)
 */
 VOID WINAPI WlxShutdown(PVOID pWlxContext, DWORD ShutdownType) 
 {
+	pGINA_FROM_CTX(pWlxContext);
+	pGina->Shutdown(ShutdownType);
 }
 
 /**
@@ -334,7 +350,8 @@ VOID WINAPI WlxShutdown(PVOID pWlxContext, DWORD ShutdownType)
 */
 BOOL WINAPI WlxScreenSaverNotify(PVOID  pWlxContext, BOOL * pSecure) 
 {
-	return FALSE;
+	pGINA_FROM_CTX(pWlxContext);
+	return (pGina->ScreenSaverNotify(pSecure) ? TRUE: FALSE);
 }
 
 /**
@@ -365,7 +382,8 @@ BOOL WINAPI WlxScreenSaverNotify(PVOID  pWlxContext, BOOL * pSecure)
 */
 BOOL WINAPI WlxStartApplication(PVOID pWlxContext, PWSTR pszDesktopName, PVOID pEnvironment, PWSTR pszCmdLine) 
 {
-	return FALSE;
+	pGINA_FROM_CTX(pWlxContext);
+	return (pGina->StartApplication(pszDesktopName, pEnvironment, pszCmdLine) ? TRUE : FALSE);
 }
 
 /**
@@ -385,7 +403,8 @@ BOOL WINAPI WlxStartApplication(PVOID pWlxContext, PWSTR pszDesktopName, PVOID p
 */
 BOOL WINAPI WlxNetworkProviderLoad(PVOID pWlxContext, PWLX_MPR_NOTIFY_INFO pNprNotifyInfo) 
 {
-	return FALSE;
+	pGINA_FROM_CTX(pWlxContext);
+	return (pGina->NetworkProviderLoad(pNprNotifyInfo) ? TRUE : FALSE);
 }
 
 /**
@@ -406,7 +425,8 @@ BOOL WINAPI WlxNetworkProviderLoad(PVOID pWlxContext, PWLX_MPR_NOTIFY_INFO pNprN
 */
 BOOL WINAPI WlxDisplayStatusMessage(PVOID pWlxContext, HDESK hDesktop, DWORD dwOptions, PWSTR pTitle, PWSTR pMessage) 
 {
-	return FALSE;
+	pGINA_FROM_CTX(pWlxContext);
+	return (pGina->DisplayStatusMessage(hDesktop, dwOptions, pTitle, pMessage) ? TRUE : FALSE);
 }
 
 /**
@@ -424,7 +444,8 @@ BOOL WINAPI WlxDisplayStatusMessage(PVOID pWlxContext, HDESK hDesktop, DWORD dwO
 */
 BOOL WINAPI WlxGetStatusMessage(PVOID   pWlxContext, DWORD * pdwOptions, PWSTR   pMessage, DWORD   dwBufferSize) 
 {
-	return FALSE;
+	pGINA_FROM_CTX(pWlxContext);
+	return (pGina->GetStatusMessage(pdwOptions, pMessage, dwBufferSize) ? TRUE : FALSE);
 }
 
 /**
@@ -439,7 +460,8 @@ BOOL WINAPI WlxGetStatusMessage(PVOID   pWlxContext, DWORD * pdwOptions, PWSTR  
 */
 BOOL WINAPI WlxRemoveStatusMessage(PVOID pWlxContext) 
 {
-	return FALSE;
+	pGINA_FROM_CTX(pWlxContext);
+	return (pGina->RemoveStatusMessage() ? TRUE : FALSE);
 }
 
 /**
@@ -447,6 +469,8 @@ BOOL WINAPI WlxRemoveStatusMessage(PVOID pWlxContext)
 */
 VOID WINAPI WlxReconnectNotify(PVOID pWlxContext) 
 {
+	pGINA_FROM_CTX(pWlxContext);
+	pGina->ReconnectNotify();
 }
 
 /**
@@ -454,6 +478,8 @@ VOID WINAPI WlxReconnectNotify(PVOID pWlxContext)
 */
 VOID WINAPI WlxDisconnectNotify(PVOID pWlxContext) 
 {	
+	pGINA_FROM_CTX(pWlxContext);
+	pGina->DisconnectNotify();
 }
 
 /**
@@ -467,5 +493,6 @@ VOID WINAPI WlxDisconnectNotify(PVOID pWlxContext)
 */
 BOOL WINAPI WlxGetConsoleSwitchCredentials(PVOID  pWlxContext, PVOID  pCredInfo) 
 {
-	return FALSE;
+	pGINA_FROM_CTX(pWlxContext);
+	return (pGina->GetConsoleSwitchCredentials(pCredInfo) ? TRUE : FALSE);
 }

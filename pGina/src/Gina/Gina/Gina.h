@@ -71,6 +71,8 @@ namespace pGina
 			virtual bool StartApplication(PWSTR pszDesktopName, PVOID pEnvironment, PWSTR pszCmdLine) = 0;
 			virtual bool NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo) = 0;						
 
+			virtual ~Gina();
+
 		protected:
 			WinlogonInterface * m_winlogon;
 		};

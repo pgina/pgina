@@ -29,11 +29,25 @@
 #include <Windows.h>
 
 #include "GinaChain.h"
+#include "WinlogonRouter.h"
 
 namespace pGina
 {
 	namespace GINA
 	{
+		GinaChain::GinaChain(WinlogonInterface *pWinLogonIface) : 
+			Gina(pWinLogonIface), WinlogonProxy(pWinLogonIface) 
+		{
+			// When we use the winlogon router table, we want it to 
+			//	direct all winlogon calls to us (via our WinlogonProxy 
+			//	implementation).  We sit between winlogon and a real
+			//	GINA, so our Gina interface let's us have first shot
+			//	at Winlogon->Gina direction calls, and WinlogonRouter+
+			//	WinlogonProxy let's us have first shot at Gina->Winlogon
+			//	direction traffic.
+			WinlogonRouter::Interface(this);
+		}
+
 		// Queries from winlogon
 		bool GinaChain::IsLockOk()
 		{
@@ -130,6 +144,6 @@ namespace pGina
 		bool GinaChain::NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo)
 		{
 			return false;
-		}
+		}							
 	}
 }

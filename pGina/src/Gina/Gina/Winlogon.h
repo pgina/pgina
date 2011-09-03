@@ -39,11 +39,7 @@ namespace pGina
 		public:
 			static DWORD Version() { return s_winlogonVersion; }
 			static void  Version(DWORD v) { s_winlogonVersion = v; }
-
-		protected:
-			// No public constructor, only a Real or Test impl should be created
-			WinlogonInterface() {}			
-
+		
 			// Winlogon functions
 			virtual void WlxUseCtrlAltDel() = 0;
 			virtual void WlxSetContextPointer(void *newContext) = 0;
@@ -72,6 +68,10 @@ namespace pGina
 			virtual int  WlxQueryTerminalServicesData(PWLX_TERMINAL_SERVICES_DATA pTSData, WCHAR *UserName, WCHAR *Domain) = 0;
 			virtual int  WlxQueryConsoleSwitchCredentials(PWLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0 pCred) = 0;
 			virtual bool WlxQueryTsLogonCredentials(PWLX_CLIENT_CREDENTIALS_INFO_V2_0 pCred) = 0;
+
+		protected:
+			// No public constructor, only a Real or Test impl should be created
+			WinlogonInterface() {}			
 
 		private:
 			static DWORD s_winlogonVersion;
