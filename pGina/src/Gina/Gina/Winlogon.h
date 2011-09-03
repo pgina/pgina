@@ -27,11 +27,13 @@
 #pragma once
 
 #include <Windows.h>
+#include <WinWlx.h>
 
 namespace pGina
 {
 	namespace GINA
 	{
+		// Base class for wrapping up interaction with winlogon via it's dispatch table
 		class WinlogonInterface
 		{
 		public:
@@ -41,28 +43,38 @@ namespace pGina
 		protected:
 			// No public constructor, only a Real or Test impl should be created
 			WinlogonInterface() {}			
-		
+
+			// Winlogon functions
+			virtual void WlxUseCtrlAltDel() = 0;
+			virtual void WlxSetContextPointer(void *newContext) = 0;
+			virtual void WlxSasNotify(DWORD sas) = 0;
+			virtual bool WlxSetTimeout(DWORD newTimeout) = 0;
+			virtual int  WlxAssignShellProtection(HANDLE token, HANDLE process, HANDLE thread) = 0;
+			virtual int  WlxMessageBox(HWND owner, LPWSTR title, LPWSTR text, UINT style) = 0;
+			virtual int  WlxDialogBox(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc) = 0;
+			virtual int  WlxDialogBoxParam(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam) = 0;
+			virtual int  WlxDialogBoxIndirect(HANDLE hInst, LPCDLGTEMPLATE hDialogTemplate, HWND hwndOwner, DLGPROC dlgprc) = 0;
+			virtual int  WlxDialogBoxIndirectParam(HANDLE hInst, LPCDLGTEMPLATE hDialogTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam) = 0;
+			virtual int  WlxSwitchDesktopToUser() = 0;
+			virtual int  WlxSwitchDesktopToWinlogon() = 0;
+			virtual int  WlxChangePasswordNotify(PWLX_MPR_NOTIFY_INFO pMprInfo, DWORD dwChangeInfo) = 0;
+			virtual bool WlxGetSourceDesktop(PWLX_DESKTOP *ppDesktop) = 0;
+			virtual bool WlxSetReturnDesktop(PWLX_DESKTOP pDesktop) = 0;
+			virtual bool WlxCreateUserDesktop(HANDLE hToken, DWORD Flags, PWSTR pszDesktopName, PWLX_DESKTOP *ppDesktop) = 0;
+			virtual int  WlxChangePasswordNotifyEx(PWLX_MPR_NOTIFY_INFO pMprInfo, DWORD dwChangeInfo, PWSTR ProviderName, PVOID Reserved) = 0;
+			virtual bool WlxCloseUserDesktop(PWLX_DESKTOP pDesktop, HANDLE hToken) = 0;
+			virtual bool WlxSetOption(DWORD Option, ULONG_PTR Value, ULONG_PTR *OldValue) = 0;
+			virtual bool WlxGetOption(DWORD Option, ULONG_PTR *Value) = 0;
+			virtual void WlxWin31Migrate() = 0;
+			virtual bool WlxQueryClientCredentials(PWLX_CLIENT_CREDENTIALS_INFO_V1_0 pCred) = 0;
+			virtual bool WlxQueryInetConnectorCredentials(PWLX_CLIENT_CREDENTIALS_INFO_V1_0 pCred) = 0;
+			virtual bool WlxDisconnect() = 0;
+			virtual int  WlxQueryTerminalServicesData(PWLX_TERMINAL_SERVICES_DATA pTSData, WCHAR *UserName, WCHAR *Domain) = 0;
+			virtual int  WlxQueryConsoleSwitchCredentials(PWLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0 pCred) = 0;
+			virtual bool WlxQueryTsLogonCredentials(PWLX_CLIENT_CREDENTIALS_INFO_V2_0 pCred) = 0;
+
 		private:
 			static DWORD s_winlogonVersion;
-		};
-
-		class RealWinlogonInterface : public WinlogonInterface
-		{
-		public:
-			RealWinlogonInterface(HANDLE hWlx, void * pWinlogonFuncTable) :
-				m_hWlx(hWlx), m_pFuncTable(pWinlogonFuncTable)	 {}			
-
-		private:
-			HANDLE m_hWlx;
-			void * m_pFuncTable;
-		};
-
-		class DebugWinlogonInterface : public WinlogonInterface
-		{
-		public:
-			DebugWinlogonInterface() {}
-
-		private:			
 		};
 	}
 }

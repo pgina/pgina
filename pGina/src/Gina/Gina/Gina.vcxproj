@@ -158,10 +158,14 @@
     <ClCompile Include="Gina.cpp" />
     <ClCompile Include="GinaExports.cpp" />
     <ClCompile Include="Winlogon.cpp" />
+    <ClCompile Include="WinlogonDebug.cpp" />
+    <ClCompile Include="WinlogonReal.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dll.h" />
     <ClInclude Include="Gina.h" />
+    <ClInclude Include="WinlogonDebug.h" />
+    <ClInclude Include="WinlogonReal.h" />
     <ClInclude Include="Winlogon.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

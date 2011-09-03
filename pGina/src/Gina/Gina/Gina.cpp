@@ -25,6 +25,8 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "Gina.h"
+#include "WinlogonDebug.h"
+#include "WinlogonReal.h"
 
 namespace pGina
 {
@@ -32,12 +34,11 @@ namespace pGina
 	{
 		static WinlogonInterface * WinlogonInterfaceFactory(HANDLE hWlx, void * pFuncs)
 		{
-#if _DEBUG
-			// In debug only, if hWlx == NULL || pFuncs is null, then we
+			// If hWlx == NULL || pFuncs is null, then we
 			//	create a winlogon interface that is fake for testing purposes.
 			if(hWlx == NULL || pFuncs == NULL)			
 				return new DebugWinlogonInterface();			
-#endif
+
 			return new RealWinlogonInterface(hWlx, pFuncs);
 		}
 

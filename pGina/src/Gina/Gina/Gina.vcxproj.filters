@@ -32,6 +32,12 @@
     <ClCompile Include="Gina.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WinlogonReal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WinlogonDebug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dll.h">
@@ -41,6 +47,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Winlogon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WinlogonReal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WinlogonDebug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
