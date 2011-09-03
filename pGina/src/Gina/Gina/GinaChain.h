@@ -28,50 +28,52 @@
 
 #include <Windows.h>
 
-#include "Winlogon.h"
+#include "Gina.h"
 
 namespace pGina
 {
 	namespace GINA
 	{
-		class Gina
+		// Gina implementation that loads another gina dll that hooks 
+		//	(and stubs) msgina.dll for customization (ui etc).
+		class GinaChain : public Gina
 		{
 		public:
 			static bool Initialize(HANDLE hWlx, void * pWinlogonFunctions, Gina **context);
 
-			Gina(WinlogonInterface *pWinLogonIface);
+			GinaChain(WinlogonInterface *pWinLogonIface) : Gina(pWinLogonIface) {}
 
 			// Queries from winlogon
-			virtual bool IsLockOk() = 0;
-			virtual bool IsLogoffOk() = 0;
-			virtual bool GetConsoleSwitchCredentials(PVOID pCredInfo) = 0;
+			virtual bool IsLockOk();
+			virtual bool IsLogoffOk();
+			virtual bool GetConsoleSwitchCredentials(PVOID pCredInfo);
 
 			// Notifications from winlogon
-			virtual void ReconnectNotify() = 0;
-			virtual void DisconnectNotify() = 0;
-			virtual void Logoff() = 0;
-			virtual bool ScreenSaverNotify(BOOL * pSecure) = 0;
-			virtual void Shutdown(DWORD ShutdownType) = 0;
+			virtual void ReconnectNotify();
+			virtual void DisconnectNotify();
+			virtual void Logoff();
+			virtual bool ScreenSaverNotify(BOOL * pSecure);
+			virtual void Shutdown(DWORD ShutdownType);
 
 			// Notices/Status messages
-			virtual void DisplaySASNotice() = 0;
-			virtual void DisplayLockedNotice() = 0;
-			virtual bool DisplayStatusMessage(HDESK hDesktop, DWORD dwOptions, PWSTR pTitle, PWSTR pMessage) = 0;
-			virtual bool GetStatusMessage(DWORD * pdwOptions, PWSTR pMessage, DWORD dwBufferSize) = 0;
-			virtual bool RemoveStatusMessage() = 0;					
+			virtual void DisplaySASNotice();
+			virtual void DisplayLockedNotice();
+			virtual bool DisplayStatusMessage(HDESK hDesktop, DWORD dwOptions, PWSTR pTitle, PWSTR pMessage);
+			virtual bool GetStatusMessage(DWORD * pdwOptions, PWSTR pMessage, DWORD dwBufferSize);
+			virtual bool RemoveStatusMessage();						
 			
 			// SAS handling
 			virtual int  LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, 
-								 	  PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile) = 0;			
-			virtual int  LoggedOnSAS(DWORD dwSasType, PVOID pReserved) = 0;			
-			virtual int  WkstaLockedSAS(DWORD dwSasType) = 0;
+									 PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile);
+			virtual int  LoggedOnSAS(DWORD dwSasType, PVOID pReserved);
+			virtual int  WkstaLockedSAS(DWORD dwSasType);
 			
 			// Things to do when winlogon says to...
-			virtual bool ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOID pEnvironment) = 0;			
-			virtual bool StartApplication(PWSTR pszDesktopName, PVOID pEnvironment, PWSTR pszCmdLine) = 0;
-			virtual bool NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo) = 0;						
+			virtual bool ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOID pEnvironment);
+			virtual bool StartApplication(PWSTR pszDesktopName, PVOID pEnvironment, PWSTR pszCmdLine);
+			virtual bool NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo);		
 
-		protected:
+		private:
 			WinlogonInterface * m_winlogon;
 		};
 	}

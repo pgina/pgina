@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="Dll.cpp" />
     <ClCompile Include="Gina.cpp" />
+    <ClCompile Include="GinaChain.cpp" />
     <ClCompile Include="GinaExports.cpp" />
     <ClCompile Include="Winlogon.cpp" />
     <ClCompile Include="WinlogonDebug.cpp" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="Dll.h" />
     <ClInclude Include="Gina.h" />
+    <ClInclude Include="GinaChain.h" />
     <ClInclude Include="WinlogonDebug.h" />
     <ClInclude Include="WinlogonReal.h" />
     <ClInclude Include="Winlogon.h" />

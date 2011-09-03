@@ -25,8 +25,10 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "Gina.h"
+
 #include "WinlogonDebug.h"
 #include "WinlogonReal.h"
+#include "GinaChain.h"	// Currently this is the only GINA type supported
 
 namespace pGina
 {
@@ -48,7 +50,7 @@ namespace pGina
 			// Create a winlogon interface class, and a Gina class, and pair them
 			//  the result becomes our context, which Winlogon will give us on all
 			//  calls.
-			*context = new Gina(WinlogonInterfaceFactory(hWlx, pWinlogonFunctions));			
+			*context = new GinaChain(WinlogonInterfaceFactory(hWlx, pWinlogonFunctions));			
 			return true;
 		}
 

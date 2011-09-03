@@ -469,5 +469,3 @@ BOOL WINAPI WlxGetConsoleSwitchCredentials(PVOID  pWlxContext, PVOID  pCredInfo)
 {
 	return FALSE;
 }
-
-
