@@ -37,7 +37,7 @@ namespace pGina
 		class Gina
 		{
 		public:
-			static bool Initialize(HANDLE hWlx, void * pWinlogonFunctions, Gina **context);
+			static bool InitializeFactory(HANDLE hWlx, void * pWinlogonFunctions, Gina **context);
 
 			Gina(WinlogonInterface *pWinLogonIface);
 
@@ -73,7 +73,7 @@ namespace pGina
 
 			virtual ~Gina();
 
-		protected:
+		protected:			
 			WinlogonInterface * m_winlogon;
 		};
 	}

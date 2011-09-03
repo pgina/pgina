@@ -43,8 +43,6 @@ namespace pGina
 		class GinaChain : public Gina, public WinlogonProxy
 		{
 		public:
-			static bool Initialize(HANDLE hWlx, void * pWinlogonFunctions, Gina **context);
-
 			GinaChain(WinlogonInterface *pWinLogonIface);
 
 			// Queries from winlogon

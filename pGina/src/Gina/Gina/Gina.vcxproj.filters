@@ -44,6 +44,9 @@
     <ClCompile Include="WinlogonRouter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GinaWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dll.h">
@@ -68,6 +71,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WinlogonProxy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GinaWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

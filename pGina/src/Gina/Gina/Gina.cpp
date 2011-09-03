@@ -45,7 +45,7 @@ namespace pGina
 		}
 
 		/*static*/
-		bool Gina::Initialize(HANDLE hWlx, void * pWinlogonFunctions, Gina **context)
+		bool Gina::InitializeFactory(HANDLE hWlx, void * pWinlogonFunctions, Gina **context)
 		{
 			// Create a winlogon interface class, and a Gina class, and pair them
 			//  the result becomes our context, which Winlogon will give us on all

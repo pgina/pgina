@@ -85,7 +85,7 @@ BOOL WINAPI WlxNegotiate(DWORD dwWinlogonVersion, DWORD *pdwDllVersion)
  */
 BOOL WINAPI WlxInitialize(LPWSTR lpWinsta, HANDLE hWlx, PVOID pvReserved, PVOID pWinlogonFunctions, PVOID * pWlxContext) 
 {
-	return (pGina::GINA::Gina::Initialize(hWlx, pWinlogonFunctions, (pGina::GINA::Gina **) pWlxContext) ? TRUE : FALSE);
+	return (pGina::GINA::Gina::InitializeFactory(hWlx, pWinlogonFunctions, (pGina::GINA::Gina **) pWlxContext) ? TRUE : FALSE);
 }
 
 
@@ -332,6 +332,9 @@ VOID WINAPI WlxShutdown(PVOID pWlxContext, DWORD ShutdownType)
 {
 	pGINA_FROM_CTX(pWlxContext);
 	pGina->Shutdown(ShutdownType);
+
+	// As noted by Keith Brown in his article, it turns out we can still get calls even after this is done,
+	//	so we leak our Gina * class JIC.  We're on our way out anyway, so this isn't a concern in the long term.
 }
 
 /**
