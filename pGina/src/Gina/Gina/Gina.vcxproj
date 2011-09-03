@@ -155,10 +155,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Dll.cpp" />
+    <ClCompile Include="Gina.cpp" />
     <ClCompile Include="GinaExports.cpp" />
+    <ClCompile Include="Winlogon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dll.h" />
+    <ClInclude Include="Gina.h" />
+    <ClInclude Include="Winlogon.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

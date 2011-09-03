@@ -27,6 +27,9 @@
 #include <windows.h>
 #include <winwlx.h>
 
+#include "Gina.h"
+#include "Winlogon.h"
+
 /**
   Winlogon and a GINA DLL use this function to determine which version of the interface each
   	was written for.
@@ -39,7 +42,16 @@
  */ 			 
 BOOL WINAPI WlxNegotiate(DWORD dwWinlogonVersion, DWORD *pdwDllVersion) 
 {	
-	return FALSE;
+	// We support all versions from 1.3 up
+	if(dwWinlogonVersion < WLX_VERSION_1_3)
+		return FALSE;
+
+	// We'll support what winlogon does
+	*pdwDllVersion = dwWinlogonVersion;
+
+	// Record winlogon version
+	pGina::GINA::WinlogonInterface::Version(dwWinlogonVersion);
+	return true;
 }
 
 /**
@@ -69,9 +81,9 @@ BOOL WINAPI WlxNegotiate(DWORD dwWinlogonVersion, DWORD *pdwDllVersion)
 			False - Indicates the Gina could not successfully initialize.\n
 			<i>Note that If the DLL could not initialize, then the system will not boot.<i>
  */
-BOOL WINAPI WlxInitialize(LPWSTR  lpWinsta, HANDLE  hWlx, PVOID   pvReserved, PVOID   pWinlogonFunctions, PVOID * pWlxContext) 
+BOOL WINAPI WlxInitialize(LPWSTR lpWinsta, HANDLE hWlx, PVOID pvReserved, PVOID pWinlogonFunctions, PVOID * pWlxContext) 
 {
-	return FALSE;
+	return (pGina::GINA::Gina::Initialize(hWlx, pWinlogonFunctions, (pGina::GINA::Gina **) pWlxContext) ? TRUE : FALSE);
 }
 
 

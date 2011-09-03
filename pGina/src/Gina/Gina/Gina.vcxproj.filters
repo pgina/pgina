@@ -26,9 +26,21 @@
     <ClCompile Include="GinaExports.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Winlogon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Gina.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Gina.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Winlogon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
