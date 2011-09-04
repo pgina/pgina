@@ -59,7 +59,7 @@ namespace pGina
 			static void WlxSasNotify(HANDLE hWlx, DWORD sas);
 			static bool WlxSetTimeout(HANDLE hWlx, DWORD newTimeout);
 			static int  WlxAssignShellProtection(HANDLE hWlx, HANDLE token, HANDLE process, HANDLE thread);
-			static int  WlxMessageBox(HANDLE hWlx, HWND owner, LPWSTR title, LPWSTR text, UINT style);
+			static int  WlxMessageBox(HANDLE hWlx, HWND owner, LPWSTR text, LPWSTR title, UINT style);
 			static int  WlxDialogBox(HANDLE hWlx, HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc);
 			static int  WlxDialogBoxParam(HANDLE hWlx, HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam);
 			static int  WlxDialogBoxIndirect(HANDLE hWlx, HANDLE hInst, LPCDLGTEMPLATE hDialogTemplate, HWND hwndOwner, DLGPROC dlgprc);

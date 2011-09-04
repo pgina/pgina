@@ -46,7 +46,7 @@ namespace pGina
 			virtual void WlxSasNotify(DWORD sas) = 0;
 			virtual bool WlxSetTimeout(DWORD newTimeout) = 0;
 			virtual int  WlxAssignShellProtection(HANDLE token, HANDLE process, HANDLE thread) = 0;
-			virtual int  WlxMessageBox(HWND owner, LPWSTR title, LPWSTR text, UINT style) = 0;
+			virtual int  WlxMessageBox(HWND owner, LPWSTR text, LPWSTR title, UINT style) = 0;
 			virtual int  WlxDialogBox(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc) = 0;
 			virtual int  WlxDialogBoxParam(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam) = 0;
 			virtual int  WlxDialogBoxIndirect(HANDLE hInst, LPCDLGTEMPLATE hDialogTemplate, HWND hwndOwner, DLGPROC dlgprc) = 0;

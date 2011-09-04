@@ -57,9 +57,9 @@ namespace pGina
 			return ((PWLX_DISPATCH_VERSION_1_3)m_pFuncTable)->WlxAssignShellProtection(m_hWlx, token, process, thread);
 		}
 
-		int  RealWinlogonInterface::WlxMessageBox(HWND owner, LPWSTR title, LPWSTR text, UINT style)
+		int  RealWinlogonInterface::WlxMessageBox(HWND owner, LPWSTR text, LPWSTR title, UINT style)
 		{
-			return ((PWLX_DISPATCH_VERSION_1_3)m_pFuncTable)->WlxMessageBox(m_hWlx, owner, title, text, style);
+			return ((PWLX_DISPATCH_VERSION_1_3)m_pFuncTable)->WlxMessageBox(m_hWlx, owner, text, title, style);
 		}
 
 		int  RealWinlogonInterface::WlxDialogBox(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc)

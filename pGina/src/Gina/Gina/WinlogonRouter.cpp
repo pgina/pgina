@@ -102,10 +102,10 @@ namespace pGina
 		}
 
 		/*static*/ 
-		int  WinlogonRouter::WlxMessageBox(HANDLE hWlx, HWND owner, LPWSTR title, LPWSTR text, UINT style)
+		int  WinlogonRouter::WlxMessageBox(HANDLE hWlx, HWND owner, LPWSTR text, LPWSTR title, UINT style)
 		{
 			if(!s_interface) return -1;
-			return s_interface->WlxMessageBox(owner, title, text, style);
+			return s_interface->WlxMessageBox(owner, text, title, style);
 		}
 
 		/*static*/ 

@@ -46,7 +46,7 @@ namespace pGina
 
 		bool DebugWinlogonInterface::WlxSetTimeout(DWORD newTimeout)
 		{
-			return false;
+			return true;
 		}
 
 		int  DebugWinlogonInterface::WlxAssignShellProtection(HANDLE token, HANDLE process, HANDLE thread)
@@ -54,29 +54,29 @@ namespace pGina
 			return 0;
 		}
 
-		int  DebugWinlogonInterface::WlxMessageBox(HWND owner, LPWSTR title, LPWSTR text, UINT style)
+		int  DebugWinlogonInterface::WlxMessageBox(HWND owner, LPWSTR text, LPWSTR title, UINT style)
 		{
-			return 0;
+			return MessageBox(owner, text, title, style);
 		}
 
 		int  DebugWinlogonInterface::WlxDialogBox(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc)
 		{
-			return 0;
+			return (int) DialogBox((HINSTANCE) hInst, lpszTemplate, hwndOwner, dlgprc);
 		}
 
 		int  DebugWinlogonInterface::WlxDialogBoxParam(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam)
 		{
-			return 0;
+			return (int) DialogBoxParam((HINSTANCE) hInst, lpszTemplate, hwndOwner, dlgprc, dwInitParam);
 		}
 
 		int  DebugWinlogonInterface::WlxDialogBoxIndirect(HANDLE hInst, LPCDLGTEMPLATE hDialogTemplate, HWND hwndOwner, DLGPROC dlgprc)
 		{
-			return 0;
+			return (int) DialogBoxIndirect((HINSTANCE) hInst, hDialogTemplate, hwndOwner, dlgprc);
 		}
 
 		int  DebugWinlogonInterface::WlxDialogBoxIndirectParam(HANDLE hInst, LPCDLGTEMPLATE hDialogTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam)
 		{
-			return 0;
+			return (int) DialogBoxIndirectParam((HINSTANCE) hInst, hDialogTemplate, hwndOwner, dlgprc, dwInitParam);
 		}
 
 		int  DebugWinlogonInterface::WlxSwitchDesktopToUser()
@@ -101,7 +101,7 @@ namespace pGina
 
 		bool DebugWinlogonInterface::WlxSetReturnDesktop(PWLX_DESKTOP pDesktop)
 		{
-			return false;
+			return true;
 		}
 
 		bool DebugWinlogonInterface::WlxCreateUserDesktop(HANDLE hToken, DWORD Flags, PWSTR pszDesktopName, PWLX_DESKTOP *ppDesktop)
@@ -121,7 +121,7 @@ namespace pGina
 
 		bool DebugWinlogonInterface::WlxSetOption(DWORD Option, ULONG_PTR Value, ULONG_PTR *OldValue)
 		{
-			return false;
+			return true;
 		}
 
 		bool DebugWinlogonInterface::WlxGetOption(DWORD Option, ULONG_PTR *Value)

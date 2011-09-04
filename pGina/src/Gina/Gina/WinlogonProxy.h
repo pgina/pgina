@@ -49,7 +49,7 @@ namespace pGina
 			virtual void WlxSasNotify(DWORD sas) { m_iface->WlxSasNotify(sas); }
 			virtual bool WlxSetTimeout(DWORD newTimeout) { return m_iface->WlxSetTimeout(newTimeout); }
 			virtual int  WlxAssignShellProtection(HANDLE token, HANDLE process, HANDLE thread) { return m_iface->WlxAssignShellProtection(token, process, thread); }
-			virtual int  WlxMessageBox(HWND owner, LPWSTR title, LPWSTR text, UINT style) { return m_iface->WlxMessageBox(owner, title, text, style); }
+			virtual int  WlxMessageBox(HWND owner, LPWSTR text, LPWSTR title, UINT style) { return m_iface->WlxMessageBox(owner, text, title, style); }
 			virtual int  WlxDialogBox(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc) { return m_iface->WlxDialogBox(hInst, lpszTemplate, hwndOwner, dlgprc); }
 			virtual int  WlxDialogBoxParam(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam) { return m_iface->WlxDialogBoxParam(hInst, lpszTemplate, hwndOwner, dlgprc, dwInitParam); }
 			virtual int  WlxDialogBoxIndirect(HANDLE hInst, LPCDLGTEMPLATE hDialogTemplate, HWND hwndOwner, DLGPROC dlgprc) { return m_iface->WlxDialogBoxIndirect(hInst, hDialogTemplate, hwndOwner, dlgprc); }
