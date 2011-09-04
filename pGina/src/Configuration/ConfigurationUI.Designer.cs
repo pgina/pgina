@@ -29,11 +29,13 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigurationUI));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
+            this.servGB = new System.Windows.Forms.GroupBox();
+            this.servStatusLabel = new System.Windows.Forms.Label();
             this.motdGB = new System.Windows.Forms.GroupBox();
             this.label12 = new System.Windows.Forms.Label();
             this.motdTB = new System.Windows.Forms.TextBox();
@@ -116,8 +118,12 @@
             this.m_radioUseService = new System.Windows.Forms.RadioButton();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnOkay = new System.Windows.Forms.Button();
+            this.serviceStatusTB = new System.Windows.Forms.TextBox();
+            this.serviceStartBtn = new System.Windows.Forms.Button();
+            this.serviceStopBtn = new System.Windows.Forms.Button();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
+            this.servGB.SuspendLayout();
             this.motdGB.SuspendLayout();
             this.groupBox12.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_tileImagePreview)).BeginInit();
@@ -165,6 +171,7 @@
             // 
             // m_generalConfigTab
             // 
+            this.m_generalConfigTab.Controls.Add(this.servGB);
             this.m_generalConfigTab.Controls.Add(this.motdGB);
             this.m_generalConfigTab.Controls.Add(this.groupBox12);
             this.m_generalConfigTab.Location = new System.Drawing.Point(4, 22);
@@ -174,6 +181,28 @@
             this.m_generalConfigTab.TabIndex = 1;
             this.m_generalConfigTab.Text = "General";
             this.m_generalConfigTab.UseVisualStyleBackColor = true;
+            // 
+            // servGB
+            // 
+            this.servGB.Controls.Add(this.serviceStopBtn);
+            this.servGB.Controls.Add(this.serviceStartBtn);
+            this.servGB.Controls.Add(this.serviceStatusTB);
+            this.servGB.Controls.Add(this.servStatusLabel);
+            this.servGB.Location = new System.Drawing.Point(17, 271);
+            this.servGB.Name = "servGB";
+            this.servGB.Size = new System.Drawing.Size(236, 87);
+            this.servGB.TabIndex = 2;
+            this.servGB.TabStop = false;
+            this.servGB.Text = "pGina Service";
+            // 
+            // servStatusLabel
+            // 
+            this.servStatusLabel.AutoSize = true;
+            this.servStatusLabel.Location = new System.Drawing.Point(8, 22);
+            this.servStatusLabel.Name = "servStatusLabel";
+            this.servStatusLabel.Size = new System.Drawing.Size(40, 13);
+            this.servStatusLabel.TabIndex = 0;
+            this.servStatusLabel.Text = "Status:";
             // 
             // motdGB
             // 
@@ -305,33 +334,33 @@
             this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle16.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle16;
             this.pluginsDG.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle17.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle17;
             this.pluginsDG.Location = new System.Drawing.Point(10, 19);
             this.pluginsDG.Name = "pluginsDG";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle18.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle18.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle18;
             this.pluginsDG.Size = new System.Drawing.Size(735, 253);
             this.pluginsDG.TabIndex = 10;
             this.pluginsDG.DoubleClick += new System.EventHandler(this.pluginsDG_DoubleClick);
@@ -1081,6 +1110,34 @@
             this.btnOkay.UseVisualStyleBackColor = true;
             this.btnOkay.Click += new System.EventHandler(this.btnOkay_Click);
             // 
+            // serviceStatusTB
+            // 
+            this.serviceStatusTB.Location = new System.Drawing.Point(54, 19);
+            this.serviceStatusTB.Name = "serviceStatusTB";
+            this.serviceStatusTB.ReadOnly = true;
+            this.serviceStatusTB.Size = new System.Drawing.Size(166, 20);
+            this.serviceStatusTB.TabIndex = 1;
+            // 
+            // serviceStartBtn
+            // 
+            this.serviceStartBtn.Location = new System.Drawing.Point(54, 45);
+            this.serviceStartBtn.Name = "serviceStartBtn";
+            this.serviceStartBtn.Size = new System.Drawing.Size(80, 26);
+            this.serviceStartBtn.TabIndex = 2;
+            this.serviceStartBtn.Text = "Start";
+            this.serviceStartBtn.UseVisualStyleBackColor = true;
+            this.serviceStartBtn.Click += new System.EventHandler(this.serviceStartBtn_Click);
+            // 
+            // serviceStopBtn
+            // 
+            this.serviceStopBtn.Location = new System.Drawing.Point(140, 45);
+            this.serviceStopBtn.Name = "serviceStopBtn";
+            this.serviceStopBtn.Size = new System.Drawing.Size(80, 26);
+            this.serviceStopBtn.TabIndex = 3;
+            this.serviceStopBtn.Text = "Stop";
+            this.serviceStopBtn.UseVisualStyleBackColor = true;
+            this.serviceStopBtn.Click += new System.EventHandler(this.serviceStopBtn_Click);
+            // 
             // ConfigurationUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1093,6 +1150,8 @@
             this.Text = "pGina Configuration";
             this.m_tabs.ResumeLayout(false);
             this.m_generalConfigTab.ResumeLayout(false);
+            this.servGB.ResumeLayout(false);
+            this.servGB.PerformLayout();
             this.motdGB.ResumeLayout(false);
             this.motdGB.PerformLayout();
             this.groupBox12.ResumeLayout(false);
@@ -1216,5 +1275,10 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.TextBox motdTB;
         private System.Windows.Forms.Label motdLabel;
+        private System.Windows.Forms.GroupBox servGB;
+        private System.Windows.Forms.Label servStatusLabel;
+        private System.Windows.Forms.Button serviceStopBtn;
+        private System.Windows.Forms.Button serviceStartBtn;
+        private System.Windows.Forms.TextBox serviceStatusTB;
     }
 }

@@ -33,6 +33,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.ServiceProcess;
 
 using pGina.Core;
 using pGina.Core.Messages;
@@ -50,9 +51,14 @@ namespace pGina.Configuration
 {
     public partial class ConfigurationUI : Form
     {
+        private static readonly string PGINA_SERVICE_NAME = "pGina";
+
         // Plugin information keyed by Guid
         private Dictionary<string, IPluginBase> m_plugins = new Dictionary<string, IPluginBase>();
         private ILog m_logger = LogManager.GetLogger("ConfigurationUI");
+
+        private ServiceController m_pGinaServiceController = null;
+        private System.Timers.Timer m_serviceTimer = new System.Timers.Timer();
         
         private const string PLUGIN_UUID_COLUMN = "Uuid";
         private const string PLUGIN_VERSION_COLUMN = "Version";
@@ -82,6 +88,89 @@ namespace pGina.Configuration
             m_tileImageTxt.Text = Settings.Get.GetSetting("TileImage", null);
             LoadTileImagePreview();
             this.motdTB.Text = Settings.Get.GetSetting("Motd");
+
+            // Make sure that the pGina service is installed
+            foreach( ServiceController ctrl in ServiceController.GetServices() )
+            {
+                if (ctrl.ServiceName == PGINA_SERVICE_NAME)
+                {
+                    m_pGinaServiceController = ctrl;
+                    break;
+                }
+            }
+
+            // This works around an annoying aspect of the textbox where the foreground color
+            // can't be changed unless the background color is set.
+            this.serviceStatusTB.BackColor = Color.GhostWhite;
+
+            if (m_pGinaServiceController != null)
+            {
+                // Setup the timer that checks the service status periodically
+                m_serviceTimer.Interval = 1500;
+                m_serviceTimer.SynchronizingObject = this.serviceStatusTB;
+                m_serviceTimer.AutoReset = true;
+                m_serviceTimer.Elapsed += new System.Timers.ElapsedEventHandler(m_serviceTimer_Elapsed);
+                m_serviceTimer.Start();
+                UpdateServiceStatus();
+            }
+            else
+            {
+                this.serviceStatusTB.Text = "Not Installed";
+                this.serviceStopBtn.Enabled = false;
+                this.serviceStartBtn.Enabled = false;
+            }
+        }
+
+        private void UpdateServiceStatus()
+        {
+            m_pGinaServiceController.Refresh();
+            ServiceControllerStatus stat = m_pGinaServiceController.Status;
+            string statusStr = stat.ToString();
+            switch (stat)
+            {
+                case ServiceControllerStatus.Running:
+                    this.serviceStatusTB.ForeColor = Color.Green;
+                    this.serviceStopBtn.Enabled = true;
+                    this.serviceStartBtn.Enabled = false;
+                    statusStr = "Running";
+                    break;
+                case ServiceControllerStatus.ContinuePending:
+                    statusStr = "Continue pending...";
+                    this.serviceStatusTB.ForeColor = Color.Black;
+                    this.serviceStopBtn.Enabled = false;
+                    this.serviceStartBtn.Enabled = false;
+                    break;
+                case ServiceControllerStatus.PausePending:
+                    statusStr = "Pause pending...";
+                    this.serviceStatusTB.ForeColor = Color.Black;
+                    this.serviceStopBtn.Enabled = false;
+                    this.serviceStartBtn.Enabled = false;
+                    break;
+                case ServiceControllerStatus.StartPending:
+                    statusStr = "Starting...";
+                    this.serviceStatusTB.ForeColor = Color.Black;
+                    this.serviceStopBtn.Enabled = false;
+                    this.serviceStartBtn.Enabled = false;
+                    break;
+                case ServiceControllerStatus.StopPending:
+                    statusStr = "Stopping...";
+                    this.serviceStatusTB.ForeColor = Color.Black;
+                    this.serviceStopBtn.Enabled = false;
+                    this.serviceStartBtn.Enabled = false;
+                    break;
+                case ServiceControllerStatus.Paused:
+                    this.serviceStatusTB.ForeColor = Color.Black;
+                    this.serviceStopBtn.Enabled = true;
+                    this.serviceStartBtn.Enabled = true;
+                    break;
+                case ServiceControllerStatus.Stopped:
+                    statusStr = "Stopped";
+                    this.serviceStatusTB.ForeColor = Color.Red;
+                    this.serviceStopBtn.Enabled = false;
+                    this.serviceStartBtn.Enabled = true;
+                    break;
+            }
+            this.serviceStatusTB.Text = statusStr;
         }
 
         private void LoadTileImagePreview()
@@ -1052,6 +1141,35 @@ namespace pGina.Configuration
         private void pluginsDG_DoubleClick(object sender, EventArgs e)
         {
             configureButton_Click(sender, e);
+        }
+
+        private void serviceStartBtn_Click(object sender, EventArgs e)
+        {
+            if (m_pGinaServiceController.Status == ServiceControllerStatus.Stopped)
+            {
+                // Disable this right away, otherwise it isn't disabled until the
+                // service controller shows it as "Start pending"
+                serviceStartBtn.Enabled = false;
+                m_pGinaServiceController.Start();
+                UpdateServiceStatus();
+            }
+        }
+
+        private void serviceStopBtn_Click(object sender, EventArgs e)
+        {
+            if (m_pGinaServiceController.Status == ServiceControllerStatus.Running)
+            {
+                // Disable this right away, otherwise it isn't disabled until the
+                // service controller shows it as "Stop pending"
+                serviceStopBtn.Enabled = false;
+                m_pGinaServiceController.Stop();
+                UpdateServiceStatus();
+            }
+        }
+
+        void m_serviceTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            UpdateServiceStatus();
         }
     }
 }
