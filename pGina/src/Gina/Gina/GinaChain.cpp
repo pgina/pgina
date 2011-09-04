@@ -30,6 +30,7 @@
 #include <string>
 
 #include <pGinaNativeLib.h>
+#include <Macros.h>
 
 #include "GinaChain.h"
 #include "GinaWrapper.h"
@@ -53,13 +54,27 @@ namespace pGina
 
 			// Init and load our chained/wrapped gina
 			std::wstring ginaName = pGina::Registry::GetString(L"ChainedGinaPath", L"MSGINA.DLL");
+			pDEBUG(L"Wrapping gina: %s", ginaName.c_str());
+
 			m_wrappedGina = new GinaWrapper(ginaName.c_str());
-			if(m_wrappedGina->Load())	// TBD: What do we do if this fails? other than crap our pantses..
+			if(!m_wrappedGina->Load())
 			{
-				// Now negotiate and initialize our wrapped gina			
-				m_wrappedGina->Negotiate(WinlogonInterface::Version());
-				m_wrappedGina->Initialize(L"Winsta0", WinlogonRouter::Interface(), NULL, WinlogonRouter::DispatchTable());
-			}			
+				pERROR(L"Failed to load wrapped gina: 0x%08x", GetLastError());
+				return;
+			}
+
+			// Now negotiate and initialize our wrapped gina			
+			if(!m_wrappedGina->Negotiate(WinlogonInterface::Version()))
+			{	
+				pERROR(L"Failed to negotiate with wrapped gina using version: %d (0x%08x)", WinlogonInterface::Version(), WinlogonInterface::Version());
+				return;
+			}
+
+			if(!m_wrappedGina->Initialize(L"Winsta0", WinlogonRouter::Interface(), NULL, WinlogonRouter::DispatchTable()))
+			{
+				pERROR(L"Failed to initialize wrapped gina");
+				return;
+			}
 		}
 
 		GinaChain::~GinaChain()

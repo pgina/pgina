@@ -499,3 +499,13 @@ BOOL WINAPI WlxGetConsoleSwitchCredentials(PVOID  pWlxContext, PVOID  pCredInfo)
 	pGINA_FROM_CTX(pWlxContext);
 	return (pGina->GetConsoleSwitchCredentials(pCredInfo) ? TRUE : FALSE);
 }
+
+VOID WINAPI DebugEntryPoint()
+{
+	DWORD fakeDllVersion = 0;
+	WlxNegotiate(WLX_VERSION_1_4, &fakeDllVersion);    
+
+	void * context = 0;
+    WlxInitialize(0, 0, 0, 0, &context);    
+    WlxDisplaySASNotice(context);
+}

@@ -26,6 +26,8 @@
 */
 #include <assert.h>
 
+#include <Macros.h>
+
 #include "Provider.h"
 #include "Dll.h"
 
@@ -34,7 +36,6 @@
 #include <shlwapi.h>
 #pragma warning(pop)
 
-#include "Macros.h"
 #include "TileUiLogon.h"
 #include "TileUiUnlock.h"
 #include "ProviderGuid.h"

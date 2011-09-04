@@ -35,12 +35,12 @@
 #pragma warning(pop)
 
 #include <pGinaNativeLib.h>
+#include <Macros.h>
 
 #include "ClassFactory.h"
 #include "TileUiTypes.h"
 #include "TileUiLogon.h"
 #include "TileUiUnlock.h"
-#include "Macros.h"
 #include "SerializationHelpers.h"
 #include "ProviderGuid.h"
 #include "resource.h"
