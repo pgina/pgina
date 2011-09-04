@@ -27,8 +27,12 @@
 #pragma once
 
 #include <Windows.h>
+#include <string>
+
+#include <pGinaNativeLib.h>
 
 #include "GinaChain.h"
+#include "GinaWrapper.h"
 #include "WinlogonRouter.h"
 
 namespace pGina
@@ -46,69 +50,94 @@ namespace pGina
 			//	WinlogonProxy let's us have first shot at Gina->Winlogon
 			//	direction traffic.
 			WinlogonRouter::Interface(this);
+
+			// Init and load our chained/wrapped gina
+			std::wstring ginaName = pGina::Registry::GetString(L"ChainedGinaPath", L"MSGINA.DLL");
+			m_wrappedGina = new GinaWrapper(ginaName.c_str());
+			if(m_wrappedGina->Load())	// TBD: What do we do if this fails? other than crap our pantses..
+			{
+				// Now negotiate and initialize our wrapped gina			
+				m_wrappedGina->Negotiate(WinlogonInterface::Version());
+				m_wrappedGina->Initialize(L"Winsta0", WinlogonRouter::Interface(), NULL, WinlogonRouter::DispatchTable());
+			}			
+		}
+
+		GinaChain::~GinaChain()
+		{
+			if(m_wrappedGina)
+			{
+				delete m_wrappedGina;
+				m_wrappedGina = NULL;
+			}
 		}
 
 		// Queries from winlogon
 		bool GinaChain::IsLockOk()
 		{
-			return false;
+			return m_wrappedGina->IsLockOk();
 		}
 
 		bool GinaChain::IsLogoffOk()
 		{
-			return false;
+			return m_wrappedGina->IsLogoffOk();
 		}
 
 		bool GinaChain::GetConsoleSwitchCredentials(PVOID pCredInfo)
 		{
-			return false;
+			return m_wrappedGina->GetConsoleSwitchCredentials(pCredInfo);
 		}
 
 		// Notifications from winlogon
 		void GinaChain::ReconnectNotify()
 		{
+			m_wrappedGina->ReconnectNotify();
 		}
 
 		void GinaChain::DisconnectNotify()
 		{
+			m_wrappedGina->DisconnectNotify();
 		}
 
 		void GinaChain::Logoff()
 		{
+			m_wrappedGina->Logoff();
 		}
 
 		bool GinaChain::ScreenSaverNotify(BOOL * pSecure)
 		{
-			return false;
+			return m_wrappedGina->ScreenSaverNotify(pSecure);
 		}
 
 		void GinaChain::Shutdown(DWORD ShutdownType)
 		{
+			m_wrappedGina->Shutdown(ShutdownType);
 		}
 
 
 		// Notices/Status messages
 		void GinaChain::DisplaySASNotice()
 		{
+			m_wrappedGina->DisplaySASNotice();
 		}
 
 		void GinaChain::DisplayLockedNotice()
 		{
+			m_wrappedGina->DisplayLockedNotice();
 		}
 
 		bool GinaChain::DisplayStatusMessage(HDESK hDesktop, DWORD dwOptions, PWSTR pTitle, PWSTR pMessage)
 		{
-			return false;
+			return m_wrappedGina->DisplayStatusMessage(hDesktop, dwOptions, pTitle, pMessage);
 		}
 
 		bool GinaChain::GetStatusMessage(DWORD * pdwOptions, PWSTR pMessage, DWORD dwBufferSize)
 		{
-			return false;
+			return m_wrappedGina->GetStatusMessage(pdwOptions, pMessage, dwBufferSize);
 		}
 
 		bool GinaChain::RemoveStatusMessage()
 		{
-			return false;
+			return m_wrappedGina->RemoveStatusMessage();
 		}
 
 			
@@ -116,34 +145,34 @@ namespace pGina
 		int  GinaChain::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, 
 									 PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile)
 		{
-			return 0;
+			return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
 		}
 
 		int  GinaChain::LoggedOnSAS(DWORD dwSasType, PVOID pReserved)
 		{
-			return 0;
+			return m_wrappedGina->LoggedOnSAS(dwSasType, pReserved);
 		}
 
 		int  GinaChain::WkstaLockedSAS(DWORD dwSasType)
 		{
-			return 0;
+			return m_wrappedGina->WkstaLockedSAS(dwSasType);
 		}
 
 			
 		// Things to do when winlogon says to...
 		bool GinaChain::ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOID pEnvironment)
 		{
-			return false;
+			return m_wrappedGina->ActivateUserShell(pszDesktopName, pszMprLogonScript, pEnvironment);
 		}
 
 		bool GinaChain::StartApplication(PWSTR pszDesktopName, PVOID pEnvironment, PWSTR pszCmdLine)
 		{
-			return false;
+			return m_wrappedGina->StartApplication(pszDesktopName, pEnvironment, pszCmdLine);
 		}
 
 		bool GinaChain::NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo)
 		{
-			return false;
+			return m_wrappedGina->NetworkProviderLoad(pNprNotifyInfo);
 		}							
 	}
 }

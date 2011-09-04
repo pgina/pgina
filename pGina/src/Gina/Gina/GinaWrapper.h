@@ -57,9 +57,8 @@ namespace pGina
 		typedef BOOL (WINAPI * PFWLXGETSTATUSMESSAGE) (PVOID, DWORD *, PWSTR, DWORD);
 		typedef BOOL (WINAPI * PFWLXREMOVESTATUSMESSAGE) (PVOID);
 		typedef BOOL (WINAPI * PFWLXGETCONSOLESWITCHCREDENTIALS) (PVOID, PVOID); 
-		typedef BOOL (WINAPI * PFWLXRECONNECTNOTIFY) (PVOID);
-		typedef BOOL (WINAPI * PFWLXDISCONNECTNOTIFY) (PVOID); 
-
+		typedef VOID (WINAPI * PFWLXRECONNECTNOTIFY) (PVOID);
+		typedef VOID (WINAPI * PFWLXDISCONNECTNOTIFY) (PVOID); 
 
 		// Gina implementation that loads another gina dll only (no stubbing/hooking), 
 		//	allowing a caller to 'be' winlogon.
@@ -69,8 +68,10 @@ namespace pGina
 			GinaWrapper(const wchar_t * dll);
 			~GinaWrapper();
 
+			DWORD Version() { return m_dllVersion; }			
+
 			// Additional GINA exports that we implement
-			bool Negotiate(DWORD dwWinlogonVersion, DWORD *pdwDllVersion);
+			bool Negotiate(DWORD dwWinlogonVersion);
 			bool Initialize(LPWSTR lpWinsta, HANDLE hWlx, PVOID pvReserved, PVOID pWinlogonFunctions);
 			
 			// Standard Gina * interfaces, directly map to GINA exports
@@ -104,6 +105,7 @@ namespace pGina
 			std::wstring m_dllname;
 			void * m_ginaContext;
 			HINSTANCE m_dll;
+			DWORD m_dllVersion;
 
 			// Pointers to the real MSGINA functions.
 			PFWLXNEGOTIATE                		m_pfWlxNegotiate;

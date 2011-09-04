@@ -29,6 +29,7 @@
 #include <Windows.h>
 
 #include "Gina.h"
+#include "GinaWrapper.h"
 #include "Winlogon.h"
 #include "WinlogonProxy.h"
 
@@ -44,6 +45,7 @@ namespace pGina
 		{
 		public:
 			GinaChain(WinlogonInterface *pWinLogonIface);
+			virtual ~GinaChain();
 
 			// Queries from winlogon
 			virtual bool IsLockOk();
@@ -76,6 +78,7 @@ namespace pGina
 			virtual bool NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo);		
 		
 		private:
+			GinaWrapper * m_wrappedGina;
 		};
 	}
 }
