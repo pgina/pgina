@@ -106,6 +106,8 @@ namespace pGina
 			void * m_ginaContext;
 			HINSTANCE m_dll;
 			DWORD m_dllVersion;
+			bool m_negotiated;
+			bool m_initialized;
 
 			// Pointers to the real MSGINA functions.
 			PFWLXNEGOTIATE                		m_pfWlxNegotiate;

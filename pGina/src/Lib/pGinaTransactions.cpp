@@ -93,8 +93,10 @@ namespace pGina
 		/* static */
 		void Log::LogInternal(const wchar_t *level, const wchar_t *message)
 		{
-			// Call outputdebugstring
-			OutputDebugString(message);
+			// Call outputdebugstring, after appending a \n and truncating
+			wchar_t ods_buffer[4096 - 6];	// Max output to OutputDebugString
+			_snwprintf_s(ods_buffer, sizeof(ods_buffer) / sizeof(WORD), _TRUNCATE, L"%s\n", message);
+			OutputDebugString(ods_buffer);
 
 			// Write a log message to the service
 			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");

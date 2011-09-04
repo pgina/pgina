@@ -36,6 +36,8 @@ namespace pGina
 			m_ginaContext(0),
 			m_dll(0),
 			m_dllVersion(0),
+			m_negotiated(false),
+			m_initialized(false),
 			m_pfWlxNegotiate(0),
 			m_pfWlxInitialize(0),
 			m_pfWlxDisplaySASNotice(0),
@@ -74,128 +76,130 @@ namespace pGina
 		bool GinaWrapper::Negotiate(DWORD dwWinlogonVersion)
 		{
 			if(!m_pfWlxNegotiate) return false;
-			return m_pfWlxNegotiate(dwWinlogonVersion, &m_dllVersion) ? true : false;
+			m_negotiated = m_pfWlxNegotiate(dwWinlogonVersion, &m_dllVersion) ? true : false;
+			return m_negotiated;
 		}
 
 		bool GinaWrapper::Initialize(LPWSTR lpWinsta, HANDLE hWlx, PVOID pvReserved, PVOID pWinlogonFunctions)
 		{
 			if(!m_pfWlxInitialize) return false;
-			return m_pfWlxInitialize(lpWinsta, hWlx, pvReserved, pWinlogonFunctions, &m_ginaContext) ? true : false;
+			m_initialized = m_pfWlxInitialize(lpWinsta, hWlx, pvReserved, pWinlogonFunctions, &m_ginaContext) ? true : false;
+			return m_initialized;
 		}
 			
 		// Standard Gina * interfaces, directly map to GINA exports
 		bool GinaWrapper::IsLockOk()
 		{
-			if(!m_pfWlxIsLockOk) return true;
+			if(!m_pfWlxIsLockOk || !m_negotiated || !m_initialized) return true;
 			return (m_pfWlxIsLockOk(m_ginaContext) ? true : false);
 		}
 
 		bool GinaWrapper::IsLogoffOk()
 		{
-			if(!m_pfWlxIsLogoffOk) return true;
+			if(!m_pfWlxIsLogoffOk || !m_negotiated || !m_initialized) return true;
 			return (m_pfWlxIsLogoffOk(m_ginaContext) ? true : false);			
 		}
 
 		bool GinaWrapper::GetConsoleSwitchCredentials(PVOID pCredInfo)
 		{
-			if(!m_pfWlxGetConsoleSwitchCredentials) return false;
+			if(!m_pfWlxGetConsoleSwitchCredentials || !m_negotiated || !m_initialized) return false;
 			return m_pfWlxGetConsoleSwitchCredentials(m_ginaContext, pCredInfo) ? true : false;
 		}
 
 		void GinaWrapper::ReconnectNotify()
 		{			
-			if(m_pfWlxReconnectNotify)
+			if(m_pfWlxReconnectNotify && m_negotiated && m_initialized)
 				m_pfWlxReconnectNotify(m_ginaContext);
 		}
 
 		void GinaWrapper::DisconnectNotify()
 		{
-			if(m_pfWlxDisconnectNotify)
+			if(m_pfWlxDisconnectNotify && m_negotiated && m_initialized)
 				m_pfWlxDisconnectNotify(m_ginaContext);
 		}
 
 		void GinaWrapper::Logoff()
 		{
-			if(m_pfWlxLogoff)
+			if(m_pfWlxLogoff && m_negotiated && m_initialized)
 				m_pfWlxLogoff(m_ginaContext);
 		}
 
 		bool GinaWrapper::ScreenSaverNotify(BOOL * pSecure)
 		{
-			if(!m_pfWlxScreenSaverNotify) return false;
+			if(!m_pfWlxScreenSaverNotify || !m_negotiated || !m_initialized) return false;
 			return m_pfWlxScreenSaverNotify(m_ginaContext, pSecure) ? true : false;
 		}
 
 		void GinaWrapper::Shutdown(DWORD ShutdownType)
 		{
-			if(m_pfWlxShutdown)
+			if(m_pfWlxShutdown && m_negotiated && m_initialized)
 				m_pfWlxShutdown(m_ginaContext, ShutdownType);
 		}
 
 		void GinaWrapper::DisplaySASNotice()
 		{
-			if(m_pfWlxDisplaySASNotice)
+			if(m_pfWlxDisplaySASNotice && m_negotiated && m_initialized)
 				m_pfWlxDisplaySASNotice(m_ginaContext);
 		}
 
 		void GinaWrapper::DisplayLockedNotice()
 		{
-			if(m_pfWlxDisplayLockedNotice)
+			if(m_pfWlxDisplayLockedNotice && m_negotiated && m_initialized)
 				m_pfWlxDisplayLockedNotice(m_ginaContext);
 		}
 
 		bool GinaWrapper::DisplayStatusMessage(HDESK hDesktop, DWORD dwOptions, PWSTR pTitle, PWSTR pMessage)
 		{
-			if(!m_pfWlxDisplayStatusMessage) return false;
+			if(!m_pfWlxDisplayStatusMessage || !m_negotiated || !m_initialized) return false;
 			return m_pfWlxDisplayStatusMessage(m_ginaContext, hDesktop, dwOptions, pTitle, pMessage) ? true : false;
 		}
 
 		bool GinaWrapper::GetStatusMessage(DWORD * pdwOptions, PWSTR pMessage, DWORD dwBufferSize)
 		{
-			if(!m_pfWlxGetStatusMessage) return false;
+			if(!m_pfWlxGetStatusMessage || !m_negotiated || !m_initialized) return false;
 			return m_pfWlxGetStatusMessage(m_ginaContext, pdwOptions, pMessage, dwBufferSize) ? true : false;
 		}
 
 		bool GinaWrapper::RemoveStatusMessage()
 		{
-			if(!m_pfWlxRemoveStatusMessage) return false;
+			if(!m_pfWlxRemoveStatusMessage || !m_negotiated || !m_initialized) return false;
 			return m_pfWlxRemoveStatusMessage(m_ginaContext) ? true : false;
 		}
 
 		int  GinaWrapper::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions,
 								 PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile)
 		{
-			if(!m_pfWlxLoggedOutSAS) return 0;
+			if(!m_pfWlxLoggedOutSAS || !m_negotiated || !m_initialized) return 0;
 			return m_pfWlxLoggedOutSAS(m_ginaContext, dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
 		}
 
 		int  GinaWrapper::LoggedOnSAS(DWORD dwSasType, PVOID pReserved)
 		{
-			if(!m_pfWlxLoggedOnSAS) return 0;
+			if(!m_pfWlxLoggedOnSAS || !m_negotiated || !m_initialized) return 0;
 			return m_pfWlxLoggedOnSAS(m_ginaContext, dwSasType, pReserved);
 		}
 
 		int  GinaWrapper::WkstaLockedSAS(DWORD dwSasType)
 		{
-			if(!m_pfWlxWkstaLockedSAS) return 0;
+			if(!m_pfWlxWkstaLockedSAS || !m_negotiated || !m_initialized) return 0;
 			return m_pfWlxWkstaLockedSAS(m_ginaContext, dwSasType);
 		}
 
 		bool GinaWrapper::ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOID pEnvironment)
 		{
-			if(!m_pfWlxActivateUserShell) return false;
+			if(!m_pfWlxActivateUserShell || !m_negotiated || !m_initialized) return false;
 			return m_pfWlxActivateUserShell(m_ginaContext, pszDesktopName, pszMprLogonScript, pEnvironment) ? true : false;
 		}
 
 		bool GinaWrapper::StartApplication(PWSTR pszDesktopName, PVOID pEnvironment, PWSTR pszCmdLine)
 		{
-			if(!m_pfWlxStartApplication) return false;
+			if(!m_pfWlxStartApplication || !m_negotiated || !m_initialized) return false;
 			return m_pfWlxStartApplication(m_ginaContext, pszDesktopName, pEnvironment, pszCmdLine) ? true : false;
 		}
 
 		bool GinaWrapper::NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo)
 		{
-			if(!m_pfWlxNetworkProviderLoad) return false;
+			if(!m_pfWlxNetworkProviderLoad || !m_negotiated || !m_initialized) return false;
 			return m_pfWlxNetworkProviderLoad(m_ginaContext, pNprNotifyInfo) ? true : false;
 		}
 
