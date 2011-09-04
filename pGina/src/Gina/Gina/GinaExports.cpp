@@ -27,6 +27,8 @@
 #include <windows.h>
 #include <winwlx.h>
 
+#include <Macros.h>
+
 #include "Gina.h"
 #include "Winlogon.h"
 
@@ -44,6 +46,7 @@
  */ 			 
 BOOL WINAPI WlxNegotiate(DWORD dwWinlogonVersion, DWORD *pdwDllVersion) 
 {	
+	pDEBUG(L"WlxNegotiate(%d (0x%08x), ...)", dwWinlogonVersion, dwWinlogonVersion);
 	// We support all versions from 1.3 up
 	if(dwWinlogonVersion < WLX_VERSION_1_3)
 		return FALSE;
@@ -85,6 +88,7 @@ BOOL WINAPI WlxNegotiate(DWORD dwWinlogonVersion, DWORD *pdwDllVersion)
  */
 BOOL WINAPI WlxInitialize(LPWSTR lpWinsta, HANDLE hWlx, PVOID pvReserved, PVOID pWinlogonFunctions, PVOID * pWlxContext) 
 {
+	pDEBUG(L"WlxInitialize(%s, 0x%08x, 0x%08x, 0x%08x, ...)", lpWinsta, hWlx, pvReserved, pWinlogonFunctions);
 	return (pGina::GINA::Gina::InitializeFactory(hWlx, pWinlogonFunctions, (pGina::GINA::Gina **) pWlxContext) ? TRUE : FALSE);
 }
 
@@ -102,6 +106,7 @@ BOOL WINAPI WlxInitialize(LPWSTR lpWinsta, HANDLE hWlx, PVOID pvReserved, PVOID 
  */
 VOID WINAPI WlxDisplaySASNotice(PVOID pWlxContext) 
 {
+	pDEBUG(L"WlxDisplaySASNotice");
 	pGINA_FROM_CTX(pWlxContext);
 	pGina->DisplaySASNotice();
 }
@@ -154,7 +159,7 @@ VOID WINAPI WlxDisplaySASNotice(PVOID pWlxContext)
 int WINAPI WlxLoggedOutSAS(PVOID pWlxContext, DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, 
 						   PDWORD pdwOptions, PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile) 
 {
-
+	pDEBUG(L"WlxLoggedOutSAS");
 	pGINA_FROM_CTX(pWlxContext);
 	return pGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);	
 }
@@ -187,6 +192,7 @@ int WINAPI WlxLoggedOutSAS(PVOID pWlxContext, DWORD dwSasType, PLUID pAuthentica
 */
 BOOL WINAPI WlxActivateUserShell(PVOID pWlxContext, PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOID pEnvironment) 
 {
+	pDEBUG(L"WlxActivateUserShell");
 	pGINA_FROM_CTX(pWlxContext);
 	return (pGina->ActivateUserShell(pszDesktopName, pszMprLogonScript, pEnvironment) ? TRUE : FALSE);	
 }
@@ -222,6 +228,7 @@ BOOL WINAPI WlxActivateUserShell(PVOID pWlxContext, PWSTR pszDesktopName, PWSTR 
 */
 int WINAPI WlxLoggedOnSAS(PVOID pWlxContext, DWORD dwSasType, PVOID pReserved) 
 {
+	pDEBUG(L"WlxLoggedOnSAS");
 	pGINA_FROM_CTX(pWlxContext);
 	return pGina->LoggedOnSAS(dwSasType, pReserved);
 }
@@ -238,6 +245,7 @@ int WINAPI WlxLoggedOnSAS(PVOID pWlxContext, DWORD dwSasType, PVOID pReserved)
 */
 VOID WINAPI WlxDisplayLockedNotice(PVOID pWlxContext) 
 {
+	pDEBUG(L"WlxDisplayLockedNotice");
 	pGINA_FROM_CTX(pWlxContext);
 	pGina->DisplayLockedNotice();
 }
@@ -254,6 +262,7 @@ VOID WINAPI WlxDisplayLockedNotice(PVOID pWlxContext)
 */
 BOOL WINAPI WlxIsLockOk(PVOID pWlxContext) 
 {	
+	pDEBUG(L"WlxIsLockOk");
 	pGINA_FROM_CTX(pWlxContext);
 	return (pGina->IsLockOk() ? TRUE : FALSE);
 }
@@ -278,6 +287,7 @@ BOOL WINAPI WlxIsLockOk(PVOID pWlxContext)
 */
 int WINAPI WlxWkstaLockedSAS(PVOID pWlxContext, DWORD dwSasType) 
 {
+	pDEBUG(L"WlxWkstaLockedSAS");
 	pGINA_FROM_CTX(pWlxContext);
 	return pGina->WkstaLockedSAS(dwSasType);
 }
@@ -293,7 +303,7 @@ int WINAPI WlxWkstaLockedSAS(PVOID pWlxContext, DWORD dwSasType)
 			False - Indicates that it is not OK to lock the workstation.\n
 */
 BOOL WINAPI WlxIsLogoffOk(PVOID pWlxContext) 
-{
+{	
 	pGINA_FROM_CTX(pWlxContext);
 	return (pGina->IsLogoffOk() ? TRUE : FALSE);
 }
