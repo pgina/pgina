@@ -40,6 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Core\Properties\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Helpers\TimedCache.cs" />
     <Compile Include="Logging\LibraryLogging.cs" />
     <Compile Include="Pipes\PipeMessage.cs" />

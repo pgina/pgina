@@ -46,6 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Core\Properties\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Logging\InProcAppender.cs" />
     <Compile Include="Settings\DynamicSetting.cs" />
     <Compile Include="Settings\DynamicSettings.cs" />

@@ -347,8 +347,8 @@ namespace pGina.Service.Impl
             string pattern = @"\%v";
             if (Regex.IsMatch(motd, pattern))
             {
-                // TODO get this value dynamically
-                motd = Regex.Replace(motd, pattern, "3.0.0.0");
+                string vers = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                motd = Regex.Replace(motd, pattern, vers);
             }
 
             // IP Address
