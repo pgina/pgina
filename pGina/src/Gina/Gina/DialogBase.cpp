@@ -54,14 +54,31 @@ namespace pGina
 
 				// Now set a ptr to us in user data that will always be available
 				SetWindowLongPtr(hwnd, GWLP_USERDATA, lparam);				
-			}
 
-			// Try and get a ptr to us out of user data, if not available, just do nothing
-			DialogBase * dialog = (DialogBase *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-			if(!dialog)
-				return FALSE;
+				// Inherited init
+				dialog->DialogInit();
+			}
+			else
+			{
+				// Try and get a ptr to us out of user data, if not available, just do nothing
+				DialogBase * dialog = (DialogBase *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+				if(!dialog)
+					return FALSE;
 			
-			return dialog->DialogProcImpl(msg, wparam, lparam);			
+				// We call different verbs on subs based on message
+				switch(msg)
+				{
+				case WM_COMMAND:
+					dialog->Command(LOWORD(wparam));
+					return TRUE;
+					break;
+				default:
+					return dialog->DialogProcImpl(msg, wparam, lparam);	
+				}								
+
+				// Shouldn't get here
+				return FALSE;
+			}
 		}
 
 		void DialogBase::CenterWindow()
@@ -155,6 +172,11 @@ namespace pGina
 			memset(buffer, 0, sizeof(buffer));
 			GetDlgItemText(m_hwnd, itemId, buffer, 1024 * 64);
 			return buffer;
+		}
+
+		void DialogBase::SetFocusItem(int itemid)
+		{
+			SetFocus(GetItem(itemid));
 		}
 	}
 }

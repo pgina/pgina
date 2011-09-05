@@ -40,7 +40,9 @@ namespace pGina
 		public:
 			DialogLoggedOutSAS(WinlogonInterface *iface) :
 				DialogBase(iface, IDD_LOGGEDOUT_SAS) {}
-
+			
+			virtual void DialogInit();
+			virtual void Command(int itemId);
 			virtual INT_PTR DialogProcImpl(UINT msg, WPARAM wparam, LPARAM lparam);
 		};
 	}

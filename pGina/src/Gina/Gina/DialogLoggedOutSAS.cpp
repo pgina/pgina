@@ -30,6 +30,17 @@ namespace pGina
 {
 	namespace GINA
 	{
+		void DialogLoggedOutSAS::DialogInit()
+		{
+			SetItemText(IDC_USERNAME_TXT, L"Duuude!");
+			SetFocusItem(IDC_PASSWORD_TXT);
+		}
+
+		void DialogLoggedOutSAS::Command(int itemId)
+		{
+
+		}
+
 		INT_PTR DialogLoggedOutSAS::DialogProcImpl(UINT msg, WPARAM wparam, LPARAM lparam)
 		{
 			return FALSE;

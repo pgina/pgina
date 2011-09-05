@@ -517,5 +517,5 @@ VOID WINAPI DebugEntryPoint()
 
 	void * context = 0;
     WlxInitialize(0, 0, 0, 0, &context);    
-    WlxDisplaySASNotice(context);
+    WlxLoggedOutSAS(context, 1, NULL, NULL, 0, NULL, NULL, NULL);
 }

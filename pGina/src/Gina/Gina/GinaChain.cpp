@@ -36,6 +36,8 @@
 #include "GinaWrapper.h"
 #include "WinlogonRouter.h"
 
+#include "DialogLoggedOutSAS.h"
+
 namespace pGina
 {
 	namespace GINA
@@ -160,7 +162,9 @@ namespace pGina
 		int  GinaChain::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, 
 									 PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile)
 		{
-			return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
+			DialogLoggedOutSAS *dialog = new DialogLoggedOutSAS(m_winlogon);
+			return dialog->ShowDialog();			
+			//return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
 		}
 
 		int  GinaChain::LoggedOnSAS(DWORD dwSasType, PVOID pReserved)
