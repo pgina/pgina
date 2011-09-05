@@ -167,6 +167,8 @@
     <None Include="pginalogo.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DialogBase.cpp" />
+    <ClCompile Include="DialogLoggedOutSAS.cpp" />
     <ClCompile Include="Dll.cpp" />
     <ClCompile Include="Gina.cpp" />
     <ClCompile Include="GinaChain.cpp" />
@@ -178,6 +180,8 @@
     <ClCompile Include="WinlogonRouter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DialogBase.h" />
+    <ClInclude Include="DialogLoggedOutSAS.h" />
     <ClInclude Include="Dll.h" />
     <ClInclude Include="Gina.h" />
     <ClInclude Include="GinaChain.h" />
