@@ -164,6 +164,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="GinaExports.def" />
+    <None Include="pginalogo.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Dll.cpp" />
@@ -181,11 +182,15 @@
     <ClInclude Include="Gina.h" />
     <ClInclude Include="GinaChain.h" />
     <ClInclude Include="GinaWrapper.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="WinlogonDebug.h" />
     <ClInclude Include="WinlogonProxy.h" />
     <ClInclude Include="WinlogonRouter.h" />
     <ClInclude Include="WinlogonReal.h" />
     <ClInclude Include="Winlogon.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Gina.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
