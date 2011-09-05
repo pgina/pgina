@@ -66,7 +66,10 @@ namespace pGina.Plugin.SingleUser
 
         public string Version
         {
-            get { return "1.0.0"; }
+            get
+            {
+                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            }
         }
 
         public Guid Uuid

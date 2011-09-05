@@ -116,7 +116,10 @@ namespace pGina.Plugin.DriveMapper
 
         public string Version
         {
-            get { return "1.0.0"; }
+            get
+            {
+                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            }
         }
 
         public void Configure()
