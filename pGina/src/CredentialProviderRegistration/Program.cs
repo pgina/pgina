@@ -37,6 +37,12 @@ namespace pGina.CredentialProvider.Registration
 {
     class Program
     {
+        static Program()
+        {
+            // Init logging
+            pGina.Shared.Logging.Logging.Init();
+        }
+
         static ILog m_logger = LogManager.GetLogger("Program");
 
         static int Main(string[] args)
