@@ -31,6 +31,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 
+using Abstractions;
+
 namespace pGina.CredentialProvider.Registration
 {
     public enum OperationMode
@@ -48,17 +50,20 @@ namespace pGina.CredentialProvider.Registration
         public string Path { get; set; }
         public bool Verbose { get; set; }
 
+        public Settings()
+        {
+            // Defaults
+            this.ProviderGuid = new Guid("{D0BEFEFB-3D2C-44DA-BBAD-3B2D04557246}");
+            this.Path = ".";
+            this.ShortName = null;
+            this.OpMode = OperationMode.INSTALL;
+            this.Verbose = false;
+        }
+
         public static Settings ParseClArgs(string[] args)
         {
             Settings settings = new Settings();
             
-            // Defaults
-            settings.ProviderGuid = new Guid("{D0BEFEFB-3D2C-44DA-BBAD-3B2D04557246}");
-            settings.Path = ".";
-            settings.ShortName = null;
-            settings.OpMode = OperationMode.INSTALL;
-            settings.Verbose = false;
-
             int nArgs = args.Count();
 
             // Process options
