@@ -340,5 +340,14 @@ namespace pGina.Plugin.LocalMachine
                 logger.ErrorFormat("Unexpected error while syncing local groups, skipping rest: {0}", e);
             }
         }
+
+        public static void RemoveUserAndProfile(string user)
+        {
+            using (UserPrincipal userPrincipal = GetUserPrincipal(user))
+            {
+                Abstractions.WindowsApi.pInvokes.DeleteProfile(userPrincipal.Sid);
+                userPrincipal.Delete();                
+            }
+        }
     }
 }

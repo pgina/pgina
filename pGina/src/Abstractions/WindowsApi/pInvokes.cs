@@ -376,6 +376,12 @@ namespace Abstractions.WindowsApi
             public static extern bool WTSQuerySessionInformation(System.IntPtr hServer, int sessionId, WTS_INFO_CLASS wtsInfoClass, out System.IntPtr ppBuffer, out uint pBytesReturned);
             #endregion
 
+            #region userenv.dll
+            [DllImport("userenv.dll")]
+            public static extern bool DeleteProfile(string sidString, string path, string machine);            
+
+            #endregion
+
             #region kernel32.dll
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
@@ -415,6 +421,10 @@ namespace Abstractions.WindowsApi
             return IntPtr.Zero;        
         }
 
+        public static bool DeleteProfile(SecurityIdentifier sid)
+        {
+            return SafeNativeMethods.DeleteProfile(sid.ToString(), null, null);
+        }
 
         public static List<string> GetInteractiveUserList()
         {            

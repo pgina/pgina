@@ -144,7 +144,9 @@ namespace pGina.Plugin.LocalMachine
                 //  make note of the username!
                 using (UserPrincipal user = LocalAccount.GetUserPrincipal(userInfo.Username))
                 {
-                    if (user == null && (Settings.Store.ScramblePasswords || Settings.Store.RemoveProfiles))
+                    bool scramble = Settings.Store.ScramblePasswords;
+                    bool remove = Settings.Store.RemoveProfiles;
+                    if (user == null && (scramble || remove))
                     {                        
                         AddCleanupUser(userInfo.Username);
                     }
@@ -337,13 +339,13 @@ namespace pGina.Plugin.LocalMachine
 
         public void Starting()
         {         
-            // Start background timer            
-            m_backgroundTimer = new Timer(new TimerCallback(BackgroundTaskCallback), null, BackgroundTimeSpan, TimeSpan.FromMilliseconds(-1));            
+            // Start background timer                        
+            m_backgroundTimer = new Timer(new TimerCallback(BackgroundTaskCallback), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(-1));            
         }
 
         public void Stopping()
         {            
-            // Dispose of our background timer
+            // Dispose of our background timer            
             lock (this)
             {
                 m_backgroundTimer.Change(TimeSpan.FromMilliseconds(-1), TimeSpan.FromMilliseconds(-1));
@@ -384,7 +386,7 @@ namespace pGina.Plugin.LocalMachine
                 if (user.Contains("\\"))
                 {
                     if (user.StartsWith(Environment.MachineName))
-                        xformed.Add(user.Substring(user.IndexOf("\\") + 1));
+                        xformed.Add(user.Substring(user.IndexOf("\\") + 1).ToUpper());
                 }
                 else
                     xformed.Add(user);
@@ -394,42 +396,48 @@ namespace pGina.Plugin.LocalMachine
 
         private void IterateCleanupUsers()
         {
-            bool scramblePasswords = Settings.Store.ScramblePasswords;
-            bool removeProfiles = Settings.Store.RemoveProfiles;
+            lock(this)
+            {
+                bool scramblePasswords = Settings.Store.ScramblePasswords;
+                bool removeProfiles = Settings.Store.RemoveProfiles;
 
-            string[] users = Settings.Store.CleanupUsers;
-            List<string> loggedOnUsers = LoggedOnLocalUsers();
+                string[] users = Settings.Store.CleanupUsers;
+                List<string> loggedOnUsers = LoggedOnLocalUsers();
 
-            foreach (string user in users)
-            {                
-                using(UserPrincipal userPrincipal = LocalAccount.GetUserPrincipal(user))
-                {
-                    // Make sure there is a user to scramble!
-                    if(userPrincipal == null)
-                    {
-                        // This dude doesn't exist!
+                foreach (string user in users)
+                {                
+                    using(UserPrincipal userPrincipal = LocalAccount.GetUserPrincipal(user))
+                    {                   
+                        // Make sure there is a user to scramble!
+                        if(userPrincipal == null)
+                        {
+                            // This dude doesn't exist!
+                            RemoveCleanupUser(user);
+                            continue;
+                        }
+
+                        // Is she logged in still?
+                        if (loggedOnUsers.Contains(user.ToUpper()))
+                            continue;
+
+                        try
+                        {
+                            if (scramblePasswords)
+                                LocalAccount.ScrambleUsersPassword(user);
+                            else if(removeProfiles)                            
+                                LocalAccount.RemoveUserAndProfile(user);                                                         
+                        }
+                        catch(Exception e)
+                        {
+                            m_logger.WarnFormat("Cleanup for {0} failed, will retry next time around. Error: {1}", user, e);
+                            continue;
+                        }
+
+                        // All done! No more cleanup for this user needed
                         RemoveCleanupUser(user);
-                        continue;
-                    }
-
-                    // Is she logged in still?
-                    if (loggedOnUsers.Contains(user))
-                        continue;
-
-                    if (scramblePasswords)
-                    {
-                        // Scramble!
-                        LocalAccount.ScrambleUsersPassword(user);
-                    }
-                    else
-                    {
-                        // Remove!
-                    }
-
-                    // All done! No more cleanup for this user needed
-                    RemoveCleanupUser(user);
-                }                                
+                    }                                
+                }
             }
-        }               
+        }                
     }
 }

@@ -115,12 +115,12 @@ namespace pGina.Plugin.LocalMachine
 
         private void m_chkScramble_CheckedChanged(object sender, EventArgs e)
         {
-            MaskAuthzUi();
+            if (m_chkScramble.Checked) m_chkRemoveProfile.Checked = false;
         }
 
         private void m_chkRemoveProfile_CheckedChanged(object sender, EventArgs e)
         {
-            MaskAuthzUi();
+            if (m_chkRemoveProfile.Checked) m_chkScramble.Checked = false;
         }
     }
 }
