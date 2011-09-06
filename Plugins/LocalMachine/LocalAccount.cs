@@ -97,6 +97,20 @@ namespace pGina.Plugin.LocalMachine
         {
             return GroupPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Sid, sid.ToString());
         }
+
+        public static DirectoryEntry GetUserDirectoryEntry(string username)
+        {
+            return m_sam.Children.Find(username, "User");
+        }
+
+        public static void ScrambleUsersPassword(string username)
+        {
+            using (DirectoryEntry userDe = GetUserDirectoryEntry(username))
+            {
+                userDe.Invoke("SetPassword", new object[] { Guid.NewGuid().ToString().Replace("-", "").Replace("{", "").Replace("}", "") });
+                userDe.CommitChanges();
+            }
+        } 
         
         // Non recursive group check (immediate membership only currently)
         private bool IsUserInGroup(string username, string groupname)

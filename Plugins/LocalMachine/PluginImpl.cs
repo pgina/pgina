@@ -30,6 +30,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Security.Principal;
+using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Threading;
 
@@ -144,7 +145,7 @@ namespace pGina.Plugin.LocalMachine
                 using (UserPrincipal user = LocalAccount.GetUserPrincipal(userInfo.Username))
                 {
                     if (user == null && (Settings.Store.ScramblePasswords || Settings.Store.RemoveProfiles))
-                    {
+                    {                        
                         AddCleanupUser(userInfo.Username);
                     }
                 }
@@ -329,12 +330,15 @@ namespace pGina.Plugin.LocalMachine
 
         public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription)
         {            
+            // We cloud use logoff to try and do a cleanup.. but our timer is 15 seconds by default,
+            //  so why double effort, and add complexity of locking (timer race vs this call)? Best
+            //  just leave it be.
         }
 
         public void Starting()
         {         
             // Start background timer            
-            m_backgroundTimer = new Timer(new TimerCallback(BackgroundTaskCallback), null, BackgroundTimeSpan, TimeSpan.FromMilliseconds(-1));
+            m_backgroundTimer = new Timer(new TimerCallback(BackgroundTaskCallback), null, BackgroundTimeSpan, TimeSpan.FromMilliseconds(-1));            
         }
 
         public void Stopping()
@@ -360,12 +364,72 @@ namespace pGina.Plugin.LocalMachine
         private void BackgroundTaskCallback(object state)
         {
             // Do background stuff
-
-            lock (this)
+            lock(this)
             {
+                IterateCleanupUsers();
+
                 if (m_backgroundTimer != null)
                     m_backgroundTimer.Change(BackgroundTimeSpan, TimeSpan.FromMilliseconds(-1));
             }
-        }        
+        }
+
+        private List<string> LoggedOnLocalUsers()
+        {
+            List<string> loggedOnUsers = Abstractions.WindowsApi.pInvokes.GetInteractiveUserList();
+
+            // Transform the logged on list, strip it to just local users, then drop the machine name
+            List<string> xformed = new List<string>();
+            foreach (string user in loggedOnUsers)
+            {
+                if (user.Contains("\\"))
+                {
+                    if (user.StartsWith(Environment.MachineName))
+                        xformed.Add(user.Substring(user.IndexOf("\\") + 1));
+                }
+                else
+                    xformed.Add(user);
+            }
+            return xformed;
+        }
+
+        private void IterateCleanupUsers()
+        {
+            bool scramblePasswords = Settings.Store.ScramblePasswords;
+            bool removeProfiles = Settings.Store.RemoveProfiles;
+
+            string[] users = Settings.Store.CleanupUsers;
+            List<string> loggedOnUsers = LoggedOnLocalUsers();
+
+            foreach (string user in users)
+            {                
+                using(UserPrincipal userPrincipal = LocalAccount.GetUserPrincipal(user))
+                {
+                    // Make sure there is a user to scramble!
+                    if(userPrincipal == null)
+                    {
+                        // This dude doesn't exist!
+                        RemoveCleanupUser(user);
+                        continue;
+                    }
+
+                    // Is she logged in still?
+                    if (loggedOnUsers.Contains(user))
+                        continue;
+
+                    if (scramblePasswords)
+                    {
+                        // Scramble!
+                        LocalAccount.ScrambleUsersPassword(user);
+                    }
+                    else
+                    {
+                        // Remove!
+                    }
+
+                    // All done! No more cleanup for this user needed
+                    RemoveCleanupUser(user);
+                }                                
+            }
+        }               
     }
 }

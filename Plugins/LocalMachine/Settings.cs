@@ -31,6 +31,7 @@ namespace pGina.Plugin.LocalMachine
 
             // Notification settings
             m_settings.SetDefault("CleanupUsers", new string[] { });     // List of principal names we must cleanup!
+            m_settings.SetDefault("BackgroundTimerSeconds", 15);         // How often we look to cleanup
         }
 
         public static dynamic Store

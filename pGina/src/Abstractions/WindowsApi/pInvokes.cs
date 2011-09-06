@@ -273,9 +273,55 @@ namespace Abstractions.WindowsApi
                 public UInt32 dwThreadId;
             };
 
-            public const int CREATE_UNICODE_ENVIRONMENT = 0x00000400;            
-            #endregion
-            
+            public const int CREATE_UNICODE_ENVIRONMENT = 0x00000400;
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct WTS_SESSION_INFO
+            {
+                public Int32 SessionID;
+
+                [MarshalAs(UnmanagedType.LPStr)]
+                public String pWinStationName;
+
+                public WTS_CONNECTSTATE_CLASS State;
+            }
+
+            public enum WTS_INFO_CLASS
+            {
+                WTSInitialProgram,
+                WTSApplicationName,
+                WTSWorkingDirectory,
+                WTSOEMId,
+                WTSSessionId,
+                WTSUserName,
+                WTSWinStationName,
+                WTSDomainName,
+                WTSConnectState,
+                WTSClientBuildNumber,
+                WTSClientName,
+                WTSClientDirectory,
+                WTSClientProductId,
+                WTSClientHardwareId,
+                WTSClientAddress,
+                WTSClientDisplay,
+                WTSClientProtocolType
+            }
+            public enum WTS_CONNECTSTATE_CLASS
+            {
+                WTSActive,
+                WTSConnected,
+                WTSConnectQuery,
+                WTSShadow,
+                WTSDisconnected,
+                WTSIdle,
+                WTSListen,
+                WTSReset,
+                WTSDown,
+                WTSInit
+            }
+
+            public static IntPtr WTS_CURRENT_SERVER_HANDLE = IntPtr.Zero;
+            #endregion            
 
             #region credui.dll
             [DllImport("credui.dll", CharSet = CharSet.Auto)]
@@ -309,6 +355,25 @@ namespace Abstractions.WindowsApi
             #region wtsapi32.dll
             [DllImport("wtsapi32.dll", SetLastError = true)]            
             public static extern bool WTSQueryUserToken(int sessionId, out IntPtr Token);
+
+            [DllImport("wtsapi32.dll")]
+            public static extern IntPtr WTSOpenServer([MarshalAs(UnmanagedType.LPStr)] String pServerName);
+
+            [DllImport("wtsapi32.dll")]
+            public static extern void WTSCloseServer(IntPtr hServer);
+
+            [DllImport("wtsapi32.dll")]
+            public static extern int WTSEnumerateSessions(IntPtr hServer,
+                [MarshalAs(UnmanagedType.U4)] int Reserved,
+                [MarshalAs(UnmanagedType.U4)] int Version,
+                ref IntPtr ppSessionInfo,
+                [MarshalAs(UnmanagedType.U4)] ref int pCount);
+
+            [DllImport("wtsapi32.dll")]
+            public static extern void WTSFreeMemory(IntPtr pMemory);
+
+            [DllImport("Wtsapi32.dll")]
+            public static extern bool WTSQuerySessionInformation(System.IntPtr hServer, int sessionId, WTS_INFO_CLASS wtsInfoClass, out System.IntPtr ppBuffer, out uint pBytesReturned);
             #endregion
 
             #region kernel32.dll
@@ -347,7 +412,52 @@ namespace Abstractions.WindowsApi
             IntPtr result = IntPtr.Zero;
             if (SafeNativeMethods.WTSQueryUserToken(sessionId, out result))
                 return result;
-            return IntPtr.Zero;
+            return IntPtr.Zero;        
+        }
+
+
+        public static List<string> GetInteractiveUserList()
+        {            
+            List<string> result = new List<string>();                          
+
+            IntPtr sessionInfoList = IntPtr.Zero;
+            int sessionCount = 0;
+            int retVal = SafeNativeMethods.WTSEnumerateSessions(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, 0, 1, ref sessionInfoList, ref sessionCount);
+
+            if(retVal != 0)
+            {                
+                int dataSize = Marshal.SizeOf(typeof(SafeNativeMethods.WTS_SESSION_INFO));
+                int currentSession = (int) sessionInfoList;                
+
+                for(int x = 0; x < sessionCount; x++)
+                {
+                    SafeNativeMethods.WTS_SESSION_INFO sessionInfo = 
+                        (SafeNativeMethods.WTS_SESSION_INFO)Marshal.PtrToStructure((IntPtr)currentSession, typeof(SafeNativeMethods.WTS_SESSION_INFO));
+                    currentSession += dataSize;
+
+                    uint bytes = 0;
+                    IntPtr userInfo = IntPtr.Zero;
+                    IntPtr domainInfo = IntPtr.Zero;
+
+                    SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionInfo.SessionID, SafeNativeMethods.WTS_INFO_CLASS.WTSUserName, out userInfo, out bytes);
+                    SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionInfo.SessionID, SafeNativeMethods.WTS_INFO_CLASS.WTSDomainName, out domainInfo, out bytes);
+
+                    string user = Marshal.PtrToStringAnsi(userInfo);
+                    string domain = Marshal.PtrToStringAnsi(domainInfo);
+                    if (!string.IsNullOrEmpty(domain))
+                    {
+                        result.Add(string.Format("{0}\\{1}", domain, user));
+                    }
+                    else if (!string.IsNullOrEmpty(user))
+                    {
+                        result.Add(user);
+                    }
+                }
+
+                SafeNativeMethods.WTSFreeMemory(sessionInfoList);
+            }
+
+            return result;            
         }
 
         public static bool CloseHandle(IntPtr handle)
