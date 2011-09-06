@@ -27,10 +27,14 @@ namespace pGina.Plugin.LocalMachine
             bool MirrorGroupsForAuthdUsers = Settings.Store.MirrorGroupsForAuthdUsers;
             bool GroupCreateFailIsFail = Settings.Store.GroupCreateFailIsFail;
             string[] MandatoryGroups = Settings.Store.MandatoryGroups;
+            bool ScramblePasswords = Settings.Store.ScramblePasswords;
+            bool RemoveProfiles = Settings.Store.RemoveProfiles;
 
             m_chkAlwaysAuth.Checked = AlwaysAuthenticate;
             m_chkAuthzLocalAdmin.Checked = AuthzLocalAdminsOnly;
             m_chkAuthzRequireLocal.Checked = AuthzLocalGroupsOnly;
+            m_chkScramble.Checked = ScramblePasswords;
+            m_chkRemoveProfile.Checked = RemoveProfiles;
 
             foreach (string group in AuthzLocalGroups)
             {
@@ -54,6 +58,8 @@ namespace pGina.Plugin.LocalMachine
             Settings.Store.AlwaysAuthenticate = m_chkAlwaysAuth.Checked;
             Settings.Store.AuthzLocalAdminsOnly = m_chkAuthzLocalAdmin.Checked;
             Settings.Store.AuthzLocalGroupsOnly = m_chkAuthzRequireLocal.Checked;
+            Settings.Store.ScramblePasswords = m_chkScramble.Checked;
+            Settings.Store.RemoveProfiles = m_chkRemoveProfile.Checked;
 
             List<string> localGroups = new List<string>();
             foreach (DataGridViewRow row in m_localGroupDgv.Rows)
@@ -86,7 +92,9 @@ namespace pGina.Plugin.LocalMachine
 
         public void MaskAuthzUi()
         {
-            m_localGroupDgv.Enabled = m_chkAuthzRequireLocal.Checked;            
+            m_localGroupDgv.Enabled = m_chkAuthzRequireLocal.Checked;
+            if (m_chkScramble.Checked) m_chkRemoveProfile.Checked = false;
+            if (m_chkRemoveProfile.Checked) m_chkScramble.Checked = false;
         }
 
         private void m_chkAuthzRequireLocal_CheckedChanged(object sender, EventArgs e)
@@ -103,6 +111,16 @@ namespace pGina.Plugin.LocalMachine
         private void m_btnClose_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void m_chkScramble_CheckedChanged(object sender, EventArgs e)
+        {
+            MaskAuthzUi();
+        }
+
+        private void m_chkRemoveProfile_CheckedChanged(object sender, EventArgs e)
+        {
+            MaskAuthzUi();
         }
     }
 }

@@ -31,6 +31,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Security.Principal;
 using System.DirectoryServices.AccountManagement;
+using System.Threading;
 
 using log4net;
 
@@ -40,15 +41,21 @@ using pGina.Shared.Types;
 namespace pGina.Plugin.LocalMachine
 {
 
-    public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration
+    public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration, IPluginEventNotifications
     {
+        // Static lock so all instances in a process can mutex on a setting (ala CleanupUsers)
+        private static object s_lock = new object();
+
+        // Per-instance logger
+        private ILog m_logger = LogManager.GetLogger("LocalMachine");
+
+        private Timer m_backgroundTimer = null;
+
         public static Guid PluginUuid
         {
             get { return new Guid("{12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D}"); }
         }
-
-        private ILog m_logger = LogManager.GetLogger("LocalMachine");
-
+        
         public PluginImpl()
         {
             using(Process me = Process.GetCurrentProcess())
@@ -79,6 +86,31 @@ namespace pGina.Plugin.LocalMachine
         {
             get { return PluginUuid; }
         }
+
+        private void AddCleanupUser(string username)
+        {
+            lock (s_lock)
+            {
+                string[] cleanupUsers = Settings.Store.CleanupUsers;
+                List<string> users = cleanupUsers.ToList();
+                users.Add(username);
+                Settings.Store.CleanupUsers = users.ToArray();
+            }
+        }
+
+        private void RemoveCleanupUser(string username)
+        {
+            lock (s_lock)
+            {
+                string[] cleanupUsers = Settings.Store.CleanupUsers;
+                List<string> users = cleanupUsers.ToList();
+                if (users.Contains(username))
+                {
+                    users.Remove(username);
+                    Settings.Store.CleanupUsers = users.ToArray();
+                }
+            }
+        }
         
         public BooleanResult AuthenticatedUserGateway(SessionProperties properties)
         {
@@ -106,7 +138,17 @@ namespace pGina.Plugin.LocalMachine
             }
 
             try
-            {                
+            {   
+                // If this user doesn't already exist, and we are supposed to clean up after ourselves,
+                //  make note of the username!
+                using (UserPrincipal user = LocalAccount.GetUserPrincipal(userInfo.Username))
+                {
+                    if (user == null && (Settings.Store.ScramblePasswords || Settings.Store.RemoveProfiles))
+                    {
+                        AddCleanupUser(userInfo.Username);
+                    }
+                }
+       
                 m_logger.DebugFormat("AuthenticatedUserGateway({0}) for user: {1}", properties.Id.ToString(), userInfo.Username);
                 LocalAccount.SyncUserInfoToLocalUser(userInfo);
             }
@@ -283,6 +325,47 @@ namespace pGina.Plugin.LocalMachine
             }
 
             return false;
+        }
+
+        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription)
+        {            
+        }
+
+        public void Starting()
+        {         
+            // Start background timer            
+            m_backgroundTimer = new Timer(new TimerCallback(BackgroundTaskCallback), null, BackgroundTimeSpan, TimeSpan.FromMilliseconds(-1));
+        }
+
+        public void Stopping()
+        {            
+            // Dispose of our background timer
+            lock (this)
+            {
+                m_backgroundTimer.Change(TimeSpan.FromMilliseconds(-1), TimeSpan.FromMilliseconds(-1));
+                m_backgroundTimer.Dispose();
+                m_backgroundTimer = null;
+            }
+        }
+
+        private TimeSpan BackgroundTimeSpan
+        {
+            get
+            {
+                int seconds = Settings.Store.BackgroundTimerSeconds;
+                return TimeSpan.FromSeconds(seconds);
+            }
+        }
+
+        private void BackgroundTaskCallback(object state)
+        {
+            // Do background stuff
+
+            lock (this)
+            {
+                if (m_backgroundTimer != null)
+                    m_backgroundTimer.Change(BackgroundTimeSpan, TimeSpan.FromMilliseconds(-1));
+            }
         }        
     }
 }

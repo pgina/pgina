@@ -26,6 +26,11 @@ namespace pGina.Plugin.LocalMachine
             // Gateway step settings                        
             m_settings.SetDefault("GroupCreateFailIsFail", true);        // Do we fail gateway if group create/add fails?            
             m_settings.SetDefault("MandatoryGroups", new string[] { });  // *All* users are added to these groups (by name)
+            m_settings.SetDefault("ScramblePasswords", false);           // Do we scramble users passwords after logout?
+            m_settings.SetDefault("RemoveProfiles", false);              // Do we remove accounts/profiles after logout?
+
+            // Notification settings
+            m_settings.SetDefault("CleanupUsers", new string[] { });     // List of principal names we must cleanup!
         }
 
         public static dynamic Store

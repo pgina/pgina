@@ -41,9 +41,9 @@ namespace pGina.Plugin.LocalMachine
 {
     public class LocalAccount
     {
-        private ILog m_logger = null; 
-        private DirectoryEntry m_sam = new DirectoryEntry("WinNT://" + Environment.MachineName + ",computer");
-        private PrincipalContext m_machinePrincipal = new PrincipalContext(ContextType.Machine, Environment.MachineName);
+        private static ILog m_logger = null; 
+        private static DirectoryEntry m_sam = new DirectoryEntry("WinNT://" + Environment.MachineName + ",computer");
+        private static PrincipalContext m_machinePrincipal = new PrincipalContext(ContextType.Machine, Environment.MachineName);
         
         public class GroupSyncException : Exception 
         {
@@ -76,24 +76,24 @@ namespace pGina.Plugin.LocalMachine
             UserInfo = userInfo;            
         }        
 
-        private UserPrincipal GetUserPrincipal(string username)
+        public static UserPrincipal GetUserPrincipal(string username)
         {
             if (string.IsNullOrEmpty(username)) return null;
             return UserPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Name, username);
         }
 
-        private UserPrincipal GetUserPrincipal(SecurityIdentifier sid)
+        public static UserPrincipal GetUserPrincipal(SecurityIdentifier sid)
         {
             return UserPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Sid, sid.ToString());
         }
 
-        private GroupPrincipal GetGroupPrincipal(string groupname)
+        public static GroupPrincipal GetGroupPrincipal(string groupname)
         {
             if (string.IsNullOrEmpty(groupname)) return null;
             return GroupPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Name, groupname);
         }
 
-        private GroupPrincipal GetGroupPrincipal(SecurityIdentifier sid)
+        public static GroupPrincipal GetGroupPrincipal(SecurityIdentifier sid)
         {
             return GroupPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Sid, sid.ToString());
         }
