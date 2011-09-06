@@ -13,9 +13,14 @@ namespace pGina.Plugin.SingleUser
 
         static Settings()
         {
+            Init();
+        }
+
+        public static void Init()
+        {
             m_settings.SetDefault("Username", "Username");
             m_settings.SetDefault("Domain", Environment.MachineName);
-            m_settings.SetDefault("Password", "Password");
+            m_settings.SetEncryptedSetting("Password", "", null);            
             m_settings.SetDefault("RequirePlugins", false);
             m_settings.SetDefault("RequiredPluginList", new string[] { });
         }

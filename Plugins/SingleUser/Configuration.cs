@@ -23,7 +23,7 @@ namespace pGina.Plugin.SingleUser
         {
             m_txtUser.Text = Settings.Store.Username;
             m_txtDomain.Text = Settings.Store.Domain;
-            m_txtPass.Text = Settings.Store.Password;
+            m_txtPass.Text = Settings.Store.GetEncryptedSetting("Password", null);
             m_chkRequirePlugin.Checked = Settings.Store.RequirePlugins;
             string[] plugins = Settings.Store.RequiredPluginList;
 
@@ -38,7 +38,7 @@ namespace pGina.Plugin.SingleUser
         {
             Settings.Store.Username = m_txtUser.Text;
             Settings.Store.Domain = m_txtDomain.Text;
-            Settings.Store.Password = m_txtPass.Text;
+            Settings.Store.SetEncryptedSetting("Password", m_txtPass.Text, null);
             Settings.Store.RequirePlugins = m_chkRequirePlugin.Checked;
 
             List<string> uuids = new List<string>();

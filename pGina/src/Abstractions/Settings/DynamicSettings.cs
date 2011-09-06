@@ -29,6 +29,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Dynamic;
+using System.Security;
+using System.Security.Cryptography;
 using Microsoft.Win32;
 
 namespace Abstractions.Settings
@@ -73,6 +75,22 @@ namespace Abstractions.Settings
                 key.SetValue(name, value);
             }            
         }
+
+        public void SetEncryptedSetting(string name, string value, byte[] optionalEntropy)
+        {
+            byte[] valueBytes = UnicodeEncoding.Default.GetBytes(value);
+            byte[] protectedBytes = ProtectedData.Protect(valueBytes, optionalEntropy, DataProtectionScope.LocalMachine);
+            string base64 = Convert.ToBase64String(protectedBytes);
+            SetSetting(name, base64);
+        }
+
+        public string GetEncryptedSetting(string name, byte[] optionalEntropy)
+        {
+            string base64 = (string) GetSettingFromRegistry(name);
+            byte[] protectedBytes = Convert.FromBase64String(base64);
+            byte[] valueBytes = ProtectedData.Unprotect(protectedBytes, optionalEntropy, DataProtectionScope.LocalMachine);
+            return UnicodeEncoding.Default.GetString(valueBytes);
+        }
         
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
@@ -80,7 +98,7 @@ namespace Abstractions.Settings
             return true;
         }
 
-        public DynamicSetting GetSetting(string name)
+        private object GetSettingFromRegistry(string name)
         {
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_rootKey))
             {
@@ -91,18 +109,22 @@ namespace Abstractions.Settings
                     {
                         if (String.Compare(valueName, name, true) == 0)
                         {
-                            object value = key.GetValue(name);
-                            return new DynamicSetting(name, value);
+                            return key.GetValue(name);                            
                         }
                     }
 
                     throw new KeyNotFoundException(string.Format("Unable to find value for: {0}", name));
                 }
                 else
-                {                    
+                {
                     throw new KeyNotFoundException(string.Format("Unable to open registry key"));
                 }
             }
+        }
+
+        public DynamicSetting GetSetting(string name)
+        {
+            return new DynamicSetting(name, GetSettingFromRegistry(name));
         }
 
         public DynamicSetting GetSetting(string name, object def)

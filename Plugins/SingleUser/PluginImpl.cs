@@ -42,14 +42,12 @@ namespace pGina.Plugin.SingleUser
     {
         private ILog m_logger = LogManager.GetLogger("SingleUserPlugin");
         public static Guid PluginUuid = new Guid("{81F8034E-E278-4754-B10C-7066656DE5B7}");        
-        private dynamic m_settings = null;
-
+        
         public PluginImpl()
         {
             using(Process me = Process.GetCurrentProcess())
             {
-                m_settings = new pGinaDynamicSettings(PluginUuid);
-                m_settings.SetDefault("ShowDescription", true);                                
+                Settings.Init();
                 m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
             }
         }        
@@ -104,7 +102,7 @@ namespace pGina.Plugin.SingleUser
 
             string username = Settings.Store.Username;
             string domain = Settings.Store.Domain;
-            string password = Settings.Store.Password;
+            string password = Settings.Store.GetEncryptedSetting("Password", null);
             bool requirePlugins = Settings.Store.RequirePlugins;
             string[] pluginList = Settings.Store.RequiredPluginList;
 
