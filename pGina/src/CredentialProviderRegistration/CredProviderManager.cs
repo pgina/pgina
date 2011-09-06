@@ -9,6 +9,7 @@ using log4net;
 
 namespace pGina.CredentialProvider.Registration
 {
+
     public abstract class CredProviderManager
     {
         public Settings CpInfo { get; set; }
@@ -56,6 +57,11 @@ namespace pGina.CredentialProvider.Registration
         public abstract void Uninstall();
         public abstract void Disable();
         public abstract void Enable();
+
+        public abstract bool Registered();
+        public abstract bool Registered6432();
+        public abstract bool Enabled();
+        public abstract bool Enabled6432();
     }
 
     public class GinaCredProviderManager : CredProviderManager
@@ -77,6 +83,26 @@ namespace pGina.CredentialProvider.Registration
         }
 
         public override void Enable()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool Registered()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool Registered6432()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool Enabled()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool Enabled6432()
         {
             throw new NotImplementedException();
         }
@@ -122,8 +148,9 @@ namespace pGina.CredentialProvider.Registration
 
         public DefaultCredProviderManager()
         {
-            // Default Guid for pGina Credential Provider
+            // Defaults for pGina Credential Provider
             this.CpInfo.ProviderGuid = new Guid("{D0BEFEFB-3D2C-44DA-BBAD-3B2D04557246}");
+            this.CpInfo.ShortName = "pGinaCredentialProvider";
         }
 
         public override void Install()
@@ -344,6 +371,51 @@ namespace pGina.CredentialProvider.Registration
                     {
                         m_logger.Error("WARNING: Did not find a (32 bit) registry entry for that GUID.");
                     }
+                }
+            }
+        }
+
+        public override bool Registered()
+        {
+            bool result = false;
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(this.ProviderKey))
+            {
+                if (key != null)
+                    result = true;
+            }
+            return result;
+        }
+
+        public override bool Enabled()
+        {
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(this.ProviderKey))
+            {
+                object value = key.GetValue("Disabled");
+                if (value == null) return true;
+                else
+                {
+                    return (int)value == 0;
+                }
+            }
+        }
+
+        public override bool Registered6432()
+        {
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(this.ProviderKey6432))
+            {
+                return key != null;
+            }
+        }
+
+        public override bool Enabled6432()
+        {
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(this.ProviderKey6432))
+            {
+                object value = key.GetValue("Disabled");
+                if (value == null) return true;
+                else
+                {
+                    return (int)value == 0;
                 }
             }
         }

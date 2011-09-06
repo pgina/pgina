@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigurationUI));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
             this.servGB = new System.Windows.Forms.GroupBox();
@@ -84,6 +84,7 @@
             this.authenticateDGV = new System.Windows.Forms.DataGridView();
             this.m_simTab = new System.Windows.Forms.TabPage();
             this.groupBox13 = new System.Windows.Forms.GroupBox();
+            this.m_chkStartStop = new System.Windows.Forms.CheckBox();
             this.chkIgnoreGateway = new System.Windows.Forms.CheckBox();
             this.chkInvokeUser = new System.Windows.Forms.CheckBox();
             this.chkInvokeSystem = new System.Windows.Forms.CheckBox();
@@ -121,7 +122,13 @@
             this.m_radioUseService = new System.Windows.Forms.RadioButton();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnOkay = new System.Windows.Forms.Button();
-            this.m_chkStartStop = new System.Windows.Forms.CheckBox();
+            this.groupBox14 = new System.Windows.Forms.GroupBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.cpRegisteredTB = new System.Windows.Forms.TextBox();
+            this.cpEnabledLabel = new System.Windows.Forms.Label();
+            this.cpEnabledTB = new System.Windows.Forms.TextBox();
+            this.cpRegisterBtn = new System.Windows.Forms.Button();
+            this.cpEnableDisableBtn = new System.Windows.Forms.Button();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
             this.servGB.SuspendLayout();
@@ -152,13 +159,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.m_tileImage)).BeginInit();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.groupBox14.SuspendLayout();
             this.SuspendLayout();
             // 
             // m_tabs
             // 
-            this.m_tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.m_tabs.Controls.Add(this.m_generalConfigTab);
             this.m_tabs.Controls.Add(this.m_pluginConfigTab);
             this.m_tabs.Controls.Add(this.m_pluginOrderTab);
@@ -172,6 +180,7 @@
             // 
             // m_generalConfigTab
             // 
+            this.m_generalConfigTab.Controls.Add(this.groupBox14);
             this.m_generalConfigTab.Controls.Add(this.servGB);
             this.m_generalConfigTab.Controls.Add(this.motdGB);
             this.m_generalConfigTab.Controls.Add(this.groupBox12);
@@ -344,9 +353,9 @@
             // 
             // pluginsGroupBox
             // 
-            this.pluginsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pluginsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.pluginsGroupBox.Controls.Add(this.pluginsDG);
             this.pluginsGroupBox.Controls.Add(this.configureButton);
             this.pluginsGroupBox.Location = new System.Drawing.Point(15, 212);
@@ -360,36 +369,36 @@
             // 
             this.pluginsDG.AllowUserToAddRows = false;
             this.pluginsDG.AllowUserToDeleteRows = false;
-            this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
             this.pluginsDG.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle14.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle14;
             this.pluginsDG.Location = new System.Drawing.Point(10, 19);
             this.pluginsDG.Name = "pluginsDG";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle15;
             this.pluginsDG.Size = new System.Drawing.Size(735, 253);
             this.pluginsDG.TabIndex = 10;
             this.pluginsDG.DoubleClick += new System.EventHandler(this.pluginsDG_DoubleClick);
@@ -407,8 +416,8 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.btnRemove);
             this.groupBox1.Controls.Add(this.btnAdd);
             this.groupBox1.Controls.Add(this.lstPluginDirs);
@@ -443,8 +452,8 @@
             // 
             // lstPluginDirs
             // 
-            this.lstPluginDirs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstPluginDirs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.lstPluginDirs.Location = new System.Drawing.Point(10, 19);
             this.lstPluginDirs.MultiSelect = false;
             this.lstPluginDirs.Name = "lstPluginDirs";
@@ -504,8 +513,8 @@
             // 
             // userDGV
             // 
-            this.userDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.userDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.userDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.userDGV.Location = new System.Drawing.Point(15, 20);
             this.userDGV.Name = "userDGV";
@@ -548,8 +557,8 @@
             // 
             // gatewayDGV
             // 
-            this.gatewayDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gatewayDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.gatewayDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gatewayDGV.Location = new System.Drawing.Point(15, 20);
             this.gatewayDGV.Name = "gatewayDGV";
@@ -592,8 +601,8 @@
             // 
             // eventDGV
             // 
-            this.eventDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.eventDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.eventDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.eventDGV.Location = new System.Drawing.Point(15, 20);
             this.eventDGV.Name = "eventDGV";
@@ -636,8 +645,8 @@
             // 
             // authorizeDGV
             // 
-            this.authorizeDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.authorizeDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.authorizeDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.authorizeDGV.Location = new System.Drawing.Point(15, 20);
             this.authorizeDGV.Name = "authorizeDGV";
@@ -680,8 +689,8 @@
             // 
             // systemDGV
             // 
-            this.systemDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.systemDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.systemDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.systemDGV.Location = new System.Drawing.Point(15, 20);
             this.systemDGV.Name = "systemDGV";
@@ -724,8 +733,8 @@
             // 
             // authenticateDGV
             // 
-            this.authenticateDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.authenticateDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.authenticateDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.authenticateDGV.Location = new System.Drawing.Point(15, 20);
             this.authenticateDGV.Name = "authenticateDGV";
@@ -761,6 +770,16 @@
             this.groupBox13.TabIndex = 3;
             this.groupBox13.TabStop = false;
             this.groupBox13.Text = "Simulation Options";
+            // 
+            // m_chkStartStop
+            // 
+            this.m_chkStartStop.AutoSize = true;
+            this.m_chkStartStop.Location = new System.Drawing.Point(207, 79);
+            this.m_chkStartStop.Name = "m_chkStartStop";
+            this.m_chkStartStop.Size = new System.Drawing.Size(181, 17);
+            this.m_chkStartStop.TabIndex = 5;
+            this.m_chkStartStop.Text = "Invoke Starting/Stopping Events";
+            this.m_chkStartStop.UseVisualStyleBackColor = true;
             // 
             // chkIgnoreGateway
             // 
@@ -1032,8 +1051,8 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this.m_liveLog);
             this.groupBox4.Location = new System.Drawing.Point(16, 370);
             this.groupBox4.Name = "groupBox4";
@@ -1044,8 +1063,8 @@
             // 
             // m_liveLog
             // 
-            this.m_liveLog.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_liveLog.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.m_liveLog.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.LogEntry});
             this.m_liveLog.FullRowSelect = true;
@@ -1140,15 +1159,74 @@
             this.btnOkay.UseVisualStyleBackColor = true;
             this.btnOkay.Click += new System.EventHandler(this.btnOkay_Click);
             // 
-            // m_chkStartStop
+            // groupBox14
             // 
-            this.m_chkStartStop.AutoSize = true;
-            this.m_chkStartStop.Location = new System.Drawing.Point(207, 79);
-            this.m_chkStartStop.Name = "m_chkStartStop";
-            this.m_chkStartStop.Size = new System.Drawing.Size(181, 17);
-            this.m_chkStartStop.TabIndex = 5;
-            this.m_chkStartStop.Text = "Invoke Starting/Stopping Events";
-            this.m_chkStartStop.UseVisualStyleBackColor = true;
+            this.groupBox14.Controls.Add(this.cpEnableDisableBtn);
+            this.groupBox14.Controls.Add(this.cpRegisterBtn);
+            this.groupBox14.Controls.Add(this.cpEnabledTB);
+            this.groupBox14.Controls.Add(this.cpEnabledLabel);
+            this.groupBox14.Controls.Add(this.cpRegisteredTB);
+            this.groupBox14.Controls.Add(this.label13);
+            this.groupBox14.Location = new System.Drawing.Point(264, 271);
+            this.groupBox14.Name = "groupBox14";
+            this.groupBox14.Size = new System.Drawing.Size(296, 86);
+            this.groupBox14.TabIndex = 3;
+            this.groupBox14.TabStop = false;
+            this.groupBox14.Text = "Credential Provider/GINA Status";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(13, 22);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(61, 13);
+            this.label13.TabIndex = 0;
+            this.label13.Text = "Registered:";
+            // 
+            // cpRegisteredTB
+            // 
+            this.cpRegisteredTB.Location = new System.Drawing.Point(80, 19);
+            this.cpRegisteredTB.Name = "cpRegisteredTB";
+            this.cpRegisteredTB.ReadOnly = true;
+            this.cpRegisteredTB.Size = new System.Drawing.Size(124, 20);
+            this.cpRegisteredTB.TabIndex = 1;
+            // 
+            // cpEnabledLabel
+            // 
+            this.cpEnabledLabel.AutoSize = true;
+            this.cpEnabledLabel.Location = new System.Drawing.Point(25, 54);
+            this.cpEnabledLabel.Name = "cpEnabledLabel";
+            this.cpEnabledLabel.Size = new System.Drawing.Size(49, 13);
+            this.cpEnabledLabel.TabIndex = 2;
+            this.cpEnabledLabel.Text = "Enabled:";
+            // 
+            // cpEnabledTB
+            // 
+            this.cpEnabledTB.Location = new System.Drawing.Point(80, 51);
+            this.cpEnabledTB.Name = "cpEnabledTB";
+            this.cpEnabledTB.ReadOnly = true;
+            this.cpEnabledTB.Size = new System.Drawing.Size(124, 20);
+            this.cpEnabledTB.TabIndex = 3;
+            // 
+            // cpRegisterBtn
+            // 
+            this.cpRegisterBtn.Location = new System.Drawing.Point(210, 15);
+            this.cpRegisterBtn.Name = "cpRegisterBtn";
+            this.cpRegisterBtn.Size = new System.Drawing.Size(65, 26);
+            this.cpRegisterBtn.TabIndex = 4;
+            this.cpRegisterBtn.Text = "Register";
+            this.cpRegisterBtn.UseVisualStyleBackColor = true;
+            this.cpRegisterBtn.Click += new System.EventHandler(this.cpRegisterBtn_Click);
+            // 
+            // cpEnableDisableBtn
+            // 
+            this.cpEnableDisableBtn.Location = new System.Drawing.Point(210, 47);
+            this.cpEnableDisableBtn.Name = "cpEnableDisableBtn";
+            this.cpEnableDisableBtn.Size = new System.Drawing.Size(65, 26);
+            this.cpEnableDisableBtn.TabIndex = 6;
+            this.cpEnableDisableBtn.Text = "Enable";
+            this.cpEnableDisableBtn.UseVisualStyleBackColor = true;
+            this.cpEnableDisableBtn.Click += new System.EventHandler(this.cpEnableDisableBtn_Click);
             // 
             // ConfigurationUI
             // 
@@ -1197,6 +1275,8 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.groupBox14.ResumeLayout(false);
+            this.groupBox14.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1293,5 +1373,12 @@
         private System.Windows.Forms.Button serviceStartBtn;
         private System.Windows.Forms.TextBox serviceStatusTB;
         private System.Windows.Forms.CheckBox m_chkStartStop;
+        private System.Windows.Forms.GroupBox groupBox14;
+        private System.Windows.Forms.Button cpEnableDisableBtn;
+        private System.Windows.Forms.Button cpRegisterBtn;
+        private System.Windows.Forms.TextBox cpEnabledTB;
+        private System.Windows.Forms.Label cpEnabledLabel;
+        private System.Windows.Forms.TextBox cpRegisteredTB;
+        private System.Windows.Forms.Label label13;
     }
 }

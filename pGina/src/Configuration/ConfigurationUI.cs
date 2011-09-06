@@ -102,6 +102,8 @@ namespace pGina.Configuration
             // This works around an annoying aspect of the textbox where the foreground color
             // can't be changed unless the background color is set.
             this.serviceStatusTB.BackColor = Color.GhostWhite;
+            this.cpEnabledTB.BackColor = Color.GhostWhite;
+            this.cpRegisteredTB.BackColor = Color.GhostWhite;
 
             if (m_pGinaServiceController != null)
             {
@@ -118,6 +120,51 @@ namespace pGina.Configuration
                 this.serviceStatusTB.Text = "Not Installed";
                 this.serviceStopBtn.Enabled = false;
                 this.serviceStartBtn.Enabled = false;
+            }
+
+            UpdateCpStatus();
+        }
+
+        private void UpdateCpStatus()
+        {
+            pGina.CredentialProvider.Registration.CredProviderManager manager =
+                pGina.CredentialProvider.Registration.CredProviderManager.GetManager();
+
+            if (manager.Registered())
+            {
+                this.cpRegisteredTB.Text = "Yes";
+                this.cpRegisteredTB.ForeColor = Color.Green;
+                this.cpRegisterBtn.Text = "Unregister";
+                this.cpEnableDisableBtn.Enabled = true;
+
+                if (manager.Enabled())
+                {
+                    this.cpEnabledTB.Text = "Yes";
+                    this.cpEnabledTB.ForeColor = Color.Green;
+                    this.cpEnableDisableBtn.Text = "Disable";
+                }
+                else
+                {
+                    this.cpEnabledTB.Text = "No";
+                    this.cpEnabledTB.ForeColor = Color.Red;
+                    this.cpEnableDisableBtn.Text = "Enable";
+                }
+
+                if (Abstractions.Windows.OsInfo.Is64Bit() && !manager.Registered6432())
+                {
+                    MessageBox.Show("Warning: The 32-bit CP/GINA is not registered.  32-bit apps that " +
+                        "make use of the CP/GINA may not function correctly.");
+                }
+            }
+            else
+            {
+                this.cpRegisteredTB.Text = "No";
+                this.cpRegisteredTB.ForeColor = Color.Red;
+                this.cpRegisterBtn.Text = "Register";
+                this.cpEnabledTB.Text = "No";
+                this.cpEnabledTB.ForeColor = Color.Red;
+                this.cpEnableDisableBtn.Enabled = false;
+                this.cpEnableDisableBtn.Text = "Enable";
             }
         }
 
@@ -1176,6 +1223,59 @@ namespace pGina.Configuration
         void m_serviceTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             UpdateServiceStatus();
+        }
+
+        private void cpRegisterBtn_Click(object sender, EventArgs e)
+        {
+            pGina.CredentialProvider.Registration.CredProviderManager manager =
+                pGina.CredentialProvider.Registration.CredProviderManager.GetManager();
+
+            try
+            {
+                if (manager.Registered())
+                    manager.Uninstall();
+                else
+                {
+                    FolderBrowserDialog dlg = new FolderBrowserDialog();
+                    dlg.Description = "Choose folder containing Credential Provider/GINA DLL." +
+                        "  Optionally, the DLL(s) may be contained in subfolders named 'x64' " +
+                        " and 'Win32' for 64 and 32-bit DLLs respectively.";
+                    if (dlg.ShowDialog() == DialogResult.OK)
+                    {
+                        manager.CpInfo.Path = dlg.SelectedPath;
+                        manager.Install();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+
+            this.UpdateCpStatus();
+        }
+
+        private void cpEnableDisableBtn_Click(object sender, EventArgs e)
+        {
+            pGina.CredentialProvider.Registration.CredProviderManager manager =
+                pGina.CredentialProvider.Registration.CredProviderManager.GetManager();
+
+            try
+            {
+                if (manager.Registered())
+                {
+                    if (manager.Enabled())
+                        manager.Disable();
+                    else
+                        manager.Enable();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+
+            this.UpdateCpStatus();
         }
     }
 }
