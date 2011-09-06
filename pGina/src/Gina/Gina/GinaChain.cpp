@@ -43,8 +43,11 @@ namespace pGina
 	namespace GINA
 	{
 		GinaChain::GinaChain(WinlogonInterface *pWinLogonIface) : 
-			Gina(pWinLogonIface), WinlogonProxy(pWinLogonIface) 
+			Gina(pWinLogonIface), WinlogonProxy(pWinLogonIface), m_passthru(false)
 		{
+			// Are we in passthru mode?
+			m_passthru = pGina::Registry::GetBool(L"GinaPassthru", false);
+
 			// When we use the winlogon router table, we want it to 
 			//	direct all winlogon calls to us (via our WinlogonProxy 
 			//	implementation).  We sit between winlogon and a real
@@ -162,9 +165,13 @@ namespace pGina
 		int  GinaChain::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, 
 									 PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile)
 		{
+			if(m_passthru)
+			{
+				return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
+			}
+
 			DialogLoggedOutSAS *dialog = new DialogLoggedOutSAS(m_winlogon);
-			return dialog->ShowDialog();			
-			//return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
+			return dialog->ShowDialog();						
 		}
 
 		int  GinaChain::LoggedOnSAS(DWORD dwSasType, PVOID pReserved)

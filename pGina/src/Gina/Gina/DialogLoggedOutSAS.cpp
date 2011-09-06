@@ -36,13 +36,20 @@ namespace pGina
 			SetFocusItem(IDC_PASSWORD_TXT);
 		}
 
-		void DialogLoggedOutSAS::Command(int itemId)
+		bool DialogLoggedOutSAS::Command(int itemId)
 		{
+			switch(itemId)
+			{
+			case IDCANCEL:
+				FinishWithResult(WLX_SAS_ACTION_NONE);
+				return true;			
+			}
 
+			return false;
 		}
 
 		INT_PTR DialogLoggedOutSAS::DialogProcImpl(UINT msg, WPARAM wparam, LPARAM lparam)
-		{
+		{			
 			return FALSE;
 		}
 	}

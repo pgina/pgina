@@ -79,6 +79,7 @@ namespace pGina
 		
 		private:
 			GinaWrapper * m_wrappedGina;
+			bool m_passthru;
 		};
 	}
 }

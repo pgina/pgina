@@ -48,10 +48,9 @@ namespace pGina
 			
 		protected:
 			virtual void DialogInit() = 0;			// WM_INITDIALOG
-			virtual void Command(int itemId) = 0;	// WM_COMMAND
+			virtual bool Command(int itemId) = 0;	// WM_COMMAND
 			virtual INT_PTR DialogProcImpl(UINT msg, WPARAM wparam, LPARAM lparam) = 0;
 			
-
 			// Helpers that subclasses can use to center, get/set data etc
 			void CenterWindow();
 			HWND GetItem(int itemId);
@@ -66,6 +65,7 @@ namespace pGina
 			void CheckState(int itemId, bool checked);
 			bool CheckState(int itemId);
 			void SetFocusItem(int itemId);
+			void FinishWithResult(INT_PTR result) { EndDialog(m_hwnd, result); }
 
 		private:
 			static INT_PTR CALLBACK DialogProcInternal(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);

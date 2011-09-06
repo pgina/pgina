@@ -69,15 +69,12 @@ namespace pGina
 				switch(msg)
 				{
 				case WM_COMMAND:
-					dialog->Command(LOWORD(wparam));
-					return TRUE;
-					break;
-				default:
-					return dialog->DialogProcImpl(msg, wparam, lparam);	
-				}								
+					if(dialog->Command(LOWORD(wparam)))
+						return true;					
+					break;				
+				}			
 
-				// Shouldn't get here
-				return FALSE;
+				return dialog->DialogProcImpl(msg, wparam, lparam);					
 			}
 		}
 
