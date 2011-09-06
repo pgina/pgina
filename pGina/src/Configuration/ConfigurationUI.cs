@@ -970,6 +970,9 @@ namespace pGina.Configuration
             bool authorized = false;
             bool gatewayed = false;
 
+            if (m_chkStartStop.Checked)
+                PluginDriver.Starting();
+
             try
             {
                 Shared.Types.BooleanResult result = sessionDriver.AuthenticateUser();
@@ -1052,7 +1055,10 @@ namespace pGina.Configuration
                     sessionDriver.InvokeUserSessionHelpers();
                     sessionDriver.EndUserSessionHelpers();
                 }
-            }            
+            }
+
+            if (m_chkStartStop.Checked)
+                PluginDriver.Stopping();
         }
 
 

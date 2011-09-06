@@ -99,15 +99,17 @@ namespace pGina.Service.Impl
 
         public void Start()
         {
-            HookUpAbstractionsLibraryLogging();
             m_logger.InfoFormat("Starting service");
+            HookUpAbstractionsLibraryLogging();            
             m_server.Start();
+            PluginDriver.Starting();
         }
 
         public void Stop()
         {
-            DetachAbstractionsLibraryLogging();
             m_logger.InfoFormat("Stopping service");
+            PluginDriver.Stopping();
+            DetachAbstractionsLibraryLogging();            
             m_server.Stop();
         }
 

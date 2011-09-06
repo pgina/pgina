@@ -86,7 +86,7 @@ namespace pGina.Core
             foreach (IPluginBase plugin in m_plugins)
             {                
                 Settings.Get.SetDefault(plugin.Uuid.ToString(), 0);
-            }
+            }            
         }
 
         private static void LoadPluginsFromDir(string dir)

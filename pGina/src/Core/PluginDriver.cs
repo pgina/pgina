@@ -83,6 +83,18 @@ namespace pGina.Core
             get { return m_properties.GetTrackedSingle<UserInformation>().Groups; }
         }
 
+        public static void Starting()
+        {
+            foreach (IPluginEventNotifications plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
+                plugin.Starting();
+        }
+
+        public static void Stopping()
+        {
+            foreach (IPluginEventNotifications plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
+                plugin.Stopping();
+        }
+
         public BooleanResult PerformLoginProcess()
         {
             try

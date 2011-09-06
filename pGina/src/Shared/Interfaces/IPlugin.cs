@@ -126,13 +126,21 @@ namespace pGina.Shared.Interfaces
     public interface IPluginEventNotifications : IPluginBase
     {
         /// <summary>
+        /// Called when plugin is initially loaded after startup, for 'startup' time processing
+        /// </summary>
+        void Starting();
+
+        /// <summary>
+        /// Called when shutting down, for 'stopping' time processing
+        /// </summary>
+        void Stopping();
+
+        /// <summary>
         /// Default System session notification (as provided to pGina service
         ///  via http://msdn.microsoft.com/en-us/library/system.serviceprocess.servicebase.onsessionchange.aspx) 
         /// </summary>
         /// <param name="changeDescription"></param>
-        void SessionChange(SessionChangeDescription changeDescription);
-        
-        // Others? login success|fail, logging hook?
+        void SessionChange(SessionChangeDescription changeDescription);                
     }
 
 }
