@@ -48,7 +48,7 @@ namespace pGina.Plugin.ScriptRunner
             USER = 0x01, SYSTEM = 0x02
         }
 
-        static dynamic m_settings = new DynamicSettings( PluginImpl.ScriptRunnerPluginUuid );
+        static dynamic m_settings = new pGinaDynamicSettings( PluginImpl.ScriptRunnerPluginUuid );
 
         public static List<Script> Load()
         {

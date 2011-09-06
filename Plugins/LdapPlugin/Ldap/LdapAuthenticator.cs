@@ -51,7 +51,7 @@ namespace pGina.Plugin.Ldap
         public LdapAuthenticator(NetworkCredential creds)
         {
             m_creds = creds;
-            m_settings = new DynamicSettings(LdapPlugin.LdapUuid);
+            m_settings = new pGinaDynamicSettings(LdapPlugin.LdapUuid);
         }
 
         public BooleanResult Authenticate()

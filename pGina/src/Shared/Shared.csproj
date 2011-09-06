@@ -50,7 +50,6 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Logging\InProcAppender.cs" />
-    <Compile Include="Settings\DynamicSetting.cs" />
     <Compile Include="Settings\DynamicSettings.cs" />
     <Compile Include="Types\BooleanResult.cs" />
     <Compile Include="Types\GroupInformation.cs" />
@@ -66,7 +65,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Abstractions\Abstractions.csproj">
+      <Project>{3E914BA5-74D4-4487-82DA-FFD7F7929363}</Project>
+      <Name>Abstractions</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /y "$(TargetPath)" ..\..\..\Plugins\SDK\

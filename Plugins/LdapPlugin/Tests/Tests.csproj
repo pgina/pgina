@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Abstractions">
+      <HintPath>..\..\SDK\Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="pGina.Shared">
       <HintPath>..\..\SDK\pGina.Shared.dll</HintPath>
     </Reference>

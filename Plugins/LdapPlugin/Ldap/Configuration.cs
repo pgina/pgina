@@ -53,7 +53,7 @@ namespace pGina.Plugin.Ldap
 
         private void LoadSettings()
         {
-            dynamic settings = new DynamicSettings(LdapPlugin.LdapUuid);
+            dynamic settings = new pGinaDynamicSettings(LdapPlugin.LdapUuid);
 
             // Set default values for settings (if not already set)
             settings.SetDefault("LdapHost", new string[] { "ldap.example.com" });
@@ -288,7 +288,7 @@ namespace pGina.Plugin.Ldap
 
         private void StoreSettings()
         {
-            dynamic settings = new DynamicSettings(LdapPlugin.LdapUuid);
+            dynamic settings = new pGinaDynamicSettings(LdapPlugin.LdapUuid);
 
             settings.LdapHost = Regex.Split(ldapHostTextBox.Text.Trim(), @"\s+"); 
             settings.LdapPort = Convert.ToInt32(ldapPortTextBox.Text.Trim());

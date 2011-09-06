@@ -9,7 +9,7 @@ namespace pGina.Plugin.LocalMachine
 {
     public class Settings
     {
-        private static dynamic m_settings = new DynamicSettings(PluginImpl.PluginUuid);
+        private static dynamic m_settings = new pGinaDynamicSettings(PluginImpl.PluginUuid);
 
         static Settings()
         {            

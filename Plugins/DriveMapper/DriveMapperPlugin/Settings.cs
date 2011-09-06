@@ -43,7 +43,7 @@ namespace pGina.Plugin.DriveMapper
 
     class Settings
     {
-        private static dynamic m_settings = new DynamicSettings(DriveMapperPlugin.DriveMapperPluginUuid);
+        private static dynamic m_settings = new pGinaDynamicSettings(DriveMapperPlugin.DriveMapperPluginUuid);
 
         public static List<DriveEntry> Load()
         {

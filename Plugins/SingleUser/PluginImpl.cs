@@ -48,7 +48,7 @@ namespace pGina.Plugin.SingleUser
         {
             using(Process me = Process.GetCurrentProcess())
             {
-                m_settings = new DynamicSettings(PluginUuid);
+                m_settings = new pGinaDynamicSettings(PluginUuid);
                 m_settings.SetDefault("ShowDescription", true);                                
                 m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
             }

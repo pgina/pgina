@@ -37,7 +37,7 @@ namespace pGina.Core
 {
     public static class Settings
     {
-        public static dynamic s_settings = new DynamicSettings(DynamicSettings.PGINA_KEY);
+        public static dynamic s_settings = new pGinaDynamicSettings();
         public static dynamic Get
         {
             get { return s_settings; }

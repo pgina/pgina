@@ -50,7 +50,7 @@ namespace pGina.Plugin.Sample
         {
             using(Process me = Process.GetCurrentProcess())
             {
-                m_settings = new DynamicSettings(SimpleUuid);
+                m_settings = new pGinaDynamicSettings(SimpleUuid);
                 m_settings.SetDefault("ShowDescription", true);
                 m_settings.SetDefault("Description", m_defaultDescription);
                 

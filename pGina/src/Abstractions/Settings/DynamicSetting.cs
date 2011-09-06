@@ -33,7 +33,7 @@ using System.Reflection;
 using System.ComponentModel;
 using Microsoft.Win32;
 
-namespace pGina.Shared.Settings
+namespace Abstractions.Settings
 {
     public class DynamicSetting : DynamicObject
     {

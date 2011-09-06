@@ -50,7 +50,7 @@ namespace pGina.Plugin.MySqlLogger
 
         static PluginImpl()
         {
-            m_settings = new DynamicSettings(PluginUuid);
+            m_settings = new pGinaDynamicSettings(PluginUuid);
             // Set defaults
             m_settings.SetDefault("Host", "localhost");
             m_settings.SetDefault("Port", 3306);

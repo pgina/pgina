@@ -58,7 +58,7 @@ namespace pGina.Plugin.Ldap
 
         private void InitSettings()
         {
-            m_settings = new DynamicSettings(LdapUuid);
+            m_settings = new pGinaDynamicSettings(LdapUuid);
 
             // Set default values for settings (if not already set)
             m_settings.SetDefault("LdapHost", new string[] { "ldap.example.com" });

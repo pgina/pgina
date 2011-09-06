@@ -13,7 +13,7 @@ namespace pGina.Plugin.Sample
 {
     public partial class Configuration : Form
     {
-        dynamic m_settings = new DynamicSettings(SimplePlugin.SimpleUuid);
+        dynamic m_settings = new pGinaDynamicSettings(SimplePlugin.SimpleUuid);
 
         public Configuration()
         {

@@ -60,8 +60,8 @@ namespace pGina.Plugin.Ldap.Tests
 
             // Add a UserInformation object as pGina would            
             properties.AddTrackedSingle<Shared.Types.UserInformation>(userInfo);
-            
-            dynamic settings = new DynamicSettings(LdapPlugin.LdapUuid);
+
+            dynamic settings = new pGinaDynamicSettings(LdapPlugin.LdapUuid);
 
             settings.LdapHost = new string[] { "192.168.51.100", "192.168.56.101" };
             settings.LdapPort = 636;
