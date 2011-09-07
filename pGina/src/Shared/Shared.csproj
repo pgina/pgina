@@ -50,6 +50,9 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Logging\InProcAppender.cs" />
+    <Compile Include="Registration\CredProviderManager.cs" />
+    <Compile Include="Registration\DllUtils.cs" />
+    <Compile Include="Registration\Settings.cs" />
     <Compile Include="Settings\DynamicSettings.cs" />
     <Compile Include="Types\BooleanResult.cs" />
     <Compile Include="Types\GroupInformation.cs" />
