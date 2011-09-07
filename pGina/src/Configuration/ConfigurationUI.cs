@@ -34,6 +34,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.ServiceProcess;
+using System.Reflection;
 
 using pGina.Core;
 using pGina.Core.Messages;
@@ -1237,9 +1238,10 @@ namespace pGina.Configuration
                 else
                 {
                     FolderBrowserDialog dlg = new FolderBrowserDialog();
-                    dlg.Description = "Choose folder containing Credential Provider/GINA DLL." +
+                    dlg.Description = "Select the folder containing Credential Provider/GINA DLL." +
                         "  Optionally, the DLL(s) may be contained in subfolders named 'x64' " +
-                        " and 'Win32' for 64 and 32-bit DLLs respectively.";
+                        " and 'Win32' for 64 and 32-bit DLLs.";
+                    dlg.SelectedPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     if (dlg.ShowDialog() == DialogResult.OK)
                     {
                         manager.CpInfo.Path = dlg.SelectedPath;
