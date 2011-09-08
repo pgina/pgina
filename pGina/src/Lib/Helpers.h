@@ -34,5 +34,6 @@ namespace pGina
 	namespace Helpers
 	{
 		std::wstring GetDomainName();
+		bool UserIsRemote();
 	}
 }

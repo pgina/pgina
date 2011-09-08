@@ -58,8 +58,7 @@ namespace pGina
 				SAS_ACTION_SHUTDOWN_HIBERNATE =          (14),
 				SAS_ACTION_RECONNECTED =                 (15),
 				SAS_ACTION_DELAYED_FORCE_LOGOFF =        (16),
-				SAS_ACTION_SWITCH_CONSOLE =              (17),
-				PGINA_LOGIN_FAILED,
+				SAS_ACTION_SWITCH_CONSOLE =              (17),				
 				PGINA_EMERGENCY_ESCAPE_HATCH,
 			};
 
@@ -73,15 +72,15 @@ namespace pGina
 			virtual bool Command(int itemId);
 			virtual INT_PTR DialogProcImpl(UINT msg, WPARAM wparam, LPARAM lparam);
 
-			pGina::Transactions::User::LoginResult LoginResult() { return m_loginResult; }						
-
-		private:
-			DialogResult LoginAttempt(std::wstring const& username, std::wstring const& password);
-
+			std::wstring Username() { return m_username; }
+			void		 Username(std::wstring const& v) { m_username = v; }
+			std::wstring Password() { return m_password; }
+			void		 Password(std::wstring const& v) { m_password = v; }
 			
 
 		private:
-			pGina::Transactions::User::LoginResult m_loginResult;						
+			std::wstring m_username;
+			std::wstring m_password;
 		};
 	}
 }

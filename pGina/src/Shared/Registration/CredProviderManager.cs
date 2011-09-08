@@ -122,7 +122,8 @@ namespace pGina.CredentialProvider.Registration
                         m_logger.DebugFormat("{0} {1} => {2}", key.ToString(), "GinaDLL",
                             dll.FullName);
                         key.SetValue("GinaDLL", dll.FullName);
-                        key.SetValue("NoDomainUI", 1);                        
+                        key.SetValue("NoDomainUI", 1);
+                        key.SetValue("DontDisplayLastUserName", 1);
                     }
                 }
             }

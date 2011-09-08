@@ -40,5 +40,10 @@ namespace pGina
 			else
 				return computerName;
 		}
+
+		bool UserIsRemote() 
+		{
+			return 0 != GetSystemMetrics(SM_REMOTESESSION);
+		}
 	}
 }

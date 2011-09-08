@@ -33,3 +33,4 @@
 #include <ObjectCleanupPool.h>
 #include <pGinaMessages.h>
 #include <pGinaTransactions.h>
+#include <Helpers.h>
