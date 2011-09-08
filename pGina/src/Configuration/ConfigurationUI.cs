@@ -131,37 +131,52 @@ namespace pGina.Configuration
             pGina.CredentialProvider.Registration.CredProviderManager manager =
                 pGina.CredentialProvider.Registration.CredProviderManager.GetManager();
 
-            if (manager.Registered())
+            try
             {
-                this.cpRegisteredTB.Text = "Yes";
-                this.cpRegisteredTB.ForeColor = Color.Green;
-                this.cpRegisterBtn.Text = "Unregister";
-                this.cpEnableDisableBtn.Enabled = true;
-
-                if (manager.Enabled())
+                if (manager.Registered())
                 {
-                    this.cpEnabledTB.Text = "Yes";
-                    this.cpEnabledTB.ForeColor = Color.Green;
-                    this.cpEnableDisableBtn.Text = "Disable";
+                    this.cpRegisteredTB.Text = "Yes";
+                    this.cpRegisteredTB.ForeColor = Color.Green;
+                    this.cpRegisterBtn.Text = "Unregister";
+                    this.cpEnableDisableBtn.Enabled = true;
+
+                    if (manager.Enabled())
+                    {
+                        this.cpEnabledTB.Text = "Yes";
+                        this.cpEnabledTB.ForeColor = Color.Green;
+                        this.cpEnableDisableBtn.Text = "Disable";
+                    }
+                    else
+                    {
+                        this.cpEnabledTB.Text = "No";
+                        this.cpEnabledTB.ForeColor = Color.Red;
+                        this.cpEnableDisableBtn.Text = "Enable";
+                    }
+
+                    if (Abstractions.Windows.OsInfo.Is64Bit() && !manager.Registered6432())
+                    {
+                        MessageBox.Show("Warning: The 32-bit CP/GINA is not registered.  32-bit apps that " +
+                            "make use of the CP/GINA may not function correctly.");
+                    }
                 }
                 else
                 {
+                    this.cpRegisteredTB.Text = "No";
+                    this.cpRegisteredTB.ForeColor = Color.Red;
+                    this.cpRegisterBtn.Text = "Register";
                     this.cpEnabledTB.Text = "No";
                     this.cpEnabledTB.ForeColor = Color.Red;
+                    this.cpEnableDisableBtn.Enabled = false;
                     this.cpEnableDisableBtn.Text = "Enable";
                 }
-
-                if (Abstractions.Windows.OsInfo.Is64Bit() && !manager.Registered6432())
-                {
-                    MessageBox.Show("Warning: The 32-bit CP/GINA is not registered.  32-bit apps that " +
-                        "make use of the CP/GINA may not function correctly.");
-                }
             }
-            else
-            {
+            catch (NotImplementedException) 
+            { 
+                /* until GINA manager is implemented */
                 this.cpRegisteredTB.Text = "No";
                 this.cpRegisteredTB.ForeColor = Color.Red;
                 this.cpRegisterBtn.Text = "Register";
+                this.cpRegisterBtn.Enabled = false;
                 this.cpEnabledTB.Text = "No";
                 this.cpEnabledTB.ForeColor = Color.Red;
                 this.cpEnableDisableBtn.Enabled = false;
