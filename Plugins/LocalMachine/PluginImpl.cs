@@ -224,8 +224,8 @@ namespace pGina.Plugin.LocalMachine
         public BooleanResult AuthorizeUser(SessionProperties properties)
         {
             // Some things we always do,
-            bool mirrorGroups = Settings.Store.MirrorGroupsForAuthdUsers;   // Should we load users groups from SAM?
-            if (mirrorGroups)
+            bool mirrorGroups = Settings.Store.MirrorGroupsForAuthdUsers;   // Should we load users groups from SAM? We always do if we auth'd only
+            if (mirrorGroups || DidWeAuthThisUser(properties, true))
             {
                 m_logger.DebugFormat("AuthorizeUser: Mirroring users group membership from SAM");
                 LocalAccount.SyncLocalGroupsToUserInfo(properties.GetTrackedSingle<UserInformation>());
@@ -326,10 +326,32 @@ namespace pGina.Plugin.LocalMachine
             if (authzAllUsers) return true;
             
             // Did we auth this user?
+            return DidWeAuthThisUser(properties, false);
+        }
+
+        private bool DidWeAuthThisUser(SessionProperties properties, bool exclusiveOnly)
+        {
             PluginActivityInformation pluginInfo = properties.GetTrackedSingle<PluginActivityInformation>();
-            if (pluginInfo.GetAuthorizationPlugins().Contains(PluginUuid))
+
+            if (!exclusiveOnly)
             {
-                return pluginInfo.GetAuthenticationResult(PluginUuid).Success;
+                if (pluginInfo.GetAuthenticationPlugins().Contains(PluginUuid))
+                {
+                    return pluginInfo.GetAuthenticationResult(PluginUuid).Success;
+                }
+            }
+            else
+            {
+                if (!pluginInfo.GetAuthenticationPlugins().Contains(PluginUuid))
+                    return false;
+
+                // We must be the only one
+                foreach (Guid pluginId in pluginInfo.GetAuthenticationPlugins())
+                {
+                    if (pluginId != PluginUuid && pluginInfo.GetAuthenticationResult(pluginId).Success) return false;
+                }
+
+                return true;
             }
 
             return false;

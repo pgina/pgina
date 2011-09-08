@@ -41,6 +41,7 @@ namespace pGina
 			static DLGPROC GetDlgHookProc() { return (DLGPROC) MicrosoftDialogProcWrapper; }
 			static bool Enabled() { return s_hookingEnabled; }
 			static void Enabled(bool v) { s_hookingEnabled = v; }
+			static void SetLoginInfo(pGina::Transactions::User::LoginResult result) { s_loginResult = result; }
 
 		private:
 			static DLGPROC s_hookedDlgProc;			

@@ -186,6 +186,7 @@ namespace pGina
 				{
 					// Invoke the msgina logged out sas dialog, intercept it, set username/password, and hit ok!
 					HookedLoggedOutSAS::Enabled(true);
+					HookedLoggedOutSAS::SetLoginInfo(dialog.LoginResult());
 					int msresult = m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
 					HookedLoggedOutSAS::Enabled(false);				
 					return msresult;
