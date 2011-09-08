@@ -37,6 +37,10 @@
 #include "WinlogonRouter.h"
 
 #include "DialogLoggedOutSAS.h"
+#include "HookedLoggedOutSAS.h"
+
+// Dialog ID's for MSGINA's WlxLoggedOutSAS Dialog
+#define IDD_WLXLOGGEDOUTSAS_DIALOG 1500 
 
 namespace pGina
 {
@@ -175,20 +179,27 @@ namespace pGina
 			
 			if(ourDialogResult == DialogLoggedOutSAS::PGINA_EMERGENCY_ESCAPE_HATCH)
 				return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
-			
+						
 			switch(ourDialogResult)
 			{
 			case DialogLoggedOutSAS::SAS_ACTION_LOGON:
-				// Invoke the msgina logged out sas dialog, intercept it, set username/password, and hit ok!
+				{
+					// Invoke the msgina logged out sas dialog, intercept it, set username/password, and hit ok!
+					HookedLoggedOutSAS::Enabled(true);
+					int msresult = m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
+					HookedLoggedOutSAS::Enabled(false);				
+					return msresult;
+				}
 				break;
 			case DialogLoggedOutSAS::PGINA_LOGIN_FAILED:
-				std::wstring failureMessage = dialog.LoginResult().Message();
-				m_winlogon->WlxMessageBox(NULL, const_cast<wchar_t *>(failureMessage.c_str()), L"Login Failure", MB_ICONEXCLAMATION | MB_OK);
-				return WLX_SAS_ACTION_NONE;	
+				{
+					std::wstring failureMessage = dialog.LoginResult().Message();
+					m_winlogon->WlxMessageBox(NULL, const_cast<wchar_t *>(failureMessage.c_str()), L"Login Failure", MB_ICONEXCLAMATION | MB_OK);
+					return WLX_SAS_ACTION_NONE;	
+				}
 				break;			
 			}
 
-			// If we make it here, just return none
 			return WLX_SAS_ACTION_NONE;
 		}
 
@@ -217,6 +228,27 @@ namespace pGina
 		bool GinaChain::NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo)
 		{
 			return m_wrappedGina->NetworkProviderLoad(pNprNotifyInfo);
-		}							
+		}					
+
+		// Winlogon calls from MSGINA that we hook
+		int GinaChain::WlxDialogBoxParam(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam)
+		{
+			// Is it a dialog id (integer)?
+			if (!HIWORD(lpszTemplate)) 
+			{
+				// Make sure we only hook the dialogs we want
+				switch ((DWORD) lpszTemplate) 
+				{
+					case IDD_WLXLOGGEDOUTSAS_DIALOG:
+						// Thank god gina is single threaded... I think...
+						HookedLoggedOutSAS::SetHookedDlgProc(dlgprc);
+						return WinlogonProxy::WlxDialogBoxParam(hInst, lpszTemplate, hwndOwner, HookedLoggedOutSAS::GetDlgHookProc(), dwInitParam);
+						break;
+				}
+			}			
+
+			// Everyone else falls through
+   			return WinlogonProxy::WlxDialogBoxParam(hInst, lpszTemplate, hwndOwner, dlgprc, dwInitParam);
+		}
 	}
 }

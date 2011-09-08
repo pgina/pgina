@@ -24,7 +24,7 @@
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "DialogLoggedOutSAS.h"
+#include "HookedLoggedOutSAS.h"
 
 #include <Macros.h>
 
@@ -35,51 +35,37 @@
 namespace pGina
 {
 	namespace GINA
-	{				
-		void DialogLoggedOutSAS::DialogInit()
-		{
-			SetItemText(IDC_USERNAME_TXT, L"Duuude!");
-			SetFocusItem(IDC_PASSWORD_TXT);
-		}
+	{
+		/* static */ DLGPROC HookedLoggedOutSAS::s_hookedDlgProc = 0;
+		/* static */ bool    HookedLoggedOutSAS::s_hookingEnabled = false;
+		/* static */ pGina::Transactions::User::LoginResult HookedLoggedOutSAS::s_loginResult;
 
-		bool DialogLoggedOutSAS::Command(int itemId)
+		/* static */
+		INT_PTR HookedLoggedOutSAS::MicrosoftDialogProcWrapper(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		{
-			switch(itemId)
+			if(s_hookedDlgProc == 0)
 			{
-			case IDCANCEL:
-				FinishWithResult(SAS_ACTION_NONE);
-				return true;	
-
-			case IDC_EMERGENCY_ESCAPE_HATCH:
-				FinishWithResult(PGINA_EMERGENCY_ESCAPE_HATCH);
-				return true;
-
-			case IDC_LOGIN_BUTTON:
-				FinishWithResult(LoginAttempt(GetItemText(IDC_USERNAME_TXT), GetItemText(IDC_PASSWORD_TXT)));
-				return true;
+				pERROR(L"HookedLoggedOutSAS::MicrosoftDialogProcWrapper: Dialog wrapper called before we know who we're hooking!");
+				return 0;	// Nothin we can do!
 			}
 
-			return false;
-		}
+			// Fall through if hooking is not enabled
+			if(!s_hookingEnabled)
+				return s_hookedDlgProc(hwnd, msg, wparam, lparam);
 
-		INT_PTR DialogLoggedOutSAS::DialogProcImpl(UINT msg, WPARAM wparam, LPARAM lparam)
-		{			
-			return FALSE;
-		}
+			// Hooking is on, so we let msgina do its thing
+			INT_PTR msginaResult = s_hookedDlgProc(hwnd, msg, wparam, lparam);
 
-		DialogLoggedOutSAS::DialogResult DialogLoggedOutSAS::LoginAttempt(std::wstring const& username, std::wstring const& password)
-		{
-			// WLX_SAS_ACTION_LOGON
-			pDEBUG(L"DialogLoggedOutSAS::LoginAttempt: Processing login for %s", username.c_str());
-			m_loginResult = pGina::Transactions::User::ProcessLoginForUser(username.c_str(), NULL, password.c_str());
-			if(!m_loginResult.Result())
+			// If we're init'ing, then we set username, password and queue a message to login
+			if(msg == WM_INITDIALOG)
 			{
-				pERROR(L"DialogLoggedOutSAS::LoginAttempt: %s", m_loginResult.Message().c_str());
-				return PGINA_LOGIN_FAILED;
-			}			
+				pDEBUG(L"HookedLoggedOutSAS::MicrosoftDialogProcWrapper: Hooked dialog, setting username/password and submitting");
+				SetDlgItemText(hwnd, IDC_MSGINA_USERNAME, s_loginResult.Username().c_str());
+				SetDlgItemText(hwnd, IDC_MSGINA_PASSWORD, s_loginResult.Password().c_str());			
+				// SendMessage(hwnd, WM_COMMAND, 1, 1);
+			}
 
-			pDEBUG(L"DialogLoggedOutSAS::LoginAttempt: Successful, resulting username: %s", m_loginResult.Username().c_str());
-			return SAS_ACTION_LOGON;
+			return msginaResult;
 		}
 	}
 }

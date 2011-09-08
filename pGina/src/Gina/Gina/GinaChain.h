@@ -77,6 +77,8 @@ namespace pGina
 			virtual bool StartApplication(PWSTR pszDesktopName, PVOID pEnvironment, PWSTR pszCmdLine);
 			virtual bool NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo);		
 		
+			// Winlogon callbacks that we hook
+			virtual int  WlxDialogBoxParam(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam);
 		private:
 			GinaWrapper * m_wrappedGina;
 			bool m_passthru;

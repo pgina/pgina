@@ -56,6 +56,9 @@
     <ClCompile Include="DialogLoggedOutSAS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HookedLoggedOutSAS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dll.h">
@@ -92,6 +95,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DialogLoggedOutSAS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HookedLoggedOutSAS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -30,58 +30,24 @@
 
 #include <pGinaNativeLib.h>
 
-#include "DialogBase.h"
-#include "resource.h"
-
 namespace pGina
 {
 	namespace GINA
 	{
-		class DialogLoggedOutSAS : public DialogBase
+		class HookedLoggedOutSAS
 		{
 		public:
-			typedef enum DialogResult
-			{
-				SAS_ACTION_LOGON =						 (1),
-				SAS_ACTION_NONE =						 (2),
-				SAS_ACTION_LOCK_WKSTA =					 (3),
-				SAS_ACTION_LOGOFF =						 (4),
-				SAS_ACTION_SHUTDOWN =					 (5),
-				SAS_ACTION_PWD_CHANGED =				 (6),
-				SAS_ACTION_TASKLIST  =                   (7),
-				SAS_ACTION_UNLOCK_WKSTA =                (8),
-				SAS_ACTION_FORCE_LOGOFF =                (9),
-				SAS_ACTION_SHUTDOWN_POWER_OFF =          (10),
-				SAS_ACTION_SHUTDOWN_REBOOT =             (11),
-				SAS_ACTION_SHUTDOWN_SLEEP =              (12),
-				SAS_ACTION_SHUTDOWN_SLEEP2 =             (13),
-				SAS_ACTION_SHUTDOWN_HIBERNATE =          (14),
-				SAS_ACTION_RECONNECTED =                 (15),
-				SAS_ACTION_DELAYED_FORCE_LOGOFF =        (16),
-				SAS_ACTION_SWITCH_CONSOLE =              (17),
-				PGINA_LOGIN_FAILED,
-				PGINA_EMERGENCY_ESCAPE_HATCH,
-			};
-
-		public:
-			DialogLoggedOutSAS(WinlogonInterface *iface) :
-				DialogBase(iface, IDD_LOGGEDOUT_SAS)
-				{					
-				}
-			
-			virtual void DialogInit();
-			virtual bool Command(int itemId);
-			virtual INT_PTR DialogProcImpl(UINT msg, WPARAM wparam, LPARAM lparam);
-
-			pGina::Transactions::User::LoginResult LoginResult() { return m_loginResult; }						
+			static void SetHookedDlgProc(DLGPROC proc) { s_hookedDlgProc = proc; }
+			static DLGPROC GetDlgHookProc() { return (DLGPROC) MicrosoftDialogProcWrapper; }
+			static bool Enabled() { return s_hookingEnabled; }
+			static void Enabled(bool v) { s_hookingEnabled = v; }
 
 		private:
-			DialogResult LoginAttempt(std::wstring const& username, std::wstring const& password);
+			static DLGPROC s_hookedDlgProc;			
+			static bool    s_hookingEnabled;
+			static pGina::Transactions::User::LoginResult s_loginResult;
 
-			
-
-		private:
-			pGina::Transactions::User::LoginResult m_loginResult;						
+			static INT_PTR MicrosoftDialogProcWrapper(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 		};
 	}
 }
