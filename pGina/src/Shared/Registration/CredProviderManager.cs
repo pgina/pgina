@@ -170,17 +170,17 @@ namespace pGina.CredentialProvider.Registration
 
         public override bool Registered6432()
         {
-            throw new Exception("Not used for GINA");
+            return false;
         }
 
         public override bool Enabled()
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public override bool Enabled6432()
         {
-            throw new Exception("Not used for GINA");
+            return false;
         }
     }
 
