@@ -93,14 +93,53 @@ namespace pGina.CredentialProvider.Registration
     public class GinaCredProviderManager : CredProviderManager
     {
 
+        private static readonly string GINA_KEY = @"Software\Microsoft\Windows NT\CurrentVersion\Winlogon";
+        private ILog m_logger = LogManager.GetLogger("GinaCredProviderManager");
+
+        public GinaCredProviderManager()
+        {
+            this.CpInfo.ShortName = "pGinaGINA";
+        }
+
         public override void Install()
         {
-            throw new NotImplementedException();
+            FileInfo dll = null;
+            if (Abstractions.Windows.OsInfo.Is64Bit())
+            {
+                dll = DllUtils.Find64BitDll(this.CpInfo.Path, this.CpInfo.ShortName);
+            }
+            else
+            {
+                dll = DllUtils.Find32BitDll(this.CpInfo.Path, this.CpInfo.ShortName);
+            }
+            if (dll != null)
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(GINA_KEY, true))
+                {
+                    if (key != null)
+                    {
+                        m_logger.DebugFormat("{0} {1} => {2}", key.ToString(), "GinaDLL",
+                            dll.FullName);
+                        key.SetValue("GinaDLL", dll.FullName);
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception("GINA DLL not found in " + CpInfo.Path);
+            }
         }
 
         public override void Uninstall()
         {
-            throw new NotImplementedException();
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(GINA_KEY, true))
+            {
+                if (key != null)
+                {
+                    m_logger.DebugFormat("Deleting GinaDLL value in {0}", key.ToString());
+                    key.DeleteValue("GinaDLL", false);
+                }
+            }
         }
 
         public override void Disable()
@@ -115,12 +154,23 @@ namespace pGina.CredentialProvider.Registration
 
         public override bool Registered()
         {
-            throw new NotImplementedException();
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(GINA_KEY))
+            {
+                if (key != null)
+                {
+                    object value = key.GetValue("GinaDLL");
+                    return value != null;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
         public override bool Registered6432()
         {
-            throw new NotImplementedException();
+            throw new Exception("Not used for GINA");
         }
 
         public override bool Enabled()
@@ -130,7 +180,7 @@ namespace pGina.CredentialProvider.Registration
 
         public override bool Enabled6432()
         {
-            throw new NotImplementedException();
+            throw new Exception("Not used for GINA");
         }
     }
 
