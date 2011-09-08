@@ -122,6 +122,7 @@ namespace pGina.CredentialProvider.Registration
                         m_logger.DebugFormat("{0} {1} => {2}", key.ToString(), "GinaDLL",
                             dll.FullName);
                         key.SetValue("GinaDLL", dll.FullName);
+                        key.SetValue("NoDomainUI", 1);                        
                     }
                 }
             }
@@ -139,6 +140,7 @@ namespace pGina.CredentialProvider.Registration
                 {
                     m_logger.DebugFormat("Deleting GinaDLL value in {0}", key.ToString());
                     key.DeleteValue("GinaDLL", false);
+                    key.DeleteValue("NoDomainUI", false);
                 }
             }
         }

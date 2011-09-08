@@ -59,10 +59,14 @@ namespace pGina
 			// If we're init'ing, then we set username, password and queue a message to login
 			if(msg == WM_INITDIALOG)
 			{
-				pDEBUG(L"HookedLoggedOutSAS::MicrosoftDialogProcWrapper: Hooked dialog, setting username/password and submitting");
-				SetDlgItemText(hwnd, IDC_MSGINA_USERNAME, s_loginResult.Username().c_str());
+				std::wstring domainUsername = s_loginResult.Domain();
+				domainUsername += L"\\";
+				domainUsername += s_loginResult.Username();
+
+				pDEBUG(L"HookedLoggedOutSAS::MicrosoftDialogProcWrapper: Hooked dialog, setting username/password and submitting for user: %s", domainUsername.c_str());
+				SetDlgItemText(hwnd, IDC_MSGINA_USERNAME, domainUsername.c_str());
 				SetDlgItemText(hwnd, IDC_MSGINA_PASSWORD, s_loginResult.Password().c_str());			
-				// SendMessage(hwnd, WM_COMMAND, 1, 1);
+				SendMessage(hwnd, WM_COMMAND, 1, 1);
 			}
 
 			return msginaResult;
