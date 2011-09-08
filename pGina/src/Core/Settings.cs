@@ -53,6 +53,7 @@ namespace pGina.Core
             s_settings.SetDefault("SessionInfoCacheTimeout", 300);
             s_settings.SetDefault("SessionHelperExe", "pGina.Service.SessionHelper.exe");
             s_settings.SetDefault("Motd", "pGina Version: %v");
+            s_settings.SetDefault("GinaPassthru", false);
         }
     }
 }

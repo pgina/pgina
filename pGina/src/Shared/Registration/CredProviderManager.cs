@@ -32,6 +32,7 @@ using System.IO;
 using Microsoft.Win32;
 
 using log4net;
+using pGina.Shared.Settings;
 
 namespace pGina.CredentialProvider.Registration
 {
@@ -144,12 +145,14 @@ namespace pGina.CredentialProvider.Registration
 
         public override void Disable()
         {
-            throw new NotImplementedException();
+            dynamic pGinaSettings = new pGinaDynamicSettings();
+            pGinaSettings.GinaPassthru = true;
         }
 
         public override void Enable()
         {
-            throw new NotImplementedException();
+            dynamic pGinaSettings = new pGinaDynamicSettings();
+            pGinaSettings.GinaPassthru = false;
         }
 
         public override bool Registered()
@@ -170,17 +173,19 @@ namespace pGina.CredentialProvider.Registration
 
         public override bool Registered6432()
         {
-            throw new Exception("Not used for GINA");
+            return true;
         }
 
         public override bool Enabled()
         {
-            throw new NotImplementedException();
+            dynamic pGinaSettings = new pGinaDynamicSettings();
+            bool passthru = pGinaSettings.GetSetting("GinaPassthru", false);
+            return !passthru;
         }
 
         public override bool Enabled6432()
         {
-            throw new Exception("Not used for GINA");
+            return true;
         }
     }
 
