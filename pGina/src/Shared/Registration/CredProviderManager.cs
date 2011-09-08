@@ -186,7 +186,7 @@ namespace pGina.CredentialProvider.Registration
         public override bool Enabled6432()
         {
             return true;
-        }
+        }        
     }
 
     public class DefaultCredProviderManager : CredProviderManager
