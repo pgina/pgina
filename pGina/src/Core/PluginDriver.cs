@@ -148,8 +148,15 @@ namespace pGina.Core
                     }
                     else
                     {
-                        m_logger.WarnFormat("{0} Failed with Message: {1}", plugin.Uuid, pluginResult.Message);
-                        finalResult.Message = pluginResult.Message;
+                        if (!string.IsNullOrEmpty(pluginResult.Message))
+                        {
+                            m_logger.WarnFormat("{0} Failed with Message: {1}", plugin.Uuid, pluginResult.Message);
+                            finalResult.Message = pluginResult.Message;
+                        }
+                        else
+                        {
+                            m_logger.WarnFormat("{0} Failed without a message", plugin.Uuid);
+                        }
                     }
                 }
                 catch (Exception e)

@@ -167,11 +167,29 @@ namespace pGina
 		{
 			if(m_passthru)
 			{
-				return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
+				return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);				
 			}
 
-			DialogLoggedOutSAS *dialog = new DialogLoggedOutSAS(m_winlogon);
-			return dialog->ShowDialog();						
+			DialogLoggedOutSAS dialog(m_winlogon);
+			int ourDialogResult = dialog.ShowDialog();	
+			
+			if(ourDialogResult == DialogLoggedOutSAS::PGINA_EMERGENCY_ESCAPE_HATCH)
+				return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
+			
+			switch(ourDialogResult)
+			{
+			case DialogLoggedOutSAS::SAS_ACTION_LOGON:
+				// Invoke the msgina logged out sas dialog, intercept it, set username/password, and hit ok!
+				break;
+			case DialogLoggedOutSAS::PGINA_LOGIN_FAILED:
+				std::wstring failureMessage = dialog.LoginResult().Message();
+				m_winlogon->WlxMessageBox(NULL, const_cast<wchar_t *>(failureMessage.c_str()), L"Login Failure", MB_ICONEXCLAMATION | MB_OK);
+				return WLX_SAS_ACTION_NONE;	
+				break;			
+			}
+
+			// If we make it here, just return none
+			return WLX_SAS_ACTION_NONE;
 		}
 
 		int  GinaChain::LoggedOnSAS(DWORD dwSasType, PVOID pReserved)

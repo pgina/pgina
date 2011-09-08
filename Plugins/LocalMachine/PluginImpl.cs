@@ -94,8 +94,11 @@ namespace pGina.Plugin.LocalMachine
             {
                 string[] cleanupUsers = Settings.Store.CleanupUsers;
                 List<string> users = cleanupUsers.ToList();
-                users.Add(username);
-                Settings.Store.CleanupUsers = users.ToArray();
+                if (!users.Contains(username))
+                {
+                    users.Add(username);
+                    Settings.Store.CleanupUsers = users.ToArray();
+                }
             }
         }
 
@@ -207,7 +210,9 @@ namespace pGina.Plugin.LocalMachine
                 }        
 
                 m_logger.ErrorFormat("Failed to authenticate user: {0}", userInfo.Username);
-                return new BooleanResult() { Success = false, Message = string.Format("Local account validation failed.") };
+                // Note that we don't include a message.  We are a last chance auth, and want previous/failed plugins
+                //  to have the honor of explaining why.
+                return new BooleanResult() { Success = false, Message = null }; 
             }
             catch (Exception e)
             {

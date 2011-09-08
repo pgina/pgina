@@ -26,6 +26,8 @@
 */
 #include "DialogLoggedOutSAS.h"
 
+#include <Macros.h>
+
 namespace pGina
 {
 	namespace GINA
@@ -41,8 +43,16 @@ namespace pGina
 			switch(itemId)
 			{
 			case IDCANCEL:
-				FinishWithResult(WLX_SAS_ACTION_NONE);
-				return true;			
+				FinishWithResult(DialogResult::SAS_ACTION_NONE);
+				return true;	
+
+			case IDC_EMERGENCY_ESCAPE_HATCH:
+				FinishWithResult(DialogResult::PGINA_EMERGENCY_ESCAPE_HATCH);
+				return true;
+
+			case IDC_LOGIN_BUTTON:
+				FinishWithResult(LoginAttempt(GetItemText(IDC_USERNAME_TXT), GetItemText(IDC_PASSWORD_TXT)));
+				return true;
 			}
 
 			return false;
@@ -51,6 +61,21 @@ namespace pGina
 		INT_PTR DialogLoggedOutSAS::DialogProcImpl(UINT msg, WPARAM wparam, LPARAM lparam)
 		{			
 			return FALSE;
+		}
+
+		DialogLoggedOutSAS::DialogResult DialogLoggedOutSAS::LoginAttempt(std::wstring const& username, std::wstring const& password)
+		{
+			// WLX_SAS_ACTION_LOGON
+			pDEBUG(L"DialogLoggedOutSAS::LoginAttempt: Processing login for %s", username.c_str());
+			m_loginResult = pGina::Transactions::User::ProcessLoginForUser(username.c_str(), NULL, password.c_str());
+			if(!m_loginResult.Result())
+			{
+				pERROR(L"DialogLoggedOutSAS::LoginAttempt: %s", m_loginResult.Message().c_str());
+				return DialogResult::PGINA_LOGIN_FAILED;
+			}			
+
+			pDEBUG(L"DialogLoggedOutSAS::LoginAttempt: Successful, resulting username: %s", m_loginResult.Username().c_str());
+			return DialogResult::SAS_ACTION_LOGON;
 		}
 	}
 }
