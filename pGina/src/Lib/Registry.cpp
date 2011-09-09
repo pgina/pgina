@@ -75,7 +75,14 @@ namespace pGina
 
 		bool GetBool(const wchar_t * keyName, bool defaultValue)
 		{
-			return (GetDword(keyName, defaultValue ? (DWORD) 0x01 : (DWORD) 0x00) != (DWORD) 0x00);
+			std::wstring v = defaultValue ? L"True" : L"False";
+			v = GetString(keyName, v.c_str());
+			if(_wcsicmp(v.c_str(), L"True") == 0)
+				return true;
+			if(_wcsicmp(v.c_str(), L"False") == 0)
+				return false;
+
+			return defaultValue;
 		}
 	}
 }

@@ -42,29 +42,29 @@ namespace pGina
 		public:
 			typedef enum DialogResult
 			{
-				SAS_ACTION_LOGON =						 (1),
-				SAS_ACTION_NONE =						 (2),
-				SAS_ACTION_LOCK_WKSTA =					 (3),
-				SAS_ACTION_LOGOFF =						 (4),
-				SAS_ACTION_SHUTDOWN =					 (5),
-				SAS_ACTION_PWD_CHANGED =				 (6),
-				SAS_ACTION_TASKLIST  =                   (7),
-				SAS_ACTION_UNLOCK_WKSTA =                (8),
-				SAS_ACTION_FORCE_LOGOFF =                (9),
-				SAS_ACTION_SHUTDOWN_POWER_OFF =          (10),
-				SAS_ACTION_SHUTDOWN_REBOOT =             (11),
-				SAS_ACTION_SHUTDOWN_SLEEP =              (12),
-				SAS_ACTION_SHUTDOWN_SLEEP2 =             (13),
-				SAS_ACTION_SHUTDOWN_HIBERNATE =          (14),
-				SAS_ACTION_RECONNECTED =                 (15),
-				SAS_ACTION_DELAYED_FORCE_LOGOFF =        (16),
-				SAS_ACTION_SWITCH_CONSOLE =              (17),				
-				PGINA_EMERGENCY_ESCAPE_HATCH,
+				SAS_ACTION_LOGON =						 WLX_SAS_ACTION_LOGON,
+				SAS_ACTION_NONE =						 WLX_SAS_ACTION_NONE,
+				SAS_ACTION_LOCK_WKSTA =					 WLX_SAS_ACTION_LOCK_WKSTA,
+				SAS_ACTION_LOGOFF =						 WLX_SAS_ACTION_LOGOFF,
+				SAS_ACTION_SHUTDOWN =					 WLX_SAS_ACTION_SHUTDOWN,
+				SAS_ACTION_PWD_CHANGED =				 WLX_SAS_ACTION_PWD_CHANGED,
+				SAS_ACTION_TASKLIST  =                   WLX_SAS_ACTION_TASKLIST,
+				SAS_ACTION_UNLOCK_WKSTA =                WLX_SAS_ACTION_UNLOCK_WKSTA,
+				SAS_ACTION_FORCE_LOGOFF =                WLX_SAS_ACTION_FORCE_LOGOFF,
+				SAS_ACTION_SHUTDOWN_POWER_OFF =          WLX_SAS_ACTION_SHUTDOWN_POWER_OFF,
+				SAS_ACTION_SHUTDOWN_REBOOT =             WLX_SAS_ACTION_SHUTDOWN_REBOOT,
+				SAS_ACTION_SHUTDOWN_SLEEP =              WLX_SAS_ACTION_SHUTDOWN_SsLEEP,
+				SAS_ACTION_SHUTDOWN_SLEEP2 =             WLX_SAS_ACTION_SHUTDOWN_SLEEP2,
+				SAS_ACTION_SHUTDOWN_HIBERNATE =          WLX_SAS_ACTION_SHUTDOWN_HIBERNATE,
+				SAS_ACTION_RECONNECTED =                 WLX_SAS_ACTION_RECONNECTED,
+				SAS_ACTION_DELAYED_FORCE_LOGOFF =        WLX_SAS_ACTION_DELAYED_FORCE_LOGOFF,
+				SAS_ACTION_SWITCH_CONSOLE =              WLX_SAS_ACTION_SWITCH_CONSOLE,								
 			};
 
 		public:
 			DialogLoggedOutSAS(WinlogonInterface *iface) :
-				DialogBase(iface, IDD_LOGGEDOUT_SAS)
+				DialogBase(iface, IDD_LOGGEDOUT_SAS),
+					m_bitmap(NULL)
 				{					
 				}
 			
@@ -76,11 +76,14 @@ namespace pGina
 			void		 Username(std::wstring const& v) { m_username = v; }
 			std::wstring Password() { return m_password; }
 			void		 Password(std::wstring const& v) { m_password = v; }
-			
+		
+		private:
+			void ApplyLogoImage();
 
 		private:
 			std::wstring m_username;
 			std::wstring m_password;
+			HBITMAP m_bitmap;
 		};
 	}
 }

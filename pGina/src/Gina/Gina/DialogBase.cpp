@@ -175,5 +175,10 @@ namespace pGina
 		{
 			SetFocus(GetItem(itemid));
 		}
+
+		void DialogBase::SetItemBitmap(int itemid, HBITMAP bitmap)
+		{
+			SendDlgItemMessage(m_hwnd, itemid, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bitmap);
+		}
 	}
 }

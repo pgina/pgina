@@ -76,12 +76,58 @@ namespace pGina.Configuration
         {
             Framework.Init();
             InitializeComponent();
+            InitOptionsTabs();
             InitPluginsDGV();
             PopulatePluginDirs();
             InitOrderLists();
             RefreshPluginLists();
             InitLiveLog();
-            LoadGeneralSettings();
+            LoadGeneralSettings();            
+        }
+
+        private void InitOptionsTabs()
+        {
+            if (Abstractions.Windows.OsInfo.IsVistaOrLater())
+            {
+                m_tabs.TabPages.Remove(ginaOptions);
+                InitCpOptions();
+            }
+            else
+            {
+                m_tabs.TabPages.Remove(cpOptions);
+                InitGinaOptions();
+            }
+        }
+
+        private void InitCpOptions()
+        {
+        }
+
+        private void InitGinaOptions()
+        {
+            m_txtGinaChain.Text = Settings.Get.ChainedGinaPath;
+            chkSpecialButton.Checked = Settings.Get.EnableSpecialActionButton;
+            string action = Settings.Get.SpecialAction;
+            switch (action)
+            {
+                case "Shutdown":
+                    radioShutdown.Checked = true;
+                    break;
+                case "Restart":
+                    radioRestart.Checked = true;
+                    break;
+                case "Sleep":
+                    radioSleep.Checked = true;
+                    break;
+                case "Hibernate":
+                    radioHibernate.Checked = true;
+                    break;
+            }
+
+            radioSleep.Enabled = chkSpecialButton.Checked;
+            radioShutdown.Enabled = chkSpecialButton.Checked;
+            radioRestart.Enabled = chkSpecialButton.Checked;
+            radioHibernate.Enabled = chkSpecialButton.Checked;
         }
 
         private void LoadGeneralSettings()
@@ -708,6 +754,9 @@ namespace pGina.Configuration
             Core.Settings.Get.TileImage = m_tileImageTxt.Text;
             this.LoadTileImagePreview();
             Settings.Get.Motd = this.motdTB.Text.Trim();
+
+            this.SaveGinaSettings();
+            this.SaveCpSettings();
         }
 
         private void MoveUp(DataGridView dgv, int index)
@@ -1278,6 +1327,45 @@ namespace pGina.Configuration
             }
 
             this.UpdateCpStatus();
+        }
+
+        private void btnGinaBrowse_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "DLL Files (*.dll)|*.dll";
+            ofd.Multiselect = false;
+            ofd.Title = "Select GINA to be chained";
+            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                m_txtGinaChain.Text = ofd.FileName;
+            }
+        }
+
+        private void SaveGinaSettings()
+        {
+            Settings.Get.ChainedGinaPath = m_txtGinaChain.Text;
+            Settings.Get.EnableSpecialActionButton = chkSpecialButton.Checked;
+
+            if (radioShutdown.Checked)
+                Settings.Get.SpecialAction = "Shutdown";
+            else if (radioRestart.Checked)
+                Settings.Get.SpecialAction = "Restart";
+            else if (radioSleep.Checked)
+                Settings.Get.SpecialAction = "Sleep";
+            else if (radioHibernate.Checked)
+                Settings.Get.SpecialAction = "Hibernate";            
+        }
+
+        private void SaveCpSettings()
+        {
+        }
+
+        private void chkSpecialButton_CheckedChanged(object sender, EventArgs e)
+        {
+            radioSleep.Enabled = chkSpecialButton.Checked;
+            radioShutdown.Enabled = chkSpecialButton.Checked;
+            radioRestart.Enabled = chkSpecialButton.Checked;
+            radioHibernate.Enabled = chkSpecialButton.Checked;
         }
     }
 }

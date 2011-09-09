@@ -25,7 +25,9 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "DialogLoggedOutSAS.h"
+#include "Dll.h"
 
+#include <wchar.h>
 #include <Macros.h>
 
 // ID's for MSGINA's WlxLoggedOutSAS dialog
@@ -40,7 +42,19 @@ namespace pGina
 		{
 			if(!m_username.empty()) SetItemText(IDC_USERNAME_TXT, m_username.c_str());
 			if(!m_password.empty()) SetItemText(IDC_PASSWORD_TXT, m_password.c_str());
-			SetFocusItem(IDC_PASSWORD_TXT);
+			std::wstring motd = pGina::Transactions::TileUi::GetDynamicLabel(L"MOTD");
+			SetItemText(IDC_MOTD, motd.c_str());
+			ApplyLogoImage();
+			SetFocusItem(IDC_USERNAME_TXT);
+
+			bool specialActionEnabled = pGina::Registry::GetBool(L"EnableSpecialActionButton", false);
+			if(specialActionEnabled)
+			{
+				EnableItem(IDC_SPECIAL);
+				SetItemText(IDC_SPECIAL, pGina::Registry::GetString(L"SpecialAction", L"Shutdown").c_str());
+			}
+			else
+				DisableItem(IDC_SPECIAL);			
 		}
 
 		bool DialogLoggedOutSAS::Command(int itemId)
@@ -50,15 +64,25 @@ namespace pGina
 			case IDCANCEL:
 				FinishWithResult(SAS_ACTION_NONE);
 				return true;	
-
-			case IDC_EMERGENCY_ESCAPE_HATCH:
-				FinishWithResult(PGINA_EMERGENCY_ESCAPE_HATCH);
-				return true;
-
+			
 			case IDC_LOGIN_BUTTON:
 				m_username = GetItemText(IDC_USERNAME_TXT);
 				m_password = GetItemText(IDC_PASSWORD_TXT);
 				FinishWithResult(SAS_ACTION_LOGON);
+				return true;
+
+			case IDC_SPECIAL:
+				{
+					std::wstring action = pGina::Registry::GetString(L"SpecialAction", L"Shutdown").c_str();
+					if(_wcsicmp(action.c_str(), L"Shutdown") == 0)
+						FinishWithResult(SAS_ACTION_SHUTDOWN_POWER_OFF);
+					else if(_wcsicmp(action.c_str(), L"Reboot") == 0)
+						FinishWithResult(SAS_ACTION_SHUTDOWN_REBOOT);
+					else if(_wcsicmp(action.c_str(), L"Sleep") == 0)
+						FinishWithResult(SAS_ACTION_SHUTDOWN_SLEEP);
+					else if(_wcsicmp(action.c_str(), L"Hibernate") == 0)
+						FinishWithResult(SAS_ACTION_SHUTDOWN_HIBERNATE);					
+				}
 				return true;
 			}
 
@@ -69,5 +93,28 @@ namespace pGina
 		{			
 			return FALSE;
 		}		
+
+		void DialogLoggedOutSAS::ApplyLogoImage()
+		{
+			if(m_bitmap == NULL)
+			{
+				std::wstring tileImage = pGina::Registry::GetString(L"TileImage", L"");
+				if(tileImage.empty() || tileImage.length() == 1)
+				{
+					// Use builtin
+					m_bitmap = LoadBitmap(GetMyInstance(), MAKEINTRESOURCE(IDB_PGINA_LOGO));
+				}
+				else
+				{
+					pDEBUG(L"Credential::GetBitmapValue: Loading image from: %s", tileImage.c_str());
+					m_bitmap = (HBITMAP) LoadImageW((HINSTANCE) NULL, tileImage.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);			
+				}				
+			}
+
+			if(m_bitmap)
+			{
+				SetItemBitmap(IDC_LOGO, m_bitmap);
+			}
+		}
 	}
 }

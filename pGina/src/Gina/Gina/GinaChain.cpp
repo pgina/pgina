@@ -202,17 +202,18 @@ namespace pGina
 				DialogLoggedOutSAS dialog(m_winlogon);						
 				dialog.Username(username);
 				dialog.Password(password);
-				switch(dialog.ShowDialog())
+
+				int dialogResult = dialog.ShowDialog();
+				switch(dialogResult)
 				{
-				case DialogLoggedOutSAS::PGINA_EMERGENCY_ESCAPE_HATCH:
-					return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
-					break;
 				case DialogLoggedOutSAS::SAS_ACTION_LOGON:
 					username = dialog.Username();
 					password = dialog.Password();
 					break;
+				
+				// If not LOGON, just return it to winlogon
 				default:
-					return WLX_SAS_ACTION_NONE;
+					return dialogResult;
 				}
 			}
 

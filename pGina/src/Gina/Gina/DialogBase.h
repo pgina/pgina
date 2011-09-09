@@ -65,6 +65,7 @@ namespace pGina
 			void CheckState(int itemId, bool checked);
 			bool CheckState(int itemId);
 			void SetFocusItem(int itemId);
+			void SetItemBitmap(int itemId, HBITMAP bitmap);
 			void FinishWithResult(INT_PTR result) { EndDialog(m_hwnd, result); }
 
 		private:

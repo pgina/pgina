@@ -54,6 +54,9 @@ namespace pGina.Core
             s_settings.SetDefault("SessionHelperExe", "pGina.Service.SessionHelper.exe");
             s_settings.SetDefault("Motd", "pGina Version: %v");
             s_settings.SetDefault("GinaPassthru", false);
+            s_settings.SetDefault("ChainedGinaPath", "MSGINA.DLL");
+            s_settings.SetDefault("EnableSpecialActionButton", false);
+            s_settings.SetDefault("SpecialAction", "Shutdown");
         }
     }
 }
