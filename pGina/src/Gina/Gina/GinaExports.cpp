@@ -31,6 +31,7 @@
 
 #include "Gina.h"
 #include "Winlogon.h"
+#include "Themes.h"
 
 #define pGINA_FROM_CTX(context) pGina::GINA::Gina * pGina = static_cast<pGina::GINA::Gina *>(context)
 
@@ -89,6 +90,7 @@ BOOL WINAPI WlxNegotiate(DWORD dwWinlogonVersion, DWORD *pdwDllVersion)
 BOOL WINAPI WlxInitialize(LPWSTR lpWinsta, HANDLE hWlx, PVOID pvReserved, PVOID pWinlogonFunctions, PVOID * pWlxContext) 
 {
 	pDEBUG(L"WlxInitialize(%s, 0x%08x, 0x%08x, 0x%08x, ...)", lpWinsta, hWlx, pvReserved, pWinlogonFunctions);
+	pGina::GINA::Themes::Init();
 	return (pGina::GINA::Gina::InitializeFactory(hWlx, pWinlogonFunctions, (pGina::GINA::Gina **) pWlxContext) ? TRUE : FALSE);
 }
 

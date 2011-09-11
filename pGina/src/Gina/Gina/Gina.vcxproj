@@ -175,6 +175,7 @@
     <ClCompile Include="GinaExports.cpp" />
     <ClCompile Include="GinaWrapper.cpp" />
     <ClCompile Include="HookedLoggedOutSAS.cpp" />
+    <ClCompile Include="Themes.cpp" />
     <ClCompile Include="Winlogon.cpp" />
     <ClCompile Include="WinlogonDebug.cpp" />
     <ClCompile Include="WinlogonReal.cpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="GinaWrapper.h" />
     <ClInclude Include="HookedLoggedOutSAS.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Themes.h" />
     <ClInclude Include="WinlogonDebug.h" />
     <ClInclude Include="WinlogonProxy.h" />
     <ClInclude Include="WinlogonRouter.h" />
