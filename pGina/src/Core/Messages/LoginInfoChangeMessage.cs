@@ -28,22 +28,43 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
+using System.Dynamic;
 
 namespace pGina.Core.Messages
 {
-    public enum MessageType
+    public class LoginInfoChangeMessage : LoginRequestMessage
     {
-        Unknown         = 0x00,
-        Hello           = 0x01,
-        Disconnect      = 0x02,
-        Ack             = 0x03,
-        Log             = 0x04,
-        LoginRequest    = 0x05,
-        LoginResponse   = 0x06,
-        InfoRequest     = 0x07,
-        InfoResponse    = 0x08,
-        DynLabelRequest = 0x09,
-        DynLabelResponse = 0x0a,
-        LoginInfoChange = 0x0b,
+        public enum ChangeType
+        {
+            Add = 0,
+            Remove,
+        }
+   
+        public ChangeType Change { get; set; }
+
+        public LoginInfoChangeMessage(dynamic expandoVersion)
+        {
+            FromExpando(expandoVersion);
+        }
+
+        public LoginInfoChangeMessage()
+        {
+        }
+
+        public override void FromExpando(dynamic expandoVersion)
+        {
+            base.FromExpando((ExpandoObject)expandoVersion);
+            Change = (ChangeType) ((byte)expandoVersion.Change);
+        }
+
+        public override dynamic ToExpando()
+        {
+            dynamic exp = base.ToExpando();
+
+            exp.Change = (byte)Change;
+            exp.MessageType = (byte)MessageType.LoginInfoChange;
+            return exp;
+        }
     }
 }

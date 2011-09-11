@@ -168,9 +168,24 @@ namespace pGina
 		int  GinaChain::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, 
 									 PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile)
 		{
-			if(m_passthru || dwSasType == WLX_SAS_TYPE_AUTHENTICATED)
+			if(m_passthru)
 			{
 				return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);				
+			}
+
+			// We auth'd in another session - this session is the real one though, need to tell the service to add!
+			if(dwSasType == WLX_SAS_TYPE_AUTHENTICATED)
+			{
+				// We could do this, but we don't get password (without additional wrapping of our own in WlxGetConsoleSwitchCredentials
+				//  So instead we grab it post SAS processing via msgina.
+				/*
+				WLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0 credInfo;
+				if(m_winlogon->WlxQueryConsoleSwitchCredentials(&credInfo))
+					pGina::Transactions::LoginInfo::Add(credInfo.UserName, credInfo.Domain);
+				*/
+				int msresult = m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
+				pGina::Transactions::LoginInfo::Add(pMprNotifyInfo->pszUserName, pMprNotifyInfo->pszDomain, pMprNotifyInfo->pszPassword);
+				return msresult;
 			}
 
 			// Gather username/password from user.  If remote, we get it from rdp client if provided,
@@ -219,7 +234,7 @@ namespace pGina
 
 			// We now have the login info, let's give it a shot!
 			pDEBUG(L"GinaChain::LoggedOutSAS: Processing login for %s", username.c_str());
-			pGina::Transactions::User::LoginResult result = pGina::Transactions::User::ProcessLoginForUser(username.c_str(), NULL, password.c_str());
+			pGina::Transactions::User::LoginResult result = pGina::Transactions::User::ProcessLoginForUser(username.c_str(), NULL, password.c_str(), pGina::Protocol::LoginRequestMessage::Login);
 			if(!result.Result())
 			{
 				std::wstring failureMsg = result.Message();

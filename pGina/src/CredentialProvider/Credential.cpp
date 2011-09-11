@@ -235,9 +235,19 @@ namespace pGina
 			PWSTR username = FindUsernameValue();			
 			PWSTR password = FindPasswordValue();
 			PWSTR domain = NULL;
-						
+			
+			pGina::Protocol::LoginRequestMessage::LoginReason reason = pGina::Protocol::LoginRequestMessage::Login;
+			switch(m_usageScenario)
+			{
+			case CPUS_LOGON:
+				break;
+			case CPUS_UNLOCK_WORKSTATION:
+				reason = pGina::Protocol::LoginRequestMessage::Unlock;
+				break;
+			}
+
 			pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);
-			pGina::Transactions::User::LoginResult loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password);
+			pGina::Transactions::User::LoginResult loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password, reason);
 			if(!loginResult.Result())
 			{
 				pERROR(L"Credential::GetSerialization: Failed login");

@@ -128,7 +128,9 @@ namespace pGina.Service.Impl
                     m_logger.ErrorFormat("Ignoring unhandled exception from {0}: {1}", plugin.Uuid, e);
                 }
             }
-            
+
+            m_logger.DebugFormat("Change: {0} Session: {1}", changeDescription.Reason, changeDescription.SessionId); 
+
             if (changeDescription.Reason == SessionChangeReason.SessionLogon)
             {
                 // We only start session helpers in sessions we know have recently (within our timed cache
@@ -248,6 +250,8 @@ namespace pGina.Service.Impl
                     return HandleInfoRequest(new HelperInfoRequestMessage(msg)).ToExpando();
                 case MessageType.DynLabelRequest:
                     return HandleDynamicLabelRequest(new DynamicLabelRequestMessage(msg)).ToExpando();
+                case MessageType.LoginInfoChange:
+                    return HandleLoginInfoChange(new LoginInfoChangeMessage(msg)).ToExpando();
                 default:
                     return null;                // Unknowns get disconnected
             }
@@ -310,7 +314,8 @@ namespace pGina.Service.Impl
                 m_logger.DebugFormat("Processing LoginRequest for {0} in session {1}", msg.Username, msg.Session);
                 BooleanResult result = sessionDriver.PerformLoginProcess();
                 
-                m_sessionInfoCache.Add(msg.Session, sessionDriver.UserInformation);
+                if(msg.Reason == LoginRequestMessage.LoginReason.Login)
+                    m_sessionInfoCache.Add(msg.Session, sessionDriver.UserInformation);
 
                 return new LoginResponseMessage()
                 {
@@ -339,6 +344,27 @@ namespace pGina.Service.Impl
                 // Others can be added here.
             }
             return null;
+        }
+
+        private EmptyMessage HandleLoginInfoChange(LoginInfoChangeMessage msg)
+        {
+            switch (msg.Change)
+            {
+                case LoginInfoChangeMessage.ChangeType.Add:
+                    {
+                        UserInformation userInfo = new UserInformation() { Username = msg.Username, Domain = msg.Domain, Password = msg.Password };
+                        m_logger.DebugFormat("Adding userinfo for {0} to session {1}", msg.Username, msg.Session);
+                        m_sessionInfoCache.Add(msg.Session, userInfo);
+                    }
+                    break;
+                case LoginInfoChangeMessage.ChangeType.Remove:
+                    {
+                        m_logger.DebugFormat("Removing userinfo for session {0}", msg.Session);
+                        m_sessionInfoCache.Remove(msg.Session);
+                    }
+                    break;
+            }
+            return new EmptyMessage(MessageType.Ack);
         }
 
         private string FormatMotd(string text)

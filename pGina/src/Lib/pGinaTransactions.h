@@ -28,6 +28,7 @@
 
 #include <Windows.h>
 #include <string>
+#include <pGinaMessages.h>
 
 namespace pGina
 {
@@ -79,7 +80,7 @@ namespace pGina
 					bool m_result;
 			};			
 
-			static LoginResult ProcessLoginForUser(const wchar_t *username, const wchar_t *domain, const wchar_t *password);
+			static LoginResult ProcessLoginForUser(const wchar_t *username, const wchar_t *domain, const wchar_t *password, pGina::Protocol::LoginRequestMessage::LoginReason reason);
 		};
 
 		/* Generic transaction for receiving some text for a field in the UI. */
@@ -87,6 +88,13 @@ namespace pGina
 		{
 		public:
 			static std::wstring GetDynamicLabel(const wchar_t *labelName);
+		};
+
+		class LoginInfo
+		{
+		public:
+			static void Add(const wchar_t *username, const wchar_t *domain, const wchar_t *password);
+			static void Remove();
 		};
 	}
 }

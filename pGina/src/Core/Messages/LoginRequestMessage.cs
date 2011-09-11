@@ -34,11 +34,18 @@ using System.Dynamic;
 namespace pGina.Core.Messages
 {
     public class LoginRequestMessage : MessageBase
-    {        
+    {
+        public enum LoginReason
+        {
+            Login = 0,
+            Unlock,
+        }
+
         public string Username { get; set; }
         public string Password { get; set; }
         public string Domain { get; set; }
         public int Session { get; set; }
+        public LoginReason Reason { get; set; }
 
         public LoginRequestMessage(dynamic expandoVersion)
         {
@@ -55,6 +62,7 @@ namespace pGina.Core.Messages
             Password = expandoVersion.Password;
             Domain = expandoVersion.Domain;
             Session = expandoVersion.Session;
+            Reason = (LoginReason)((byte)expandoVersion.Reason);
         }
 
         public override dynamic ToExpando()
@@ -64,6 +72,7 @@ namespace pGina.Core.Messages
             exp.Password = this.Password;
             exp.Domain = this.Domain;
             exp.Session = this.Session;
+            exp.Reason = (byte)this.Reason;
             exp.MessageType = (byte) MessageType.LoginRequest;
             return exp;
         }

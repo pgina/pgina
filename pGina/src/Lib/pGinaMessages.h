@@ -49,6 +49,7 @@ namespace pGina
 			InfoResponse    = 0x08,
 			DynLabelRequest = 0x09,
 			DynLabelResponse= 0x0a,
+			LoginInfoChange = 0x0b,
 		};
 				
 		class MessageBase 
@@ -163,28 +164,36 @@ namespace pGina
 		class LoginRequestMessage : public MessageBase
 		{
 		public:
+			enum LoginReason
+			{
+				Login = 0,
+				Unlock
+			};
+
 			LoginRequestMessage()
 			{
 				Type(LoginRequest);
 				SessionFromProcessId();
 			}
 
-			LoginRequestMessage(std::wstring const& username, std::wstring const& domain, std::wstring const& password)
+			LoginRequestMessage(std::wstring const& username, std::wstring const& domain, std::wstring const& password, LoginReason reason)
 			{
 				Type(LoginRequest);
 				Username(username);
 				Domain(domain);
 				Password(password);
 				SessionFromProcessId();
+				Reason(reason);
 			}
 
-			LoginRequestMessage(const wchar_t * username, const wchar_t * domain, const wchar_t *password)
+			LoginRequestMessage(const wchar_t * username, const wchar_t * domain, const wchar_t *password, LoginReason reason)
 			{
 				Type(LoginRequest);
 				Username(username ? username : L"");
 				Domain(domain ? domain : L"");
 				Password(password ? password : L"");
 				SessionFromProcessId();
+				Reason(reason);
 			}
 
 			std::wstring const& Username() { return m_username; }
@@ -198,6 +207,9 @@ namespace pGina
 
 			DWORD				Session() { return m_session; }
 			void				Session(DWORD const& v) { m_session = v; }
+
+			LoginReason			Reason() { return m_reason; }
+			void				Reason(LoginReason v) { m_reason = v; }
 
 			virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
 			{
@@ -214,6 +226,9 @@ namespace pGina
 
 				if(msg->Exists<int>(L"Session"))
 					Session(msg->Property<int>(L"Session"));
+
+				if(msg->Exists<unsigned char>(L"Reason"))
+					Reason((LoginReason) msg->Property<unsigned char>(L"Reason"));
 			}
 
 			virtual pGina::Messaging::Message * ToDynamicMessage()
@@ -223,6 +238,7 @@ namespace pGina
 				msg->Property<std::wstring>(L"Domain", Domain(), pGina::Messaging::String);
 				msg->Property<std::wstring>(L"Password", Password(), pGina::Messaging::String);
 				msg->Property<int>(L"Session", Session(), pGina::Messaging::Integer);
+				msg->Property<unsigned char>(L"Reason", (unsigned char) (Reason()), pGina::Messaging::Byte);
 				return msg;
 			}
 
@@ -231,6 +247,7 @@ namespace pGina
 			std::wstring m_domain;
 			std::wstring m_password;
 			int m_session;
+			LoginReason m_reason;
 
 		protected:
 			void SessionFromProcessId()
@@ -345,6 +362,50 @@ namespace pGina
 
 		private:
 			std::wstring m_text;
+		};
+
+		class LoginInfoChangeMessage : public LoginRequestMessage
+		{
+			public:
+				enum ChangeType
+				{
+					Add,
+					Remove
+				};
+
+				LoginInfoChangeMessage()
+				{
+					Type(LoginInfoChange);
+					Change(Remove);
+				}
+
+				LoginInfoChangeMessage(const wchar_t * username, const wchar_t * domain, const wchar_t *password) :
+					LoginRequestMessage(username, domain, password, Login)
+				{
+					Type(LoginInfoChange);
+					Change(Add);
+				}
+				
+				ChangeType Change() { return m_changeType; }
+				void       Change(ChangeType type) { m_changeType = type; }
+
+				virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
+				{
+					LoginRequestMessage::FromDynamicMessage(msg);
+
+					if(msg->Exists<unsigned char>(L"Change"))
+						Change((ChangeType) msg->Property<unsigned char>(L"Change"));
+				}
+
+				virtual pGina::Messaging::Message * ToDynamicMessage()
+				{				
+					pGina::Messaging::Message * msg = LoginRequestMessage::ToDynamicMessage();				
+					msg->Property<unsigned char>(L"Change", (unsigned char) Change(), pGina::Messaging::Byte);					
+					return msg;
+				}
+
+			private:
+				ChangeType m_changeType;
 		};
 	}
 }
