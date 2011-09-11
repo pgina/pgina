@@ -88,16 +88,36 @@ namespace pGina.Plugin.LocalMachine
             get { return PluginUuid; }
         }
 
+        private int FindString(string[] array, string filter)
+        {
+            for (int x = 0; x < array.Length; x++)
+            {
+                if (array[x].StartsWith(filter))
+                    return x;
+            }
+
+            return -1;
+        }
+
         private void AddCleanupUser(string username)
         {
             lock (s_lock)
             {
                 string[] cleanupUsers = Settings.Store.CleanupUsers;
-                List<string> users = cleanupUsers.ToList();
-                if (!users.Contains(username))
+                string upperName = username.ToUpper();
+                string filter = string.Format("{0}|@|", upperName);
+
+                int foundIndex = FindString(cleanupUsers, filter);
+                if(foundIndex == -1)
                 {
-                    users.Add(username);
+                    List<string> users = cleanupUsers.ToList();
+                    users.Add(string.Format("{0}|@|{1}", upperName, DateTime.Now.ToBinary()));
                     Settings.Store.CleanupUsers = users.ToArray();
+                }
+                else
+                {
+                    cleanupUsers[foundIndex] = string.Format("{0}|@|{1}", upperName, DateTime.Now.ToBinary());
+                    Settings.Store.CleanupUsers = cleanupUsers;
                 }
             }
         }
@@ -107,12 +127,36 @@ namespace pGina.Plugin.LocalMachine
             lock (s_lock)
             {
                 string[] cleanupUsers = Settings.Store.CleanupUsers;
-                List<string> users = cleanupUsers.ToList();
-                if (users.Contains(username))
+                string upperName = username.ToUpper();
+                string filter = string.Format("{0}|@|", upperName);
+
+                int foundIndex = FindString(cleanupUsers, filter);
+                if (foundIndex != -1)
                 {
-                    users.Remove(username);
+                    List<string> users = cleanupUsers.ToList();
+                    users.Remove(cleanupUsers[foundIndex]);
                     Settings.Store.CleanupUsers = users.ToArray();
                 }
+            }
+        }
+
+        private List<string> EligibleCleanupUsers()
+        {
+            lock (s_lock)
+            {
+                string[] cleanupUsers = Settings.Store.CleanupUsers;
+                List<string> result = new List<string>();
+                foreach (string fullstr in cleanupUsers)
+                {
+                    string username = fullstr.Substring(0, fullstr.IndexOf("|@|"));
+                    DateTime timestamp = DateTime.FromBinary(long.Parse(fullstr.Substring(fullstr.IndexOf("|@|") + 3)));
+
+                    if ((DateTime.Now - timestamp) > TimeSpan.FromSeconds(30))
+                    {
+                        result.Add(username);
+                    }
+                }
+                return result;
             }
         }
         
@@ -428,7 +472,7 @@ namespace pGina.Plugin.LocalMachine
                 bool scramblePasswords = Settings.Store.ScramblePasswords;
                 bool removeProfiles = Settings.Store.RemoveProfiles;
 
-                string[] users = Settings.Store.CleanupUsers;
+                List<string> users = EligibleCleanupUsers();
                 List<string> loggedOnUsers = LoggedOnLocalUsers();
 
                 foreach (string user in users)

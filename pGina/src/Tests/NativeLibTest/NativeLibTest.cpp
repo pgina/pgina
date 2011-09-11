@@ -86,8 +86,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	// Put it all together, use the transactions log:
 	pGina::Transactions::Log::Debug(L"What the what? %s", L"What!");
 
+	// Stress test, lots of logging!
+	for(int x = 0; x < 100; x++)
+		pGina::Transactions::Log::Debug(L"Log test: %d", x);
+
 	// And auth, all in one...
-	pGina::Transactions::User::LoginResult result = pGina::Transactions::User::ProcessLoginForUser(L"puser", L"", L"foo", pGina::Protocol::LoginRequestMessage::Login);
+	pGina::Transactions::User::LoginResult result = pGina::Transactions::User::ProcessLoginForUser(L"footle", L"", L"foo", pGina::Protocol::LoginRequestMessage::Login);
 	if(result.Result())
 	{
 		pGina::Transactions::Log::Info(L"User: %s login successful!", result.Username().c_str());

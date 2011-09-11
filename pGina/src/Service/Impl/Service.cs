@@ -311,7 +311,7 @@ namespace pGina.Service.Impl
                 sessionDriver.UserInformation.Username = msg.Username;
                 sessionDriver.UserInformation.Password = msg.Password;
 
-                m_logger.DebugFormat("Processing LoginRequest for {0} in session {1}", msg.Username, msg.Session);
+                m_logger.DebugFormat("Processing LoginRequest for: {0} in session: {1} reason: {2}", msg.Username, msg.Session, msg.Reason);
                 BooleanResult result = sessionDriver.PerformLoginProcess();
                 
                 if(msg.Reason == LoginRequestMessage.LoginReason.Login)

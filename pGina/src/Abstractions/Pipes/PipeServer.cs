@@ -124,22 +124,30 @@ namespace Abstractions.Pipes
 
             while (Running)
             {
-                using (NamedPipeServerStream pipeServer = new NamedPipeServerStream(Name, PipeDirection.InOut, MaxClients,
-                        PipeTransmissionMode.Byte, PipeOptions.WriteThrough, 0, 0, security, HandleInheritability.None))
+                try
                 {
-                    try
+                    using (NamedPipeServerStream pipeServer = new NamedPipeServerStream(Name, PipeDirection.InOut, MaxClients,
+                            PipeTransmissionMode.Byte, PipeOptions.WriteThrough, 0, 0, security, HandleInheritability.None))
                     {
-                        pipeServer.WaitForConnection();
-                    }
-                    catch (Exception e)
-                    {
-                        LibraryLogging.Error("Error in server connection handler: {0}", e);
-                        continue;
-                    }
+                        try
+                        {
+                            pipeServer.WaitForConnection();
+                        }
+                        catch (Exception e)
+                        {
+                            LibraryLogging.Error("Error in server connection handler: {0}", e);
+                            continue;
+                        }
 
-                    // Handle this connection, note that we always expect client to initiate the
-                    //  flow of messages, so we do not include an initial message
-                    HandlePipeConnection(pipeServer, null);
+                        // Handle this connection, note that we always expect client to initiate the
+                        //  flow of messages, so we do not include an initial message
+                        HandlePipeConnection(pipeServer, null);
+                    }
+                }
+                catch (Exception e)
+                {
+                    LibraryLogging.Error("Error while trying to open pipe server: {0}", e);
+                    Thread.Sleep(500);
                 }
             }
         }
