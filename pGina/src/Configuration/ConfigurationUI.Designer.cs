@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigurationUI));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
             this.groupBox14 = new System.Windows.Forms.GroupBox();
@@ -127,20 +127,20 @@
             this.m_radioCredUI = new System.Windows.Forms.RadioButton();
             this.m_radioEmulate = new System.Windows.Forms.RadioButton();
             this.m_radioUseService = new System.Windows.Forms.RadioButton();
+            this.ginaOptions = new System.Windows.Forms.TabPage();
+            this.groupBox16 = new System.Windows.Forms.GroupBox();
+            this.btnGinaBrowse = new System.Windows.Forms.Button();
+            this.m_txtGinaChain = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.groupBox15 = new System.Windows.Forms.GroupBox();
+            this.radioHibernate = new System.Windows.Forms.RadioButton();
+            this.radioSleep = new System.Windows.Forms.RadioButton();
+            this.radioRestart = new System.Windows.Forms.RadioButton();
+            this.radioShutdown = new System.Windows.Forms.RadioButton();
+            this.chkSpecialButton = new System.Windows.Forms.CheckBox();
+            this.cpOptions = new System.Windows.Forms.TabPage();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnOkay = new System.Windows.Forms.Button();
-            this.ginaOptions = new System.Windows.Forms.TabPage();
-            this.cpOptions = new System.Windows.Forms.TabPage();
-            this.groupBox15 = new System.Windows.Forms.GroupBox();
-            this.chkSpecialButton = new System.Windows.Forms.CheckBox();
-            this.radioShutdown = new System.Windows.Forms.RadioButton();
-            this.radioRestart = new System.Windows.Forms.RadioButton();
-            this.radioSleep = new System.Windows.Forms.RadioButton();
-            this.radioHibernate = new System.Windows.Forms.RadioButton();
-            this.groupBox16 = new System.Windows.Forms.GroupBox();
-            this.label14 = new System.Windows.Forms.Label();
-            this.m_txtGinaChain = new System.Windows.Forms.TextBox();
-            this.btnGinaBrowse = new System.Windows.Forms.Button();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
             this.groupBox14.SuspendLayout();
@@ -173,8 +173,8 @@
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.ginaOptions.SuspendLayout();
-            this.groupBox15.SuspendLayout();
             this.groupBox16.SuspendLayout();
+            this.groupBox15.SuspendLayout();
             this.SuspendLayout();
             // 
             // m_tabs
@@ -458,33 +458,33 @@
             this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.pluginsDG.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle2;
             this.pluginsDG.Location = new System.Drawing.Point(10, 19);
             this.pluginsDG.Name = "pluginsDG";
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.pluginsDG.Size = new System.Drawing.Size(735, 253);
             this.pluginsDG.TabIndex = 10;
             this.pluginsDG.DoubleClick += new System.EventHandler(this.pluginsDG_DoubleClick);
@@ -1223,6 +1223,135 @@
             this.m_radioUseService.UseVisualStyleBackColor = true;
             this.m_radioUseService.CheckedChanged += new System.EventHandler(this.simMethodChanged);
             // 
+            // ginaOptions
+            // 
+            this.ginaOptions.Controls.Add(this.groupBox16);
+            this.ginaOptions.Controls.Add(this.groupBox15);
+            this.ginaOptions.Location = new System.Drawing.Point(4, 22);
+            this.ginaOptions.Name = "ginaOptions";
+            this.ginaOptions.Padding = new System.Windows.Forms.Padding(3);
+            this.ginaOptions.Size = new System.Drawing.Size(790, 547);
+            this.ginaOptions.TabIndex = 4;
+            this.ginaOptions.Text = "GINA Options";
+            this.ginaOptions.UseVisualStyleBackColor = true;
+            // 
+            // groupBox16
+            // 
+            this.groupBox16.Controls.Add(this.btnGinaBrowse);
+            this.groupBox16.Controls.Add(this.m_txtGinaChain);
+            this.groupBox16.Controls.Add(this.label14);
+            this.groupBox16.Location = new System.Drawing.Point(17, 17);
+            this.groupBox16.Name = "groupBox16";
+            this.groupBox16.Size = new System.Drawing.Size(755, 70);
+            this.groupBox16.TabIndex = 1;
+            this.groupBox16.TabStop = false;
+            this.groupBox16.Text = "General";
+            // 
+            // btnGinaBrowse
+            // 
+            this.btnGinaBrowse.Location = new System.Drawing.Point(544, 21);
+            this.btnGinaBrowse.Name = "btnGinaBrowse";
+            this.btnGinaBrowse.Size = new System.Drawing.Size(75, 23);
+            this.btnGinaBrowse.TabIndex = 2;
+            this.btnGinaBrowse.Text = "Browse...";
+            this.btnGinaBrowse.UseVisualStyleBackColor = true;
+            this.btnGinaBrowse.Click += new System.EventHandler(this.btnGinaBrowse_Click);
+            // 
+            // m_txtGinaChain
+            // 
+            this.m_txtGinaChain.Location = new System.Drawing.Point(104, 23);
+            this.m_txtGinaChain.Name = "m_txtGinaChain";
+            this.m_txtGinaChain.Size = new System.Drawing.Size(434, 20);
+            this.m_txtGinaChain.TabIndex = 1;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(19, 26);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(78, 13);
+            this.label14.TabIndex = 0;
+            this.label14.Text = "Chained GINA:";
+            // 
+            // groupBox15
+            // 
+            this.groupBox15.Controls.Add(this.radioHibernate);
+            this.groupBox15.Controls.Add(this.radioSleep);
+            this.groupBox15.Controls.Add(this.radioRestart);
+            this.groupBox15.Controls.Add(this.radioShutdown);
+            this.groupBox15.Controls.Add(this.chkSpecialButton);
+            this.groupBox15.Location = new System.Drawing.Point(17, 93);
+            this.groupBox15.Name = "groupBox15";
+            this.groupBox15.Size = new System.Drawing.Size(755, 134);
+            this.groupBox15.TabIndex = 0;
+            this.groupBox15.TabStop = false;
+            this.groupBox15.Text = "Login UI";
+            // 
+            // radioHibernate
+            // 
+            this.radioHibernate.AutoSize = true;
+            this.radioHibernate.Location = new System.Drawing.Point(179, 77);
+            this.radioHibernate.Name = "radioHibernate";
+            this.radioHibernate.Size = new System.Drawing.Size(132, 17);
+            this.radioHibernate.TabIndex = 4;
+            this.radioHibernate.TabStop = true;
+            this.radioHibernate.Text = "Hibernate the machine";
+            this.radioHibernate.UseVisualStyleBackColor = true;
+            // 
+            // radioSleep
+            // 
+            this.radioSleep.AutoSize = true;
+            this.radioSleep.Location = new System.Drawing.Point(179, 54);
+            this.radioSleep.Name = "radioSleep";
+            this.radioSleep.Size = new System.Drawing.Size(142, 17);
+            this.radioSleep.TabIndex = 3;
+            this.radioSleep.TabStop = true;
+            this.radioSleep.Text = "Put the machine to sleep";
+            this.radioSleep.UseVisualStyleBackColor = true;
+            // 
+            // radioRestart
+            // 
+            this.radioRestart.AutoSize = true;
+            this.radioRestart.Location = new System.Drawing.Point(39, 77);
+            this.radioRestart.Name = "radioRestart";
+            this.radioRestart.Size = new System.Drawing.Size(120, 17);
+            this.radioRestart.TabIndex = 2;
+            this.radioRestart.TabStop = true;
+            this.radioRestart.Text = "Restart the machine";
+            this.radioRestart.UseVisualStyleBackColor = true;
+            // 
+            // radioShutdown
+            // 
+            this.radioShutdown.AutoSize = true;
+            this.radioShutdown.Location = new System.Drawing.Point(39, 54);
+            this.radioShutdown.Name = "radioShutdown";
+            this.radioShutdown.Size = new System.Drawing.Size(134, 17);
+            this.radioShutdown.TabIndex = 1;
+            this.radioShutdown.TabStop = true;
+            this.radioShutdown.Text = "Shutdown the machine";
+            this.radioShutdown.UseVisualStyleBackColor = true;
+            // 
+            // chkSpecialButton
+            // 
+            this.chkSpecialButton.AutoSize = true;
+            this.chkSpecialButton.Location = new System.Drawing.Point(18, 30);
+            this.chkSpecialButton.Name = "chkSpecialButton";
+            this.chkSpecialButton.Size = new System.Drawing.Size(186, 17);
+            this.chkSpecialButton.TabIndex = 0;
+            this.chkSpecialButton.Text = "Enable \'Special Action\' Button for:";
+            this.chkSpecialButton.UseVisualStyleBackColor = true;
+            this.chkSpecialButton.CheckedChanged += new System.EventHandler(this.chkSpecialButton_CheckedChanged);
+            // 
+            // cpOptions
+            // 
+            this.cpOptions.Location = new System.Drawing.Point(4, 22);
+            this.cpOptions.Name = "cpOptions";
+            this.cpOptions.Padding = new System.Windows.Forms.Padding(3);
+            this.cpOptions.Size = new System.Drawing.Size(790, 547);
+            this.cpOptions.TabIndex = 5;
+            this.cpOptions.Text = "Credential Provider Options";
+            this.cpOptions.UseVisualStyleBackColor = true;
+            // 
             // btnApply
             // 
             this.btnApply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -1245,135 +1374,6 @@
             this.btnOkay.UseVisualStyleBackColor = true;
             this.btnOkay.Click += new System.EventHandler(this.btnOkay_Click);
             // 
-            // ginaOptions
-            // 
-            this.ginaOptions.Controls.Add(this.groupBox16);
-            this.ginaOptions.Controls.Add(this.groupBox15);
-            this.ginaOptions.Location = new System.Drawing.Point(4, 22);
-            this.ginaOptions.Name = "ginaOptions";
-            this.ginaOptions.Padding = new System.Windows.Forms.Padding(3);
-            this.ginaOptions.Size = new System.Drawing.Size(790, 547);
-            this.ginaOptions.TabIndex = 4;
-            this.ginaOptions.Text = "GINA Options";
-            this.ginaOptions.UseVisualStyleBackColor = true;
-            // 
-            // cpOptions
-            // 
-            this.cpOptions.Location = new System.Drawing.Point(4, 22);
-            this.cpOptions.Name = "cpOptions";
-            this.cpOptions.Padding = new System.Windows.Forms.Padding(3);
-            this.cpOptions.Size = new System.Drawing.Size(790, 547);
-            this.cpOptions.TabIndex = 5;
-            this.cpOptions.Text = "Credential Provider Options";
-            this.cpOptions.UseVisualStyleBackColor = true;
-            // 
-            // groupBox15
-            // 
-            this.groupBox15.Controls.Add(this.radioHibernate);
-            this.groupBox15.Controls.Add(this.radioSleep);
-            this.groupBox15.Controls.Add(this.radioRestart);
-            this.groupBox15.Controls.Add(this.radioShutdown);
-            this.groupBox15.Controls.Add(this.chkSpecialButton);
-            this.groupBox15.Location = new System.Drawing.Point(17, 93);
-            this.groupBox15.Name = "groupBox15";
-            this.groupBox15.Size = new System.Drawing.Size(755, 134);
-            this.groupBox15.TabIndex = 0;
-            this.groupBox15.TabStop = false;
-            this.groupBox15.Text = "Login UI";
-            // 
-            // chkSpecialButton
-            // 
-            this.chkSpecialButton.AutoSize = true;
-            this.chkSpecialButton.Location = new System.Drawing.Point(18, 30);
-            this.chkSpecialButton.Name = "chkSpecialButton";
-            this.chkSpecialButton.Size = new System.Drawing.Size(186, 17);
-            this.chkSpecialButton.TabIndex = 0;
-            this.chkSpecialButton.Text = "Enable \'Special Action\' Button for:";
-            this.chkSpecialButton.UseVisualStyleBackColor = true;
-            this.chkSpecialButton.CheckedChanged += new System.EventHandler(this.chkSpecialButton_CheckedChanged);
-            // 
-            // radioShutdown
-            // 
-            this.radioShutdown.AutoSize = true;
-            this.radioShutdown.Location = new System.Drawing.Point(39, 54);
-            this.radioShutdown.Name = "radioShutdown";
-            this.radioShutdown.Size = new System.Drawing.Size(134, 17);
-            this.radioShutdown.TabIndex = 1;
-            this.radioShutdown.TabStop = true;
-            this.radioShutdown.Text = "Shutdown the machine";
-            this.radioShutdown.UseVisualStyleBackColor = true;
-            // 
-            // radioRestart
-            // 
-            this.radioRestart.AutoSize = true;
-            this.radioRestart.Location = new System.Drawing.Point(39, 77);
-            this.radioRestart.Name = "radioRestart";
-            this.radioRestart.Size = new System.Drawing.Size(120, 17);
-            this.radioRestart.TabIndex = 2;
-            this.radioRestart.TabStop = true;
-            this.radioRestart.Text = "Restart the machine";
-            this.radioRestart.UseVisualStyleBackColor = true;
-            // 
-            // radioSleep
-            // 
-            this.radioSleep.AutoSize = true;
-            this.radioSleep.Location = new System.Drawing.Point(179, 54);
-            this.radioSleep.Name = "radioSleep";
-            this.radioSleep.Size = new System.Drawing.Size(142, 17);
-            this.radioSleep.TabIndex = 3;
-            this.radioSleep.TabStop = true;
-            this.radioSleep.Text = "Put the machine to sleep";
-            this.radioSleep.UseVisualStyleBackColor = true;
-            // 
-            // radioHibernate
-            // 
-            this.radioHibernate.AutoSize = true;
-            this.radioHibernate.Location = new System.Drawing.Point(179, 77);
-            this.radioHibernate.Name = "radioHibernate";
-            this.radioHibernate.Size = new System.Drawing.Size(132, 17);
-            this.radioHibernate.TabIndex = 4;
-            this.radioHibernate.TabStop = true;
-            this.radioHibernate.Text = "Hibernate the machine";
-            this.radioHibernate.UseVisualStyleBackColor = true;
-            // 
-            // groupBox16
-            // 
-            this.groupBox16.Controls.Add(this.btnGinaBrowse);
-            this.groupBox16.Controls.Add(this.m_txtGinaChain);
-            this.groupBox16.Controls.Add(this.label14);
-            this.groupBox16.Location = new System.Drawing.Point(17, 17);
-            this.groupBox16.Name = "groupBox16";
-            this.groupBox16.Size = new System.Drawing.Size(755, 70);
-            this.groupBox16.TabIndex = 1;
-            this.groupBox16.TabStop = false;
-            this.groupBox16.Text = "General";
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(19, 26);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(78, 13);
-            this.label14.TabIndex = 0;
-            this.label14.Text = "Chained GINA:";
-            // 
-            // m_txtGinaChain
-            // 
-            this.m_txtGinaChain.Location = new System.Drawing.Point(104, 23);
-            this.m_txtGinaChain.Name = "m_txtGinaChain";
-            this.m_txtGinaChain.Size = new System.Drawing.Size(434, 20);
-            this.m_txtGinaChain.TabIndex = 1;
-            // 
-            // btnGinaBrowse
-            // 
-            this.btnGinaBrowse.Location = new System.Drawing.Point(544, 21);
-            this.btnGinaBrowse.Name = "btnGinaBrowse";
-            this.btnGinaBrowse.Size = new System.Drawing.Size(75, 23);
-            this.btnGinaBrowse.TabIndex = 2;
-            this.btnGinaBrowse.Text = "Browse...";
-            this.btnGinaBrowse.UseVisualStyleBackColor = true;
-            this.btnGinaBrowse.Click += new System.EventHandler(this.btnGinaBrowse_Click);
-            // 
             // ConfigurationUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1382,6 +1382,7 @@
             this.Controls.Add(this.btnApply);
             this.Controls.Add(this.btnOkay);
             this.Controls.Add(this.m_tabs);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ConfigurationUI";
             this.Text = "pGina Configuration";
             this.m_tabs.ResumeLayout(false);
@@ -1424,10 +1425,10 @@
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.ginaOptions.ResumeLayout(false);
-            this.groupBox15.ResumeLayout(false);
-            this.groupBox15.PerformLayout();
             this.groupBox16.ResumeLayout(false);
             this.groupBox16.PerformLayout();
+            this.groupBox15.ResumeLayout(false);
+            this.groupBox15.PerformLayout();
             this.ResumeLayout(false);
 
         }

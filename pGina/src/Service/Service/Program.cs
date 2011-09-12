@@ -29,6 +29,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
+using System.Configuration;
+using System.Configuration.Install;
+using System.Reflection;
+
+using log4net;
 
 namespace Service
 {
@@ -37,14 +42,61 @@ namespace Service
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        static void Main()
+        static void Main(string[] args)
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[] 
-			{ 
-				new pGinaServiceHost() 
-			};
-            ServiceBase.Run(ServicesToRun);
+            if (System.Environment.UserInteractive)
+            {
+                ILog m_log = LogManager.GetLogger("Service Install");  
+                string parameter = string.Concat(args);
+                switch (parameter)
+                {
+                    case "--install":
+                        ManagedInstallerClass.InstallHelper(new string[] { Assembly.GetExecutingAssembly().Location });
+                        break;
+                    case "--uninstall":
+                        ManagedInstallerClass.InstallHelper(new string[] { "/u", Assembly.GetExecutingAssembly().Location });
+                        break;
+                    case "--start":
+                        Start(args);
+                        break;
+                    case "--stop":
+                        Stop();
+                        break;
+                }
+            }
+            else
+            {
+                ServiceBase[] ServicesToRun;
+                ServicesToRun = new ServiceBase[] 
+			    { 
+				    new pGinaServiceHost() 
+			    };
+                ServiceBase.Run(ServicesToRun);
+            }
+        }
+
+        private static void Start(string[] args)
+        {
+            foreach (ServiceController ctrl in ServiceController.GetServices())
+            {
+                if (ctrl.ServiceName == "pGina")
+                {
+                    ctrl.Start(args);
+                    break;
+                }
+            }
+        }
+
+        private static void Stop()
+        {
+            foreach (ServiceController ctrl in ServiceController.GetServices())
+            {
+                if (ctrl.ServiceName == "pGina")
+                {
+                    ctrl.Stop();
+                    break;
+                }
+            }
         }
     }
 }
