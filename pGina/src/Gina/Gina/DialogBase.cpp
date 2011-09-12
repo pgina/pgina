@@ -57,6 +57,7 @@ namespace pGina
 
 				// Inherited init
 				dialog->DialogInit();
+				return TRUE;
 			}
 			else
 			{
