@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.pGinaServiceProcessInstaller = new System.ServiceProcess.ServiceProcessInstaller();
-            this.pGinaServiceInstaller = new System.ServiceProcess.ServiceInstaller();
+            this.pGinaServiceProjectInstaller = new System.ServiceProcess.ServiceInstaller();
             // 
             // pGinaServiceProcessInstaller
             // 
@@ -37,24 +37,24 @@
             this.pGinaServiceProcessInstaller.Password = null;
             this.pGinaServiceProcessInstaller.Username = null;
             // 
-            // pGinaServiceInstaller
+            // pGinaServiceProjectInstaller
             // 
-            this.pGinaServiceInstaller.Description = "pGina Management Service";
-            this.pGinaServiceInstaller.DisplayName = "pGina Service";
-            this.pGinaServiceInstaller.ServiceName = "pGina";
-            this.pGinaServiceInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+            this.pGinaServiceProjectInstaller.Description = "pGina Management Service";
+            this.pGinaServiceProjectInstaller.DisplayName = "pGina Service";
+            this.pGinaServiceProjectInstaller.ServiceName = "pGina";
+            this.pGinaServiceProjectInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // ProjectInstaller
             // 
             this.Installers.AddRange(new System.Configuration.Install.Installer[] {
             this.pGinaServiceProcessInstaller,
-            this.pGinaServiceInstaller});
+            this.pGinaServiceProjectInstaller});
 
         }
 
         #endregion
 
         private System.ServiceProcess.ServiceProcessInstaller pGinaServiceProcessInstaller;
-        private System.ServiceProcess.ServiceInstaller pGinaServiceInstaller;
+        private System.ServiceProcess.ServiceInstaller pGinaServiceProjectInstaller;
     }
 }

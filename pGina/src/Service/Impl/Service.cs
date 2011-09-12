@@ -152,10 +152,13 @@ namespace pGina.Service.Impl
 
         private void KickoffSessionHelpers(int sessionId)
         {
-            string helperApp = pGina.Core.Settings.Get.GetSetting("SessionHelperExe", "pGina.Service.SessionHelper.exe");            
+            string helperAppExe = pGina.Core.Settings.Get.GetSetting("SessionHelperExe", "pGina.Service.SessionHelper.exe");            
             int numHelperStartRetries = pGina.Core.Settings.Get.GetSetting("HelperStartRetryCount", 60);
             int helperStartRetryDelay = pGina.Core.Settings.Get.GetSetting("HelperStartRetryDelay", 1000);
-            string systemApp = string.Format("{0} --serviceMode", helperApp);
+            string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            string systemApp = string.Format("{0}\\{1} --serviceMode", currentDir, helperAppExe);
+            string helperApp = string.Format("{0}\\{1}", currentDir, helperAppExe);
 
             Process systemHelper = null;
             Process userHelper = null;
@@ -177,7 +180,15 @@ namespace pGina.Service.Impl
                     {
                         if (exception.NativeErrorCode != ERROR_INVALID_PARAMETER &&
                             exception.NativeErrorCode != ERROR_PIPE_NOT_CONNECTED)
+                        {
+                            m_logger.ErrorFormat("Unexpected error: {0}", exception);
                             break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        m_logger.ErrorFormat("Unexpected error: {0}", e);
+                        break;
                     }
 
                     Thread.Sleep(helperStartRetryDelay);
@@ -198,7 +209,15 @@ namespace pGina.Service.Impl
                     {
                         if (exception.NativeErrorCode != ERROR_INVALID_PARAMETER &&
                             exception.NativeErrorCode != ERROR_PIPE_NOT_CONNECTED)
+                        {
+                            m_logger.ErrorFormat("Unexpected error: {0}", exception);
                             break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        m_logger.ErrorFormat("Unexpected error: {0}", e);
+                        break;
                     }
 
                     Thread.Sleep(helperStartRetryDelay);

@@ -33,7 +33,6 @@
             // 
             this.CanHandleSessionChangeEvent = true;
             this.ServiceName = "pGina";
-
         }
 
         #endregion

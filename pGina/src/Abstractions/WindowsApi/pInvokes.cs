@@ -552,7 +552,10 @@ namespace Abstractions.WindowsApi
                 if (!SafeNativeMethods.CreateProcessAsUser(token, null, cmdLine,
                                     ref defSec, ref defSec, false, SafeNativeMethods.CREATE_UNICODE_ENVIRONMENT,
                                     environmentBlock, null, ref startInfo, out procInfo))
-                    throw new Win32Exception(Marshal.GetLastWin32Error(), "CreateProcessAsUser");
+                {
+                    int lastError = Marshal.GetLastWin32Error();
+                    throw new Win32Exception(lastError, "CreateProcessAsUser");
+                }
 
                 // We made it, process is running! Closing our handles to it ensures it doesn't orphan,
                 //  then we just use its pid to return a process object
