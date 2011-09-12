@@ -30,6 +30,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Reflection;
 
 using Abstractions;
 
@@ -60,7 +61,7 @@ namespace pGina.CredentialProvider.Registration
         {
             // Defaults
             this.ProviderGuid = new Guid("{D0BEFEFB-3D2C-44DA-BBAD-3B2D04557246}");
-            this.Path = ".";
+            this.Path = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\";
             this.ShortName = null;
             this.OpMode = OperationMode.INSTALL;
         }

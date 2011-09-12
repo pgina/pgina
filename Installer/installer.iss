@@ -19,7 +19,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={pf}\{#MyAppName}
+DefaultDirName={pf}\{#MyAppName}-3
 DefaultGroupName={#MyAppName}
 AllowNoIcons=true
 LicenseFile=C:\Code\pgina\LICENSE
@@ -29,7 +29,9 @@ Compression=lzma/Max
 SolidCompression=true
 AppCopyright=pGina Team
 AppVerName=pGina v3.0.0
-ExtraDiskSpaceRequired=2
+ExtraDiskSpaceRequired=6
+
+ArchitecturesInstallIn64BitMode=x64 ia64
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -56,8 +58,11 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 [Run]
 Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--install"
 Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--start"
+Filename: "{app}\pGina.CredentialProvider.Registration.exe"; Parameters: "--mode install"; WorkingDir: "{app}" 
+Filename: "{app}\pGina.CredentialProvider.Registration.exe"; Parameters: "--mode enable"; WorkingDir: "{app}"
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, "&", "&&")}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
 Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--uninstall"
 Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--stop"
+Filename: "{app}\pGina.CredentialProvider.Registration.exe"; Parameters: "--mode uninstall"; WorkingDir: "{app}"

@@ -50,11 +50,11 @@ namespace pGina.CredentialProvider.Registration
         static int Main(string[] args)
         {
             // Default settings
-            Settings settings = new Settings();
+            CredProviderManager manager = CredProviderManager.GetManager();
             try
             {
                 // Parse command line arguments
-                settings = ParseClArgs(args);
+                ParseClArgs(args, manager.CpInfo);
             }
             catch (Exception e)
             {
@@ -64,18 +64,16 @@ namespace pGina.CredentialProvider.Registration
             }
 
             // Check path for sanity
-            DirectoryInfo pathInfo = new DirectoryInfo(settings.Path);
+            DirectoryInfo pathInfo = new DirectoryInfo(manager.CpInfo.Path);
             if (! pathInfo.Exists )
             {
-                m_logger.ErrorFormat("Path {0} doesn't exist or is not a directory.", settings.Path);
+                m_logger.ErrorFormat("Path {0} doesn't exist or is not a directory.", manager.CpInfo.Path);
                 return 1;
             }
                
             // Do the work...
             try
             {
-                CredProviderManager manager = CredProviderManager.GetManager();
-                manager.CpInfo = settings;
                 manager.ExecuteDefaultAction();
             }
             catch (Exception e)
@@ -87,10 +85,8 @@ namespace pGina.CredentialProvider.Registration
             return 0;
         }
 
-        public static Settings ParseClArgs(string[] args)
+        public static Settings ParseClArgs(string[] args, Settings settings)
         {
-            Settings settings = new Settings();
-
             int nArgs = args.Count();
 
             // Process options
@@ -115,6 +111,28 @@ namespace pGina.CredentialProvider.Registration
                         case "path":
                             settings.Path = value;
                             break;
+                        case "mode":
+                            {
+                                switch (value)
+                                {
+                                    case "install":
+                                        settings.OpMode = OperationMode.INSTALL;
+                                        break;
+                                    case "uninstall":
+                                        settings.OpMode = OperationMode.UNINSTALL;
+                                        break;
+                                    case "enable":
+                                        settings.OpMode = OperationMode.ENABLE;
+                                        break;
+                                    case "disable":
+                                        settings.OpMode = OperationMode.DISABLE;
+                                        break;
+                                }
+                            }
+                            break;
+                        case "dll":
+                            settings.ShortName = value;
+                            break;
                         default:
                             throw new Exception("Unknown option: " + opt);
                     }
@@ -138,34 +156,6 @@ namespace pGina.CredentialProvider.Registration
                 }
             }
 
-            if (idx >= nArgs)
-                throw new Exception("Must provide a short name.");
-
-            // There should be at most 2 arguments left
-            if (idx >= nArgs - 2 && idx < nArgs)
-            {
-                if (idx == nArgs - 2)
-                {
-                    string mode = args[idx++];
-                    if (mode.Equals("install", StringComparison.CurrentCultureIgnoreCase))
-                        settings.OpMode = OperationMode.INSTALL;
-                    else if (mode.Equals("uninstall", StringComparison.CurrentCultureIgnoreCase))
-                        settings.OpMode = OperationMode.UNINSTALL;
-                    else if (mode.Equals("disable", StringComparison.CurrentCultureIgnoreCase))
-                        settings.OpMode = OperationMode.DISABLE;
-                    else if (mode.Equals("enable", StringComparison.CurrentCultureIgnoreCase))
-                        settings.OpMode = OperationMode.ENABLE;
-                    else
-                        throw new Exception("Unrecognized operation mode: " + mode);
-                }
-
-                settings.ShortName = args[idx++];
-            }
-            else
-            {
-                throw new Exception("Must provide the <short_name> argument.");
-            }
-
             return settings;
         }
 
@@ -174,10 +164,10 @@ namespace pGina.CredentialProvider.Registration
             return String.Format(
                 "Usage: {0} [options] [Mode] <short_name>" + Environment.NewLine +
                 "-------------------------------------------------------------------------------" + Environment.NewLine +
-                "  Mode         The operating mode.  One of install, uninstall, enable or " + Environment.NewLine +
-                "               disable. " + Environment.NewLine +
-                "               Default: INSTALL." + Environment.NewLine +
-                "  short_name   The short name of the credential provider DLL." + Environment.NewLine +
+                "  --mode <mode>    The operating mode.  One of install, uninstall, enable or " + Environment.NewLine +
+                "                   disable. " + Environment.NewLine +
+                "                     Default: INSTALL." + Environment.NewLine +
+                "  --dll <name>     The short name of the credential provider DLL." + Environment.NewLine +
                 Environment.NewLine +
                 "  Options" + Environment.NewLine +
                 "     --guid <guid>     The Guid of the credential provider to be installed." + Environment.NewLine +
