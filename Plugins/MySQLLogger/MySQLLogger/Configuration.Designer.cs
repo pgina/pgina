@@ -42,6 +42,7 @@
             this.passwdTB = new System.Windows.Forms.TextBox();
             this.testButton = new System.Windows.Forms.Button();
             this.createTableBtn = new System.Windows.Forms.Button();
+            this.showPassCB = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -62,17 +63,17 @@
             // 
             // okBtn
             // 
-            this.okBtn.Location = new System.Drawing.Point(306, 173);
+            this.okBtn.Location = new System.Drawing.Point(386, 173);
             this.okBtn.Name = "okBtn";
             this.okBtn.Size = new System.Drawing.Size(70, 28);
             this.okBtn.TabIndex = 9;
-            this.okBtn.Text = "OK";
+            this.okBtn.Text = "Save";
             this.okBtn.UseVisualStyleBackColor = true;
             this.okBtn.Click += new System.EventHandler(this.okBtn_Click);
             // 
             // cancelBtn
             // 
-            this.cancelBtn.Location = new System.Drawing.Point(230, 173);
+            this.cancelBtn.Location = new System.Drawing.Point(310, 173);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(70, 28);
             this.cancelBtn.TabIndex = 8;
@@ -143,6 +144,7 @@
             this.passwdTB.Name = "passwdTB";
             this.passwdTB.Size = new System.Drawing.Size(288, 20);
             this.passwdTB.TabIndex = 5;
+            this.passwdTB.UseSystemPasswordChar = true;
             // 
             // testButton
             // 
@@ -164,11 +166,23 @@
             this.createTableBtn.UseVisualStyleBackColor = true;
             this.createTableBtn.Click += new System.EventHandler(this.createTableBtn_Click);
             // 
+            // showPassCB
+            // 
+            this.showPassCB.AutoSize = true;
+            this.showPassCB.Location = new System.Drawing.Point(378, 135);
+            this.showPassCB.Name = "showPassCB";
+            this.showPassCB.Size = new System.Drawing.Size(77, 17);
+            this.showPassCB.TabIndex = 15;
+            this.showPassCB.Text = "Show Text";
+            this.showPassCB.UseVisualStyleBackColor = true;
+            this.showPassCB.CheckedChanged += new System.EventHandler(this.showPassCB_CheckedChanged);
+            // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(388, 213);
+            this.ClientSize = new System.Drawing.Size(468, 213);
+            this.Controls.Add(this.showPassCB);
             this.Controls.Add(this.createTableBtn);
             this.Controls.Add(this.testButton);
             this.Controls.Add(this.passwdTB);
@@ -206,5 +220,6 @@
         private System.Windows.Forms.TextBox passwdTB;
         private System.Windows.Forms.Button testButton;
         private System.Windows.Forms.Button createTableBtn;
+        private System.Windows.Forms.CheckBox showPassCB;
     }
 }

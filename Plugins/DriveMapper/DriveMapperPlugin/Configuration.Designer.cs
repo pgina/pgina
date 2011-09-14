@@ -32,6 +32,7 @@
             this.okBtn = new System.Windows.Forms.Button();
             this.cancelBtn = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.useAltCredsCB = new System.Windows.Forms.CheckBox();
             this.passLabel = new System.Windows.Forms.Label();
             this.passwordTextBox = new System.Windows.Forms.TextBox();
@@ -43,7 +44,7 @@
             this.uncPathLabel = new System.Windows.Forms.Label();
             this.removeBtn = new System.Windows.Forms.Button();
             this.addBtn = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.showPassCB = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.driveListDGV)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -65,7 +66,7 @@
             this.okBtn.Name = "okBtn";
             this.okBtn.Size = new System.Drawing.Size(85, 28);
             this.okBtn.TabIndex = 1;
-            this.okBtn.Text = "OK";
+            this.okBtn.Text = "Save";
             this.okBtn.UseVisualStyleBackColor = true;
             this.okBtn.Click += new System.EventHandler(this.okBtn_Click);
             // 
@@ -81,6 +82,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.showPassCB);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.useAltCredsCB);
             this.groupBox1.Controls.Add(this.passLabel);
@@ -97,6 +99,16 @@
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Drive Details";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(492, 46);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(122, 26);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "%u will be replaced with \r\nthe username.";
             // 
             // useAltCredsCB
             // 
@@ -124,6 +136,7 @@
             this.passwordTextBox.Name = "passwordTextBox";
             this.passwordTextBox.Size = new System.Drawing.Size(354, 20);
             this.passwordTextBox.TabIndex = 6;
+            this.passwordTextBox.UseSystemPasswordChar = true;
             // 
             // unameTextBox
             // 
@@ -194,15 +207,16 @@
             this.addBtn.UseVisualStyleBackColor = true;
             this.addBtn.Click += new System.EventHandler(this.addBtn_Click);
             // 
-            // label1
+            // showPassCB
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(492, 46);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(122, 26);
-            this.label1.TabIndex = 9;
-            this.label1.Text = "%u will be replaced with \r\nthe username.";
+            this.showPassCB.AutoSize = true;
+            this.showPassCB.Location = new System.Drawing.Point(435, 140);
+            this.showPassCB.Name = "showPassCB";
+            this.showPassCB.Size = new System.Drawing.Size(77, 17);
+            this.showPassCB.TabIndex = 10;
+            this.showPassCB.Text = "Show Text";
+            this.showPassCB.UseVisualStyleBackColor = true;
+            this.showPassCB.CheckedChanged += new System.EventHandler(this.showPassCB_CheckedChanged);
             // 
             // Configuration
             // 
@@ -242,5 +256,6 @@
         private System.Windows.Forms.TextBox uncTextBox;
         private System.Windows.Forms.Label uncPathLabel;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox showPassCB;
     }
 }

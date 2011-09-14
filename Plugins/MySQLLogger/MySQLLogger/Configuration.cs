@@ -47,15 +47,15 @@ namespace pGina.Plugin.MySqlLogger
 
         private void InitUI()
         {
-            string host = PluginImpl.Settings.Host;
+            string host = Settings.Store.Host;
             this.hostTB.Text = host;
-            int port = PluginImpl.Settings.Port;
+            int port = Settings.Store.Port;
             this.portTB.Text = Convert.ToString(port);
-            string db = PluginImpl.Settings.Database;
+            string db = Settings.Store.Database;
             this.dbTB.Text = db;
-            string user = PluginImpl.Settings.User;
+            string user = Settings.Store.User;
             this.userTB.Text = user;
-            string pass = PluginImpl.Settings.Password;
+            string pass = Settings.Store.GetEncryptedSetting("Password",null);
             this.passwdTB.Text = pass;
         }
 
@@ -79,7 +79,7 @@ namespace pGina.Plugin.MySqlLogger
             try
             {
                 int port = Convert.ToInt32(this.portTB.Text);
-                PluginImpl.Settings.Port = port;
+                Settings.Store.Port = port;
             }
             catch (FormatException)
             {
@@ -87,10 +87,10 @@ namespace pGina.Plugin.MySqlLogger
                 return false;
             }
 
-            PluginImpl.Settings.Host = this.hostTB.Text.Trim();
-            PluginImpl.Settings.Database = this.dbTB.Text.Trim();
-            PluginImpl.Settings.User = this.userTB.Text.Trim();
-            PluginImpl.Settings.Password = this.passwdTB.Text;
+            Settings.Store.Host = this.hostTB.Text.Trim();
+            Settings.Store.Database = this.dbTB.Text.Trim();
+            Settings.Store.User = this.userTB.Text.Trim();
+            Settings.Store.SetEncryptedSetting("Password", this.passwdTB.Text, null);
 
             return true;
         }
@@ -187,6 +187,11 @@ namespace pGina.Plugin.MySqlLogger
             {
                 MessageBox.Show(String.Format("Error: {0}", ex.Message));
             }
+        }
+
+        private void showPassCB_CheckedChanged(object sender, EventArgs e)
+        {
+            this.passwdTB.UseSystemPasswordChar = !this.showPassCB.Checked;
         }
 
     }

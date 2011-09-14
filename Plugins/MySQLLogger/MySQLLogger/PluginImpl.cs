@@ -39,25 +39,7 @@ namespace pGina.Plugin.MySqlLogger
     {
         public static readonly Guid PluginUuid = new Guid("B68CF064-9299-4765-AC08-ACB49F93F892");
         private ILog m_logger = LogManager.GetLogger("MySqlLoggerPlugin");
-
         public static readonly string TABLE_NAME = "pGinaLog";
-
-        private static dynamic m_settings = null;
-        internal static dynamic Settings
-        {
-            get { return m_settings; }
-        }
-
-        static PluginImpl()
-        {
-            m_settings = new pGinaDynamicSettings(PluginUuid);
-            // Set defaults
-            m_settings.SetDefault("Host", "localhost");
-            m_settings.SetDefault("Port", 3306);
-            m_settings.SetDefault("User", "pGina");
-            m_settings.SetDefault("Password", "secret");
-            m_settings.SetDefault("Database", "pGinaDB");
-        }
 
         public void SessionEnding(Shared.Types.SessionProperties properties)
         {

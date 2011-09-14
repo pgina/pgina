@@ -68,11 +68,11 @@ namespace pGina.Plugin.MySqlLogger
             m_logger.DebugFormat("My Host name: {0}", m_hostName);
             m_logger.DebugFormat("My IP: {0}", m_ip);
 
-            string server = PluginImpl.Settings.Host;
-            int port = PluginImpl.Settings.Port;
-            string userName = PluginImpl.Settings.User;
-            string passwd = PluginImpl.Settings.Password;
-            string database = PluginImpl.Settings.Database;
+            string server = Settings.Store.Host;
+            int port = Settings.Store.Port;
+            string userName = Settings.Store.User;
+            string passwd = Settings.Store.GetEncryptedSetting("Password", null);
+            string database = Settings.Store.Database;
 
             string connStr = String.Format("server={0}; port={1};user={2}; password={3}; database={4};",
                 server, port, userName, passwd, database);

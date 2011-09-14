@@ -369,5 +369,10 @@ namespace pGina.Plugin.DriveMapper
                 this.driveListDGV.Rows.Remove(row);
             }
         }
+
+        private void showPassCB_CheckedChanged(object sender, EventArgs e)
+        {
+            this.passwordTextBox.UseSystemPasswordChar = !this.showPassCB.Checked;
+        }
     }
 }
