@@ -76,6 +76,11 @@ namespace Abstractions.Settings
             }            
         }
 
+        public void SetDefaultEncryptedSetting(string name, string value)
+        {
+            this.SetDefaultEncryptedSetting(name, value, null);
+        }
+
         public void SetDefaultEncryptedSetting(string name, string value, byte[] optionalEntropy)
         {
             try
@@ -88,12 +93,22 @@ namespace Abstractions.Settings
             }
         }
 
+        public void SetEncryptedSetting(string name, string value)
+        {
+            this.SetEncryptedSetting(name, value, null);
+        }
+
         public void SetEncryptedSetting(string name, string value, byte[] optionalEntropy)
         {
             byte[] valueBytes = UnicodeEncoding.Default.GetBytes(value);
             byte[] protectedBytes = ProtectedData.Protect(valueBytes, optionalEntropy, DataProtectionScope.LocalMachine);
             string base64 = Convert.ToBase64String(protectedBytes);
             SetSetting(name, base64);
+        }
+
+        public string GetEncryptedSetting(string name)
+        {
+            return GetEncryptedSetting(name, null);
         }
 
         public string GetEncryptedSetting(string name, byte[] optionalEntropy)
