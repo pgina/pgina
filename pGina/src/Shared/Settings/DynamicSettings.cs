@@ -85,7 +85,6 @@ namespace pGina.Shared.Settings
         /// <param name="toKeep">The list of sub-keys to keep, all others are deleted.</param>
         public static void CleanSubSettings(Guid pluginGuid, List<string> toKeep)
         {
-            List<string> toDelete = new List<string>();
             string subKey = string.Format(@"{0}\Plugins\{1}", pGinaRoot, pluginGuid.ToString());
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(subKey, true))
             {
@@ -96,13 +95,8 @@ namespace pGina.Shared.Settings
                     {
                         if (! toKeep.Contains(n))
                         {
-                            toDelete.Add(n);
+                            key.DeleteSubKey(n, false);
                         }
-                    }
-
-                    foreach (string name in toDelete)
-                    {
-                        key.DeleteSubKey(name, false);
                     }
                 }
             }
