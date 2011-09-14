@@ -38,6 +38,8 @@ namespace pGina.Plugin.ScriptRunner
         public string File { get; set; }
         public bool UserSession { get; set; }
         public bool SystemSession { get; set; }
+        public Guid Uuid { get; set; }
+
         public string Type
         {
             get
@@ -60,6 +62,7 @@ namespace pGina.Plugin.ScriptRunner
         public Script()
         {
             this.File = null;
+            this.Uuid = Guid.NewGuid();
         }
 
         public abstract void Run();

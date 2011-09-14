@@ -43,6 +43,7 @@ namespace pGina.Plugin.ScriptRunner
         private static readonly string SCRIPT_FILE_COLUMN = "ScriptFileName";
         private static readonly string USER_SESSION_COLUMN = "UserSession";
         private static readonly string SYSTEM_SESSION_COLUMN = "SystemSession";
+        private static readonly string GUID_COLUMN = "Guid";
 
         public Configuration()
         {
@@ -89,6 +90,12 @@ namespace pGina.Plugin.ScriptRunner
                 DataPropertyName = "SystemSession",
                 HeaderText = "System Session",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            dgv.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                Name = GUID_COLUMN,
+                DataPropertyName = "Uuid",
+                Visible = false
             });
 
             dgv.DataSource = this.scriptList;
