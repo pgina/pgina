@@ -71,7 +71,7 @@ namespace pGina.Plugin.MySqlLogger
             string server = Settings.Store.Host;
             int port = Settings.Store.Port;
             string userName = Settings.Store.User;
-            string passwd = Settings.Store.GetEncryptedSetting("Password", null);
+            string passwd = Settings.Store.GetEncryptedSetting("Password");
             string database = Settings.Store.Database;
 
             string connStr = String.Format("server={0}; port={1};user={2}; password={3}; database={4};",

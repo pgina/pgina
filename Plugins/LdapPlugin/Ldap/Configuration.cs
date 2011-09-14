@@ -100,7 +100,7 @@ namespace pGina.Plugin.Ldap
             string searchDn = Settings.Store.SearchDN;
             searchDnTextBox.Text = searchDn;
 
-            string searchPw = Settings.Store.GetEncryptedSetting("SearchPW",null);
+            string searchPw = Settings.Store.GetEncryptedSetting("SearchPW");
             searchPassTextBox.Text = searchPw;
 
         }
@@ -275,7 +275,7 @@ namespace pGina.Plugin.Ldap
             Settings.Store.SearchFilter = searchFilterTextBox.Text.Trim();
             Settings.Store.SearchContexts = Regex.Split(searchContextsTextBox.Text.Trim(), @"\s*\r?\n\s*");
             Settings.Store.SearchDN = searchDnTextBox.Text.Trim();
-            Settings.Store.SetEncryptedSetting("SearchPW", searchPassTextBox.Text, null);
+            Settings.Store.SetEncryptedSetting("SearchPW", searchPassTextBox.Text);
         }
 
         private void showPwCB_CheckedChanged(object sender, EventArgs e)

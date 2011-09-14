@@ -56,7 +56,7 @@ namespace pGina.Plugin.DriveMapper
                     UncPath = kv.Value.UNC,
                     UseAltCreds = kv.Value.UseAltCreds,
                     UserName = kv.Value.Username,
-                    Password = kv.Value.GetEncryptedSetting("Password", null)
+                    Password = kv.Value.GetEncryptedSetting("Password")
                 });
             }
 
@@ -88,7 +88,7 @@ namespace pGina.Plugin.DriveMapper
                 settings.UNC = d.UncPath;
                 settings.UseAltCreds = d.UseAltCreds;
                 settings.Username = d.UserName;
-                settings.SetEncryptedSetting("Password", d.Password, null);
+                settings.SetEncryptedSetting("Password", d.Password);
             }
         }
     }

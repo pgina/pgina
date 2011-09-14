@@ -102,7 +102,7 @@ namespace pGina.Plugin.Ldap
                         {
                             // Attempt to bind in order to do the search
                             string searchDN = Settings.Store.SearchDN;
-                            string searchPW = Settings.Store.GetEncryptedSetting("SearchPW", null);
+                            string searchPW = Settings.Store.GetEncryptedSetting("SearchPW");
                             if (searchDN.Length > 0)
                             {
                                 NetworkCredential creds = new NetworkCredential(searchDN, searchPW);

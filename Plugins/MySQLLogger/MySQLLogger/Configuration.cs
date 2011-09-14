@@ -55,7 +55,7 @@ namespace pGina.Plugin.MySqlLogger
             this.dbTB.Text = db;
             string user = Settings.Store.User;
             this.userTB.Text = user;
-            string pass = Settings.Store.GetEncryptedSetting("Password",null);
+            string pass = Settings.Store.GetEncryptedSetting("Password");
             this.passwdTB.Text = pass;
         }
 
@@ -90,7 +90,7 @@ namespace pGina.Plugin.MySqlLogger
             Settings.Store.Host = this.hostTB.Text.Trim();
             Settings.Store.Database = this.dbTB.Text.Trim();
             Settings.Store.User = this.userTB.Text.Trim();
-            Settings.Store.SetEncryptedSetting("Password", this.passwdTB.Text, null);
+            Settings.Store.SetEncryptedSetting("Password", this.passwdTB.Text);
 
             return true;
         }

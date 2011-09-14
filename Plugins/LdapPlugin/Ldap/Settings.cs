@@ -32,7 +32,7 @@ namespace pGina.Plugin.Ldap
             m_settings.SetDefault("SearchFilter", "");
             m_settings.SetDefault("DnPattern", "uid=%u,dc=example,dc=com");
             m_settings.SetDefault("SearchDN", "");
-            m_settings.SetDefaultEncryptedSetting("SearchPW", "secret", null);
+            m_settings.SetDefaultEncryptedSetting("SearchPW", "secret");
             m_settings.SetDefault("DoGroupAuthorization", false);
             m_settings.SetDefault("LdapLoginGroups", new string[] { });
             m_settings.SetDefault("LdapAdminGroup", "wheel");
