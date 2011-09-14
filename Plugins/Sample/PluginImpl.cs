@@ -41,7 +41,6 @@ namespace pGina.Plugin.Sample
     public class SimplePlugin : IPluginConfiguration, IPluginAuthentication
     {
         private ILog m_logger = LogManager.GetLogger("SimplePlugin");
-        private Guid m_descriptionGuid = new Guid("{22B06063-DEF1-4CE2-96DC-C6FDB409FEFD}");
         public static Guid SimpleUuid = new Guid("{16FC47C0-F17B-4D99-A820-EDBF0B0C764A}");
         private string m_defaultDescription = "A demonstration plugin that allows all usernames that begin with the letter \"p\" to succeed.";
         private dynamic m_settings = null;

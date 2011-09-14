@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Sample Plugin")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("An example plugin")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("pGina Team")]
 [assembly: AssemblyProduct("Sample Plugin")]
