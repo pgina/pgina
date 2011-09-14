@@ -44,6 +44,69 @@ namespace pGina.Shared.Settings
         public pGinaDynamicSettings(Guid pluginGuid) :
             base(string.Format(@"{0}\Plugins\{1}", pGinaRoot, pluginGuid.ToString()))
         {            
-        }                
+        }
+
+        public pGinaDynamicSettings(Guid pluginGuid, string subKey) :
+            base(string.Format(@"{0}\Plugins\{1}\{2}", pGinaRoot, pluginGuid.ToString(), subKey))
+        {
+        }
+
+        /// <summary>
+        /// Get a dictionary containing all sub-keys of the plugin's registry
+        /// key.  The Dictionary key is the sub-key name, the value is a pGinaDynamicSettings object
+        /// corresponding to the sub-key.
+        /// </summary>
+        /// <param name="pluginGuid">The plugin Guid.</param>
+        /// <returns></returns>
+        public static Dictionary<string, dynamic> GetSubSettings(Guid pluginGuid)
+        {
+            Dictionary<string, dynamic> result = new Dictionary<string, dynamic>();
+
+            string subKey = string.Format(@"{0}\Plugins\{1}", pGinaRoot, pluginGuid.ToString());
+            using( RegistryKey key = Registry.LocalMachine.OpenSubKey(subKey, false) )
+            {
+                if (key != null)
+                {
+                    string[] names = key.GetSubKeyNames();
+                    foreach (string n in names)
+                    {
+                        result.Add(n, new pGinaDynamicSettings(pluginGuid, n));
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Remove all sub-keys that are NOT in the provided list.
+        /// </summary>
+        /// <param name="pluginGuid">The plugin's Guid.</param>
+        /// <param name="toKeep">The list of sub-keys to keep, all others are deleted.</param>
+        public static void CleanSubSettings(Guid pluginGuid, List<string> toKeep)
+        {
+            List<string> toDelete = new List<string>();
+            string subKey = string.Format(@"{0}\Plugins\{1}", pGinaRoot, pluginGuid.ToString());
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(subKey, true))
+            {
+                if (key != null)
+                {
+                    string[] names = key.GetSubKeyNames();
+                    foreach (string n in names)
+                    {
+                        if (! toKeep.Contains(n))
+                        {
+                            toDelete.Add(n);
+                        }
+                    }
+
+                    foreach (string name in toDelete)
+                    {
+                        key.DeleteSubKey(name, false);
+                    }
+                }
+            }
+
+        }
     }
 }

@@ -43,35 +43,20 @@ namespace pGina.Plugin.DriveMapper
 
     class Settings
     {
-        private static dynamic m_settings = new pGinaDynamicSettings(DriveMapperPlugin.DriveMapperPluginUuid);
-
         public static List<DriveEntry> Load()
         {
+            Dictionary<string, dynamic> driveSettings = pGinaDynamicSettings.GetSubSettings(DriveMapperPlugin.DriveMapperPluginUuid);
             List<DriveEntry> driveList = new List<DriveEntry>();
 
-            // Set defaults in case the data is not there yet.
-            m_settings.SetDefault("Drives", new string[] { });
-            m_settings.SetDefault("UncPaths", new string[] { });
-            m_settings.SetDefault("UseAlternateCreds", new string[] { });
-            m_settings.SetDefault("Usernames", new string[] { });
-            m_settings.SetDefault("Passwords", new string[] { });
-
-            // Load the settings
-            string[] drives = m_settings.Drives;
-            string[] paths = m_settings.UncPaths;
-            string[] useCreds = m_settings.UseAlternateCreds;
-            string[] usernameList = m_settings.Usernames;
-            string[] passList = m_settings.Passwords;
-
-            for (int i = 0; i < drives.Count(); i++ )
+            foreach (KeyValuePair<string, dynamic> kv in driveSettings)
             {
                 driveList.Add(new DriveEntry
                 {
-                    Drive = drives[i],
-                    UncPath = paths[i],
-                    UseAltCreds = useCreds[i] != "0",
-                    UserName = usernameList[i],
-                    Password = passList[i]
+                    Drive = kv.Key,
+                    UncPath = kv.Value.UNC,
+                    UseAltCreds = kv.Value.UseAltCreds,
+                    UserName = kv.Value.Username,
+                    Password = kv.Value.GetEncryptedSetting("Password", null)
                 });
             }
 
@@ -81,23 +66,30 @@ namespace pGina.Plugin.DriveMapper
         public static void Save( List<DriveEntry> driveList )
         {
             List<string> driveLetterList = new List<string>();
-            List<string> uncPathList = new List<string>();
-            List<string> useCredsList = new List<string>();
-            List<string> usernameList = new List<string>();
-            List<string> passList = new List<string>();
             foreach (DriveEntry d in driveList)
             {
                 driveLetterList.Add(d.Drive);
-                uncPathList.Add(d.UncPath);
-                useCredsList.Add(d.UseAltCreds ? "1" : "0");
-                usernameList.Add(d.UserName);
-                passList.Add(d.Password);
             }
-            m_settings.Drives = driveLetterList.ToArray();
-            m_settings.UncPaths = uncPathList.ToArray();
-            m_settings.UseAlternateCreds = useCredsList.ToArray();
-            m_settings.Usernames = usernameList.ToArray();
-            m_settings.Passwords = passList.ToArray();
+
+            pGinaDynamicSettings.CleanSubSettings(DriveMapperPlugin.DriveMapperPluginUuid, driveLetterList);
+            Dictionary<string, dynamic> driveSettings = pGinaDynamicSettings.GetSubSettings(DriveMapperPlugin.DriveMapperPluginUuid);
+
+            foreach (DriveEntry d in driveList)
+            {
+                dynamic settings = null;
+                try
+                {
+                    settings = driveSettings[d.Drive];
+                }
+                catch (KeyNotFoundException)
+                {
+                    settings = new pGinaDynamicSettings(DriveMapperPlugin.DriveMapperPluginUuid, d.Drive);
+                }
+                settings.UNC = d.UncPath;
+                settings.UseAltCreds = d.UseAltCreds;
+                settings.Username = d.UserName;
+                settings.SetEncryptedSetting("Password", d.Password, null);
+            }
         }
     }
 }
