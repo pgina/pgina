@@ -76,6 +76,18 @@ namespace Abstractions.Settings
             }            
         }
 
+        public void SetDefaultEncryptedSetting(string name, string value, byte[] optionalEntropy)
+        {
+            try
+            {
+                GetEncryptedSetting(name, optionalEntropy);
+            }
+            catch (KeyNotFoundException)
+            {
+                SetEncryptedSetting(name, value, optionalEntropy);
+            }
+        }
+
         public void SetEncryptedSetting(string name, string value, byte[] optionalEntropy)
         {
             byte[] valueBytes = UnicodeEncoding.Default.GetBytes(value);
