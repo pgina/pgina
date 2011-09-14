@@ -53,26 +53,7 @@ namespace pGina.Plugin.Ldap
 
         private void LoadSettings()
         {
-            dynamic settings = new pGinaDynamicSettings(LdapPlugin.LdapUuid);
-
-            // Set default values for settings (if not already set)
-            settings.SetDefault("LdapHost", new string[] { "ldap.example.com" });
-            settings.SetDefault("LdapPort", 389);
-            settings.SetDefault("LdapTimeout", 10);
-            settings.SetDefault("UseSsl", false);
-            settings.SetDefault("RequireCert", false);
-            settings.SetDefault("ServerCertFile", "");
-            settings.SetDefault("DoSearch", false);
-            settings.SetDefault("SearchContexts", new string[] { });
-            settings.SetDefault("SearchFilter", "");
-            settings.SetDefault("DnPattern", "uid=%u,dc=example,dc=com");
-            settings.SetDefault("SearchDN", "");
-            settings.SetDefault("SearchPW", "");
-            settings.SetDefault("DoGroupAuthorization", false);
-            settings.SetDefault("LdapLoginGroups", new string[] { });
-            settings.SetDefault("LdapAdminGroup", "wheel");
-
-            string[] ldapHosts = settings.LdapHost;
+            string[] ldapHosts = Settings.Store.LdapHost;
             string hosts = "";
             for (int i = 0; i < ldapHosts.Count(); i++)
             {
@@ -82,25 +63,25 @@ namespace pGina.Plugin.Ldap
             }
             ldapHostTextBox.Text = hosts;
 
-            int port = settings.LdapPort;
+            int port = Settings.Store.LdapPort;
             ldapPortTextBox.Text = Convert.ToString(port);
 
-            int timeout = settings.LdapTimeout;
+            int timeout = Settings.Store.LdapTimeout;
             timeoutTextBox.Text = Convert.ToString(timeout);
 
-            bool useSsl = settings.UseSsl;
+            bool useSsl = Settings.Store.UseSsl;
             useSslCheckBox.CheckState = useSsl ? CheckState.Checked : CheckState.Unchecked;
 
-            bool reqCert = settings.RequireCert;
+            bool reqCert = Settings.Store.RequireCert;
             validateServerCertCheckBox.CheckState = reqCert ? CheckState.Checked : CheckState.Unchecked;
 
-            string serverCertFile = settings.ServerCertFile;
+            string serverCertFile = Settings.Store.ServerCertFile;
             sslCertFileTextBox.Text = serverCertFile;
 
-            bool doSearch = settings.DoSearch;
+            bool doSearch = Settings.Store.DoSearch;
             searchForDnCheckBox.CheckState = doSearch ? CheckState.Checked : CheckState.Unchecked;
 
-            string[] searchContexts = settings.SearchContexts;
+            string[] searchContexts = Settings.Store.SearchContexts;
             string ctxs = "";
             for (int i = 0; i < searchContexts.Count(); i++)
             {
@@ -110,22 +91,17 @@ namespace pGina.Plugin.Ldap
             }
             searchContextsTextBox.Text = ctxs;
 
-            string filter = settings.SearchFilter;
+            string filter = Settings.Store.SearchFilter;
             searchFilterTextBox.Text = filter;
 
-            string dnPattern = settings.DnPattern;
+            string dnPattern = Settings.Store.DnPattern;
             dnPatternTextBox.Text = dnPattern;
 
-            string searchDn = settings.SearchDN;
+            string searchDn = Settings.Store.SearchDN;
             searchDnTextBox.Text = searchDn;
 
-            string searchPw = settings.SearchPW;
+            string searchPw = Settings.Store.GetEncryptedSetting("SearchPW",null);
             searchPassTextBox.Text = searchPw;
-
-        }
-
-        private void ldapServerGroupBox_Enter(object sender, EventArgs e)
-        {
 
         }
 
@@ -211,7 +187,7 @@ namespace pGina.Plugin.Ldap
             this.Close();
         }
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void saveButton_Click(object sender, EventArgs e)
         {
             if (ValidateInput())
             {
@@ -288,20 +264,23 @@ namespace pGina.Plugin.Ldap
 
         private void StoreSettings()
         {
-            dynamic settings = new pGinaDynamicSettings(LdapPlugin.LdapUuid);
+            Settings.Store.LdapHost = Regex.Split(ldapHostTextBox.Text.Trim(), @"\s+"); 
+            Settings.Store.LdapPort = Convert.ToInt32(ldapPortTextBox.Text.Trim());
+            Settings.Store.Timeout = Convert.ToInt32(timeoutTextBox.Text.Trim());
+            Settings.Store.UseSsl = (useSslCheckBox.CheckState == CheckState.Checked);
+            Settings.Store.RequireCert = (validateServerCertCheckBox.CheckState == CheckState.Checked);
+            Settings.Store.ServerCertFile = sslCertFileTextBox.Text.Trim();
+            Settings.Store.DnPattern = dnPatternTextBox.Text.Trim();
+            Settings.Store.DoSearch = (searchForDnCheckBox.CheckState == CheckState.Checked);
+            Settings.Store.SearchFilter = searchFilterTextBox.Text.Trim();
+            Settings.Store.SearchContexts = Regex.Split(searchContextsTextBox.Text.Trim(), @"\s*\r?\n\s*");
+            Settings.Store.SearchDN = searchDnTextBox.Text.Trim();
+            Settings.Store.SetEncryptedSetting("SearchPW", searchPassTextBox.Text, null);
+        }
 
-            settings.LdapHost = Regex.Split(ldapHostTextBox.Text.Trim(), @"\s+"); 
-            settings.LdapPort = Convert.ToInt32(ldapPortTextBox.Text.Trim());
-            settings.Timeout = Convert.ToInt32(timeoutTextBox.Text.Trim());
-            settings.UseSsl = (useSslCheckBox.CheckState == CheckState.Checked);
-            settings.RequireCert = (validateServerCertCheckBox.CheckState == CheckState.Checked);
-            settings.ServerCertFile = sslCertFileTextBox.Text.Trim();
-            settings.DnPattern = dnPatternTextBox.Text.Trim();
-            settings.DoSearch = (searchForDnCheckBox.CheckState == CheckState.Checked);
-            settings.SearchFilter = searchFilterTextBox.Text.Trim();
-            settings.SearchContexts = Regex.Split(searchContextsTextBox.Text.Trim(), @"\s*\r?\n\s*");
-            settings.SearchDN = searchDnTextBox.Text.Trim();
-            settings.SearchPW = searchPassTextBox.Text.Trim();
+        private void showPwCB_CheckedChanged(object sender, EventArgs e)
+        {
+            this.searchPassTextBox.UseSystemPasswordChar = !this.showPwCB.Checked;
         }
     }
 }

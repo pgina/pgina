@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.okButton = new System.Windows.Forms.Button();
+            this.saveButton = new System.Windows.Forms.Button();
             this.ldapHostDescriptionLabel = new System.Windows.Forms.Label();
             this.ldapHostTextBox = new System.Windows.Forms.TextBox();
             this.descriptionToolTip = new System.Windows.Forms.ToolTip(this.components);
@@ -56,19 +56,20 @@
             this.searchFilterTextBox = new System.Windows.Forms.TextBox();
             this.dnPatternTextBox = new System.Windows.Forms.TextBox();
             this.cancelButton = new System.Windows.Forms.Button();
+            this.showPwCB = new System.Windows.Forms.CheckBox();
             this.ldapServerGroupBox.SuspendLayout();
             this.authenticationGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
-            // okButton
+            // saveButton
             // 
-            this.okButton.Location = new System.Drawing.Point(591, 409);
-            this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(97, 26);
-            this.okButton.TabIndex = 0;
-            this.okButton.Text = "OK";
-            this.okButton.UseVisualStyleBackColor = true;
-            this.okButton.Click += new System.EventHandler(this.okButton_Click);
+            this.saveButton.Location = new System.Drawing.Point(607, 409);
+            this.saveButton.Name = "saveButton";
+            this.saveButton.Size = new System.Drawing.Size(81, 26);
+            this.saveButton.TabIndex = 0;
+            this.saveButton.Text = "Save";
+            this.saveButton.UseVisualStyleBackColor = true;
+            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
             // ldapHostDescriptionLabel
             // 
@@ -249,7 +250,6 @@
             this.ldapServerGroupBox.TabIndex = 3;
             this.ldapServerGroupBox.TabStop = false;
             this.ldapServerGroupBox.Text = "LDAP Server";
-            this.ldapServerGroupBox.Enter += new System.EventHandler(this.ldapServerGroupBox_Enter);
             // 
             // sslCertFileBrowseButton
             // 
@@ -270,6 +270,7 @@
             // 
             // authenticationGroupBox
             // 
+            this.authenticationGroupBox.Controls.Add(this.showPwCB);
             this.authenticationGroupBox.Controls.Add(this.searchPassTextBox);
             this.authenticationGroupBox.Controls.Add(this.label3);
             this.authenticationGroupBox.Controls.Add(this.searchDnTextBox);
@@ -328,13 +329,24 @@
             // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(487, 409);
+            this.cancelButton.Location = new System.Drawing.Point(525, 409);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(98, 26);
+            this.cancelButton.Size = new System.Drawing.Size(76, 26);
             this.cancelButton.TabIndex = 5;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            // 
+            // showPwCB
+            // 
+            this.showPwCB.AutoSize = true;
+            this.showPwCB.Location = new System.Drawing.Point(581, 177);
+            this.showPwCB.Name = "showPwCB";
+            this.showPwCB.Size = new System.Drawing.Size(77, 17);
+            this.showPwCB.TabIndex = 12;
+            this.showPwCB.Text = "Show Text";
+            this.showPwCB.UseVisualStyleBackColor = true;
+            this.showPwCB.CheckedChanged += new System.EventHandler(this.showPwCB_CheckedChanged);
             // 
             // Configuration
             // 
@@ -344,7 +356,7 @@
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.authenticationGroupBox);
             this.Controls.Add(this.ldapServerGroupBox);
-            this.Controls.Add(this.okButton);
+            this.Controls.Add(this.saveButton);
             this.Name = "Configuration";
             this.Text = "LDAP Plugin Settings";
             this.ldapServerGroupBox.ResumeLayout(false);
@@ -357,7 +369,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button okButton;
+        private System.Windows.Forms.Button saveButton;
         private System.Windows.Forms.Label ldapHostDescriptionLabel;
         private System.Windows.Forms.TextBox ldapHostTextBox;
         private System.Windows.Forms.ToolTip descriptionToolTip;
@@ -384,5 +396,6 @@
         private System.Windows.Forms.TextBox timeoutTextBox;
         private System.Windows.Forms.Label timeoutLabel;
         private System.Windows.Forms.TextBox searchPassTextBox;
+        private System.Windows.Forms.CheckBox showPwCB;
     }
 }

@@ -44,30 +44,28 @@ namespace pGina.Plugin.Ldap
 {
     class LdapAuthenticator
     {
-        private dynamic m_settings = null;
         private ILog m_logger = LogManager.GetLogger("LdapAuthenticator");
         private NetworkCredential m_creds;
 
         public LdapAuthenticator(NetworkCredential creds)
         {
             m_creds = creds;
-            m_settings = new pGinaDynamicSettings(LdapPlugin.LdapUuid);
         }
 
         public BooleanResult Authenticate()
         {
             // Generate username (if we're not doing a search for it)
             string userDN = null;
-            bool doSearch = m_settings.DoSearch;
+            bool doSearch = Settings.Store.DoSearch;
             if ( ! doSearch )
             {
                 userDN = CreateUserDN();
             }
 
             X509Certificate2 serverCert = null;
-            bool useSsl = m_settings.UseSsl;
-            bool requireCert = m_settings.RequireCert;
-            string certFile = m_settings.ServerCertFile;
+            bool useSsl = Settings.Store.UseSsl;
+            bool requireCert = Settings.Store.RequireCert;
+            string certFile = Settings.Store.ServerCertFile;
             if( useSsl && requireCert && certFile.Length > 0 ) 
             {
                 if (File.Exists(certFile))
@@ -82,8 +80,8 @@ namespace pGina.Plugin.Ldap
                 }
             }
 
-            string[] hosts = m_settings.LdapHost;
-            int port = m_settings.LdapPort;
+            string[] hosts = Settings.Store.LdapHost;
+            int port = Settings.Store.LdapPort;
             using (LdapServer serv = new LdapServer(hosts, port, useSsl, requireCert, serverCert))
             {
                 try
@@ -91,7 +89,7 @@ namespace pGina.Plugin.Ldap
                     // Connect.  Note that this always succeeds whether or not the server is 
                     // actually available.  It not clear to me whether this actually talks to the server at all.  
                     // The timeout only seems to take effect when binding.
-                    int timeout = m_settings.LdapTimeout;
+                    int timeout = Settings.Store.LdapTimeout;
                     serv.Connect(timeout);
 
                     // If we're searching, attempt to bind with the search credentials, or anonymously
@@ -103,8 +101,8 @@ namespace pGina.Plugin.Ldap
                         try
                         {
                             // Attempt to bind in order to do the search
-                            string searchDN = m_settings.SearchDN;
-                            string searchPW = m_settings.SearchPW;
+                            string searchDN = Settings.Store.SearchDN;
+                            string searchPW = Settings.Store.GetEncryptedSetting("SearchPW", null);
                             if (searchDN.Length > 0)
                             {
                                 NetworkCredential creds = new NetworkCredential(searchDN, searchPW);
@@ -187,8 +185,8 @@ namespace pGina.Plugin.Ldap
 
         /// <summary>
         /// Attempts to find the DN for the user by searching a set of LDAP trees.
-        /// The base DN for each of the trees is retrieved from m_settings.SearchContexts.
-        /// The search filter is taken from m_settings.SearchFilter.  If all
+        /// The base DN for each of the trees is retrieved from Settings.Store.SearchContexts.
+        /// The search filter is taken from Settings.Store.SearchFilter.  If all
         /// searches fail, this method returns null.
         /// </summary>
         /// <param name="serv">The LdapServer to use when performing the search.</param>
@@ -198,7 +196,7 @@ namespace pGina.Plugin.Ldap
             string filter = CreateSearchFilter();
 
             m_logger.DebugFormat("Searching for DN using filter {0}", filter);
-            string[] contexts = m_settings.SearchContexts;
+            string[] contexts = Settings.Store.SearchContexts;
             foreach( string context in contexts )
             {
                 m_logger.DebugFormat("Searching context {0}", context);
@@ -224,13 +222,13 @@ namespace pGina.Plugin.Ldap
 
         /// <summary>
         /// This generates the DN for the user assuming that a pattern has
-        /// been provided.  This assumes that m_settings.DnPattern has
+        /// been provided.  This assumes that Settings.Store.DnPattern has
         /// a valid DN pattern.
         /// </summary>
         /// <returns>A DN that can be used for binding with LDAP server.</returns>
         private string CreateUserDN()
         {
-            string result = m_settings.DnPattern;
+            string result = Settings.Store.DnPattern;
 
             // Replace the username
             result = Regex.Replace(result, @"\%u", m_creds.UserName);
@@ -246,7 +244,7 @@ namespace pGina.Plugin.Ldap
         /// <returns>A search filter.</returns>
         private string CreateSearchFilter()
         {
-            string result = m_settings.SearchFilter;
+            string result = Settings.Store.SearchFilter;
 
             // Replace the username
             result = Regex.Replace(result, @"\%u", m_creds.UserName);
