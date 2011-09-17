@@ -122,7 +122,7 @@ namespace pGina.Plugin.Ldap
                         {
                             if (e.ErrorCode == 81)
                             {
-                                m_logger.ErrorFormat("Server unavailable", e.Message);
+                                m_logger.ErrorFormat("Server unavailable: {0}", e.Message);
                             }
                             else if (e.ErrorCode == 49)
                             {
@@ -153,7 +153,7 @@ namespace pGina.Plugin.Ldap
                         {
                             if (e.ErrorCode == 81)
                             {
-                                m_logger.ErrorFormat("Server unavailable");
+                                m_logger.ErrorFormat("Server unavailable: " + e.Message);
                             }
                             else if (e.ErrorCode == 49)
                             {

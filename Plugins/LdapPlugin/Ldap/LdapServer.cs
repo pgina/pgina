@@ -82,9 +82,11 @@ namespace pGina.Plugin.Ldap
         /// and verifyCert is true, then the server's cert is verified with the Windows certificate store.</param>
         public LdapServer(string[] hosts, int port, bool useSsl, bool verifyCert, X509Certificate2 cert) 
         {
+            m_logger.DebugFormat("Initializing LdapServer host(s): [{0}], port: {1}, useSSL = {2}, verifyCert = {3}",
+                string.Join(", ", hosts), port, useSsl, verifyCert);
             m_conn = null;
             m_serverIdentifier = new LdapDirectoryIdentifier(hosts, port, false, false);
-            m_useSsl = true;
+            m_useSsl = useSsl;
             m_verifyCert = verifyCert;
             m_cert = cert;
         }
@@ -100,11 +102,10 @@ namespace pGina.Plugin.Ldap
             m_conn = new LdapConnection(m_serverIdentifier);
             m_conn.Timeout = new System.TimeSpan(0,0,timeout);
             m_logger.DebugFormat("Timeout set to {0} seconds.", timeout);
-            LdapSessionOptions opts = m_conn.SessionOptions;
-            opts.ProtocolVersion = 3;
-            opts.SecureSocketLayer = m_useSsl;
+            m_conn.SessionOptions.ProtocolVersion = 3;
+            m_conn.SessionOptions.SecureSocketLayer = m_useSsl;
             if( m_useSsl )
-                opts.VerifyServerCertificate = this.VerifyCert;
+                m_conn.SessionOptions.VerifyServerCertificate = this.VerifyCert;
         }
 
         /// <summary>
@@ -184,7 +185,7 @@ namespace pGina.Plugin.Ldap
             }
             catch (LdapException e)
             {
-                m_logger.ErrorFormat("LdapException: {0}", e.Message);
+                m_logger.ErrorFormat("LdapException: {0} {1}", e.Message, e.ServerErrorMessage);
                 throw e;
             }
             catch (InvalidOperationException e)
@@ -208,6 +209,7 @@ namespace pGina.Plugin.Ldap
             m_logger.DebugFormat("Attempting bind as {0}", creds.UserName);
 
             m_conn.AuthType = AuthType.Basic;
+
             try
             {
                 m_conn.Bind(creds);
@@ -215,7 +217,7 @@ namespace pGina.Plugin.Ldap
             }
             catch (LdapException e)
             {
-                m_logger.ErrorFormat("LdapException: {0}", e.Message);
+                m_logger.ErrorFormat("LdapException: {0} {1}", e.Message, e.ServerErrorMessage);
                 throw e;
             }
             catch (InvalidOperationException e)
