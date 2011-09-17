@@ -31,6 +31,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using pGina.Shared.Settings;
 
@@ -41,8 +42,9 @@ namespace pGina.Plugin.DriveMapper
         private static readonly string DRIVE_UNC_COLUMN = "UNC";
         private static readonly string DRIVE_LETTER_COLUMN = "DriveLetter";
         private static readonly string USE_ALTERNATE_CREDENTIALS_COLUMN = "UseAltCreds";
-        private static readonly string USERNAME_COLUMN = "Username";
-        private static readonly string PASS_COLUMN = "Password";
+        private static readonly string USERNAME_COLUMN = "Username";  //Invisible
+        private static readonly string PASS_COLUMN = "Password";  // Invisible
+        private static readonly string GROUPS_COLUMN = "Groups";  // Invisible
 
         private static readonly string[] DRIVES = {
                               "Z:", "Y:", "X:", "W:", "V:", "U:", "T:", "S:", "R:", "Q:",
@@ -70,6 +72,7 @@ namespace pGina.Plugin.DriveMapper
             this.uncTextBox.Leave += new EventHandler(uncTextBox_Leave);
             this.unameTextBox.Leave += new EventHandler(unameTextBox_Leave);
             this.passwordTextBox.Leave += new EventHandler(passwordTextBox_Leave);
+            this.groupsTB.Leave += new EventHandler(groupsTB_Leave);
         }
 
         private void InitDetailsView()
@@ -138,6 +141,12 @@ namespace pGina.Plugin.DriveMapper
             {
                 Name = PASS_COLUMN,
                 DataPropertyName = "Password",
+                Visible = false
+            });
+            dgv.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                Name = GROUPS_COLUMN,
+                DataPropertyName = "Groups",
                 Visible = false
             });
 
@@ -244,6 +253,7 @@ namespace pGina.Plugin.DriveMapper
                 this.unameTextBox.Text = entry.UserName;
                 this.passwordTextBox.Text = entry.Password;
                 this.useAltCredsCB.Checked = entry.UseAltCreds;
+                this.groupsTB.Text = string.Join(" ", entry.Groups);
             }
         }
 
@@ -266,7 +276,8 @@ namespace pGina.Plugin.DriveMapper
                 UncPath = "",
                 UseAltCreds = false,
                 UserName = "",
-                Password = ""
+                Password = "",
+                Groups = new string[]{}
             });
             this.driveListDGV.Rows[this.driveListDGV.Rows.Count - 1].Selected = true;
         }
@@ -324,6 +335,16 @@ namespace pGina.Plugin.DriveMapper
             {
                 DataGridViewRow row = this.driveListDGV.SelectedRows[0];
                 row.Cells[USERNAME_COLUMN].Value = this.unameTextBox.Text;
+            }
+        }
+
+        void groupsTB_Leave(object sender, EventArgs e)
+        {
+            int nSelectedRows = this.driveListDGV.SelectedRows.Count;
+            if (nSelectedRows > 0)
+            {
+                DataGridViewRow row = this.driveListDGV.SelectedRows[0];
+                row.Cells[GROUPS_COLUMN].Value = Regex.Split(this.groupsTB.Text.Trim(), @"\s+");
             }
         }
 

@@ -57,25 +57,43 @@ namespace pGina.Plugin.DriveMapper
         {
             foreach (DriveEntry drive in drives)
             {
-                string unc = Regex.Replace(drive.UncPath, @"\%u", userInfo.Username);
-                m_logger.DebugFormat("Attempting to map {0} to {1}", unc, drive.Drive);
-                string user = null;
-                string password = null;
-                if (drive.UseAltCreds)
+                bool groupCheckOk = true;
+                foreach (string group in drive.Groups)
                 {
-                    user = drive.UserName;
-                    password = drive.Password;
+                    if (!userInfo.Groups.Any( g => g.Name == group ) )
+                    {
+                        m_logger.DebugFormat("User is not a member of {0}", group);
+                        groupCheckOk = false;
+                        break;
+                    }
                 }
 
-                int result = pInvokes.MapNetworkDrive(unc, drive.Drive, user, password);
-                if (0 == result)
+                if (groupCheckOk)
                 {
-                    m_logger.InfoFormat("Drive {0} mapped successfully to drive letter {1}", unc, drive.Drive);
+                    string unc = Regex.Replace(drive.UncPath, @"\%u", userInfo.Username);
+                    m_logger.DebugFormat("Attempting to map {0} to {1}", unc, drive.Drive);
+                    string user = null;
+                    string password = null;
+                    if (drive.UseAltCreds)
+                    {
+                        user = drive.UserName;
+                        password = drive.Password;
+                    }
+
+                    int result = pInvokes.MapNetworkDrive(unc, drive.Drive, user, password);
+                    if (0 == result)
+                    {
+                        m_logger.InfoFormat("Drive {0} mapped successfully to drive letter {1}", unc, drive.Drive);
+                    }
+                    else
+                    {
+                        m_logger.ErrorFormat("Drive mapping failed for {0} to letter {1}.  Message: {2}",
+                            unc, drive.Drive, GetMappingErrorMessage(result));
+                    }
                 }
                 else
                 {
-                    m_logger.ErrorFormat("Drive mapping failed for {0} to letter {1}.  Message: {2}",
-                        unc, drive.Drive, GetMappingErrorMessage(result));
+                    m_logger.DebugFormat("User not in all required groups, not mapping drive {0}", drive.Drive);
                 }
             }
         }

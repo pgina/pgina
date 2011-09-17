@@ -32,6 +32,7 @@
             this.okBtn = new System.Windows.Forms.Button();
             this.cancelBtn = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.showPassCB = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.useAltCredsCB = new System.Windows.Forms.CheckBox();
             this.passLabel = new System.Windows.Forms.Label();
@@ -44,7 +45,9 @@
             this.uncPathLabel = new System.Windows.Forms.Label();
             this.removeBtn = new System.Windows.Forms.Button();
             this.addBtn = new System.Windows.Forms.Button();
-            this.showPassCB = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.groupsTB = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.driveListDGV)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -62,7 +65,7 @@
             // 
             // okBtn
             // 
-            this.okBtn.Location = new System.Drawing.Point(603, 412);
+            this.okBtn.Location = new System.Drawing.Point(603, 482);
             this.okBtn.Name = "okBtn";
             this.okBtn.Size = new System.Drawing.Size(85, 28);
             this.okBtn.TabIndex = 1;
@@ -72,7 +75,7 @@
             // 
             // cancelBtn
             // 
-            this.cancelBtn.Location = new System.Drawing.Point(507, 413);
+            this.cancelBtn.Location = new System.Drawing.Point(507, 483);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(90, 27);
             this.cancelBtn.TabIndex = 2;
@@ -82,6 +85,9 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Controls.Add(this.groupsTB);
+            this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.showPassCB);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.useAltCredsCB);
@@ -95,10 +101,21 @@
             this.groupBox1.Controls.Add(this.uncPathLabel);
             this.groupBox1.Location = new System.Drawing.Point(12, 230);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(676, 176);
+            this.groupBox1.Size = new System.Drawing.Size(676, 232);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Drive Details";
+            // 
+            // showPassCB
+            // 
+            this.showPassCB.AutoSize = true;
+            this.showPassCB.Location = new System.Drawing.Point(435, 140);
+            this.showPassCB.Name = "showPassCB";
+            this.showPassCB.Size = new System.Drawing.Size(77, 17);
+            this.showPassCB.TabIndex = 10;
+            this.showPassCB.Text = "Show Text";
+            this.showPassCB.UseVisualStyleBackColor = true;
+            this.showPassCB.CheckedChanged += new System.EventHandler(this.showPassCB_CheckedChanged);
             // 
             // label1
             // 
@@ -207,22 +224,37 @@
             this.addBtn.UseVisualStyleBackColor = true;
             this.addBtn.Click += new System.EventHandler(this.addBtn_Click);
             // 
-            // showPassCB
+            // label2
             // 
-            this.showPassCB.AutoSize = true;
-            this.showPassCB.Location = new System.Drawing.Point(435, 140);
-            this.showPassCB.Name = "showPassCB";
-            this.showPassCB.Size = new System.Drawing.Size(77, 17);
-            this.showPassCB.TabIndex = 10;
-            this.showPassCB.Text = "Show Text";
-            this.showPassCB.UseVisualStyleBackColor = true;
-            this.showPassCB.CheckedChanged += new System.EventHandler(this.showPassCB_CheckedChanged);
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(8, 177);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(236, 13);
+            this.label2.TabIndex = 11;
+            this.label2.Text = "User must be a member of the following group(s):";
+            // 
+            // groupsTB
+            // 
+            this.groupsTB.Location = new System.Drawing.Point(11, 193);
+            this.groupsTB.Name = "groupsTB";
+            this.groupsTB.Size = new System.Drawing.Size(469, 20);
+            this.groupsTB.TabIndex = 12;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(486, 196);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(139, 13);
+            this.label3.TabIndex = 13;
+            this.label3.Text = "Leave blank to always map.";
             // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(700, 454);
+            this.ClientSize = new System.Drawing.Size(700, 522);
             this.Controls.Add(this.addBtn);
             this.Controls.Add(this.removeBtn);
             this.Controls.Add(this.groupBox1);
@@ -257,5 +289,8 @@
         private System.Windows.Forms.Label uncPathLabel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox showPassCB;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox groupsTB;
+        private System.Windows.Forms.Label label2;
     }
 }

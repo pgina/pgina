@@ -39,6 +39,7 @@ namespace pGina.Plugin.DriveMapper
         public bool UseAltCreds { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
+        public string[] Groups { get; set; }
     }
 
     class Settings
@@ -56,7 +57,8 @@ namespace pGina.Plugin.DriveMapper
                     UncPath = kv.Value.UNC,
                     UseAltCreds = kv.Value.UseAltCreds,
                     UserName = kv.Value.Username,
-                    Password = kv.Value.GetEncryptedSetting("Password")
+                    Password = kv.Value.GetEncryptedSetting("Password"),
+                    Groups = kv.Value.Groups
                 });
             }
 
@@ -89,6 +91,7 @@ namespace pGina.Plugin.DriveMapper
                 settings.UseAltCreds = d.UseAltCreds;
                 settings.Username = d.UserName;
                 settings.SetEncryptedSetting("Password", d.Password);
+                settings.Groups = d.Groups;
             }
         }
     }
