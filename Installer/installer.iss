@@ -73,7 +73,7 @@ Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--install"
 Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--start"
 Filename: "{app}\pGina.CredentialProvider.Registration.exe"; Parameters: "--mode install"; WorkingDir: "{app}" 
 Filename: "{app}\pGina.CredentialProvider.Registration.exe"; Parameters: "--mode enable"; WorkingDir: "{app}"
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, "&", "&&")}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, "&", "&&")}}"; Flags: nowait postinstall skipifsilent runascurrentuser
 
 [UninstallRun]
 Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--uninstall"
