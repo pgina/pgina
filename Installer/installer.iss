@@ -42,6 +42,8 @@ SolidCompression=true
 AppCopyright=pGina Team
 AppVerName=pGina v3.0.0
 ExtraDiskSpaceRequired=6
+DisableDirPage=auto
+DisableProgramGroupPage=auto
 
 ArchitecturesInstallIn64BitMode=x64 ia64
 
@@ -94,6 +96,8 @@ Filename: "{app}\pGina.CredentialProvider.Registration.exe"; Parameters: "--mode
 #include "scripts\products\vc2010.iss"
 #endif
 
+#include "scripts\services.iss"
+
 [CustomMessages]
 win2000sp3_title=Windows 2000 Service Pack 3
 winxpsp2_title=Windows XP Service Pack 2
@@ -128,4 +132,26 @@ begin
 #endif
 	
 	Result := true;
+end;
+
+procedure DoPreInstall();
+begin
+  // If our service is already installed, stop it!
+  if IsServiceInstalled('pGina') = true then begin
+		StopService('pGina');		
+	end
+end;
+
+procedure DoPostInstall();
+begin
+  // ...
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssInstall then begin
+    DoPreInstall();
+  end else if CurStep = ssPostInstall then begin
+    DoPostInstall();
+  end;
 end;
