@@ -57,6 +57,25 @@ namespace pGina.Plugin.MySqlLogger
             this.userTB.Text = user;
             string pass = Settings.Store.GetEncryptedSetting("Password");
             this.passwdTB.Text = pass;
+
+            bool setting = Settings.Store.EvtLogon;
+            this.logonEvtCB.Checked = setting;
+            setting = Settings.Store.EvtLogoff;
+            this.logoffEvtCB.Checked = setting;
+            setting = Settings.Store.EvtLock;
+            this.lockEvtCB.Checked = setting;
+            setting = Settings.Store.EvtUnlock;
+            this.unlockEvtCB.Checked = setting;
+            setting = Settings.Store.EvtConsoleConnect;
+            this.consoleConnectEvtCB.Checked = setting;
+            setting = Settings.Store.EvtConsoleDisconnect;
+            this.consoleDisconnectEvtCB.Checked = setting;
+            setting = Settings.Store.EvtRemoteControl;
+            this.remoteControlEvtCB.Checked = setting;
+            setting = Settings.Store.EvtRemoteConnect;
+            this.remoteConnectEvtCB.Checked = setting;
+            setting = Settings.Store.EvtRemoteDisconnect;
+            this.remoteDisconnectEvtCB.Checked = setting;
         }
 
         private void okBtn_Click(object sender, EventArgs e)
@@ -92,6 +111,15 @@ namespace pGina.Plugin.MySqlLogger
             Settings.Store.User = this.userTB.Text.Trim();
             Settings.Store.SetEncryptedSetting("Password", this.passwdTB.Text);
 
+            Settings.Store.EvtLogon = this.logonEvtCB.Checked;
+            Settings.Store.EvtLogoff = this.logoffEvtCB.Checked;
+            Settings.Store.EvtLock = this.lockEvtCB.Checked;
+            Settings.Store.EvtUnlock = this.unlockEvtCB.Checked;
+            Settings.Store.EvtConsoleConnect = this.consoleConnectEvtCB.Checked;
+            Settings.Store.EvtConsoleDisconnect = this.consoleDisconnectEvtCB.Checked;
+            Settings.Store.EvtRemoteControl = this.remoteControlEvtCB.Checked;
+            Settings.Store.EvtRemoteConnect = this.remoteConnectEvtCB.Checked;
+            Settings.Store.EvtRemoteDisconnect = this.remoteDisconnectEvtCB.Checked;
             return true;
         }
 

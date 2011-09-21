@@ -25,6 +25,16 @@ namespace pGina.Plugin.MySqlLogger
             m_settings.SetDefault("User", "pGina");
             m_settings.SetDefaultEncryptedSetting("Password", "secret", null);
             m_settings.SetDefault("Database", "pGinaDB");
+
+            m_settings.SetDefault("EvtLogon", true);
+            m_settings.SetDefault("EvtLogoff", true);
+            m_settings.SetDefault("EvtLock", false);
+            m_settings.SetDefault("EvtUnlock", false);
+            m_settings.SetDefault("EvtConsoleConnect",false);
+            m_settings.SetDefault("EvtConsoleDisconnect", false);
+            m_settings.SetDefault("EvtRemoteControl", false);
+            m_settings.SetDefault("EvtRemoteConnect", false);
+            m_settings.SetDefault("EvtRemoteDisconnect", false);
         }
 
     }

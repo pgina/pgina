@@ -470,6 +470,21 @@ namespace Abstractions.WindowsApi
             return result;            
         }
 
+        public static string GetUserName(int sessionId)
+        {
+            uint bytes = 0;
+            IntPtr userInfo = IntPtr.Zero;
+            bool result = SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE,
+                sessionId, SafeNativeMethods.WTS_INFO_CLASS.WTSUserName, out userInfo, out bytes);
+
+            if (!result)
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "WTSQuerySessionInformation");
+            
+            string userName = Marshal.PtrToStringAnsi(userInfo);
+            SafeNativeMethods.WTSFreeMemory(userInfo);
+            return userName;
+        }
+
         public static bool CloseHandle(IntPtr handle)
         {
             return SafeNativeMethods.CloseHandle(handle);

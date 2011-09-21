@@ -28,41 +28,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 using pGina.Shared.Interfaces;
 using pGina.Shared.Settings;
+using Abstractions.WindowsApi;
 using log4net;
 
 namespace pGina.Plugin.MySqlLogger
 {
-    public class PluginImpl : IPluginSystemSessionHelper, IPluginConfiguration
+    public class PluginImpl : IPluginConfiguration, IPluginEventNotifications
     {
         public static readonly Guid PluginUuid = new Guid("B68CF064-9299-4765-AC08-ACB49F93F892");
         private ILog m_logger = LogManager.GetLogger("MySqlLoggerPlugin");
         public static readonly string TABLE_NAME = "pGinaLog";
-
-        public void SessionEnding(Shared.Types.SessionProperties properties)
-        {
-            m_logger.Debug("SessionEnding()");
-        }
-
-        public void SessionStarted(Shared.Types.SessionProperties properties)
-        {
-            m_logger.Debug("SessionStarted()");
-
-            Shared.Types.UserInformation userInfo = properties.GetTrackedSingle<Shared.Types.UserInformation>();
-            try
-            {
-                using (DbLogger db = DbLogger.Connect())
-                {
-                    db.Log(String.Format("Login: user={0}", userInfo.Username));
-                }
-            }
-            catch (Exception e)
-            {
-                m_logger.ErrorFormat("{0}: {1}", e.GetType().ToString(), e.Message);
-            }
-        }
 
         public string Description
         {
@@ -91,6 +70,105 @@ namespace pGina.Plugin.MySqlLogger
         {
             Configuration dlg = new Configuration();
             dlg.ShowDialog();
+        }
+
+        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription)
+        {
+            m_logger.Debug("SessionChange()");
+
+            string userName = GetUserName(changeDescription.SessionId);
+            string msg = null;
+            bool okToLog = false;
+
+            switch (changeDescription.Reason)
+            {
+                case System.ServiceProcess.SessionChangeReason.SessionLogon:
+                    okToLog = Settings.Store.EvtLogon;
+                    if( okToLog )
+                        msg = string.Format("Logon user={0} session id={1}", userName, changeDescription.SessionId);
+                    break;
+                case System.ServiceProcess.SessionChangeReason.SessionLogoff:
+                    okToLog = Settings.Store.EvtLogoff;
+                    if( okToLog )
+                        msg = string.Format("Logoff user={0} session id={1}", userName, changeDescription.SessionId);
+                    break;
+                case System.ServiceProcess.SessionChangeReason.SessionLock:
+                    okToLog = Settings.Store.EvtLock;
+                    if( okToLog )
+                        msg = string.Format("Session lock user={0} session id={1}", userName, changeDescription.SessionId);
+                    break;
+                case System.ServiceProcess.SessionChangeReason.SessionUnlock:
+                    okToLog = Settings.Store.EvtUnlock;
+                    if( okToLog )
+                        msg = string.Format("Session unlock user={0} session id={1}", userName, changeDescription.SessionId);
+                    break;
+                case System.ServiceProcess.SessionChangeReason.SessionRemoteControl:
+                    okToLog = Settings.Store.EvtRemoteControl;
+                    if( okToLog )
+                        msg = string.Format("Remote control user={0} session id={1}", userName, changeDescription.SessionId);
+                    break;
+                case System.ServiceProcess.SessionChangeReason.ConsoleConnect:
+                    okToLog = Settings.Store.EvtConsoleConnect;
+                    if( okToLog )
+                        msg = string.Format("Console connect user={0} session id={1}", userName, changeDescription.SessionId);
+                    break;
+                case System.ServiceProcess.SessionChangeReason.ConsoleDisconnect:
+                    okToLog = Settings.Store.EvtConsoleDisconnect;
+                    if( okToLog )
+                        msg = string.Format("Console disconnect user={0} session id={1}", userName, changeDescription.SessionId);
+                    break;
+                case System.ServiceProcess.SessionChangeReason.RemoteConnect:
+                    okToLog = Settings.Store.EvtRemoteConnect;
+                    if( okToLog )
+                        msg = string.Format("Remote connect user={0} session id={1}", userName, changeDescription.SessionId);
+                    break;
+                case System.ServiceProcess.SessionChangeReason.RemoteDisconnect:
+                    okToLog = Settings.Store.EvtRemoteDisconnect;
+                    if( okToLog )
+                        msg = string.Format("Remote disconnect user={0} session id={1}", userName, changeDescription.SessionId);
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(msg))
+            {
+                m_logger.Debug(msg);
+
+                // Log to DB
+                try
+                {
+                    using (DbLogger log = DbLogger.Connect())
+                    {
+                        log.Log(msg);
+                    }
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("Error logging to DB: {0}", e);
+                }
+            }
+        }
+
+        public void Starting()
+        {
+            
+        }
+
+        public void Stopping()
+        {
+            
+        }
+
+        private string GetUserName(int sessionId)
+        {
+            m_logger.DebugFormat("GetUserName({0})", sessionId);
+            try
+            {
+                return pInvokes.GetUserName(sessionId);
+            }
+            catch (Win32Exception)
+            {
+                return "--";
+            }
         }
     }
 }
