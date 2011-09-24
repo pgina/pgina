@@ -49,9 +49,7 @@ namespace pGina.Core
             AuthenticateEnabled  = 1 << 1,
             AuthorizeEnabled     = 1 << 2,
             GatewayEnabled       = 1 << 3,
-            NotificationEnabled  = 1 << 4,
-            UserSessionEnabled   = 1 << 5,
-            SystemSessionEnabled = 1 << 6,
+            NotificationEnabled  = 1 << 4,            
         }
 
         public static string[] PluginDirectories
@@ -179,13 +177,7 @@ namespace pGina.Core
 
             if (typeof(T) == typeof(IPluginEventNotifications) && TestMask(mask, State.NotificationEnabled))
                 return true;
-            
-            if (typeof(T) == typeof(IPluginUserSessionHelper) && TestMask(mask, State.UserSessionEnabled))
-                return true;
-            
-            if (typeof(T) == typeof(IPluginSystemSessionHelper) && TestMask(mask, State.SystemSessionEnabled))
-                return true;
-            
+                                    
             return false;
         }
 

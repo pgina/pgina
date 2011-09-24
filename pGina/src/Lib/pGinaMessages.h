@@ -45,11 +45,9 @@ namespace pGina
 			Log             = 0x04,
 			LoginRequest    = 0x05,
 			LoginResponse   = 0x06,
-			InfoRequest     = 0x07,
-			InfoResponse    = 0x08,
-			DynLabelRequest = 0x09,
-			DynLabelResponse= 0x0a,
-			LoginInfoChange = 0x0b,
+			DynLabelRequest = 0x07,
+			DynLabelResponse= 0x08,
+			LoginInfoChange = 0x09,
 		};
 				
 		class MessageBase 

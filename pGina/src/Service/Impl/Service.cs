@@ -129,107 +129,8 @@ namespace pGina.Service.Impl
                 }
             }
 
-            m_logger.DebugFormat("Change: {0} Session: {1}", changeDescription.Reason, changeDescription.SessionId); 
-
-            if (changeDescription.Reason == SessionChangeReason.SessionLogon)
-            {
-                // We only start session helpers in sessions we know have recently (within our timed cache
-                // timeframe that is) authenticated with our provider.  We could run them for everyone...
-                if (m_sessionInfoCache.Exists(changeDescription.SessionId))
-                {
-                    ThreadPool.QueueUserWorkItem(new WaitCallback(KickoffSessionHelperThread), changeDescription.SessionId);
-                }
-            }
-        }
-
-        private const int ERROR_INVALID_PARAMETER = 87;
-        private const int ERROR_PIPE_NOT_CONNECTED = 233;
-
-        private void KickoffSessionHelperThread(object id)
-        {
-            KickoffSessionHelpers((int)id);
-        }
-
-        private void KickoffSessionHelpers(int sessionId)
-        {
-            string helperAppExe = pGina.Core.Settings.Get.GetSetting("SessionHelperExe", "pGina.Service.SessionHelper.exe");            
-            int numHelperStartRetries = pGina.Core.Settings.Get.GetSetting("HelperStartRetryCount", 60);
-            int helperStartRetryDelay = pGina.Core.Settings.Get.GetSetting("HelperStartRetryDelay", 1000);
-            string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-            string systemApp = string.Format("{0}\\{1} --serviceMode", currentDir, helperAppExe);
-            string helperApp = string.Format("{0}\\{1}", currentDir, helperAppExe);
-
-            Process systemHelper = null;
-            Process userHelper = null;
-
-            try
-            {
-                // We know from experience that we are racing to start our helper as the session is 
-                // being setup, and when we win that race, we get invalid param or epipe errors.  So 
-                // we backoff for a few seconds then try again, up to 60 times, waiting 1 second each time.
-                m_logger.DebugFormat("Starting session helper app in system context: {0} in session {1}", systemApp, sessionId);
-                for (int x = 0; x < numHelperStartRetries && systemHelper == null; ++x)
-                {
-                    try
-                    {
-                        systemHelper = Abstractions.WindowsApi.pInvokes.StartProcessInSession(sessionId, systemApp);
-                        m_logger.DebugFormat("System helper app started as process id: {0} ({1} retries necessary)", systemHelper.Id, x);
-                    }
-                    catch (Win32Exception exception)
-                    {
-                        if (exception.NativeErrorCode != ERROR_INVALID_PARAMETER &&
-                            exception.NativeErrorCode != ERROR_PIPE_NOT_CONNECTED)
-                        {
-                            m_logger.ErrorFormat("Unexpected error: {0}", exception);
-                            break;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        m_logger.ErrorFormat("Unexpected error: {0}", e);
-                        break;
-                    }
-
-                    Thread.Sleep(helperStartRetryDelay);
-                }
-
-                // Rinse repeat, this time for the user helper.  Note that ideally retries aren't necessary here,
-                //  as we would have eventually started the system helper previously... but we'll do it anyway, 
-                //  for completeness sake.
-                m_logger.DebugFormat("Starting session helper app in user context: {0} in session {1}", helperApp, sessionId);
-                for (int x = 0; x < numHelperStartRetries && userHelper == null; ++x)
-                {
-                    try
-                    {
-                        userHelper = Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(sessionId, helperApp);
-                        m_logger.DebugFormat("User helper app started as process id: {0} ({1} retries necessary)", userHelper.Id, x);
-                    }
-                    catch (Win32Exception exception)
-                    {
-                        if (exception.NativeErrorCode != ERROR_INVALID_PARAMETER &&
-                            exception.NativeErrorCode != ERROR_PIPE_NOT_CONNECTED)
-                        {
-                            m_logger.ErrorFormat("Unexpected error: {0}", exception);
-                            break;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        m_logger.ErrorFormat("Unexpected error: {0}", e);
-                        break;
-                    }
-
-                    Thread.Sleep(helperStartRetryDelay);
-                }                
-            }
-            finally
-            {
-                if (systemHelper != null) systemHelper.Dispose();
-                if (userHelper != null) userHelper.Dispose();
-            }
-        }
-
+            m_logger.DebugFormat("Change: {0} Session: {1}", changeDescription.Reason, changeDescription.SessionId);             
+        }        
 
         // This will be called on seperate threads, 1 per client connection and
         //  represents a connected client - that is, until we return null,
@@ -264,9 +165,7 @@ namespace pGina.Service.Impl
                     HandleLogMessage(new LogMessage(msg));
                     return new EmptyMessage(MessageType.Ack).ToExpando();  // Ack
                 case MessageType.LoginRequest:
-                    return HandleLoginRequest(new LoginRequestMessage(msg)).ToExpando();
-                case MessageType.InfoRequest:
-                    return HandleInfoRequest(new HelperInfoRequestMessage(msg)).ToExpando();
+                    return HandleLoginRequest(new LoginRequestMessage(msg)).ToExpando();                
                 case MessageType.DynLabelRequest:
                     return HandleDynamicLabelRequest(new DynamicLabelRequestMessage(msg)).ToExpando();
                 case MessageType.LoginInfoChange:
@@ -300,28 +199,6 @@ namespace pGina.Service.Impl
             }
         }
                 
-        private HelperInfoResponseMessage HandleInfoRequest(HelperInfoRequestMessage msg)
-        {
-            m_logger.DebugFormat("HelperInfo requested for session: {0}", msg.Key);
-            HelperInfoResponseMessage response = new HelperInfoResponseMessage()
-            {
-                Success = m_sessionInfoCache.Exists(msg.Key)
-            };
-            
-            if(response.Success)
-            {
-                m_logger.DebugFormat("Info found, returning user data");
-                UserInformation info = m_sessionInfoCache.Get(msg.Key);
-                response.Username = info.Username;
-                // We always send an empty string for password, see GH issue #30
-                // response.Password = info.Password;
-                response.Password = "";
-                response.Domain = info.Domain;                
-            }
-
-            return response;
-        }
-
         private LoginResponseMessage HandleLoginRequest(LoginRequestMessage msg)
         {
             try

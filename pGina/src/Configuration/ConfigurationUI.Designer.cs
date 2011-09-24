@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigurationUI));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
             this.groupBox14 = new System.Windows.Forms.GroupBox();
@@ -65,10 +65,6 @@
             this.btnAdd = new System.Windows.Forms.Button();
             this.lstPluginDirs = new System.Windows.Forms.ListView();
             this.m_pluginOrderTab = new System.Windows.Forms.TabPage();
-            this.groupBox10 = new System.Windows.Forms.GroupBox();
-            this.userBtnDown = new System.Windows.Forms.Button();
-            this.userBtnUp = new System.Windows.Forms.Button();
-            this.userDGV = new System.Windows.Forms.DataGridView();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.gatewayBtnDown = new System.Windows.Forms.Button();
             this.gatewayBtnUp = new System.Windows.Forms.Button();
@@ -81,20 +77,13 @@
             this.authorizeBtnDown = new System.Windows.Forms.Button();
             this.authorizeBtnUp = new System.Windows.Forms.Button();
             this.authorizeDGV = new System.Windows.Forms.DataGridView();
-            this.groupBox9 = new System.Windows.Forms.GroupBox();
-            this.systemBtnDown = new System.Windows.Forms.Button();
-            this.systemBtnUp = new System.Windows.Forms.Button();
-            this.systemDGV = new System.Windows.Forms.DataGridView();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.authenticateBtnDown = new System.Windows.Forms.Button();
             this.authenticateBtnUp = new System.Windows.Forms.Button();
             this.authenticateDGV = new System.Windows.Forms.DataGridView();
             this.m_simTab = new System.Windows.Forms.TabPage();
             this.groupBox13 = new System.Windows.Forms.GroupBox();
-            this.m_chkStartStop = new System.Windows.Forms.CheckBox();
             this.chkIgnoreGateway = new System.Windows.Forms.CheckBox();
-            this.chkInvokeUser = new System.Windows.Forms.CheckBox();
-            this.chkInvokeSystem = new System.Windows.Forms.CheckBox();
             this.chkIgnoreAuthzError = new System.Windows.Forms.CheckBox();
             this.chkIgnoreAuthenticateError = new System.Windows.Forms.CheckBox();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
@@ -153,16 +142,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.m_pluginOrderTab.SuspendLayout();
-            this.groupBox10.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.userDGV)).BeginInit();
             this.groupBox8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).BeginInit();
             this.groupBox11.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.eventDGV)).BeginInit();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).BeginInit();
-            this.groupBox9.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.systemDGV)).BeginInit();
             this.groupBox7.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).BeginInit();
             this.m_simTab.SuspendLayout();
@@ -458,33 +443,33 @@
             this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this.pluginsDG.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle8;
             this.pluginsDG.Location = new System.Drawing.Point(10, 19);
             this.pluginsDG.Name = "pluginsDG";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
             this.pluginsDG.Size = new System.Drawing.Size(735, 253);
             this.pluginsDG.TabIndex = 10;
             this.pluginsDG.DoubleClick += new System.EventHandler(this.pluginsDG_DoubleClick);
@@ -550,11 +535,9 @@
             // 
             // m_pluginOrderTab
             // 
-            this.m_pluginOrderTab.Controls.Add(this.groupBox10);
             this.m_pluginOrderTab.Controls.Add(this.groupBox8);
             this.m_pluginOrderTab.Controls.Add(this.groupBox11);
             this.m_pluginOrderTab.Controls.Add(this.groupBox2);
-            this.m_pluginOrderTab.Controls.Add(this.groupBox9);
             this.m_pluginOrderTab.Controls.Add(this.groupBox7);
             this.m_pluginOrderTab.Location = new System.Drawing.Point(4, 22);
             this.m_pluginOrderTab.Name = "m_pluginOrderTab";
@@ -562,50 +545,6 @@
             this.m_pluginOrderTab.TabIndex = 3;
             this.m_pluginOrderTab.Text = "Plugin Order";
             this.m_pluginOrderTab.UseVisualStyleBackColor = true;
-            // 
-            // groupBox10
-            // 
-            this.groupBox10.Controls.Add(this.userBtnDown);
-            this.groupBox10.Controls.Add(this.userBtnUp);
-            this.groupBox10.Controls.Add(this.userDGV);
-            this.groupBox10.Location = new System.Drawing.Point(16, 366);
-            this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(367, 169);
-            this.groupBox10.TabIndex = 20;
-            this.groupBox10.TabStop = false;
-            this.groupBox10.Text = "User Session";
-            // 
-            // userBtnDown
-            // 
-            this.userBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.userBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.userBtnDown.Location = new System.Drawing.Point(330, 89);
-            this.userBtnDown.Name = "userBtnDown";
-            this.userBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.userBtnDown.TabIndex = 16;
-            this.userBtnDown.UseVisualStyleBackColor = true;
-            this.userBtnDown.Click += new System.EventHandler(this.userBtnDown_Click);
-            // 
-            // userBtnUp
-            // 
-            this.userBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.userBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.userBtnUp.Location = new System.Drawing.Point(330, 56);
-            this.userBtnUp.Name = "userBtnUp";
-            this.userBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.userBtnUp.TabIndex = 15;
-            this.userBtnUp.UseVisualStyleBackColor = true;
-            this.userBtnUp.Click += new System.EventHandler(this.userBtnUp_Click);
-            // 
-            // userDGV
-            // 
-            this.userDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.userDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.userDGV.Location = new System.Drawing.Point(15, 20);
-            this.userDGV.Name = "userDGV";
-            this.userDGV.Size = new System.Drawing.Size(309, 131);
-            this.userDGV.TabIndex = 0;
             // 
             // groupBox8
             // 
@@ -656,7 +595,7 @@
             this.groupBox11.Controls.Add(this.eventBtnDown);
             this.groupBox11.Controls.Add(this.eventBtnUp);
             this.groupBox11.Controls.Add(this.eventDGV);
-            this.groupBox11.Location = new System.Drawing.Point(398, 366);
+            this.groupBox11.Location = new System.Drawing.Point(398, 191);
             this.groupBox11.Name = "groupBox11";
             this.groupBox11.Size = new System.Drawing.Size(376, 169);
             this.groupBox11.TabIndex = 21;
@@ -739,50 +678,6 @@
             this.authorizeDGV.Size = new System.Drawing.Size(318, 131);
             this.authorizeDGV.TabIndex = 0;
             // 
-            // groupBox9
-            // 
-            this.groupBox9.Controls.Add(this.systemBtnDown);
-            this.groupBox9.Controls.Add(this.systemBtnUp);
-            this.groupBox9.Controls.Add(this.systemDGV);
-            this.groupBox9.Location = new System.Drawing.Point(398, 191);
-            this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(376, 169);
-            this.groupBox9.TabIndex = 19;
-            this.groupBox9.TabStop = false;
-            this.groupBox9.Text = "System Session";
-            // 
-            // systemBtnDown
-            // 
-            this.systemBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.systemBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.systemBtnDown.Location = new System.Drawing.Point(339, 89);
-            this.systemBtnDown.Name = "systemBtnDown";
-            this.systemBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.systemBtnDown.TabIndex = 16;
-            this.systemBtnDown.UseVisualStyleBackColor = true;
-            this.systemBtnDown.Click += new System.EventHandler(this.systemBtnDown_Click);
-            // 
-            // systemBtnUp
-            // 
-            this.systemBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.systemBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.systemBtnUp.Location = new System.Drawing.Point(339, 56);
-            this.systemBtnUp.Name = "systemBtnUp";
-            this.systemBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.systemBtnUp.TabIndex = 15;
-            this.systemBtnUp.UseVisualStyleBackColor = true;
-            this.systemBtnUp.Click += new System.EventHandler(this.systemBtnUp_Click);
-            // 
-            // systemDGV
-            // 
-            this.systemDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.systemDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.systemDGV.Location = new System.Drawing.Point(15, 20);
-            this.systemDGV.Name = "systemDGV";
-            this.systemDGV.Size = new System.Drawing.Size(318, 131);
-            this.systemDGV.TabIndex = 0;
-            // 
             // groupBox7
             // 
             this.groupBox7.Controls.Add(this.authenticateBtnDown);
@@ -844,10 +739,7 @@
             // 
             // groupBox13
             // 
-            this.groupBox13.Controls.Add(this.m_chkStartStop);
             this.groupBox13.Controls.Add(this.chkIgnoreGateway);
-            this.groupBox13.Controls.Add(this.chkInvokeUser);
-            this.groupBox13.Controls.Add(this.chkInvokeSystem);
             this.groupBox13.Controls.Add(this.chkIgnoreAuthzError);
             this.groupBox13.Controls.Add(this.chkIgnoreAuthenticateError);
             this.groupBox13.Location = new System.Drawing.Point(338, 18);
@@ -856,16 +748,6 @@
             this.groupBox13.TabIndex = 3;
             this.groupBox13.TabStop = false;
             this.groupBox13.Text = "Simulation Options";
-            // 
-            // m_chkStartStop
-            // 
-            this.m_chkStartStop.AutoSize = true;
-            this.m_chkStartStop.Location = new System.Drawing.Point(207, 79);
-            this.m_chkStartStop.Name = "m_chkStartStop";
-            this.m_chkStartStop.Size = new System.Drawing.Size(181, 17);
-            this.m_chkStartStop.TabIndex = 5;
-            this.m_chkStartStop.Text = "Invoke Starting/Stopping Events";
-            this.m_chkStartStop.UseVisualStyleBackColor = true;
             // 
             // chkIgnoreGateway
             // 
@@ -876,26 +758,6 @@
             this.chkIgnoreGateway.TabIndex = 4;
             this.chkIgnoreGateway.Text = "Ignore Gateway Errors";
             this.chkIgnoreGateway.UseVisualStyleBackColor = true;
-            // 
-            // chkInvokeUser
-            // 
-            this.chkInvokeUser.AutoSize = true;
-            this.chkInvokeUser.Location = new System.Drawing.Point(207, 29);
-            this.chkInvokeUser.Name = "chkInvokeUser";
-            this.chkInvokeUser.Size = new System.Drawing.Size(163, 17);
-            this.chkInvokeUser.TabIndex = 3;
-            this.chkInvokeUser.Text = "Invoke User Session Helpers";
-            this.chkInvokeUser.UseVisualStyleBackColor = true;
-            // 
-            // chkInvokeSystem
-            // 
-            this.chkInvokeSystem.AutoSize = true;
-            this.chkInvokeSystem.Location = new System.Drawing.Point(207, 54);
-            this.chkInvokeSystem.Name = "chkInvokeSystem";
-            this.chkInvokeSystem.Size = new System.Drawing.Size(175, 17);
-            this.chkInvokeSystem.TabIndex = 2;
-            this.chkInvokeSystem.Text = "Invoke System Session Helpers";
-            this.chkInvokeSystem.UseVisualStyleBackColor = true;
             // 
             // chkIgnoreAuthzError
             // 
@@ -1401,16 +1263,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.m_pluginOrderTab.ResumeLayout(false);
-            this.groupBox10.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.userDGV)).EndInit();
             this.groupBox8.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).EndInit();
             this.groupBox11.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.eventDGV)).EndInit();
             this.groupBox2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).EndInit();
-            this.groupBox9.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.systemDGV)).EndInit();
             this.groupBox7.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).EndInit();
             this.m_simTab.ResumeLayout(false);
@@ -1481,14 +1339,6 @@
         private System.Windows.Forms.Button gatewayBtnDown;
         private System.Windows.Forms.Button gatewayBtnUp;
         private System.Windows.Forms.DataGridView gatewayDGV;
-        private System.Windows.Forms.GroupBox groupBox9;
-        private System.Windows.Forms.Button systemBtnDown;
-        private System.Windows.Forms.Button systemBtnUp;
-        private System.Windows.Forms.DataGridView systemDGV;
-        private System.Windows.Forms.GroupBox groupBox10;
-        private System.Windows.Forms.Button userBtnDown;
-        private System.Windows.Forms.Button userBtnUp;
-        private System.Windows.Forms.DataGridView userDGV;
         private System.Windows.Forms.GroupBox groupBox11;
         private System.Windows.Forms.Button eventBtnDown;
         private System.Windows.Forms.Button eventBtnUp;
@@ -1512,8 +1362,6 @@
         private System.Windows.Forms.GroupBox groupBox13;
         private System.Windows.Forms.CheckBox chkIgnoreAuthenticateError;
         private System.Windows.Forms.CheckBox chkIgnoreAuthzError;
-        private System.Windows.Forms.CheckBox chkInvokeSystem;
-        private System.Windows.Forms.CheckBox chkInvokeUser;
         private System.Windows.Forms.CheckBox chkIgnoreGateway;
         private System.Windows.Forms.GroupBox motdGB;
         private System.Windows.Forms.Label label12;
@@ -1524,7 +1372,6 @@
         private System.Windows.Forms.Button serviceStopBtn;
         private System.Windows.Forms.Button serviceStartBtn;
         private System.Windows.Forms.TextBox serviceStatusTB;
-        private System.Windows.Forms.CheckBox m_chkStartStop;
         private System.Windows.Forms.GroupBox groupBox14;
         private System.Windows.Forms.Button cpEnableDisableBtn;
         private System.Windows.Forms.Button cpRegisterBtn;

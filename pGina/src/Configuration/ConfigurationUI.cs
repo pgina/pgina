@@ -69,9 +69,7 @@ namespace pGina.Configuration
         private const string AUTHORIZATION_COLUMN = "Authorization";
         private const string GATEWAY_COLUMN = "Gateway";
         private const string NOTIFICATION_COLUMN = "Notification";
-        private const string USER_SESSION_COLUMN = "UserSession";
-        private const string SYSTEM_SESSION_COLUMN = "SystemSession";
-
+        
         public ConfigurationUI()
         {
             Framework.Init();
@@ -298,9 +296,7 @@ namespace pGina.Configuration
             InitPluginOrderDGV(this.authorizeDGV);
             InitPluginOrderDGV(this.gatewayDGV);
             InitPluginOrderDGV(this.eventDGV);
-            InitPluginOrderDGV(this.userDGV);
-            InitPluginOrderDGV(this.systemDGV);            
-
+            
             // Load order lists from the registry
             LoadPluginOrderListsFromReg();
         }
@@ -366,22 +362,7 @@ namespace pGina.Configuration
                 Name = NOTIFICATION_COLUMN,
                 HeaderText = "Notification",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            });
-
-            pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
-            {
-                Name = USER_SESSION_COLUMN,
-                HeaderText = "User Session",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            });
-
-            pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
-            {
-                Name = SYSTEM_SESSION_COLUMN,
-                HeaderText = "System Session",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            });
-
+            });            
 
             pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
             {
@@ -422,7 +403,7 @@ namespace pGina.Configuration
                 pluginsDG[e.ColumnIndex, e.RowIndex].ValueType == typeof(bool))
             {
                 DataGridViewCell cell = this.pluginsDG[e.ColumnIndex, e.RowIndex];
-                string uuid = (string)this.pluginsDG.Rows[e.RowIndex].Cells[PLUGIN_UUID_COLUMN].Value;
+                string uuid = (string)this.pluginsDG.Rows[e.RowIndex].Cells[PLUGIN_UUID_COLUMN].Value;                
                 IPluginBase plug = m_plugins[uuid];
                 bool checkBoxState = Convert.ToBoolean(cell.Value);
                 string columnName = pluginsDG.Columns[e.ColumnIndex].Name;
@@ -440,13 +421,7 @@ namespace pGina.Configuration
                         break;
                     case NOTIFICATION_COLUMN:
                         SyncStateToList(checkBoxState, plug, eventDGV);
-                        break;
-                    case SYSTEM_SESSION_COLUMN:
-                        SyncStateToList(checkBoxState, plug, systemDGV);
-                        break;
-                    case USER_SESSION_COLUMN:
-                        SyncStateToList(checkBoxState, plug, userDGV);
-                        break;
+                        break;                    
                 }                
             }
         }
@@ -509,15 +484,13 @@ namespace pGina.Configuration
                     IPluginBase p = plugins[i];
                     this.m_plugins.Add(p.Uuid.ToString(), p);
                     pluginsDG.Rows.Add(
-                        new object[] { p.Name, false, false, false, false, false, false, p.Description, p.Version, p.Uuid.ToString() });
+                        new object[] { p.Name, false, false, false, false, p.Description, p.Version, p.Uuid.ToString() });
                     DataGridViewRow row = pluginsDG.Rows[i];
 
                     this.SetupCheckBoxCell<IPluginAuthentication>(row.Cells[AUTHENTICATION_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginAuthorization>(row.Cells[AUTHORIZATION_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginAuthenticationGateway>(row.Cells[GATEWAY_COLUMN], p);
-                    this.SetupCheckBoxCell<IPluginEventNotifications>(row.Cells[NOTIFICATION_COLUMN], p);
-                    this.SetupCheckBoxCell<IPluginUserSessionHelper>(row.Cells[USER_SESSION_COLUMN], p);
-                    this.SetupCheckBoxCell<IPluginSystemSessionHelper>(row.Cells[SYSTEM_SESSION_COLUMN], p);
+                    this.SetupCheckBoxCell<IPluginEventNotifications>(row.Cells[NOTIFICATION_COLUMN], p);                    
                 }
             }
 
@@ -543,9 +516,7 @@ namespace pGina.Configuration
             LoadPluginOrderListFromReg<IPluginAuthentication>(authenticateDGV);
             LoadPluginOrderListFromReg<IPluginAuthenticationGateway>(gatewayDGV);
             LoadPluginOrderListFromReg<IPluginAuthorization>(authorizeDGV);
-            LoadPluginOrderListFromReg<IPluginEventNotifications>(eventDGV);
-            LoadPluginOrderListFromReg<IPluginSystemSessionHelper>(systemDGV);
-            LoadPluginOrderListFromReg<IPluginUserSessionHelper>(userDGV);                        
+            LoadPluginOrderListFromReg<IPluginEventNotifications>(eventDGV);            
         }
 
         private void LoadPluginOrderListFromReg<T>(DataGridView grid) where T : class, IPluginBase
@@ -577,14 +548,7 @@ namespace pGina.Configuration
                     SyncStateToList((bool)row.Cells[GATEWAY_COLUMN].Value, plug, gatewayDGV);
                 
                 if (!row.Cells[NOTIFICATION_COLUMN].ReadOnly)
-                    SyncStateToList((bool)row.Cells[NOTIFICATION_COLUMN].Value, plug, eventDGV);
-
-                if (!row.Cells[USER_SESSION_COLUMN].ReadOnly)
-                    SyncStateToList((bool)row.Cells[USER_SESSION_COLUMN].Value, plug, userDGV);
-
-                if (!row.Cells[SYSTEM_SESSION_COLUMN].ReadOnly)
-                    SyncStateToList((bool)row.Cells[SYSTEM_SESSION_COLUMN].Value, plug, systemDGV);
-                
+                    SyncStateToList((bool)row.Cells[NOTIFICATION_COLUMN].Value, plug, eventDGV);                
             }
 
             // Remove any plugins that are no longer in the main list from the
@@ -592,9 +556,7 @@ namespace pGina.Configuration
             this.RemoveAllNotInMainList(authorizeDGV);
             this.RemoveAllNotInMainList(authenticateDGV);
             this.RemoveAllNotInMainList(gatewayDGV);
-            this.RemoveAllNotInMainList(eventDGV);
-            this.RemoveAllNotInMainList(systemDGV);
-            this.RemoveAllNotInMainList(userDGV);
+            this.RemoveAllNotInMainList(eventDGV);            
         }
 
         private void RemoveAllNotInMainList(DataGridView dgv)
@@ -710,11 +672,7 @@ namespace pGina.Configuration
                         mask |= (int)Core.PluginLoader.State.GatewayEnabled;
                     if (Convert.ToBoolean(row.Cells[NOTIFICATION_COLUMN].Value))
                         mask |= (int)Core.PluginLoader.State.NotificationEnabled;
-                    if (Convert.ToBoolean(row.Cells[SYSTEM_SESSION_COLUMN].Value))
-                        mask |= (int)Core.PluginLoader.State.SystemSessionEnabled;
-                    if (Convert.ToBoolean(row.Cells[USER_SESSION_COLUMN].Value))
-                        mask |= (int)Core.PluginLoader.State.UserSessionEnabled;
-
+                    
                     Core.Settings.Get.SetSetting(p.Uuid.ToString(), mask);
                 }
                 catch (Exception e)
@@ -729,9 +687,7 @@ namespace pGina.Configuration
             SavePluginOrder(authenticateDGV, typeof(IPluginAuthentication));
             SavePluginOrder(authorizeDGV, typeof(IPluginAuthorization));
             SavePluginOrder(gatewayDGV, typeof(IPluginAuthenticationGateway));
-            SavePluginOrder(eventDGV, typeof(IPluginEventNotifications));
-            SavePluginOrder(systemDGV, typeof(IPluginSystemSessionHelper));
-            SavePluginOrder(userDGV, typeof(IPluginUserSessionHelper));                        
+            SavePluginOrder(eventDGV, typeof(IPluginEventNotifications));            
         }
 
         private void SavePluginOrder(DataGridView grid, Type pluginType)
@@ -842,9 +798,7 @@ namespace pGina.Configuration
         {            
             btnLaunchCredUI.Enabled = (sender == m_radioCredUI);
             chkIgnoreAuthenticateError.Enabled = (sender == m_radioEmulate);
-            chkIgnoreAuthzError.Enabled = (sender == m_radioEmulate);
-            chkInvokeSystem.Enabled = (sender == m_radioEmulate);
-            chkInvokeUser.Enabled = (sender == m_radioEmulate);
+            chkIgnoreAuthzError.Enabled = (sender == m_radioEmulate);            
             chkIgnoreGateway.Enabled = (sender == m_radioEmulate);
         }
 
@@ -882,31 +836,7 @@ namespace pGina.Configuration
         {
             if (this.gatewayDGV.SelectedRows.Count > 0)
                 MoveDown(this.gatewayDGV, this.gatewayDGV.SelectedRows[0].Index);
-        }
-
-        private void systemBtnUp_Click(object sender, EventArgs e)
-        {
-            if (this.systemDGV.SelectedRows.Count > 0)
-                MoveUp(this.systemDGV, this.systemDGV.SelectedRows[0].Index);
-        }
-
-        private void systemBtnDown_Click(object sender, EventArgs e)
-        {
-            if (this.systemDGV.SelectedRows.Count > 0)
-                MoveDown(this.systemDGV, this.systemDGV.SelectedRows[0].Index);
-        }
-
-        private void userBtnUp_Click(object sender, EventArgs e)
-        {
-            if (this.userDGV.SelectedRows.Count > 0)
-                MoveUp(this.userDGV, this.userDGV.SelectedRows[0].Index);
-        }
-
-        private void userBtnDown_Click(object sender, EventArgs e)
-        {
-            if (this.userDGV.SelectedRows.Count > 0)
-                MoveDown(this.userDGV, this.userDGV.SelectedRows[0].Index);
-        }
+        }        
 
         private void eventBtnUp_Click(object sender, EventArgs e)
         {
@@ -1066,9 +996,8 @@ namespace pGina.Configuration
             bool authenticated = false;
             bool authorized = false;
             bool gatewayed = false;
-
-            if (m_chkStartStop.Checked)
-                PluginDriver.Starting();
+            
+            PluginDriver.Starting();
 
             try
             {
@@ -1131,31 +1060,9 @@ namespace pGina.Configuration
             // Simplify, now that we've reported actual result to the UI
             authenticated |= chkIgnoreAuthenticateError.Checked;
             authorized |= chkIgnoreAuthzError.Checked;
-            gatewayed |= chkIgnoreGateway.Checked;
-
-            if (authenticated && authorized && gatewayed)
-            {
-                if (chkInvokeSystem.Checked)
-                {
-                    // TBD: Work out how to actually invoke these as SYSTEM in the current session, for now
-                    // we settle for at least invoking them
-                    m_logger.DebugFormat("Running system session plugins notification");
-                    sessionDriver.InvokeSystemSessionHelpers();
-                    sessionDriver.EndSystemSessionHelpers();
-                }
-
-                if (chkInvokeUser.Checked)
-                {
-                    // TBD: Work out how to actually invoke these as the user who auth'd, but in the current session, for now
-                    // we settle for at least invoking them
-                    m_logger.DebugFormat("Running user session plugins notification");
-                    sessionDriver.InvokeUserSessionHelpers();
-                    sessionDriver.EndUserSessionHelpers();
-                }
-            }
-
-            if (m_chkStartStop.Checked)
-                PluginDriver.Stopping();
+            gatewayed |= chkIgnoreGateway.Checked;            
+            
+            PluginDriver.Stopping();
         }
 
 

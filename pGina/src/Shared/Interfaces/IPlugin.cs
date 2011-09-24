@@ -95,35 +95,7 @@ namespace pGina.Shared.Interfaces
         /// <param name="properties">Info about the session</param>
         /// <returns>Whether or not the plugin was successful.</returns>
         Types.BooleanResult AuthenticatedUserGateway(Types.SessionProperties properties);
-    }
-      
-    /// <summary>
-    /// Plugins that want to perform processing as the user should implement
-    /// this interface.  These plugins are loaded in the context of the users
-    /// session, as the user.  Note that users can stop (kill) the user session helper,
-    /// so *enforcement* does not belong here.  As this interface is called in a seperate
-    /// context (application) - the properties provided are shared only among IPluginUserSessionHelper
-    /// plugins. 
-    /// </summary>
-    public interface IPluginUserSessionHelper : IPluginBase
-    {
-        void SessionStarted(Types.SessionProperties properties);
-        void SessionEnding(Types.SessionProperties properties);
-    }
-
-    /// <summary>
-    /// Plugins that want to perform processing in the users session should implement
-    /// this interface.  These plugins are loaded in the context of the users
-    /// session, as the service account that runs the pGina service.  Non-admin
-    /// user's cannot stop this helper (admin users can).  As this interface is called in a seperate
-    /// context (application) - the properties provided are shared only among IPluginSystemSessionHelper
-    /// plugins. 
-    /// </summary>
-    public interface IPluginSystemSessionHelper : IPluginBase
-    {
-        void SessionStarted(Types.SessionProperties properties);
-        void SessionEnding(Types.SessionProperties properties);
-    }
+    }          
 
     /// <summary>
     /// Plugins that want notification of events as they occur must implement
