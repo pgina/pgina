@@ -31,7 +31,7 @@ using System.Text;
 
 using pGina.Shared.Settings;
 
-namespace pGina.Plugin.SingleUser
+namespace pGina.Plugin.SessionLimit
 {
     public class Settings
     {
@@ -44,11 +44,7 @@ namespace pGina.Plugin.SingleUser
 
         public static void Init()
         {
-            m_settings.SetDefault("Username", "Username");
-            m_settings.SetDefault("Domain", Environment.MachineName);
-            m_settings.SetEncryptedSetting("Password", "", null);            
-            m_settings.SetDefault("RequirePlugins", false);
-            m_settings.SetDefault("RequiredPluginList", new string[] { });
+            m_settings.SetDefault("GlobalLimit", (int) 0);            
         }
 
         public static dynamic Store

@@ -28,32 +28,64 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
+using log4net;
+
+using pGina.Shared.Interfaces;
+using pGina.Shared.Types;
 using pGina.Shared.Settings;
 
-namespace pGina.Plugin.SingleUser
+namespace pGina.Plugin.SessionLimit
 {
-    public class Settings
+    public class PluginImpl : IPluginConfiguration, IPluginEventNotifications
     {
-        private static dynamic m_settings = new pGinaDynamicSettings(PluginImpl.PluginUuid);
+        private ILog m_logger = LogManager.GetLogger("SessionLimitPlugin");
+        public static Guid PluginUuid = new Guid("{D73131D7-7AF2-47BB-BBF4-4F8583B44962}");
 
-        static Settings()
+        public PluginImpl()
         {
-            Init();
+            using (Process me = Process.GetCurrentProcess())
+            {
+                Settings.Init();
+                m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
+            }
         }
 
-        public static void Init()
+        public string Name
         {
-            m_settings.SetDefault("Username", "Username");
-            m_settings.SetDefault("Domain", Environment.MachineName);
-            m_settings.SetEncryptedSetting("Password", "", null);            
-            m_settings.SetDefault("RequirePlugins", false);
-            m_settings.SetDefault("RequiredPluginList", new string[] { });
+            get { return "Session Limit"; }
         }
 
-        public static dynamic Store
+        public string Description
         {
-            get { return m_settings; }
+            get { return "Enforces limits to user's sessions"; }
+        }
+
+        public string Version
+        {
+            get
+            {
+                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            }
+        }
+
+        public Guid Uuid
+        {
+            get { return PluginUuid; }
+        }
+
+        public void Configure()
+        {
+            /*Configuration conf = new Configuration();
+            conf.ShowDialog();*/
+        }
+        
+        public void Starting() { }
+        public void Stopping() { }
+
+        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription)
+        {            
         }
     }
 }
