@@ -101,5 +101,8 @@ namespace pGina.Plugin.ScriptRunner
             Configuration dlg = new Configuration();
             dlg.ShowDialog();
         }
+
+        public void Starting() { }
+        public void Stopping() { }
     }
 }

@@ -111,5 +111,8 @@ namespace pGina.Plugin.Sample
             Configuration conf = new Configuration();
             conf.ShowDialog();
         }
+
+        public void Starting() { }
+        public void Stopping() { }
     }
 }

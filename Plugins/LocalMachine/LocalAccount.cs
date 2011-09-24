@@ -34,6 +34,8 @@ using log4net;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Security.Principal;
+using System.Security.AccessControl;
+using System.IO;
 
 using pGina.Shared.Types;
 
@@ -66,7 +68,7 @@ namespace pGina.Plugin.LocalMachine
             }
         }
         
-        public LocalAccount()
+        static LocalAccount()
         {
             m_logger = LogManager.GetLogger("LocalAccount");
         }
@@ -345,9 +347,55 @@ namespace pGina.Plugin.LocalMachine
         {
             using (UserPrincipal userPrincipal = GetUserPrincipal(user))
             {
-                Abstractions.WindowsApi.pInvokes.DeleteProfile(userPrincipal.Sid);
+                // First we have to work out where the users profile is on disk.
+                string usersProfileDir = Abstractions.Windows.User.GetProfileDir(userPrincipal.Sid);
+                if (!string.IsNullOrEmpty(usersProfileDir))
+                {
+                    m_logger.DebugFormat("User {0} has profile in {1}, giving myself delete permission", user, usersProfileDir);
+                    RecurseDelete(usersProfileDir);                                        
+                    // Now remove it from the registry as well
+                    Abstractions.WindowsApi.pInvokes.DeleteProfile(userPrincipal.Sid);                                        
+                }
                 userPrincipal.Delete();                
             }
         }
+
+        private static void RecurseDelete(string directory)
+        {
+            m_logger.DebugFormat("Dir: {0}", directory);
+            DirectorySecurity dirSecurity = Directory.GetAccessControl(directory);
+            dirSecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().Name, FileSystemRights.FullControl, AccessControlType.Allow));
+            Directory.SetAccessControl(directory, dirSecurity);
+            File.SetAttributes(directory, FileAttributes.Normal);
+
+            DirectoryInfo di = new DirectoryInfo(directory);
+            if ((di.Attributes & FileAttributes.ReparsePoint) == 0)
+            {
+                m_logger.DebugFormat("{0} is a reparse point, skipping", directory);
+                return;
+            }
+
+            string[] files = Directory.GetFiles(directory);
+            string[] dirs = Directory.GetDirectories(directory);
+
+            // Files
+            foreach (string file in files)
+            {
+                m_logger.DebugFormat("File: {0}", file);
+                FileSecurity fileSecurity = File.GetAccessControl(file);
+                fileSecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().Name, FileSystemRights.FullControl, AccessControlType.Allow));
+                File.SetAccessControl(file, fileSecurity); // Set the new access settings.
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
+            }
+
+            // Recurse each dir
+            foreach (string dir in dirs)
+            {
+                RecurseDelete(dir);
+            }
+            
+            Directory.Delete(directory, false);
+        }        
     }
 }

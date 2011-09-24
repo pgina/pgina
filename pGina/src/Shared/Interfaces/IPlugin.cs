@@ -39,6 +39,16 @@ namespace pGina.Shared.Interfaces
         string Description { get; }
         string Version { get; }
         Guid Uuid { get; }
+
+        /// <summary>
+        /// Called when plugin is initially loaded after startup, for 'startup' time processing
+        /// </summary>
+        void Starting();
+
+        /// <summary>
+        /// Called when shutting down, for 'stopping' time processing
+        /// </summary>
+        void Stopping();
     }
     
     /// <summary>
@@ -124,17 +134,7 @@ namespace pGina.Shared.Interfaces
     /// IPlugin[User|System]SessionHelper interfaces. 
     /// </summary>
     public interface IPluginEventNotifications : IPluginBase
-    {
-        /// <summary>
-        /// Called when plugin is initially loaded after startup, for 'startup' time processing
-        /// </summary>
-        void Starting();
-
-        /// <summary>
-        /// Called when shutting down, for 'stopping' time processing
-        /// </summary>
-        void Stopping();
-
+    {        
         /// <summary>
         /// Default System session notification (as provided to pGina service
         ///  via http://msdn.microsoft.com/en-us/library/system.serviceprocess.servicebase.onsessionchange.aspx) 

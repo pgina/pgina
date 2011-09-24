@@ -127,5 +127,8 @@ namespace pGina.Plugin.SingleUser
             properties.GetTrackedSingle<UserInformation>().Password = password;
             return new BooleanResult() { Success = true };
         }
+
+        public void Starting() { }
+        public void Stopping() { }
     }
 }

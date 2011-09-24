@@ -85,13 +85,13 @@ namespace pGina.Core
 
         public static void Starting()
         {
-            foreach (IPluginEventNotifications plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
+            foreach (IPluginBase plugin in PluginLoader.AllPlugins)
                 plugin.Starting();
         }
 
         public static void Stopping()
         {
-            foreach (IPluginEventNotifications plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
+            foreach (IPluginBase plugin in PluginLoader.AllPlugins)
                 plugin.Stopping();
         }
 

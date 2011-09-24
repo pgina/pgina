@@ -42,7 +42,7 @@ using pGina.Shared.Types;
 namespace pGina.Plugin.LocalMachine
 {
 
-    public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration, IPluginEventNotifications
+    public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration
     {
         // Static lock so all instances in a process can mutex on a setting (ala CleanupUsers)
         private static object s_lock = new object();
@@ -400,17 +400,11 @@ namespace pGina.Plugin.LocalMachine
 
             return false;
         }
-
-        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription)
-        {            
-            // We cloud use logoff to try and do a cleanup.. but our timer is 15 seconds by default,
-            //  so why double effort, and add complexity of locking (timer race vs this call)? Best
-            //  just leave it be.
-        }
-
+        
         public void Starting()
         {         
-            // Start background timer                        
+            // Start background timer          
+            m_logger.DebugFormat("Starting background timer");  
             m_backgroundTimer = new Timer(new TimerCallback(BackgroundTaskCallback), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(-1));            
         }
 
@@ -419,6 +413,7 @@ namespace pGina.Plugin.LocalMachine
             // Dispose of our background timer            
             lock (this)
             {
+                m_logger.DebugFormat("Stopping background timer");
                 m_backgroundTimer.Change(TimeSpan.FromMilliseconds(-1), TimeSpan.FromMilliseconds(-1));
                 m_backgroundTimer.Dispose();
                 m_backgroundTimer = null;
@@ -439,6 +434,7 @@ namespace pGina.Plugin.LocalMachine
             // Do background stuff
             lock(this)
             {
+                m_logger.DebugFormat("Background timer fire");
                 IterateCleanupUsers();
 
                 if (m_backgroundTimer != null)
