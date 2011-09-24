@@ -348,13 +348,20 @@ namespace pGina.Plugin.LocalMachine
             using (UserPrincipal userPrincipal = GetUserPrincipal(user))
             {
                 // First we have to work out where the users profile is on disk.
-                string usersProfileDir = Abstractions.Windows.User.GetProfileDir(userPrincipal.Sid);
-                if (!string.IsNullOrEmpty(usersProfileDir))
+                try
                 {
-                    m_logger.DebugFormat("User {0} has profile in {1}, giving myself delete permission", user, usersProfileDir);
-                    RecurseDelete(usersProfileDir);                                        
-                    // Now remove it from the registry as well
-                    Abstractions.WindowsApi.pInvokes.DeleteProfile(userPrincipal.Sid);                                        
+                    string usersProfileDir = Abstractions.Windows.User.GetProfileDir(userPrincipal.Sid);
+                    if (!string.IsNullOrEmpty(usersProfileDir))
+                    {
+                        m_logger.DebugFormat("User {0} has profile in {1}, giving myself delete permission", user, usersProfileDir);
+                        RecurseDelete(usersProfileDir);
+                        // Now remove it from the registry as well
+                        Abstractions.WindowsApi.pInvokes.DeleteProfile(userPrincipal.Sid);
+                    }
+                }
+                catch (KeyNotFoundException) 
+                {
+                    m_logger.DebugFormat("User {0} has no disk profile, just removing principal", user);
                 }
                 userPrincipal.Delete();                
             }
