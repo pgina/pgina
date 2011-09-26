@@ -73,7 +73,7 @@ namespace pGina.Plugin.MySqlLogger
             dlg.ShowDialog();
         }
 
-        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription)
+        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, pGina.Shared.Types.SessionProperties properties)
         {
             m_logger.DebugFormat("SessionChange({0})", changeDescription.Reason.ToString());
 

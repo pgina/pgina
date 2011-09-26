@@ -57,8 +57,8 @@ namespace pGina.Service.Impl
     {
         private ILog m_logger = LogManager.GetLogger("pGina.Service.Impl");
         private ILog m_abstractLogger = LogManager.GetLogger("Abstractions");
-        private PipeServer m_server = null;
-        private TimedCache<int, UserInformation> m_sessionInfoCache = null;
+        private PipeServer m_server = null;        
+        private ObjectCache<int, SessionProperties> m_sessionPropertyCache = new ObjectCache<int, SessionProperties>();
 
         static Service()
         {
@@ -90,10 +90,7 @@ namespace pGina.Service.Impl
         {
             string pipeName = Core.Settings.Get.ServicePipeName;
             int maxClients = Core.Settings.Get.MaxClients;
-            int cacheTimeoutInSeconds = Core.Settings.Get.SessionInfoCacheTimeout;
-            
-            m_logger.DebugFormat("Service created - PipeName: {0} MaxClients: {1} Cache Timeout (secs): {2}", pipeName, maxClients, cacheTimeoutInSeconds);                
-            m_sessionInfoCache = new TimedCache<int,UserInformation>(TimeSpan.FromSeconds(cacheTimeoutInSeconds));            
+            m_logger.DebugFormat("Service created - PipeName: {0} MaxClients: {1}", pipeName, maxClients);
             m_server = new PipeServer(pipeName, maxClients, (Func<dynamic, dynamic>) HandleMessage);                
         }
 
@@ -121,15 +118,20 @@ namespace pGina.Service.Impl
             {
                 try
                 {
-                    plugin.SessionChange(changeDescription);
+                    if (m_sessionPropertyCache.Exists(changeDescription.SessionId))
+                        plugin.SessionChange(changeDescription, m_sessionPropertyCache.Get(changeDescription.SessionId));
+                    else
+                        plugin.SessionChange(changeDescription, null);
                 }
                 catch (Exception e)
                 {
                     m_logger.ErrorFormat("Ignoring unhandled exception from {0}: {1}", plugin.Uuid, e);
                 }
-            }
+            }            
 
-            m_logger.DebugFormat("Change: {0} Session: {1}", changeDescription.Reason, changeDescription.SessionId);             
+            // If this is a logout, remove from our map
+            if (changeDescription.Reason == SessionChangeReason.SessionLogoff && m_sessionPropertyCache.Exists(changeDescription.SessionId))
+                m_sessionPropertyCache.Remove(changeDescription.SessionId);
         }        
 
         // This will be called on seperate threads, 1 per client connection and
@@ -209,9 +211,9 @@ namespace pGina.Service.Impl
 
                 m_logger.DebugFormat("Processing LoginRequest for: {0} in session: {1} reason: {2}", msg.Username, msg.Session, msg.Reason);
                 BooleanResult result = sessionDriver.PerformLoginProcess();
-                
-                if(msg.Reason == LoginRequestMessage.LoginReason.Login)
-                    m_sessionInfoCache.Add(msg.Session, sessionDriver.UserInformation);
+
+                if (msg.Reason == LoginRequestMessage.LoginReason.Login)
+                    m_sessionPropertyCache.Add(msg.Session, sessionDriver.SessionProperties);
 
                 return new LoginResponseMessage()
                 {
@@ -246,7 +248,8 @@ namespace pGina.Service.Impl
         {
             switch (msg.Change)
             {
-                case LoginInfoChangeMessage.ChangeType.Add:
+                    // TBD: This changes to 'remove from, add to' all in one message
+                /*case LoginInfoChangeMessage.ChangeType.Add:
                     {
                         UserInformation userInfo = new UserInformation() { Username = msg.Username, Domain = msg.Domain, Password = msg.Password };
                         m_logger.DebugFormat("Adding userinfo for {0} to session {1}", msg.Username, msg.Session);
@@ -258,7 +261,7 @@ namespace pGina.Service.Impl
                         m_logger.DebugFormat("Removing userinfo for session {0}", msg.Session);
                         m_sessionInfoCache.Remove(msg.Session);
                     }
-                    break;
+                    break;*/
             }
             return new EmptyMessage(MessageType.Ack);
         }

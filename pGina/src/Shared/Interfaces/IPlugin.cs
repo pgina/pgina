@@ -111,8 +111,12 @@ namespace pGina.Shared.Interfaces
         /// Default System session notification (as provided to pGina service
         ///  via http://msdn.microsoft.com/en-us/library/system.serviceprocess.servicebase.onsessionchange.aspx) 
         /// </summary>
-        /// <param name="changeDescription"></param>
-        void SessionChange(SessionChangeDescription changeDescription);                
+        /// <param name="changeDescription">See MSDN, includes session id and change reason (login, logout etc)</param>
+        /// <param name="properties">
+        /// If the session is a pGina session, this is the properties instance used by the plugins at auth time.
+        /// This value is null if the session is not a pGina session.
+        /// </param>
+        void SessionChange(SessionChangeDescription changeDescription, Types.SessionProperties properties);                
     }
 
 }

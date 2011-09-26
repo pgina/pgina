@@ -49,8 +49,7 @@ namespace pGina.Core
             s_settings.SetDefault("PluginDirectories", new string[] { string.Format("{0}\\Plugins", curPath) });
             s_settings.SetDefault("ServicePipeName", "pGinaPipe");
             s_settings.SetDefault("MaxClients", 25);
-            s_settings.SetDefault("TraceMsgTraffic", false);
-            s_settings.SetDefault("SessionInfoCacheTimeout", 300);
+            s_settings.SetDefault("TraceMsgTraffic", false);            
             s_settings.SetDefault("SessionHelperExe", "pGina.Service.SessionHelper.exe");
             s_settings.SetDefault("Motd", "pGina Version: %v");
             s_settings.SetDefault("GinaPassthru", false);

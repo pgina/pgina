@@ -83,6 +83,11 @@ namespace pGina.Core
             get { return m_properties.GetTrackedSingle<UserInformation>().Groups; }
         }
 
+        public SessionProperties SessionProperties
+        {
+            get { return m_properties; }
+        }
+
         public static void Starting()
         {
             foreach (IPluginBase plugin in PluginLoader.AllPlugins)

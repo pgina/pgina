@@ -84,8 +84,13 @@ namespace pGina.Plugin.SessionLimit
         public void Starting() { }
         public void Stopping() { }
 
-        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription)
-        {            
+        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, SessionProperties properties)
+        {
+            // Only applies to pGina sessions!
+            if (properties != null)
+            {
+
+            }
         }
     }
 }

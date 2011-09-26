@@ -33,50 +33,38 @@ using System.Diagnostics;
 
 namespace Abstractions.Helpers
 {
-    public class TimedCache<KeyType, ValueType> : IDisposable
+    public class TimedCache<KeyType, ValueType> : ObjectCache<KeyType, ValueType>
     {
-        internal class CacheEntry
+        protected class TimedCacheEntry : CacheEntry
         {
-            public KeyType Key;
-            public ValueType Value;
             public TimeSpan InsertionTime;
         }
 
-        private Dictionary<KeyType, CacheEntry> m_cache = new Dictionary<KeyType, CacheEntry>();
-        private TimeSpan m_entryTtl = TimeSpan.FromMinutes(5);
+        private TimeSpan m_entryTtl;
         private Timer m_timer = null;
         private Stopwatch m_stopwatch = new Stopwatch(); 
 
-        public TimedCache()
-        {
-            InitTimer();
+        public TimedCache() : this(TimeSpan.FromMinutes(5))
+        {            
         }
 
-        public TimedCache(TimeSpan ttl)
+        public TimedCache(TimeSpan ttl) : base()
         {
             m_entryTtl = ttl;
-            InitTimer();
+            InitTimer();            
         }
 
-        public void Add(KeyType key, ValueType value)
+        protected override CacheEntry WrapValue(KeyType key, ValueType value)
         {
-            CacheEntry ce = new CacheEntry()
+            return (CacheEntry)(new TimedCacheEntry()
             {
                 Key = key,
                 Value = value,
-                InsertionTime = m_stopwatch.Elapsed                
-            };
-
-            lock (m_cache)
-            {
-                if (m_cache.ContainsKey(key))
-                    m_cache[key] = ce;
-                else
-                    m_cache.Add(key, ce);
-            }
+                InsertionTime = m_stopwatch.Elapsed
+            });
         }
-
-        public ValueType Get(KeyType key)
+        
+        public override ValueType Get(KeyType key)
         {
             return Get(key, false);
         }
@@ -85,31 +73,17 @@ namespace Abstractions.Helpers
         {
             lock (m_cache)
             {
-                if (refreshTimer)                
-                    m_cache[key].InsertionTime = m_stopwatch.Elapsed;
+                if (refreshTimer)
+                {
+                    TimedCacheEntry ce = m_cache[key] as TimedCacheEntry;
+                    ce.InsertionTime = m_stopwatch.Elapsed;
+                    return ce.Value;
+                }
+
                 return m_cache[key].Value;
             }
         }
-
-        public void Remove(KeyType key)
-        {
-            lock (m_cache)
-            {
-                if (m_cache.ContainsKey(key))
-                {
-                    m_cache.Remove(key);
-                }
-            }
-        }
-
-        public bool Exists(KeyType key)
-        {
-            lock (m_cache)
-            {
-                return m_cache.ContainsKey(key);
-            }
-        }
-
+        
         private void InitTimer()
         {
             m_stopwatch.Start();
@@ -123,7 +97,8 @@ namespace Abstractions.Helpers
                 List<KeyType> expirations = new List<KeyType>();
                 foreach (KeyValuePair<KeyType, CacheEntry> kv in m_cache)
                 {
-                    if (m_stopwatch.Elapsed - kv.Value.InsertionTime > m_entryTtl)
+                    TimedCacheEntry ce = kv.Value as TimedCacheEntry;
+                    if (m_stopwatch.Elapsed - ce.InsertionTime > m_entryTtl)
                     {
                         expirations.Add(kv.Key);
                     }
@@ -144,15 +119,34 @@ namespace Abstractions.Helpers
             m_timer.Change(m_entryTtl, TimeSpan.FromMilliseconds(-1));
         }
 
-        private bool m_disposed = false;
-        public void Dispose()
+        private void ExpireAll()
         {
-            if (!m_disposed)
-            {                
-                m_timer.Dispose();
-                m_stopwatch.Stop();
-                m_disposed = true;
+            lock (m_cache)
+            {
+                List<KeyType> expirations = new List<KeyType>();
+                foreach (KeyValuePair<KeyType, CacheEntry> kv in m_cache)
+                {
+                    CacheEntry ce = kv.Value;
+                    if (ce.Value is IDisposable)
+                    {
+                        IDisposable disposableValue = (IDisposable)ce.Value;
+                        disposableValue.Dispose();
+                    }                 
+                }
+                m_cache.Clear();
             }
+
+            m_timer.Change(m_entryTtl, TimeSpan.FromMilliseconds(-1));
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                ExpireAll();
+            }
+
+            base.Dispose(disposing);
+        }        
     }
 }
