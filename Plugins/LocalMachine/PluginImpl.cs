@@ -433,8 +433,7 @@ namespace pGina.Plugin.LocalMachine
         {
             // Do background stuff
             lock(this)
-            {
-                m_logger.DebugFormat("Background timer fire");
+            {                
                 IterateCleanupUsers();
 
                 if (m_backgroundTimer != null)

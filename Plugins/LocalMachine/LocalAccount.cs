@@ -369,16 +369,17 @@ namespace pGina.Plugin.LocalMachine
 
         private static void RecurseDelete(string directory)
         {
-            m_logger.DebugFormat("Dir: {0}", directory);
+            // m_logger.DebugFormat("Dir: {0}", directory);
             DirectorySecurity dirSecurity = Directory.GetAccessControl(directory);
             dirSecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().Name, FileSystemRights.FullControl, AccessControlType.Allow));
             Directory.SetAccessControl(directory, dirSecurity);
             File.SetAttributes(directory, FileAttributes.Normal);
 
             DirectoryInfo di = new DirectoryInfo(directory);
-            if ((di.Attributes & FileAttributes.ReparsePoint) == 0)
+            if ((di.Attributes & FileAttributes.ReparsePoint) != 0)
             {
-                m_logger.DebugFormat("{0} is a reparse point, skipping", directory);
+                // m_logger.DebugFormat("{0} is a reparse point, just deleting without recursing", directory);
+                Directory.Delete(directory, false);
                 return;
             }
 
@@ -388,7 +389,7 @@ namespace pGina.Plugin.LocalMachine
             // Files
             foreach (string file in files)
             {
-                m_logger.DebugFormat("File: {0}", file);
+                // m_logger.DebugFormat("File: {0}", file);
                 FileSecurity fileSecurity = File.GetAccessControl(file);
                 fileSecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().Name, FileSystemRights.FullControl, AccessControlType.Allow));
                 File.SetAccessControl(file, fileSecurity); // Set the new access settings.
