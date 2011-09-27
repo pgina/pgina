@@ -66,6 +66,7 @@
     <Compile Include="DbLogger.cs" />
     <Compile Include="PluginImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SessionCache.cs" />
     <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>

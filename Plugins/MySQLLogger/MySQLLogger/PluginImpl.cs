@@ -42,7 +42,7 @@ namespace pGina.Plugin.MySqlLogger
         public static readonly Guid PluginUuid = new Guid("B68CF064-9299-4765-AC08-ACB49F93F892");
         private ILog m_logger = LogManager.GetLogger("MySqlLoggerPlugin");
         public static readonly string TABLE_NAME = "pGinaLog";
-        private Dictionary<int, string> m_usernameCache = new Dictionary<int, string>();
+        private SessionCache m_usernameCache = new SessionCache();
 
         public string Description
         {
@@ -129,8 +129,6 @@ namespace pGina.Plugin.MySqlLogger
             }
         }
 
-        
-
         public void Starting()
         {
             this.m_usernameCache.Clear();
@@ -160,10 +158,7 @@ namespace pGina.Plugin.MySqlLogger
             // Since the username is not available at logoff time, we cache it
             // (tied to the session ID) so that we can get it back at the logoff
             // event.
-            if (!this.m_usernameCache.ContainsKey(sessionId))
-                this.m_usernameCache.Add(sessionId, userName);
-            else
-                this.m_usernameCache[sessionId] = userName;
+            m_usernameCache.Add(sessionId, userName);
 
             if (okToLog)
                 return string.Format("[{0}] Logon user: {1}", sessionId, userName);
@@ -176,12 +171,8 @@ namespace pGina.Plugin.MySqlLogger
             bool okToLog = Settings.Store.EvtLogoff;
             string userName = "";
 
-            if (this.m_usernameCache.ContainsKey(sessionId))
-            {
-                userName = this.m_usernameCache[sessionId];
-                // Delete the username from the cache because we are logging off?
-                // this.m_usernameCache.Remove(sessionId);
-            }
+            userName = m_usernameCache.Get(sessionId);
+            // Delete the username from the cache because we are logging off?
 
             if (okToLog)
                 return string.Format("[{0}] Logoff user: {1}", sessionId, userName);
@@ -194,8 +185,7 @@ namespace pGina.Plugin.MySqlLogger
             bool okToLog = Settings.Store.EvtConsoleConnect;
             string userName = "";
 
-            if (this.m_usernameCache.ContainsKey(sessionId))
-                userName = this.m_usernameCache[sessionId];
+            userName = this.m_usernameCache.Get(sessionId);
 
             if (okToLog)
                 return string.Format("[{0}] Console connect user: {1}", sessionId, userName);
@@ -208,8 +198,7 @@ namespace pGina.Plugin.MySqlLogger
             bool okToLog = Settings.Store.EvtConsoleDisconnect;
             string userName = "";
 
-            if (this.m_usernameCache.ContainsKey(sessionId))
-                userName = this.m_usernameCache[sessionId];
+            userName = this.m_usernameCache.Get(sessionId);
 
             if (okToLog)
                 return string.Format("[{0}] Console disconnect user: {1}", sessionId, userName);
@@ -222,8 +211,7 @@ namespace pGina.Plugin.MySqlLogger
             bool okToLog = Settings.Store.EvtRemoteDisconnect;
             string userName = "";
 
-            if (this.m_usernameCache.ContainsKey(sessionId))
-                userName = this.m_usernameCache[sessionId];
+            userName = this.m_usernameCache.Get(sessionId);
 
             if (okToLog)
                 return string.Format("[{0}] Remote disconnect user: {1}", sessionId, userName);
@@ -236,8 +224,7 @@ namespace pGina.Plugin.MySqlLogger
             bool okToLog = Settings.Store.EvtRemoteConnect;
             string userName = "";
 
-            if (this.m_usernameCache.ContainsKey(sessionId))
-                userName = this.m_usernameCache[sessionId];
+            userName = this.m_usernameCache.Get(sessionId);
 
             if (okToLog)
                 return string.Format("[{0}] Remote connect user: {1}", sessionId, userName);
@@ -250,9 +237,8 @@ namespace pGina.Plugin.MySqlLogger
             bool okToLog = Settings.Store.EvtRemoteControl;
             string userName = "";
 
-            if (this.m_usernameCache.ContainsKey(sessionId))
-                userName = this.m_usernameCache[sessionId];
-
+            userName = this.m_usernameCache.Get(sessionId);
+            
             if (okToLog)
                 return string.Format("[{0}] Remote control user: {1}", sessionId, userName);
 
@@ -264,8 +250,7 @@ namespace pGina.Plugin.MySqlLogger
             bool okToLog = Settings.Store.EvtSessionUnlock;
             string userName = "";
 
-            if (this.m_usernameCache.ContainsKey(sessionId))
-                userName = this.m_usernameCache[sessionId];
+            userName = this.m_usernameCache.Get(sessionId);
 
             if (okToLog)
                 return string.Format("[{0}] Session unlock user: {1}", sessionId, userName);
@@ -278,8 +263,7 @@ namespace pGina.Plugin.MySqlLogger
             bool okToLog = Settings.Store.EvtSessionLock;
             string userName = "";
 
-            if (this.m_usernameCache.ContainsKey(sessionId))
-                userName = this.m_usernameCache[sessionId];
+            userName = this.m_usernameCache.Get(sessionId);
 
             if (okToLog)
                 return string.Format("[{0}] Session lock user: {1}", sessionId, userName);
