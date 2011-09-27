@@ -27,9 +27,13 @@ namespace pGina.Plugin.MySqlLogger
 
         public string Get(int sessId)
         {
-            if (m_cache.ContainsKey(sessId))
-                return m_cache[sessId];
-            return "";
+            string result = "--Unknown--";
+            lock (this)
+            {
+                if (m_cache.ContainsKey(sessId))
+                    result = m_cache[sessId];
+            }
+            return result;
         }
 
         public void Clear()
