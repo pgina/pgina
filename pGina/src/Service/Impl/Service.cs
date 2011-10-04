@@ -114,24 +114,27 @@ namespace pGina.Service.Impl
         {
             m_logger.InfoFormat("SessionChange: {0} -> {1}", changeDescription.SessionId, changeDescription.Reason);
 
-            foreach (IPluginEventNotifications plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
+            lock (m_sessionPropertyCache)
             {
-                try
+                foreach (IPluginEventNotifications plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
                 {
-                    if (m_sessionPropertyCache.Exists(changeDescription.SessionId))
-                        plugin.SessionChange(changeDescription, m_sessionPropertyCache.Get(changeDescription.SessionId));
-                    else
-                        plugin.SessionChange(changeDescription, null);
+                    try
+                    {
+                        if (m_sessionPropertyCache.Exists(changeDescription.SessionId))
+                            plugin.SessionChange(changeDescription, m_sessionPropertyCache.Get(changeDescription.SessionId));
+                        else
+                            plugin.SessionChange(changeDescription, null);
+                    }
+                    catch (Exception e)
+                    {
+                        m_logger.ErrorFormat("Ignoring unhandled exception from {0}: {1}", plugin.Uuid, e);
+                    }
                 }
-                catch (Exception e)
-                {
-                    m_logger.ErrorFormat("Ignoring unhandled exception from {0}: {1}", plugin.Uuid, e);
-                }
-            }            
 
-            // If this is a logout, remove from our map
-            if (changeDescription.Reason == SessionChangeReason.SessionLogoff && m_sessionPropertyCache.Exists(changeDescription.SessionId))
-                m_sessionPropertyCache.Remove(changeDescription.SessionId);
+                // If this is a logout, remove from our map
+                if (changeDescription.Reason == SessionChangeReason.SessionLogoff && m_sessionPropertyCache.Exists(changeDescription.SessionId))
+                    m_sessionPropertyCache.Remove(changeDescription.SessionId);
+            }
         }        
 
         // This will be called on seperate threads, 1 per client connection and
@@ -213,7 +216,12 @@ namespace pGina.Service.Impl
                 BooleanResult result = sessionDriver.PerformLoginProcess();
 
                 if (msg.Reason == LoginRequestMessage.LoginReason.Login)
-                    m_sessionPropertyCache.Add(msg.Session, sessionDriver.SessionProperties);
+                {
+                    lock (m_sessionPropertyCache)
+                    {
+                        m_sessionPropertyCache.Add(msg.Session, sessionDriver.SessionProperties);
+                    }
+                }
 
                 return new LoginResponseMessage()
                 {
@@ -246,22 +254,14 @@ namespace pGina.Service.Impl
 
         private EmptyMessage HandleLoginInfoChange(LoginInfoChangeMessage msg)
         {
-            switch (msg.Change)
+            m_logger.DebugFormat("Changing login info at request of client, User {0} moving from {1} to {2}", msg.Username, msg.FromSession, msg.ToSession);
+            lock (m_sessionPropertyCache)
             {
-                    // TBD: This changes to 'remove from, add to' all in one message
-                /*case LoginInfoChangeMessage.ChangeType.Add:
-                    {
-                        UserInformation userInfo = new UserInformation() { Username = msg.Username, Domain = msg.Domain, Password = msg.Password };
-                        m_logger.DebugFormat("Adding userinfo for {0} to session {1}", msg.Username, msg.Session);
-                        m_sessionInfoCache.Add(msg.Session, userInfo);
-                    }
-                    break;
-                case LoginInfoChangeMessage.ChangeType.Remove:
-                    {
-                        m_logger.DebugFormat("Removing userinfo for session {0}", msg.Session);
-                        m_sessionInfoCache.Remove(msg.Session);
-                    }
-                    break;*/
+                if (m_sessionPropertyCache.Exists(msg.FromSession))
+                {
+                    m_sessionPropertyCache.Add(msg.ToSession, m_sessionPropertyCache.Get(msg.FromSession));
+                    m_sessionPropertyCache.Remove(msg.FromSession);
+                }
             }
             return new EmptyMessage(MessageType.Ack);
         }

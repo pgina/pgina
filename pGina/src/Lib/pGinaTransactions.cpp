@@ -255,8 +255,8 @@ namespace pGina
 			return labelText;
 		}
 
-		/* static */ 
-		void LoginInfo::Add(const wchar_t *username, const wchar_t *domain, const wchar_t *password)
+		/* static */
+		void LoginInfo::Move(const wchar_t *username, const wchar_t *domain, const wchar_t *password, int old_session, int new_session)
 		{
 			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
 			std::wstring pipePath = L"\\\\.\\pipe\\";
@@ -279,6 +279,9 @@ namespace pGina
 					return;
 
 				pGina::Protocol::LoginInfoChangeMessage request(username, domain, password);
+				request.FromSession(old_session);
+				request.ToSession(new_session);
+
 				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, request);
 				cleanup.Add(reply);
 
@@ -297,50 +300,6 @@ namespace pGina
 			{
 				Log::Warn(L"Unable to connect to pGina service pipe - LastError: 0x%08x, giving up.", GetLastError());
 			}
-		}
-
-		/* static */
-		void LoginInfo::Remove()
-		{
-			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
-			std::wstring pipePath = L"\\\\.\\pipe\\";
-			pipePath += pipeName;
-
-			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);	
-			std::wstring labelText = L"";
-
-			if( pipeClient.Connect() )
-			{
-				// Start a cleanup pool for messages we collect along the way
-				pGina::Memory::ObjectCleanupPool cleanup;
-
-				// Always send hello first, expect hello in return
-				pGina::Protocol::HelloMessage hello;
-				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);		
-				cleanup.Add(reply);
-
-				if(reply && reply->Type() != pGina::Protocol::Hello)
-					return;
-
-				pGina::Protocol::LoginInfoChangeMessage request;
-				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, request);
-				cleanup.Add(reply);
-
-				if(reply && reply->Type() != pGina::Protocol::Ack)
-					return;
-
-				// Send disconnect, expect ack, then close
-				pGina::Protocol::DisconnectMessage disconnect;
-				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, disconnect);
-				cleanup.Add(reply);		
-
-				// We close regardless, no need to check reply type..
-				pipeClient.Close();
-			}
-			else
-			{
-				Log::Warn(L"Unable to connect to pGina service pipe - LastError: 0x%08x, giving up.", GetLastError());
-			}
-		}
+		}		
 	}
 }

@@ -364,46 +364,48 @@ namespace pGina
 
 		class LoginInfoChangeMessage : public LoginRequestMessage
 		{
-			public:
-				enum ChangeType
-				{
-					Add,
-					Remove
-				};
-
-				LoginInfoChangeMessage()
+			public:				
+				LoginInfoChangeMessage() :
+				  m_fromSession(0),
+				  m_toSession(0)
 				{
 					Type(LoginInfoChange);
-					Change(Remove);
 				}
 
 				LoginInfoChangeMessage(const wchar_t * username, const wchar_t * domain, const wchar_t *password) :
-					LoginRequestMessage(username, domain, password, Login)
+					LoginRequestMessage(username, domain, password, Login),
+					m_fromSession(0),
+				    m_toSession(0)
 				{
-					Type(LoginInfoChange);
-					Change(Add);
+					Type(LoginInfoChange);					
 				}
 				
-				ChangeType Change() { return m_changeType; }
-				void       Change(ChangeType type) { m_changeType = type; }
+				int		FromSession() { return m_fromSession; }
+				void	FromSession(int v) { m_fromSession = v; }
+				int		ToSession() { return m_toSession; }
+				void	ToSession(int v) { m_toSession = v; }
 
 				virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
 				{
 					LoginRequestMessage::FromDynamicMessage(msg);
 
-					if(msg->Exists<unsigned char>(L"Change"))
-						Change((ChangeType) msg->Property<unsigned char>(L"Change"));
+					if(msg->Exists<int>(L"FromSession"))
+						FromSession(msg->Property<int>(L"FromSession"));
+					if(msg->Exists<int>(L"ToSession"))
+						ToSession(msg->Property<int>(L"ToSession"));
 				}
 
 				virtual pGina::Messaging::Message * ToDynamicMessage()
 				{				
 					pGina::Messaging::Message * msg = LoginRequestMessage::ToDynamicMessage();				
-					msg->Property<unsigned char>(L"Change", (unsigned char) Change(), pGina::Messaging::Byte);					
+					msg->Property<int>(L"ToSession", ToSession(), pGina::Messaging::Integer);
+					msg->Property<int>(L"FromSession", FromSession(), pGina::Messaging::Integer);
 					return msg;
 				}
 
 			private:
-				ChangeType m_changeType;
+				int m_fromSession;
+				int m_toSession;
 		};
 	}
 }

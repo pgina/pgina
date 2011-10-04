@@ -93,8 +93,7 @@ namespace pGina
 		class LoginInfo
 		{
 		public:
-			static void Add(const wchar_t *username, const wchar_t *domain, const wchar_t *password);
-			static void Remove();
+			static void Move(const wchar_t *username, const wchar_t *domain, const wchar_t *password, int old_session, int new_session);			
 		};
 	}
 }

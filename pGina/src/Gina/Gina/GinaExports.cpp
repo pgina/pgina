@@ -508,8 +508,7 @@ VOID WINAPI WlxDisconnectNotify(PVOID pWlxContext)
 */
 BOOL WINAPI WlxGetConsoleSwitchCredentials(PVOID  pWlxContext, PVOID  pCredInfo) 
 {
-	pGINA_FROM_CTX(pWlxContext);
-	pGina::Transactions::LoginInfo::Remove();	// This is the wrong session!
+	pGINA_FROM_CTX(pWlxContext);	
 	return (pGina->GetConsoleSwitchCredentials(pCredInfo) ? TRUE : FALSE);
 }
 

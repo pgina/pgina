@@ -35,13 +35,8 @@ namespace pGina.Core.Messages
 {
     public class LoginInfoChangeMessage : LoginRequestMessage
     {
-        public enum ChangeType
-        {
-            Add = 0,
-            Remove,
-        }
-   
-        public ChangeType Change { get; set; }
+        public int FromSession { get; set; }
+        public int ToSession { get; set; }
 
         public LoginInfoChangeMessage(dynamic expandoVersion)
         {
@@ -55,14 +50,15 @@ namespace pGina.Core.Messages
         public override void FromExpando(dynamic expandoVersion)
         {
             base.FromExpando((ExpandoObject)expandoVersion);
-            Change = (ChangeType) ((byte)expandoVersion.Change);
+            FromSession = expandoVersion.FromSession;
+            ToSession = expandoVersion.ToSession;            
         }
 
         public override dynamic ToExpando()
         {
             dynamic exp = base.ToExpando();
-
-            exp.Change = (byte)Change;
+            exp.FromSession = FromSession;
+            exp.ToSession = ToSession;
             exp.MessageType = (byte)MessageType.LoginInfoChange;
             return exp;
         }

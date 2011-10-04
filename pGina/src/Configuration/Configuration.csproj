@@ -172,7 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\arrow-right-3.png" />
-    <Content Include="Resources\pgina.ico" />
+    <Content Include="Resources\pgina_icons.ico" />
     <None Include="Resources\pginalogo.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

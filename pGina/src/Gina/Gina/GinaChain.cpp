@@ -108,7 +108,10 @@ namespace pGina
 
 		bool GinaChain::GetConsoleSwitchCredentials(PVOID pCredInfo)
 		{
-			return m_wrappedGina->GetConsoleSwitchCredentials(pCredInfo);
+			bool retval = m_wrappedGina->GetConsoleSwitchCredentials(pCredInfo);
+			PWLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0 pInfo = (PWLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0) pCredInfo;
+			pDEBUG(L"GetConsoleSwitchCredentials: CredInfo=%p PrivateDataLen: 0x%08x PrivateData: %p", pCredInfo, pInfo->PrivateDataLen, pInfo->PrivateData);
+			return retval;
 		}
 
 		// Notifications from winlogon
@@ -177,14 +180,15 @@ namespace pGina
 			if(dwSasType == WLX_SAS_TYPE_AUTHENTICATED)
 			{
 				// We could do this, but we don't get password (without additional wrapping of our own in WlxGetConsoleSwitchCredentials
-				//  So instead we grab it post SAS processing via msgina.
-				/*
+				//  So instead we grab it post SAS processing via msgina.				
 				WLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0 credInfo;
 				if(m_winlogon->WlxQueryConsoleSwitchCredentials(&credInfo))
-					pGina::Transactions::LoginInfo::Add(credInfo.UserName, credInfo.Domain);
-				*/
+				{
+					pDEBUG(L"LoggedOutSAS: CredInfo=%p PrivateDataLen: 0x%08x PrivateData: %p", &credInfo, credInfo.PrivateDataLen, credInfo.PrivateData);
+				}				
+				
 				int msresult = m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
-				pGina::Transactions::LoginInfo::Add(pMprNotifyInfo->pszUserName, pMprNotifyInfo->pszDomain, pMprNotifyInfo->pszPassword);
+				//pGina::Transactions::LoginInfo::Add(pMprNotifyInfo->pszUserName, pMprNotifyInfo->pszDomain, pMprNotifyInfo->pszPassword);
 				return msresult;
 			}
 
