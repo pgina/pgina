@@ -28,6 +28,20 @@
 #include "stdafx.h"
 #include <pGinaNativeLib.h>
 
+class ThreadTest : public pGina::Threading::Thread
+{
+	virtual DWORD ThreadMain()
+	{
+		while(Running())
+		{
+			printf("Hello world from the background thread...\n");
+			Sleep(1000);
+		}
+
+		return 0;
+	}
+};
+
 int _tmain(int argc, _TCHAR* argv[])
 {		
 	std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
@@ -99,7 +113,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	
 	std::wstring str = pGina::Transactions::TileUi::GetDynamicLabel(L"MOTD");
 	pGina::Transactions::Log::Info(L"TileUi::GetDynamicLabel(\"MOTD\") received: %s", str.c_str());
-
+	
+	ThreadTest ping;
+	ping.Start();
+	Sleep(10000);
+	ping.Stop();
 	return 0;
 }
 

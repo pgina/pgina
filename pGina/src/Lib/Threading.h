@@ -27,11 +27,52 @@
 #pragma once
 
 #include <Windows.h>
-#include <Registry.h>
-#include <Message.h>
-#include <PipeClient.h>
-#include <ObjectCleanupPool.h>
-#include <pGinaMessages.h>
-#include <pGinaTransactions.h>
-#include <Helpers.h>
-#include <Threading.h>
+
+namespace pGina
+{
+	namespace Threading
+	{
+		class Mutex
+		{
+		public:
+			Mutex();			
+
+			bool Lock();
+			bool Unlock();
+
+		private:
+			HANDLE m_mutexHandle;
+		};
+
+		class ScopedLock
+		{
+		public:
+			ScopedLock(Mutex& m) :
+				m_mutex(m) { m_mutex.Lock(); }
+			~ScopedLock() { m_mutex.Unlock(); }
+
+		private:
+			Mutex& m_mutex;
+		};
+
+		class Thread
+		{
+		public:
+			void Start();
+			void Stop();
+
+		protected:
+			Thread();
+			virtual ~Thread();
+			virtual DWORD ThreadMain() = 0;
+			bool Running();
+			void Running(bool v);			
+
+		private:
+			static DWORD WINAPI _internal_threadmain(LPVOID arg);
+			HANDLE m_threadHandle;
+			bool m_running;
+			Mutex m_mutex;
+		};		
+	}
+}

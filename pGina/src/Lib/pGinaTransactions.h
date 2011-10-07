@@ -46,6 +46,12 @@ namespace pGina
 			static void LogInternal(const wchar_t *level, const wchar_t *message);
 		};
 
+		class Service
+		{
+		public:
+			static bool Ping();
+		};
+
 		class User
 		{
 		public:			

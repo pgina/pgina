@@ -54,6 +54,9 @@
     <ClInclude Include="Macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Threading.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Registry.cpp">
@@ -78,6 +81,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

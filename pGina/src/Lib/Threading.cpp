@@ -24,14 +24,86 @@
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#pragma once
+#include "Threading.h"
 
-#include <Windows.h>
-#include <Registry.h>
-#include <Message.h>
-#include <PipeClient.h>
-#include <ObjectCleanupPool.h>
-#include <pGinaMessages.h>
-#include <pGinaTransactions.h>
-#include <Helpers.h>
-#include <Threading.h>
+namespace pGina
+{
+	namespace Threading
+	{
+		Thread::Thread() :
+			m_threadHandle(0),
+			m_running(false)
+		{
+		}
+
+		Thread::~Thread()
+		{
+			if(Running())
+				Stop();
+			
+			if(m_threadHandle != 0)
+				CloseHandle(m_threadHandle);
+		}
+
+		void Thread::Start()
+		{
+			if(Running())
+				return;
+
+			Running(true);
+			m_threadHandle = CreateThread(NULL, 0, _internal_threadmain, this, 0, 0);
+		}
+
+		void Thread::Stop()
+		{
+			if(!Running())
+				return;
+
+			Running(false);
+			WaitForSingleObject(m_threadHandle, INFINITE);
+			CloseHandle(m_threadHandle);
+			m_threadHandle = 0;
+		}
+
+		bool Thread::Running()
+		{
+			ScopedLock lock(m_mutex);
+			return m_running;
+		}
+
+		void Thread::Running(bool v)
+		{
+			ScopedLock lock(m_mutex);
+			m_running = v;
+		}
+			    		
+		/* static */
+		DWORD WINAPI Thread::_internal_threadmain(LPVOID arg)
+		{
+			Thread *thread = static_cast<Thread *>(arg);
+			return thread->ThreadMain();
+		}
+			
+		Mutex::Mutex()
+		{
+			m_mutexHandle = CreateMutex(NULL, FALSE, NULL);
+		}
+
+		bool Mutex::Lock()
+		{
+			DWORD res = WaitForSingleObject(m_mutexHandle, INFINITE);
+			if(res == WAIT_OBJECT_0 || res == WAIT_ABANDONED)
+				return true;
+  
+			return false;
+		}
+
+		bool Mutex::Unlock()
+		{
+			if(ReleaseMutex(m_mutexHandle))
+				return true;
+
+			return false;
+		}
+	}
+}

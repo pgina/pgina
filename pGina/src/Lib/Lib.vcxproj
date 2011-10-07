@@ -32,6 +32,7 @@
     <ClInclude Include="pGinaNativeLib.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="Registry.h" />
+    <ClInclude Include="Threading.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BinaryReader.cpp" />
@@ -42,6 +43,7 @@
     <ClCompile Include="pGinaTransactions.cpp" />
     <ClCompile Include="PipeClient.cpp" />
     <ClCompile Include="Registry.cpp" />
+    <ClCompile Include="Threading.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{67E7117F-1F42-4B2C-B2F9-7457C04F1240}</ProjectGuid>

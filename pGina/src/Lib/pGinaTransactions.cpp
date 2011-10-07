@@ -136,6 +136,40 @@ namespace pGina
 		}
 
 		/* static */
+		bool Service::Ping()
+		{
+			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
+			std::wstring pipePath = L"\\\\.\\pipe\\";
+			pipePath += pipeName;
+						
+			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);
+			if(pipeClient.Connect())
+			{
+				// Start a cleanup pool for messages we collect along the way
+				pGina::Memory::ObjectCleanupPool cleanup;
+
+				// Always send hello first, expect hello in return
+				pGina::Protocol::HelloMessage hello;
+				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);		
+				cleanup.Add(reply);
+
+				if(reply && reply->Type() != pGina::Protocol::Hello)
+					return false;
+												
+				// Send disconnect, expect ack, then close
+				pGina::Protocol::DisconnectMessage disconnect;
+				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, disconnect);
+				cleanup.Add(reply);		
+
+				// We close regardless, no need to check reply type..
+				pipeClient.Close();		
+				return true;
+			}
+
+			return false;
+		}
+
+		/* static */
 		User::LoginResult User::ProcessLoginForUser(const wchar_t *username, const wchar_t *domain, const wchar_t *password, pGina::Protocol::LoginRequestMessage::LoginReason reason)
 		{			
 			// Write a log message to the service
