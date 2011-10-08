@@ -29,12 +29,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using System.Threading;
 
 using log4net;
 
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using pGina.Shared.Settings;
+using Abstractions.WindowsApi;
 
 namespace pGina.Plugin.SessionLimit
 {
@@ -43,12 +45,46 @@ namespace pGina.Plugin.SessionLimit
         private ILog m_logger = LogManager.GetLogger("SessionLimitPlugin");
         public static Guid PluginUuid = new Guid("{D73131D7-7AF2-47BB-BBF4-4F8583B44962}");
 
+        private Timer m_timer;
+        private SessionCache m_cache;
+
         public PluginImpl()
         {
             using (Process me = Process.GetCurrentProcess())
             {
                 Settings.Init();
                 m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
+            }
+        }
+
+        private void StartTimer()
+        {
+            m_logger.Debug("Starting timer");
+            m_timer = new Timer(new TimerCallback(SessionLimitTimerCallback), null, TimeSpan.FromSeconds(0),
+                TimeSpan.FromSeconds(60));
+        }
+
+        private void StopTimer()
+        {
+            m_logger.Debug("Stopping timer");
+            m_timer.Dispose();
+            m_timer = null;
+        }
+
+        private void SessionLimitTimerCallback(object state)
+        {
+            int limit = Settings.Store.GlobalLimit;
+
+            if (limit > 0)
+            {
+                m_logger.Debug("Checking for sessions to logoff");
+                List<int> sessions = m_cache.SessionsLoggedOnLongerThan(TimeSpan.FromMinutes(limit));
+                m_logger.DebugFormat("Found {0} sessions.", sessions.Count);
+                foreach (int sess in sessions)
+                {
+                    m_logger.DebugFormat("Logging off session {0}", sess);
+                    // TODO:  Logoff user here.
+                }
             }
         }
 
@@ -77,20 +113,49 @@ namespace pGina.Plugin.SessionLimit
 
         public void Configure()
         {
-            /*Configuration conf = new Configuration();
-            conf.ShowDialog();*/
+            Configuration conf = new Configuration();
+            conf.ShowDialog();
         }
-        
-        public void Starting() { }
-        public void Stopping() { }
+
+        public void Starting() 
+        { 
+            StartTimer();
+            m_cache = new SessionCache();
+        }
+
+        public void Stopping() 
+        { 
+            StopTimer();
+            m_cache = null;
+        }
 
         public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, SessionProperties properties)
         {
             // Only applies to pGina sessions!
             if (properties != null)
             {
-
+                switch (changeDescription.Reason)
+                {
+                    case System.ServiceProcess.SessionChangeReason.SessionLogon:
+                        LogonEvent(changeDescription.SessionId);
+                        break;
+                    case System.ServiceProcess.SessionChangeReason.SessionLogoff:
+                        LogoffEvent(changeDescription.SessionId);
+                        break;
+                }
             }
+        }
+
+        private void LogonEvent(int sessId)
+        {
+            m_logger.DebugFormat("LogonEvent: {0}", sessId);
+            m_cache.Add(sessId);
+        }
+
+        private void LogoffEvent(int sessId)
+        {
+            m_logger.DebugFormat("LogoffEvent: {0}", sessId);
+            m_cache.Remove(sessId);
         }
     }
 }
