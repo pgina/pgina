@@ -29,6 +29,7 @@
 #include <Windows.h>
 #include <string>
 #include <pGinaMessages.h>
+#include <Threading.h>
 
 namespace pGina
 {
@@ -101,5 +102,26 @@ namespace pGina
 		public:
 			static void Move(const wchar_t *username, const wchar_t *domain, const wchar_t *password, int old_session, int new_session);			
 		};
+		
+		class ServiceStateThread : public pGina::Threading::Thread
+		{
+		public:
+			typedef void (*NOTIFY_STATE_CHANGE_CALLBACK)(bool newState);
+
+			ServiceStateThread();			
+
+			bool IsServiceRunning();			
+			void SetCallback(NOTIFY_STATE_CHANGE_CALLBACK callback);
+
+		protected:
+			virtual DWORD ThreadMain();
+
+		private:
+			void SetServiceRunning(bool b);
+
+		private:
+			bool m_serviceRunning;
+			NOTIFY_STATE_CHANGE_CALLBACK m_callback;
+		};		
 	}
 }

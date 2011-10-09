@@ -26,40 +26,41 @@
 */
 #pragma once
 
+#include <Windows.h>
+#include <credentialprovider.h>
+#include <list>
+
+#include <pGinaTransactions.h>
+#include <Threading.h>
+
 #include "TileUiTypes.h"
+#include "Credential.h"
+#include "Provider.h"
 
 namespace pGina
 {
-	namespace CredProv
-	{
-		// Fields for unlock and logon:
-		typedef enum LOCKED_UI_FIELD_ID
+	namespace Service
+	{		
+		class StateHelper
 		{
-			LOIFI_TILEIMAGE       = 0,
-			LOIFI_LOCKED          = 1,
-			LOIFI_USERNAME        = 2,
-			LOIFI_PASSWORD        = 3,
-			LOIFI_SUBMIT          = 4, 
-			LOIFI_STATUS		  = 5,
-			LOIFI_NUM_FIELDS      = 6,  
-		};
+		public:
+			static void Start();
+			static void Stop();
+			
+			static std::wstring GetStateText();
 
-		static const UI_FIELDS s_unlockFields =
-		{
-			LOIFI_NUM_FIELDS,		// Number of fields total
-			LOIFI_PASSWORD,			// Field index which submit button should be adjacent to
-			LOIFI_USERNAME,			// Username field index value
-			LOIFI_PASSWORD,			// Password field index value
-			LUIFI_STATUS,			// Status field
-			{
-				//  when to display,               style,             field id,        type,               name           data source  value		callback
-				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LOIFI_TILEIMAGE, CPFT_TILE_IMAGE,    L"Image" },    SOURCE_NONE, NULL,		NULL },	
-				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LOIFI_LOCKED,    CPFT_LARGE_TEXT,    L"Locked" },   SOURCE_NONE, L"Locked",	NULL }, 
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED }, { LOIFI_USERNAME,  CPFT_EDIT_TEXT,     L"Username" }, SOURCE_NONE, NULL,		NULL },	
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },	{ LOIFI_PASSWORD,  CPFT_PASSWORD_TEXT, L"Password" }, SOURCE_NONE, NULL,		NULL }, 
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },    { LOIFI_SUBMIT,    CPFT_SUBMIT_BUTTON, L"Submit" },   SOURCE_NONE, NULL,		NULL }, 
-				{ { CPFS_DISPLAY_IN_BOTH,		   CPFIS_NONE },    { LOIFI_STATUS,    CPFT_SMALL_TEXT,    L"Status" },   SOURCE_STATUS, L"Status",		NULL },
-			}
+			static void AddTarget(pGina::CredProv::Credential *ptr);
+			static void RemoveTarget(pGina::CredProv::Credential *ptr);
+			static void AddTarget(pGina::CredProv::Provider *ptr);
+			static void RemoveTarget(pGina::CredProv::Provider *ptr);
+			
+			static void NotifyStateChanged(bool newState);
+
+		private:
+			static pGina::Transactions::ServiceStateThread s_serviceStateThread;
+			static std::list<pGina::CredProv::Provider *> s_providers;
+			static std::list<pGina::CredProv::Credential *> s_creds;
+			static pGina::Threading::Mutex s_mutex;
 		};
 	}
 }

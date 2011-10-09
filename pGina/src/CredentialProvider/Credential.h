@@ -71,19 +71,24 @@ namespace pGina
 			void	Initialize(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, UI_FIELDS const& fields, 
 							   DWORD usageFlags, const wchar_t *username, const wchar_t *password);
 
+			virtual void	ServiceStateChanged(bool newState);
+
 		private:
 			void	ClearZeroAndFreeAnyPasswordFields(bool updateUi);
 			void	ClearZeroAndFreeAnyTextFields(bool updateUi);
 			void	ClearZeroAndFreeFields(CREDENTIAL_PROVIDER_FIELD_TYPE type, bool updateUi);
 			PWSTR   FindUsernameValue();
 			PWSTR   FindPasswordValue();
+			DWORD   FindStatusId();
+
+			bool	IsFieldDynamic(DWORD dwFieldID);
+			std::wstring GetTextForField(DWORD dwFieldID);
 
 		private:
 			long m_referenceCount;
 			CREDENTIAL_PROVIDER_USAGE_SCENARIO	m_usageScenario;
 			ICredentialProviderCredentialEvents * m_logonUiCallback;
-			UI_FIELDS *m_fields;
-			HBITMAP m_bitmap;
+			UI_FIELDS *m_fields;			
 			DWORD	m_usageFlags;
 		};
 	}

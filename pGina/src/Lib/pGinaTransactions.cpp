@@ -333,7 +333,50 @@ namespace pGina
 			else
 			{
 				Log::Warn(L"Unable to connect to pGina service pipe - LastError: 0x%08x, giving up.", GetLastError());
+			}		
+		}	
+
+		ServiceStateThread::ServiceStateThread() :		
+			m_serviceRunning(false),
+			m_callback(NULL)
+		{
+		}
+
+		void ServiceStateThread::SetCallback(NOTIFY_STATE_CHANGE_CALLBACK callback)
+		{
+			m_callback = callback;
+		}
+
+		DWORD ServiceStateThread::ThreadMain()
+		{
+			while(Running())
+			{				
+				bool runningNow = Service::Ping();				
+				bool runningWas = IsServiceRunning();
+				SetServiceRunning(runningNow);
+
+				if(runningNow != runningWas && m_callback != NULL)
+				{
+					m_callback(runningNow);
+				}
+
+				SetServiceRunning(runningNow);
+				Sleep(pGina::Registry::GetDword(L"PingSleepTime", 5000));
 			}
+
+			return 0;
+		}
+
+		void ServiceStateThread::SetServiceRunning(bool b)
+		{
+			pGina::Threading::ScopedLock lock(m_mutex);
+			m_serviceRunning = b;
+		}
+
+		bool ServiceStateThread::IsServiceRunning()
+		{
+			pGina::Threading::ScopedLock lock(m_mutex);
+			return m_serviceRunning;
 		}		
 	}
 }

@@ -26,7 +26,9 @@
 */
 #pragma once
 
+#include <windows.h>
 #include <credentialprovider.h>
+#include <string>
 
 // Define the fields and field states for our tiles.  Heavily modified/borrowed from sample
 // as their struct layout makes pretty good sense.
@@ -38,12 +40,16 @@ namespace pGina
 {
 	namespace CredProv
 	{		
-		// Whether or not the field text is to be determined
-		// by querying the service.
+		// Where to get text for a text field/label
 		typedef enum PGINA_FIELD_DATA_SOURCE
 		{
-			SOURCE_NONE, SOURCE_DYNAMIC
+			SOURCE_NONE,		// Use the built in text
+			SOURCE_DYNAMIC,     // Call the service
+			SOURCE_CALLBACK,    // Call a function
+			SOURCE_STATUS,		// Service status text
 		};
+
+		typedef std::wstring (*LABEL_TEXT_CALLBACK_FUNC)(LPWSTR fieldName, int fieldId);
 
 		// The first value indicates when the tile is displayed (selected, not selected)
 		// the second indicates things like whether the field is enabled, whether it has key focus, etc.
@@ -64,6 +70,7 @@ namespace pGina
 			{
 				PWSTR wstr;				
 			};
+			LABEL_TEXT_CALLBACK_FUNC labelCallback;
 		};		
 
 		struct UI_FIELDS
@@ -72,6 +79,7 @@ namespace pGina
 			DWORD submitAdjacentTo;
 			DWORD usernameFieldIdx;
 			DWORD passwordFieldIdx;
+			DWORD statusFieldIdx;
 			UI_FIELD fields[];	// Note: Warning 4200 - compiler cannot generate copy ctor, no doing UI_FIELDS x = UI_FIELDS y!
 		};
 	}

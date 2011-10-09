@@ -40,6 +40,7 @@
 #include "TileUiUnlock.h"
 #include "ProviderGuid.h"
 #include "SerializationHelpers.h"
+#include "ServiceStateHelper.h"
 
 #include <wincred.h>
 
@@ -80,11 +81,17 @@ namespace pGina
 			m_usageFlags(0),
 			m_setSerialization(NULL)
 		{		
-			AddDllReference();			
+			AddDllReference();
+
+			pGina::Service::StateHelper::AddTarget(this);
+			pGina::Service::StateHelper::Start();
 		}
 
 		Provider::~Provider()
-		{
+		{			
+			pGina::Service::StateHelper::RemoveTarget(this);
+			pGina::Service::StateHelper::Stop();
+
 			UnAdvise();
 			ReleaseDllReference();
 
@@ -399,6 +406,14 @@ namespace pGina
 					*domain = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.LogonDomainName.Length + sizeof(wchar_t));
 					CopyMemory(*domain, m_setSerialization->Logon.LogonDomainName.Buffer, m_setSerialization->Logon.LogonDomainName.Length);
 				}
+			}
+		}
+
+		void Provider::ServiceStateChanged(bool newState)
+		{
+			if(m_logonUiCallbackEvents)
+			{
+				m_logonUiCallbackEvents->CredentialsChanged(m_logonUiCallbackContext);
 			}
 		}
 

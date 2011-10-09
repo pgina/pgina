@@ -68,11 +68,13 @@ namespace pGina
 			bool Running();
 			void Running(bool v);			
 
+		protected:
+			Mutex m_mutex;
+
 		private:
 			static DWORD WINAPI _internal_threadmain(LPVOID arg);
 			HANDLE m_threadHandle;
-			bool m_running;
-			Mutex m_mutex;
+			bool m_running;			
 		};		
 	}
 }

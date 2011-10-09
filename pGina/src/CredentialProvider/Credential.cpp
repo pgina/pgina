@@ -42,6 +42,7 @@
 #include "TileUiLogon.h"
 #include "TileUiUnlock.h"
 #include "SerializationHelpers.h"
+#include "ServiceStateHelper.h"
 #include "ProviderGuid.h"
 #include "resource.h"
 
@@ -124,11 +125,18 @@ namespace pGina
 			*pcpfis = m_fields->fields[dwFieldID].fieldStatePair.fieldInteractiveState;
 			return S_OK;
 		}
-
+		
 		IFACEMETHODIMP Credential::GetStringValue(__in DWORD dwFieldID, __deref_out PWSTR* ppwsz)
 		{
 			if(!m_fields || dwFieldID >= m_fields->fieldCount || !ppwsz)
 				return E_INVALIDARG;
+
+			if(IsFieldDynamic(dwFieldID))
+			{
+				std::wstring text = GetTextForField(dwFieldID);
+				if( ! text.empty() )
+					return SHStrDupW( text.c_str(), ppwsz );
+			}	
 
 			// We copy our value with SHStrDupW which uses CoTask alloc, caller owns result
 			if(m_fields->fields[dwFieldID].wstr)
@@ -146,24 +154,23 @@ namespace pGina
 			if(m_fields->fields[dwFieldID].fieldDescriptor.cpft != CPFT_TILE_IMAGE)
 				return E_INVALIDARG;
 
-			if(m_bitmap == NULL)
+			HBITMAP bitmap = NULL;
+			std::wstring tileImage = pGina::Registry::GetString(L"TileImage", L"");
+			if(tileImage.empty() || tileImage.length() == 1)
 			{
-				std::wstring tileImage = pGina::Registry::GetString(L"TileImage", L"");
-				if(tileImage.empty() || tileImage.length() == 1)
-				{
-					// Use builtin
-					m_bitmap = LoadBitmap(GetMyInstance(), MAKEINTRESOURCE(IDB_PGINA_LOGO));
-				}
-				else
-				{
-					pDEBUG(L"Credential::GetBitmapValue: Loading image from: %s", tileImage.c_str());
-					m_bitmap = (HBITMAP) LoadImageW((HINSTANCE) NULL, tileImage.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);			
-				}
-				if(!m_bitmap)
-					return HRESULT_FROM_WIN32(GetLastError());
+				// Use builtin
+				bitmap = LoadBitmap(GetMyInstance(), MAKEINTRESOURCE(IDB_PGINA_LOGO));
 			}
-
-			*phbmp = m_bitmap;
+			else
+			{
+				pDEBUG(L"Credential::GetBitmapValue: Loading image from: %s", tileImage.c_str());
+				bitmap = (HBITMAP) LoadImageW((HINSTANCE) NULL, tileImage.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);			
+			}
+			
+			if(!bitmap)
+				return HRESULT_FROM_WIN32(GetLastError());
+			
+			*phbmp = bitmap;
 			return S_OK;
 		}
 
@@ -200,7 +207,9 @@ namespace pGina
 				return E_INVALIDARG;
 
 			if(m_fields->fields[dwFieldID].fieldDescriptor.cpft != CPFT_EDIT_TEXT &&
-			   m_fields->fields[dwFieldID].fieldDescriptor.cpft != CPFT_PASSWORD_TEXT)
+			   m_fields->fields[dwFieldID].fieldDescriptor.cpft != CPFT_PASSWORD_TEXT &&
+			   m_fields->fields[dwFieldID].fieldDescriptor.cpft != CPFT_SMALL_TEXT &&
+			   m_fields->fields[dwFieldID].fieldDescriptor.cpft != CPFT_LARGE_TEXT)
 				return E_INVALIDARG;
 
 			PWSTR *currentValue = &m_fields->fields[dwFieldID].wstr;
@@ -358,18 +367,17 @@ namespace pGina
 			m_referenceCount(1),
 			m_usageScenario(CPUS_INVALID),
 			m_logonUiCallback(NULL),
-			m_fields(NULL),
-			m_bitmap(NULL),
+			m_fields(NULL),			
 			m_usageFlags(0)
 		{
 			AddDllReference();
+			pGina::Service::StateHelper::AddTarget(this);
 		}
 		
 		Credential::~Credential()
 		{
+			pGina::Service::StateHelper::RemoveTarget(this);
 			ClearZeroAndFreeAnyTextFields(false);	// Free memory used to back text fields, no ui update
-			if(m_bitmap) DeleteObject(m_bitmap);
-			m_bitmap = NULL;
 			ReleaseDllReference();
 		}
 
@@ -385,6 +393,7 @@ namespace pGina
 			m_fields->submitAdjacentTo = fields.submitAdjacentTo;
 			m_fields->usernameFieldIdx = fields.usernameFieldIdx;
 			m_fields->passwordFieldIdx = fields.passwordFieldIdx;
+			m_fields->statusFieldIdx = fields.statusFieldIdx;
 			for(DWORD x = 0; x < fields.fieldCount; x++)
 			{
 				m_fields->fields[x].fieldDescriptor = fields.fields[x].fieldDescriptor;
@@ -396,15 +405,14 @@ namespace pGina
 					SHStrDup(fields.fields[x].wstr, &m_fields->fields[x].wstr);
 				}
 
-				// Retrieve data for dynamic fields
-				if( fields.fields[x].fieldDataSource == SOURCE_DYNAMIC )
+				if(IsFieldDynamic(x))
 				{
-					std::wstring text = pGina::Transactions::TileUi::GetDynamicLabel( fields.fields[x].fieldDescriptor.pszLabel );
+					std::wstring text = GetTextForField(x);
 					if( ! text.empty() )
 					{
 						SHStrDup( text.c_str(), &m_fields->fields[x].wstr );
 					}
-				}
+				}				
 			}			
 
 
@@ -467,6 +475,48 @@ namespace pGina
 		{
 			if(!m_fields) return NULL;			
 			return m_fields->fields[m_fields->passwordFieldIdx].wstr;
+		}
+
+		DWORD Credential::FindStatusId()
+		{
+			if(!m_fields) return 0;
+			return m_fields->statusFieldIdx;
+		}
+
+		bool Credential::IsFieldDynamic(DWORD dwFieldID)
+		{
+			// Retrieve data for dynamic fields
+			return (m_fields->fields[dwFieldID].fieldDataSource == SOURCE_DYNAMIC ||
+					(m_fields->fields[dwFieldID].fieldDataSource == SOURCE_CALLBACK && m_fields->fields[dwFieldID].labelCallback != NULL) ||
+					m_fields->fields[dwFieldID].fieldDataSource == SOURCE_STATUS);			
+		}
+
+		std::wstring Credential::GetTextForField(DWORD dwFieldID)
+		{
+			// Retrieve data for dynamic fields
+			if( m_fields->fields[dwFieldID].fieldDataSource == SOURCE_DYNAMIC )
+			{
+				return pGina::Transactions::TileUi::GetDynamicLabel( m_fields->fields[dwFieldID].fieldDescriptor.pszLabel );				
+			}
+			else if(m_fields->fields[dwFieldID].fieldDataSource == SOURCE_CALLBACK && m_fields->fields[dwFieldID].labelCallback != NULL)
+			{
+				return m_fields->fields[dwFieldID].labelCallback(m_fields->fields[dwFieldID].fieldDescriptor.pszLabel, m_fields->fields[dwFieldID].fieldDescriptor.dwFieldID);				
+			}
+			else if(m_fields->fields[dwFieldID].fieldDataSource == SOURCE_STATUS)
+			{
+				return pGina::Service::StateHelper::GetStateText();
+			}
+
+			return L"";
+		}
+
+		void Credential::ServiceStateChanged(bool newState)
+		{
+			if(m_logonUiCallback)
+			{
+				std::wstring text = pGina::Service::StateHelper::GetStateText();
+				m_logonUiCallback->SetFieldString(this, FindStatusId(), text.c_str());
+			}
 		}
 	}
 }

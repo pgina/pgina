@@ -58,6 +58,8 @@ namespace pGina
 			IFACEMETHODIMP GetCredentialAt(__in DWORD dwIndex, __deref_out ICredentialProviderCredential** ppcpc);
 
 			friend class pGina::COM::CClassFactory;
+
+			virtual void	ServiceStateChanged(bool newState);
 		protected:
 			Provider();
 			__override ~Provider();
@@ -73,7 +75,7 @@ namespace pGina
 			UINT_PTR							m_logonUiCallbackContext;
 			Credential *						m_credential;
 			DWORD								m_usageFlags;
-			KERB_INTERACTIVE_UNLOCK_LOGON *		m_setSerialization;
+			KERB_INTERACTIVE_UNLOCK_LOGON *		m_setSerialization;			
 		};
 	}
 }
