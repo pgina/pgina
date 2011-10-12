@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <lm.h>
+#include <WtsApi32.h>
 
 #include "Helpers.h"
 
@@ -63,6 +64,43 @@ namespace pGina
 			}
 
 			return result;
+		}
+
+		std::wstring GetSessionUsername(DWORD sessionId)
+		{
+			std::wstring result;
+			LPWSTR buffer = NULL;
+			DWORD bufferSize = 0;
+
+			if(WTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE, sessionId, WTSUserName, &buffer, &bufferSize))
+			{
+				result = buffer;
+				WTSFreeMemory(buffer);
+			}
+
+			return result;
+		}
+
+		std::wstring GetSessionDomainName(DWORD sessionId)
+		{
+			std::wstring result;
+			LPWSTR buffer = NULL;
+			DWORD bufferSize = 0;
+
+			if(WTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE, sessionId, WTSDomainName, &buffer, &bufferSize))
+			{
+				result = buffer;
+				WTSFreeMemory(buffer);
+			}
+
+			return result;
+		}
+
+		DWORD GetCurrentSessionId()
+		{
+			DWORD sessionId = -1;
+			ProcessIdToSessionId(GetCurrentProcessId(), &sessionId);
+			return sessionId;
 		}
 	}
 }

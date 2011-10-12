@@ -36,5 +36,8 @@ namespace pGina
 		std::wstring GetMachineName();
 		bool UserIsRemote();
 		bool IsUserLocalAdmin(std::wstring username);
+		std::wstring GetSessionUsername(DWORD sessionId);
+		std::wstring GetSessionDomainName(DWORD sessionIdsB);
+		DWORD GetCurrentSessionId();
 	}
 }

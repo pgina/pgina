@@ -320,7 +320,7 @@ namespace pGina
 					m_credential->Initialize(m_usageScenario, s_logonFields, m_usageFlags, serializedUser, serializedPass);
 					break;
 				case CPUS_UNLOCK_WORKSTATION:
-					m_credential->Initialize(m_usageScenario, s_unlockFields, m_usageFlags, serializedUser, serializedPass);
+					m_credential->Initialize(m_usageScenario, s_unlockFields, m_usageFlags, serializedUser, serializedPass);					
 					break;
 				default:
 					return E_INVALIDARG;

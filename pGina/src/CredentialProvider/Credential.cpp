@@ -417,15 +417,32 @@ namespace pGina
 
 
 			if(username != NULL)
+			{				
+				SHStrDupW(username, &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
+			}
+			else if(m_usageScenario == CPUS_UNLOCK_WORKSTATION)
 			{
-				PWSTR dest = FindUsernameValue();
-				SHStrDupW(username, &(dest));
+				// See if we can get a username from WTS
+				DWORD mySession = pGina::Helpers::GetCurrentSessionId();
+				std::wstring wtsDomain = pGina::Helpers::GetSessionDomainName(mySession);
+				std::wstring wtsUser = pGina::Helpers::GetSessionUsername(mySession);
+				std::wstring usernameFieldValue;
+
+				if(!wtsDomain.empty() && wtsDomain != pGina::Helpers::GetMachineName())
+				{
+					usernameFieldValue += wtsDomain;					
+					usernameFieldValue += L"\\";
+				}
+
+				usernameFieldValue += wtsUser;
+				
+				SHStrDupW(usernameFieldValue.c_str(), &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
 			}
 
+
 			if(password != NULL)
-			{
-				PWSTR dest = FindPasswordValue();
-				SHStrDupW(password, &(dest));
+			{				
+				SHStrDupW(password, &(m_fields->fields[m_fields->passwordFieldIdx].wstr));
 			}
 		}
 

@@ -175,8 +175,8 @@ namespace pGina
 			// Write a log message to the service
 			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
 			std::wstring pipePath = L"\\\\.\\pipe\\";
-			pipePath += pipeName;
-			
+			pipePath += pipeName;					
+
 			// Start a cleanup pool for messages we collect along the way
 			pGina::Memory::ObjectCleanupPool cleanup;
 
