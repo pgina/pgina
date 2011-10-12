@@ -33,7 +33,8 @@ namespace pGina
 {
 	namespace Helpers
 	{
-		std::wstring GetDomainName();
+		std::wstring GetMachineName();
 		bool UserIsRemote();
+		bool IsUserLocalAdmin(std::wstring username);
 	}
 }

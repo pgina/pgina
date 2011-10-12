@@ -214,7 +214,31 @@ namespace pGina
 				if(responseMsg->Domain().length() == 0)
 				{
 					Log::Warn(L"Plugins did not set a domain name, assuming local machine!");
-					responseMsg->Domain(pGina::Helpers::GetDomainName());
+					responseMsg->Domain(pGina::Helpers::GetMachineName());
+				}
+
+				// If we failed, and the 'LocalAdminFallback' option is on, try this with LogonUser iff the username is an 
+				//	admin locally.  In fact, it is so rare that this should be turned off, that we don't expose it in the UI
+				//  even..  woah!
+				if(!responseMsg->Result())					
+				{
+					if(pGina::Registry::GetBool(L"LocalAdminFallback", true))
+					{
+						Log::Warn(L"Unable to authenticate %s, checking to see if local admin fallback applies", request.Username().c_str());
+						if(pGina::Helpers::IsUserLocalAdmin(request.Username()))
+						{
+							Log::Info(L"%s is a local admin, falling back to system auth", request.Username().c_str());
+							if(LocalLoginForUser(request.Username().c_str(), request.Password().c_str()))
+							{
+								Log::Info(L"Local login succeeded");
+								return LoginResult(true, request.Username(), request.Password(), pGina::Helpers::GetMachineName(), L"");
+							}
+							else
+							{
+								Log::Error(L"Local login failed");
+							}
+						}
+					}
 				}
 
 				return LoginResult(responseMsg->Result(), responseMsg->Username(), responseMsg->Password(), responseMsg->Domain(), responseMsg->Message());				
@@ -222,19 +246,27 @@ namespace pGina
 			else
 			{
 				Log::Warn(L"Unable to connect to pGina service pipe - LastError: 0x%08x, falling back on LogonUser()", GetLastError());
-				
-				std::wstring domainName = pGina::Helpers::GetDomainName();				
-				Log::Debug(L"Using LogonUser(%s, %s, *****)", username, domainName.c_str());
-				HANDLE token = NULL;
-				if(LogonUser(username, domainName.c_str(), password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &token) == TRUE)				
-				{
-					CloseHandle(token);
-					return LoginResult(true, username ? username : L"", password ? password : L"", domainName, L"");					
-				}				
+				if(LocalLoginForUser(username, password))
+					return LoginResult(true, username ? username : L"", password ? password : L"", pGina::Helpers::GetMachineName(), L"");					
 			}
 
 			return LoginResult();
 		}	
+
+		/* static */
+		bool User::LocalLoginForUser(const wchar_t *username, const wchar_t *password)
+		{
+			std::wstring domainName = pGina::Helpers::GetMachineName();				
+			Log::Debug(L"Using LogonUser(%s, %s, *****)", username, domainName.c_str());
+			HANDLE token = NULL;
+			if(LogonUser(username, domainName.c_str(), password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &token) == TRUE)				
+			{
+				CloseHandle(token);
+				return true;
+			}
+
+			return false;
+		}
 
 		/* static */
 		std::wstring TileUi::GetDynamicLabel(const wchar_t *labelName)

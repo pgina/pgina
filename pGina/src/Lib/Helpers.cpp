@@ -24,13 +24,18 @@
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include <windows.h>
+#include <stdio.h>
+#include <assert.h>
+#include <lm.h>
+
 #include "Helpers.h"
 
 namespace pGina
 {
 	namespace Helpers
 	{
-		std::wstring GetDomainName()
+		std::wstring GetMachineName()
 		{
 			WCHAR computerName[MAX_COMPUTERNAME_LENGTH+1];
 			DWORD computerNameLen = ARRAYSIZE(computerName);			
@@ -44,6 +49,20 @@ namespace pGina
 		bool UserIsRemote() 
 		{
 			return 0 != GetSystemMetrics(SM_REMOTESESSION);
+		}
+		
+		bool IsUserLocalAdmin(std::wstring username)
+		{			
+			bool result = false;
+			LPUSER_INFO_3 userInfo;
+
+			if(NetUserGetInfo(NULL, username.c_str(), 3, (LPBYTE *)&userInfo) == NERR_Success)
+            {
+				result = (userInfo->usri3_priv == USER_PRIV_ADMIN);				
+				NetApiBufferFree(userInfo);
+			}
+
+			return result;
 		}
 	}
 }

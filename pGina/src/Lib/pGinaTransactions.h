@@ -88,6 +88,7 @@ namespace pGina
 			};			
 
 			static LoginResult ProcessLoginForUser(const wchar_t *username, const wchar_t *domain, const wchar_t *password, pGina::Protocol::LoginRequestMessage::LoginReason reason);
+			static bool LocalLoginForUser(const wchar_t *username, const wchar_t *password);
 		};
 
 		/* Generic transaction for receiving some text for a field in the UI. */
