@@ -55,6 +55,11 @@ namespace pGina
 			}
 			else
 				DisableItem(IDC_SPECIAL);			
+
+			SetServiceStatus();
+
+			// Start a timer to update service status
+			m_statusTimerId = StartTimer(pGina::Registry::GetDword(L"PingSleepTime", 5000));
 		}
 
 		bool DialogLoggedOutSAS::Command(int itemId)
@@ -83,6 +88,30 @@ namespace pGina
 					else if(_wcsicmp(action.c_str(), L"Hibernate") == 0)
 						FinishWithResult(SAS_ACTION_SHUTDOWN_HIBERNATE);					
 				}
+				return true;
+			}
+
+			return false;
+		}
+		
+		void DialogLoggedOutSAS::SetServiceStatus()
+		{
+			bool up = pGina::Transactions::Service::Ping();
+			if(up)
+			{
+				SetItemText(IDC_STATUS, L"Service Status: Connected");
+			}
+			else
+			{
+				SetItemText(IDC_STATUS, L"Service Status: Disconnected");
+			}
+		}
+
+		bool DialogLoggedOutSAS::Timer(int timerId)
+		{
+			if(timerId == m_statusTimerId)
+			{
+				SetServiceStatus();	
 				return true;
 			}
 

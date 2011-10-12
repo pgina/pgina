@@ -64,12 +64,13 @@ namespace pGina
 		public:
 			DialogLoggedOutSAS(WinlogonInterface *iface) :
 				DialogBase(iface, IDD_LOGGEDOUT_SAS),
-					m_bitmap(NULL)
+					m_bitmap(NULL), m_statusTimerId(0)
 				{					
 				}
 			
 			virtual void DialogInit();
 			virtual bool Command(int itemId);
+			virtual bool Timer(int timerId);
 			virtual INT_PTR DialogProcImpl(UINT msg, WPARAM wparam, LPARAM lparam);
 
 			std::wstring Username() { return m_username; }
@@ -79,11 +80,13 @@ namespace pGina
 		
 		private:
 			void ApplyLogoImage();
+			void SetServiceStatus();
 
 		private:
 			std::wstring m_username;
 			std::wstring m_password;
 			HBITMAP m_bitmap;
+			int m_statusTimerId;
 		};
 	}
 }

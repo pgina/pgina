@@ -32,7 +32,7 @@ namespace pGina
 	namespace GINA
 	{
 		DialogBase::DialogBase(WinlogonInterface * iface, int dialogId) :
-			m_winlogon(iface), m_dialogId(dialogId), m_instance(GetMyInstance()), m_hwnd(0)
+			m_winlogon(iface), m_dialogId(dialogId), m_instance(GetMyInstance()), m_hwnd(0), m_nextTimer(1)
 		{
 		}
 		
@@ -73,10 +73,30 @@ namespace pGina
 					if(dialog->Command(LOWORD(wparam)))
 						return true;					
 					break;				
+				case WM_TIMER:
+					if(dialog->Timer(LOWORD(wparam)))
+						return true;
+					break;
+				case WM_DESTROY:
+					dialog->InternalDestroy();					
+					break;
 				}			
 
 				return dialog->DialogProcImpl(msg, wparam, lparam);					
 			}
+		}
+
+		void DialogBase::InternalDestroy()
+		{
+			if(m_nextTimer > 1)
+			{
+				for(int x = 1; x < m_nextTimer; x++)
+				{
+					StopTimer(x);
+				}
+			}
+
+			Destroy();
 		}
 
 		void DialogBase::CenterWindow()
@@ -180,6 +200,20 @@ namespace pGina
 		void DialogBase::SetItemBitmap(int itemid, HBITMAP bitmap)
 		{
 			SendDlgItemMessage(m_hwnd, itemid, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bitmap);
+		}
+
+		int DialogBase::StartTimer(unsigned int period)
+		{
+			int timerId = m_nextTimer;
+			m_nextTimer++;
+
+			UINT_PTR result = SetTimer(m_hwnd, (UINT_PTR) timerId, period, NULL);
+			return timerId;
+		}
+
+		void DialogBase::StopTimer(int timerId)
+		{
+			KillTimer(m_hwnd, (UINT_PTR) timerId);
 		}
 	}
 }

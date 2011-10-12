@@ -28,6 +28,7 @@
 
 #include <Windows.h>
 #include <string>
+#include <vector>
 
 #include "Winlogon.h"
 
@@ -49,6 +50,8 @@ namespace pGina
 		protected:
 			virtual void DialogInit() = 0;			// WM_INITDIALOG
 			virtual bool Command(int itemId) = 0;	// WM_COMMAND
+			virtual bool Timer(int timerId) = 0;	// WM_TIMER
+			virtual void Destroy() {} 				// WM_DESTROY
 			virtual INT_PTR DialogProcImpl(UINT msg, WPARAM wparam, LPARAM lparam) = 0;
 			
 			// Helpers that subclasses can use to center, get/set data etc
@@ -67,16 +70,20 @@ namespace pGina
 			void SetFocusItem(int itemId);
 			void SetItemBitmap(int itemId, HBITMAP bitmap);
 			void FinishWithResult(INT_PTR result) { EndDialog(m_hwnd, result); }
+			int StartTimer(unsigned int period);
+			void StopTimer(int timerId);
 
 		private:
 			static INT_PTR CALLBACK DialogProcInternal(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 			void Hwnd(HWND v) { m_hwnd = v; }
+			void InternalDestroy();
 
 		protected:
 			WinlogonInterface * m_winlogon;
 			int m_dialogId;
 			HINSTANCE m_instance;
 			HWND m_hwnd;
+			int m_nextTimer;
 		};
 	}
 }
