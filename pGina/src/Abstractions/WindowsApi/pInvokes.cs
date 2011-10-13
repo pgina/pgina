@@ -374,6 +374,9 @@ namespace Abstractions.WindowsApi
 
             [DllImport("Wtsapi32.dll")]
             public static extern bool WTSQuerySessionInformation(System.IntPtr hServer, int sessionId, WTS_INFO_CLASS wtsInfoClass, out System.IntPtr ppBuffer, out uint pBytesReturned);
+
+            [DllImport("wtsapi32.dll")]
+            public static extern bool WTSLogoffSession(IntPtr hServer, int sessionId, bool bWait);
             #endregion
 
             #region userenv.dll
@@ -640,6 +643,11 @@ namespace Abstractions.WindowsApi
             myNetResource.lpRemoteName = unc;
             int result = SafeNativeMethods.WNetAddConnection2(myNetResource, password, user, 0);
             return result;
+        }
+
+        public static bool LogoffSession(int sessionId)
+        {
+            return SafeNativeMethods.WTSLogoffSession(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionId, false);
         }
     }
 }

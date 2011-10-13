@@ -83,7 +83,11 @@ namespace pGina.Plugin.SessionLimit
                 foreach (int sess in sessions)
                 {
                     m_logger.DebugFormat("Logging off session {0}", sess);
-                    // TODO:  Logoff user here.
+                    bool result = Abstractions.WindowsApi.pInvokes.LogoffSession(sess);
+                    if (result)
+                        m_logger.Debug("Log off successful.");
+                    else
+                        m_logger.Debug("Log off failed.");
                 }
             }
         }
