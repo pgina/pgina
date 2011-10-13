@@ -451,11 +451,11 @@ namespace pGina.Plugin.LocalMachine
             {
                 if (user.Contains("\\"))
                 {
-                    if (user.StartsWith(Environment.MachineName))
+                    if (user.StartsWith(Environment.MachineName,StringComparison.CurrentCultureIgnoreCase))
                         xformed.Add(user.Substring(user.IndexOf("\\") + 1).ToUpper());
                 }
                 else
-                    xformed.Add(user);
+                    xformed.Add(user.ToUpper());
             }
             return xformed;
         }
@@ -469,6 +469,9 @@ namespace pGina.Plugin.LocalMachine
 
                 List<string> users = EligibleCleanupUsers();
                 List<string> loggedOnUsers = LoggedOnLocalUsers();
+
+                m_logger.DebugFormat("IterateCleanupUsers Eligible users: {0}", string.Join(",",users));
+                m_logger.DebugFormat("IterateCleanupUsers loggedOnUsers: {0}", string.Join(",",loggedOnUsers));
 
                 foreach (string user in users)
                 {                
@@ -486,6 +489,8 @@ namespace pGina.Plugin.LocalMachine
                         if (loggedOnUsers.Contains(user.ToUpper()))
                             continue;
 
+                        m_logger.DebugFormat("Cleaning up: {0}", user);
+                        
                         try
                         {
                             if (scramblePasswords)
