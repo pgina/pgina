@@ -141,14 +141,17 @@ namespace pGina
 		{			
 			/*if ((CLSID_CpGinaProvider != pcpcs->clsidCredentialProvider) && (m_usageScenario == CPUS_CREDUI))
 				return E_INVALIDARG;*/
-
+			pDEBUG(L"SetSerialization(%p)", pcpcs);
 			HRESULT result = E_NOTIMPL;
 
 			// Must match our auth package (negotiate)			
 			ULONG authPackage = 0;
 			result = Microsoft::Sample::RetrieveNegotiateAuthPackage(&authPackage);
 			if(!SUCCEEDED(result))
+			{
+				pDEBUG(L"Failed to retrieve negotiate auth package");
 				return result;
+			}
 
 			// Slightly modified behavior depending on flags provided to SetUsageScenario
 			if(m_usageScenario == CPUS_CREDUI)
@@ -156,15 +159,22 @@ namespace pGina
 				// Must support the auth package specified in CREDUIWIN_IN_CRED_ONLY and CREDUIWIN_AUTHPACKAGE_ONLY				
 				if( ((m_usageFlags & CREDUIWIN_IN_CRED_ONLY) || (m_usageFlags & CREDUIWIN_AUTHPACKAGE_ONLY)) 
 					&& authPackage != pcpcs->ulAuthenticationPackage)
+				{
+					pDEBUG(L"Invalid auth package (%x)", pcpcs->ulAuthenticationPackage);
 					return E_INVALIDARG;
+				}
 				
 				// CREDUIWIN_AUTHPACKAGE_ONLY should NOT return S_OK unless we can serialize correctly,
 				//  so we default to S_FALSE here and change to S_OK on success.
 				if(m_usageFlags & CREDUIWIN_AUTHPACKAGE_ONLY)
+				{
+					pDEBUG(L"CPUS_CREDUI but flags doesn't indicate CREDUIWIN_AUTHPACKAGE_ONLY");
 					result = S_FALSE;				
+				}
 			}
 
 			// As long as the package matches, and there is something to read from
+			pDEBUG(L"authPackage: 0x%08x serializedPackage: 0x%08x serializedBytes: 0x%08x @ %p", authPackage, pcpcs->ulAuthenticationPackage, pcpcs->cbSerialization, pcpcs->rgbSerialization);
 			if(authPackage == pcpcs->ulAuthenticationPackage && pcpcs->cbSerialization > 0 && pcpcs->rgbSerialization)
 			{
 				KERB_INTERACTIVE_UNLOCK_LOGON* pkil = (KERB_INTERACTIVE_UNLOCK_LOGON*) pcpcs->rgbSerialization;
@@ -197,8 +207,9 @@ namespace pGina
 						}
 
 						Microsoft::Sample::KerbInteractiveUnlockLogonUnpackInPlace((KERB_INTERACTIVE_UNLOCK_LOGON *) nativeSerialization, nativeSerializationSize);
-						if(m_setSerialization) LocalFree(m_setSerialization);								
+						if(m_setSerialization) LocalFree(m_setSerialization);														
 						m_setSerialization = (KERB_INTERACTIVE_UNLOCK_LOGON *) nativeSerialization;
+						pDEBUG(L"m_setSerialization = %p", m_setSerialization);
 						result = S_OK;	// All is well!                                                                                            								
 					}
 				}
@@ -373,13 +384,18 @@ namespace pGina
 		bool Provider::SerializedCredsAppearComplete()
 		{
 			// Did we get any creds?
-			if(!m_setSerialization) return false;
+			if(!m_setSerialization)
+			{
+				pDEBUG(L"SerializedCredsAppearComplete: No serialized creds set");
+				return false;
+			}
 
 			// Can we work out a username and a password at a minimum?
 			if(m_setSerialization->Logon.UserName.Length && m_setSerialization->Logon.UserName.Buffer &&
 				m_setSerialization->Logon.Password.Length && m_setSerialization->Logon.Password.Buffer)
 				return true;
 
+			pDEBUG(L"SerializedCredsAppearComplete: couldn't work out username & password");
 			return false;
 		}
 
