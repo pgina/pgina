@@ -99,6 +99,15 @@ namespace pGina.Configuration
 
         private void InitCpOptions()
         {
+            CredentialProvider.Registration.Settings msProviderSettings = new CredentialProvider.Registration.Settings()
+            {
+                ProviderGuid = new Guid("{6f45dc1e-5384-457a-bc13-2cd81b0d28ed}"),
+                ShortName = "PasswordProvider",
+            };
+
+            CredentialProvider.Registration.CredProviderManager manager = CredentialProvider.Registration.CredProviderManager.GetManager();
+            manager.CpInfo = msProviderSettings;
+            chkMSProvider.Checked = manager.Enabled();
         }
 
         private void InitGinaOptions()
@@ -1265,6 +1274,28 @@ namespace pGina.Configuration
 
         private void SaveCpSettings()
         {
+            CredentialProvider.Registration.Settings msProviderSettings = new CredentialProvider.Registration.Settings()
+            {
+                ProviderGuid = new Guid("{6f45dc1e-5384-457a-bc13-2cd81b0d28ed}"),
+                ShortName = "PasswordProvider",
+            };
+
+            CredentialProvider.Registration.CredProviderManager manager = CredentialProvider.Registration.CredProviderManager.GetManager();
+            manager.CpInfo = msProviderSettings;
+            bool currentState = manager.Enabled();
+
+            if (chkMSProvider.Checked != currentState)
+            {
+                if (chkMSProvider.Checked)
+                    manager.Enable();
+                else
+                {
+                    if (MessageBox.Show("You have chosen to disable the built-in password provider, are you sure?", "Really?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == System.Windows.Forms.DialogResult.Yes)
+                    {
+                        manager.Disable();
+                    }
+                }
+            }
         }
 
         private void chkSpecialButton_CheckedChanged(object sender, EventArgs e)

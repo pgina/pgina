@@ -283,7 +283,7 @@ namespace pGina
 		{
 			// We currently always support only a single tile
 			*pdwCount = 1;
-			*pdwDefault = CREDENTIAL_PROVIDER_NO_DEFAULT;
+			*pdwDefault = 0;
 			*pbAutoLogonWithDefault = FALSE;
 			
 			// If we were given creds via SetSerialization, and they appear complete, then we can 

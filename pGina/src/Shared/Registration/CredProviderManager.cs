@@ -235,7 +235,7 @@ namespace pGina.CredentialProvider.Registration
             // Defaults for pGina Credential Provider
             this.CpInfo.ProviderGuid = new Guid("{D0BEFEFB-3D2C-44DA-BBAD-3B2D04557246}");
             this.CpInfo.ShortName = "pGinaCredentialProvider";
-        }
+        }        
 
         public override void Install()
         {
