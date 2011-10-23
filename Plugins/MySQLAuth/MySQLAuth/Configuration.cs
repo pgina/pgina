@@ -171,7 +171,6 @@ namespace pGina.Plugin.MySQLAuth
                     m_logger.DebugFormat("Table {0} not found.", tableName);
                     message += string.Format("\n  WARNING: Table {0} not found.", tableName);
                 }
-                rdr.Close();
 
                 if (tableExists)
                 {
