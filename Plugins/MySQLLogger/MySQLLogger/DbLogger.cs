@@ -67,15 +67,17 @@ namespace pGina.Plugin.MySqlLogger
 
         private DbLogger()
         {
-            string server = Settings.Store.Host;
+            MySqlConnectionStringBuilder bldr = new MySqlConnectionStringBuilder();
+            bldr.Server = Settings.Store.Host;
             int port = Settings.Store.Port;
-            string userName = Settings.Store.User;
-            string passwd = Settings.Store.GetEncryptedSetting("Password");
-            string database = Settings.Store.Database;
+            bldr.Port = Convert.ToUInt32(port);
+            bldr.UserID = Settings.Store.User;
+            bldr.Database = Settings.Store.Database;
+            bldr.Password = Settings.Store.GetEncryptedSetting("Password");
 
-            string connStr = String.Format("server={0}; port={1};user={2}; password={3}; database={4};",
-                server, port, userName, passwd, database);
-            m_logger.DebugFormat("Connecting to {0}:{1} as {2}, database: {3}", server, port, userName, database);
+            string connStr = bldr.GetConnectionString(true);
+            m_logger.DebugFormat("Connecting to {0}:{1} as {2}, database: {3}", 
+                bldr.Server, bldr.Port, bldr.UserID, bldr.Database);
             m_conn = new MySqlConnection(connStr);
             m_conn.Open();
 
