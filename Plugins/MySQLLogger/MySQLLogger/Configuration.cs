@@ -126,6 +126,7 @@ namespace pGina.Plugin.MySqlLogger
         private void testButton_Click(object sender, EventArgs e)
         {
             string connStr = this.BuildConnectionString();
+            if (connStr == null) return;
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(connStr))
@@ -158,6 +159,7 @@ namespace pGina.Plugin.MySqlLogger
         private void createTableBtn_Click(object sender, EventArgs e)
         {
             string connStr = this.BuildConnectionString();
+            if (connStr == null) return;
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(connStr))
@@ -189,16 +191,26 @@ namespace pGina.Plugin.MySqlLogger
 
         private string BuildConnectionString()
         {
-            string server = this.hostTB.Text.Trim();
-            string port = this.portTB.Text.Trim();
-            string userName = this.userTB.Text.Trim();
-            string passwd = this.passwdTB.Text;
-            string database = this.dbTB.Text.Trim();
 
-            string connStr = String.Format("server={0}; port={1};user={2}; password={3}; database={4};",
-                server, port, userName, passwd, database);
+            uint port = 0;
+            try
+            {
+                port = Convert.ToUInt32(this.portTB.Text);
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Invalid port number.");
+                return null;
+            }
 
-            return connStr;
+            MySqlConnectionStringBuilder bldr = new MySqlConnectionStringBuilder();
+            bldr.Server = this.hostTB.Text.Trim();
+            bldr.Port = port;
+            bldr.UserID = this.userTB.Text.Trim();
+            bldr.Database = this.dbTB.Text.Trim();
+            bldr.Password = this.passwdTB.Text;
+
+            return bldr.GetConnectionString(true);
         }
 
     }
