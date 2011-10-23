@@ -89,6 +89,7 @@ namespace pGina.Plugin.MySQLAuth
             {
                 string message = "";
                 string connStr = this.BuildConnectionString();
+                if (connStr == null) return;
                 conn = new MySqlConnection(connStr);
                 conn.Open();
 
@@ -193,6 +194,7 @@ namespace pGina.Plugin.MySQLAuth
         private void createTableBtn_Click(object sender, EventArgs e)
         {
             string connStr = this.BuildConnectionString();
+            if (connStr == null) return;
             string tableName = this.tableTB.Text.Trim();
             try
             {
@@ -236,22 +238,30 @@ namespace pGina.Plugin.MySQLAuth
 
         private string BuildConnectionString()
         {
-            string host = this.hostTB.Text.Trim();
-            string port = this.portTB.Text.Trim();
-            string user = this.userTB.Text.Trim();
-            string passwd = this.passwordTB.Text;
-            string db = this.dbTB.Text.Trim();
-
-            string connStr = String.Format(
-                "server={0}; port={1};user={2}; password={3}; database={4}",
-                    host, port, user, passwd, db);
-            if (this.useSslCB.Checked)
+            uint port = 0;
+            try
             {
-                connStr += ";SSL Mode=Required";
+                port = Convert.ToUInt32(this.portTB.Text);
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Invalid port number.");
+                return null;
             }
 
-            return connStr;
+            MySqlConnectionStringBuilder bldr = new MySqlConnectionStringBuilder();
+            bldr.Server = this.hostTB.Text.Trim();
+            bldr.Port = Convert.ToUInt32(this.portTB.Text.Trim());
+            bldr.UserID = this.userTB.Text.Trim();
+            bldr.Database = this.dbTB.Text.Trim();
+            bldr.Password = this.passwordTB.Text;
+
+            if (this.useSslCB.Checked)
+            {
+                bldr.SslMode = MySqlSslMode.Required;
+            }
+
+            return bldr.GetConnectionString(true);
         }
-        
     }
 }
