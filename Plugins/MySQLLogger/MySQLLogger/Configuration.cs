@@ -125,24 +125,7 @@ namespace pGina.Plugin.MySqlLogger
 
         private void testButton_Click(object sender, EventArgs e)
         {
-            int port = -1;
-            try
-            {
-                port = Convert.ToInt32(this.portTB.Text);
-            }
-            catch (FormatException)
-            {
-                MessageBox.Show("Invalid port number.");
-                return;
-            }
-
-            string server = this.hostTB.Text.Trim();
-            string userName = this.userTB.Text.Trim();
-            string passwd = this.passwdTB.Text;
-            string database = this.dbTB.Text.Trim();
-
-            string connStr = String.Format("server={0}; port={1};user={2}; password={3}; database={4};",
-                server, port, userName, passwd, database);
+            string connStr = this.BuildConnectionString();
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(connStr))
@@ -174,25 +157,7 @@ namespace pGina.Plugin.MySqlLogger
 
         private void createTableBtn_Click(object sender, EventArgs e)
         {
-            int port = -1;
-            try
-            {
-                port = Convert.ToInt32(this.portTB.Text);
-            }
-            catch (FormatException)
-            {
-                MessageBox.Show("Invalid port number.");
-                return;
-            }
-
-            string server = this.hostTB.Text.Trim();
-            string userName = this.userTB.Text.Trim();
-            string passwd = this.passwdTB.Text;
-            string database = this.dbTB.Text.Trim();
-
-            string connStr = String.Format("server={0}; port={1};user={2}; password={3}; database={4};",
-                server, port, userName, passwd, database);
-
+            string connStr = this.BuildConnectionString();
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(connStr))
@@ -220,6 +185,20 @@ namespace pGina.Plugin.MySqlLogger
         private void showPassCB_CheckedChanged(object sender, EventArgs e)
         {
             this.passwdTB.UseSystemPasswordChar = !this.showPassCB.Checked;
+        }
+
+        private string BuildConnectionString()
+        {
+            string server = this.hostTB.Text.Trim();
+            string port = this.portTB.Text.Trim();
+            string userName = this.userTB.Text.Trim();
+            string passwd = this.passwdTB.Text;
+            string database = this.dbTB.Text.Trim();
+
+            string connStr = String.Format("server={0}; port={1};user={2}; password={3}; database={4};",
+                server, port, userName, passwd, database);
+
+            return connStr;
         }
 
     }

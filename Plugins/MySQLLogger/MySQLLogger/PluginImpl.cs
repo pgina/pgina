@@ -35,6 +35,8 @@ using pGina.Shared.Settings;
 using Abstractions.WindowsApi;
 using log4net;
 
+using MySql.Data.MySqlClient;
+
 namespace pGina.Plugin.MySqlLogger
 {
     public class PluginImpl : IPluginConfiguration, IPluginEventNotifications
@@ -123,6 +125,13 @@ namespace pGina.Plugin.MySqlLogger
                     {
                         log.Log(msg);
                     }
+                }
+                catch (MySqlException e)
+                {
+                    if (e.Number == 1042)
+                        m_logger.ErrorFormat("Unable to connect to host: {0}", Settings.Store.Host);
+                    else
+                        m_logger.Error(e.ToString());
                 }
                 catch (Exception e)
                 {
