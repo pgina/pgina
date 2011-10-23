@@ -276,7 +276,7 @@ namespace pGina.Plugin.MySQLAuth
 
             MySqlConnectionStringBuilder bldr = new MySqlConnectionStringBuilder();
             bldr.Server = this.hostTB.Text.Trim();
-            bldr.Port = Convert.ToUInt32(this.portTB.Text.Trim());
+            bldr.Port = port;
             bldr.UserID = this.userTB.Text.Trim();
             bldr.Database = this.dbTB.Text.Trim();
             bldr.Password = this.passwordTB.Text;

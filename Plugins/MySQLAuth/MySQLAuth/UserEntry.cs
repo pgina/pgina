@@ -47,11 +47,14 @@ namespace pGina.Plugin.MySQLAuth
         {
             if (plainText != null)
             {
-                string hashed = HashPlainText(plainText);
+                string hashedPlainText = HashPlainText(plainText);
+
+                // If hash algorithm is NONE, we don't want to ignore case when comparing,
+                // otherwise, we are comparing hex strings, so case doesn't matter.
                 if (HashAlg == PasswordHashAlgorithm.NONE)
-                    return hashed.Equals(plainText);
+                    return hashedPlainText.Equals(HashedPassword);
                 else
-                    return StringComparer.OrdinalIgnoreCase.Equals(hashed, HashedPassword);
+                    return StringComparer.OrdinalIgnoreCase.Equals(hashedPlainText, HashedPassword);
             }
             else
             {
