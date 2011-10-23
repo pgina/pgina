@@ -164,6 +164,9 @@ namespace pGina.Plugin.MySQLAuth
                             case "SHA384":
                                 entry.HashAlg = PasswordHashAlgorithm.SHA384;
                                 break;
+                            default:
+                                m_logger.ErrorFormat("Unrecognized hash algorithm: {0}", rdr[1].ToString());
+                                return null;
                         }
                         rdr.Close();
                         return entry;
