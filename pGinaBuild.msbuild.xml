@@ -1,0 +1,41 @@
+
+<Project DefaultTargets="BuildAll" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration>Release</Configuration>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CoreSolution Include="pGina\src\pGina-3.x-vs2010.sln" />
+    <PluginSolutions Include="Plugins\**\*.sln" />
+  </ItemGroup>
+  
+  <!-- Build everything -->
+  <Target Name="BuildAll" DependsOnTargets="BuildCore;BuildPlugins" />
+  
+  <!-- Build core pGina -->
+  <Target Name="BuildCore">
+    <!-- Build 64 bit platform -->
+    <MSBuild Projects="@(CoreSolution)" ContinueOnError="false"
+             Properties="Configuration=$(Configuration);Platform=x64">
+    </MSBuild>
+    <!-- Build 32 bit platform -->
+    <MSBuild Projects="@(CoreSolution)" ContinueOnError="false"
+             Properties="Configuration=$(Configuration);Platform=Win32">
+    </MSBuild>
+  </Target>
+  
+  <!-- Build all plugins -->
+  <Target Name="BuildPlugins">
+    <MSBuild Projects="@(PluginSolutions)" ContinueOnError="false"
+             Properties="Configuration=$(Configuration);Platform=Any CPU">
+    </MSBuild>
+  </Target>
+
+  <!-- Clean up -->
+  <Target Name="Clean">
+    <MSBuild Projects="@(CoreSolution)" Targets="Clean" Properties="Configuration=$(Configuration);Platform=x64" />
+    <MSBuild Projects="@(CoreSolution)" Targets="Clean" Properties="Configuration=$(Configuration);Platform=Win32" />
+    <MSBuild Projects="@(PluginSolutions)" Targets="Clean" Properties="Configuration=$(Configuration);Platform=Any CPU" />
+  </Target>
+
+</Project>
