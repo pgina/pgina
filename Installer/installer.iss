@@ -1,5 +1,5 @@
 #define MyAppName "pGina"
-#define MyAppVersion "3.0.1"
+#define MyAppVersion "3.0.2"
 #define MyAppPublisher "pGina Team"
 #define MyAppURL "http://www.pgina.org/"
 #define MyAppExeName "pGina.Configuration.exe"
@@ -40,7 +40,7 @@ SetupIconFile=..\Installer\pgina.ico
 Compression=lzma/Max
 SolidCompression=true
 AppCopyright=pGina Team
-AppVerName=pGina v3.0.1
+AppVerName=pGina v3.0.2
 ExtraDiskSpaceRequired=6
 DisableDirPage=auto
 DisableProgramGroupPage=auto
