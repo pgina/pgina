@@ -1305,5 +1305,10 @@ namespace pGina.Configuration
             radioRestart.Enabled = chkSpecialButton.Checked;
             radioHibernate.Enabled = chkSpecialButton.Checked;
         }
+
+        private void showTextResultPasswordCB_CheckedChanged(object sender, EventArgs e)
+        {
+            this.m_passwordResult.UseSystemPasswordChar = ! this.showTextResultPasswordCB.Checked;
+        }
     }
 }
