@@ -117,9 +117,9 @@
             this.m_chkRequirePlugin.AutoSize = true;
             this.m_chkRequirePlugin.Location = new System.Drawing.Point(16, 114);
             this.m_chkRequirePlugin.Name = "m_chkRequirePlugin";
-            this.m_chkRequirePlugin.Size = new System.Drawing.Size(346, 17);
+            this.m_chkRequirePlugin.Size = new System.Drawing.Size(345, 17);
             this.m_chkRequirePlugin.TabIndex = 11;
-            this.m_chkRequirePlugin.Text = "Only substitute when one of the following plugins has authenticated:";
+            this.m_chkRequirePlugin.Text = "Only substitute when all of the following plugins have authenticated:";
             this.m_chkRequirePlugin.UseVisualStyleBackColor = true;
             this.m_chkRequirePlugin.CheckedChanged += new System.EventHandler(this.m_chkRequirePlugin_CheckedChanged);
             // 
