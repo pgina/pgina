@@ -720,10 +720,10 @@ namespace pGina.Configuration
             this.LoadTileImagePreview();
             Settings.Get.Motd = this.motdTB.Text.Trim();
 
-            this.SaveGinaSettings();
-            
-            if( Abstractions.Windows.OsInfo.IsVistaOrLater() )
+            if (Abstractions.Windows.OsInfo.IsVistaOrLater())
                 this.SaveCpSettings();
+            else
+                this.SaveGinaSettings();
         }
 
         private void MoveUp(DataGridView dgv, int index)
