@@ -721,7 +721,9 @@ namespace pGina.Configuration
             Settings.Get.Motd = this.motdTB.Text.Trim();
 
             this.SaveGinaSettings();
-            this.SaveCpSettings();
+            
+            if( Abstractions.Windows.OsInfo.IsVistaOrLater() )
+                this.SaveCpSettings();
         }
 
         private void MoveUp(DataGridView dgv, int index)
