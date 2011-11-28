@@ -65,7 +65,7 @@ namespace pGina.Plugin.MySQLAuth
             }
             else
             {
-                m_logger.DebugFormat("Authentication failed for {0} no entry found in DB.", userInfo.Username);
+                m_logger.DebugFormat("Authentication failed for {0}", userInfo.Username);
                 return new Shared.Types.BooleanResult() { Success = false, Message = "Invalid username or password." };
             }
         }
@@ -179,7 +179,12 @@ namespace pGina.Plugin.MySQLAuth
             }
             catch (MySqlException ex)
             {
-                m_logger.Error(ex.ToString());
+                if (ex.Number == 1042)
+                    m_logger.ErrorFormat("Unable to connect to host: {0}", Settings.Store.Host);
+                else
+                    m_logger.Error(ex.ToString());
+
+                // Return null causes failed auth.
                 return null;
             }
         }
