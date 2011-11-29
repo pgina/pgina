@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>pGina.Plugin.MySQLAuth</RootNamespace>
-    <AssemblyName>MySQLAuth</AssemblyName>
+    <AssemblyName>pGina.Plugin.MySQLAuth</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
