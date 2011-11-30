@@ -1,0 +1,14 @@
+*.suo
+*~
+*.user
+
+# Log files
+*_log.txt
+
+# Build/output directories
+obj/
+bin/
+build/
+
+# Installer output
+Installer/Output
