@@ -62,6 +62,12 @@ namespace pGina.Core
         {
             m_logger.DebugFormat("Initializing");
             PluginDirectories = Core.Settings.Get.PluginDirectories;
+            
+            // Set up an event handler to load plugin dependencies
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.AssemblyResolve += new ResolveEventHandler(ResolvePluginDependencies);
+
+            // Load the plugins themselves
             PluginLoader.LoadPlugins();
 
             m_logger.DebugFormat("Plugins loaded, list follows: ");
@@ -69,6 +75,42 @@ namespace pGina.Core
             {
                 m_logger.DebugFormat("  {0} -> {1}", plugin.Name, plugin.Uuid.ToString());
             }            
+        }
+
+        /// <summary>
+        /// This method is intended to help plugins load their dependencies.  It is an event handler 
+        /// that is triggered when an assembly is not found (resolved).  It tries to load the 
+        /// assembly from the same directory as the assembly that is requesting the dependency.
+        /// </summary>
+        /// <returns>The assembly or null if not found.</returns>
+        public static Assembly ResolvePluginDependencies(Object sender, ResolveEventArgs args)
+        {
+            // Get the file name
+            string fileName = args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll";
+
+            m_logger.DebugFormat("Resolving dependency {0} for {1}.", fileName, 
+                args.RequestingAssembly.FullName);
+            
+            // Look for the assembly in the same directory as the plugin that is loading the assembly
+            DirectoryInfo dir = Directory.GetParent(args.RequestingAssembly.Location);
+            string path = Path.Combine(dir.FullName, fileName);
+
+            m_logger.DebugFormat("Looking for: {0}", path);
+            Assembly a = null;
+            if( dir.Exists )
+            {
+                if( File.Exists(path) )
+                    a = Assembly.LoadFile(path);
+                else
+                    m_logger.DebugFormat("{0} not found", path);
+            }
+
+            if( a == null )
+                m_logger.ErrorFormat("Unable to resolve dependency for {0}", args.Name);
+            else
+                m_logger.InfoFormat("Successfully loaded assembly: {0}", a.FullName);
+
+            return a;
         }
         
         public static void LoadPlugins()
