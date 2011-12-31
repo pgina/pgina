@@ -147,26 +147,20 @@ namespace pGina.Plugin.LocalMachine
             return false;
         }
 
-        private bool IsUserInGroup(UserInformation userInfo, GroupInformation groupInfo)
+        private bool IsUserInGroup(UserPrincipal user, GroupInformation groupInfo)
         {
             if (groupInfo.SID != null)
             {
-                using (UserPrincipal user = GetUserPrincipal(userInfo.Username))
+                using (GroupPrincipal group = GetGroupPrincipal(groupInfo.SID))
                 {
-                    using (GroupPrincipal group = GetGroupPrincipal(groupInfo.SID))
-                    {
-                        return IsUserInGroup(user, group);
-                    }
+                    return IsUserInGroup(user, group);
                 }
             }
             else
             {
-                using (UserPrincipal user = GetUserPrincipal(userInfo.Username))
+                using (GroupPrincipal group = GetGroupPrincipal(groupInfo.Name))
                 {
-                    using (GroupPrincipal group = GetGroupPrincipal(groupInfo.Name))
-                    {
-                        return IsUserInGroup(user, group);
-                    }
+                    return IsUserInGroup(user, group);
                 }
             }             
         }
@@ -210,8 +204,8 @@ namespace pGina.Plugin.LocalMachine
 
         private UserPrincipal CreateOrGetUserPrincipal(UserInformation userInfo)
         {
-            UserPrincipal user = GetUserPrincipal(userInfo.Username);
-            if (user == null)
+            UserPrincipal user = null;
+            if ( ! LocalAccount.UserExists(userInfo.Username) )
             {
                 // See note about MS bug in CreateOrGetGroupPrincipal to understand the mix of DE/Principal here:
                 using (user = new UserPrincipal(m_machinePrincipal))
@@ -227,7 +221,12 @@ namespace pGina.Plugin.LocalMachine
                 }
             }
 
-            return user;
+            user = GetUserPrincipal(userInfo.Username);
+            if (user != null)
+                return user;
+            else
+                throw new Exception(
+                    String.Format("Unable to get user principal for account that apparently exists: {0}", userInfo.Username));
         }
 
         private void SyncUserPrincipalInfo(UserPrincipal user, UserInformation info)
@@ -283,7 +282,7 @@ namespace pGina.Plugin.LocalMachine
                     // Now add to any they aren't already in that they should be
                     foreach (GroupInformation groupInfo in UserInfo.Groups)
                     {
-                        if (!IsUserInGroup(UserInfo, groupInfo))
+                        if (!IsUserInGroup(user, groupInfo))
                         {
                             using (GroupPrincipal group = CreateOrGetGroupPrincipal(groupInfo))
                             {
@@ -404,6 +403,29 @@ namespace pGina.Plugin.LocalMachine
             }
             
             Directory.Delete(directory, false);
-        }        
+        }
+
+        /// <summary>
+        /// This is a faster technique for determining whether or not a user exists on the local
+        /// machine.  UserPrincipal.FindByIdentity tends to be quite slow in general, so if
+        /// you only need to know whether or not the account exists, this method is much 
+        /// faster.
+        /// </summary>
+        /// <param name="strUserName">The user name</param>
+        /// <returns>Whether or not the account with the given user name exists on the system</returns>
+        public static bool UserExists(string strUserName)
+        {
+            try
+            {
+                using (DirectoryEntry userEntry = m_sam.Children.Find(strUserName))
+                {
+                    return userEntry != null;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }

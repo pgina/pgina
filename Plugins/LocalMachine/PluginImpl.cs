@@ -189,11 +189,11 @@ namespace pGina.Plugin.LocalMachine
             {   
                 // If this user doesn't already exist, and we are supposed to clean up after ourselves,
                 //  make note of the username!
-                using (UserPrincipal user = LocalAccount.GetUserPrincipal(userInfo.Username))
+                if( ! LocalAccount.UserExists(userInfo.Username) )
                 {
                     bool scramble = Settings.Store.ScramblePasswords;
                     bool remove = Settings.Store.RemoveProfiles;
-                    if (user == null && (scramble || remove))
+                    if (scramble || remove)
                     {                        
                         AddCleanupUser(userInfo.Username);
                     }
@@ -242,14 +242,21 @@ namespace pGina.Plugin.LocalMachine
                 // Should we authenticate? Only if user has not yet authenticated, or we are not in fallback mode                
                 if (alwaysAuth || !HasUserAuthenticatedYet(properties))
                 {
-                    using (PrincipalContext pc = new PrincipalContext(ContextType.Machine, Environment.MachineName))
+                    if (LocalAccount.UserExists(userInfo.Username))
                     {
-                        if (pc.ValidateCredentials(userInfo.Username, userInfo.Password))
+                        using (PrincipalContext pc = new PrincipalContext(ContextType.Machine, Environment.MachineName))
                         {
-                            m_logger.InfoFormat("Authenticated user: {0}", userInfo.Username);
-                            userInfo.Domain = Environment.MachineName;
-                            return new BooleanResult() { Success = true };
+                            if (pc.ValidateCredentials(userInfo.Username, userInfo.Password))
+                            {
+                                m_logger.InfoFormat("Authenticated user: {0}", userInfo.Username);
+                                userInfo.Domain = Environment.MachineName;
+                                return new BooleanResult() { Success = true };
+                            }
                         }
+                    }
+                    else
+                    {
+                        m_logger.InfoFormat("User {0} does not exist on this machine.", userInfo.Username);
                     }
                 }        
 
