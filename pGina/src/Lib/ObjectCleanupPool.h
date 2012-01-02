@@ -33,56 +33,97 @@ namespace pGina
 {
 	namespace Memory
 	{
+		class ObjectCleanupBase
+		{
+		public:
+			ObjectCleanupBase(void * memory) : m_memory(memory) {}
+			virtual ~ObjectCleanupBase() {}
+
+		protected:
+			void * m_memory;
+		};
+
+		class FreeCleanup : public ObjectCleanupBase
+		{
+		public:
+			FreeCleanup(void *memory) : ObjectCleanupBase(memory) {}
+			virtual ~FreeCleanup()
+			{
+				if(m_memory)
+					free(m_memory);
+			}
+		};
+
+		class DeleteCleanup : public ObjectCleanupBase
+		{
+		public:
+			DeleteCleanup(void *memory) : ObjectCleanupBase(memory) {}
+			virtual ~DeleteCleanup()
+			{
+				if(m_memory)
+					delete m_memory;
+			}
+		};
+
+		class LocalFreeCleanup : public ObjectCleanupBase
+		{
+		public:
+			LocalFreeCleanup(void *memory) : ObjectCleanupBase(memory) {}
+			virtual ~LocalFreeCleanup()
+			{
+				if(m_memory)
+					LocalFree(m_memory);
+			}
+		};
+
+		class CoTaskMemFreeCleanup : public ObjectCleanupBase
+		{
+		public:
+			CoTaskMemFreeCleanup(void *memory) : ObjectCleanupBase(memory) {}
+			virtual ~CoTaskMemFreeCleanup()
+			{
+				if(m_memory)
+					CoTaskMemFree(m_memory);
+			}
+		};
+		
 		class ObjectCleanupPool
 		{
 		public:
 			ObjectCleanupPool() {}
 			~ObjectCleanupPool()
-			{
-				for(std::vector<void *>::iterator itr = m_delobjects.begin(); itr != m_delobjects.end(); ++itr)
+			{				
+				for(std::vector<ObjectCleanupBase *>::iterator itr = m_cleanupVector.begin(); itr != m_cleanupVector.end(); ++itr)
 				{
-					delete *itr;
+					delete *itr;					
 				}
 
-				m_delobjects.clear();
-
-				for(std::vector<DestroyerType>::iterator itr = m_destroyers.begin(); itr != m_destroyers.end(); ++itr)
-				{
-					itr->cleanupFunc(itr->cleanupArg);					
-				}
-
-				m_destroyers.clear();
+				m_cleanupVector.clear();
 			}
-
-			void Add(void *object)
+			
+			void AddFree(void *mem)
 			{
-				if(object)
+				if(mem)
 				{
-					m_delobjects.push_back(object);
+					Add(new FreeCleanup(mem));
 				}
 			}
 
-			void Add(void *object, void (*func)(void *))
+			void Add(void *obj)
 			{
-				if(object)
-				{
-					DestroyerType foo;
-					foo.cleanupFunc = func;
-					foo.cleanupArg = object;
-					m_destroyers.push_back(foo);
-				}
+				Add(new DeleteCleanup(obj));
 			}
 
+			void Add(ObjectCleanupBase *obj)
+			{
+				if(obj)
+				{
+					m_cleanupVector.push_back(obj);
+				}
+			}
+		
 		private:			
-			struct DestroyerType
-			{
-				void (*cleanupFunc)(void *);
-				void * cleanupArg;
-			};
-
-		private:
-			std::vector<void *> m_delobjects;
-			std::vector<DestroyerType> m_destroyers;
+			std::vector<ObjectCleanupBase *> m_cleanupVector;
 		};
 	}
 }
