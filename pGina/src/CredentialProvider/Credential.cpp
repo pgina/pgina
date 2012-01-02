@@ -283,16 +283,16 @@ namespace pGina
 			password = loginResult.Password().length() > 0 ? _wcsdup(loginResult.Password().c_str()) : NULL;
 			domain = loginResult.Domain().length() > 0 ? _wcsdup(loginResult.Domain().c_str()) : NULL;			
 
-			cleanup.Add(username, free);
-			cleanup.Add(password, free);
-			cleanup.Add(domain, free);
+			cleanup.AddFree(username);
+			cleanup.AddFree(password);
+			cleanup.AddFree(domain);
 
 			PWSTR protectedPassword = NULL;			
 			HRESULT result = Microsoft::Sample::ProtectIfNecessaryAndCopyPassword(password, m_usageScenario, &protectedPassword);			
 			if(!SUCCEEDED(result))
 				return result;
 
-			cleanup.Add(static_cast<void *>(protectedPassword), (void (*)(void *))(CoTaskMemFree));
+			cleanup.Add(new pGina::Memory::CoTaskMemFreeCleanup(protectedPassword));			
 
 			// CredUI we use CredPackAuthenticationBuffer
 			if(m_usageScenario == CPUS_CREDUI)

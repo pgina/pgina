@@ -320,8 +320,8 @@ namespace pGina
 				if(SerializedCredsAppearComplete())
 				{
 					GetSerializedCredentials(&serializedUser, &serializedPass, NULL);
-					cleanup.Add(serializedUser, (void (*)(void *)) LocalFree);
-					cleanup.Add(serializedPass, (void (*)(void *)) LocalFree);
+					cleanup.Add(new pGina::Memory::LocalFreeCleanup(serializedUser));
+					cleanup.Add(new pGina::Memory::LocalFreeCleanup(serializedPass));					
 				}
 
 				switch(m_usageScenario)
