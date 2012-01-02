@@ -78,48 +78,88 @@ namespace pGina.Plugin.LocalMachine
             UserInfo = userInfo;            
         }        
 
+        /// <summary>
+        /// Finds and returns the UserPrincipal object if it exists, if not, returns null.
+        /// This method uses PrincipalSearcher because it is faster than UserPrincipal.FindByIdentity.
+        /// The username comparison is case insensitive.
+        /// </summary>
+        /// <param name="username">The username to search for.</param>
+        /// <returns>The UserPrincipal object, or null if not found.</returns>
         public static UserPrincipal GetUserPrincipal(string username)
         {
-            m_logger.DebugFormat("GetUserPrincipal({0})", username);
             if (string.IsNullOrEmpty(username)) return null;
 
-            UserPrincipal result = null;
-            using (PrincipalSearcher searcher = new PrincipalSearcher(new UserPrincipal(m_machinePrincipal) { Name = username }))
+            // Since PrincipalSearcher is case sensitive, and we want a case insensitive 
+            // search, we get a list of all users and compare the names "manually."
+            using (PrincipalSearcher searcher = new PrincipalSearcher(new UserPrincipal(m_machinePrincipal)))
             {
-                Principal prin = searcher.FindOne();
-                if (prin is UserPrincipal) 
-                    result = (UserPrincipal)prin;
+                PrincipalSearchResult<Principal> sr = searcher.FindAll();
+                foreach (Principal p in sr)
+                {
+                    if (p is UserPrincipal)
+                    {
+                        UserPrincipal user = (UserPrincipal)p;
+                        if (user.Name.Equals(username, StringComparison.CurrentCultureIgnoreCase))
+                            return user;
+                    }
+                }
             }
 
-            m_logger.DebugFormat("End GetUserPrincipal({0})", username);
-            return result;
+            return null;
         }
 
         public static UserPrincipal GetUserPrincipal(SecurityIdentifier sid)
         {
+            // This could be updated to use PrincipalSearcher, but the method is currently
+            // unused.
             return UserPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Sid, sid.ToString());
         }
 
+        /// <summary>
+        /// Finds and returns the GroupPrincipal object if it exists, if not, returns null.
+        /// This method uses PrincipalSearcher because it is faster than GroupPrincipal.FindByIdentity.
+        /// The group name comparison is case insensitive.
+        /// </summary>
+        /// <param name="groupname"></param>
+        /// <returns></returns>
         public static GroupPrincipal GetGroupPrincipal(string groupname)
         {
-            m_logger.DebugFormat("GetGroupPrincipal({0})", groupname);
             if (string.IsNullOrEmpty(groupname)) return null;
 
-            GroupPrincipal result = null;
-            using(PrincipalSearcher searcher = new PrincipalSearcher(new GroupPrincipal(m_machinePrincipal, groupname))) 
+            // In order to do a case insensitive search, we need to scan all
+            // groups "manually."
+            using(PrincipalSearcher searcher = new PrincipalSearcher(new GroupPrincipal(m_machinePrincipal))) 
             {
-                Principal prin = searcher.FindOne();
-                if (prin is GroupPrincipal)
-                    result = (GroupPrincipal)prin;
+                PrincipalSearchResult<Principal> sr = searcher.FindAll();
+                foreach (Principal p in sr)
+                {
+                    if (p is GroupPrincipal)
+                    {
+                        GroupPrincipal group = (GroupPrincipal)p;
+                        if (group.Name.Equals(groupname, StringComparison.CurrentCultureIgnoreCase))
+                            return group;
+                    }
+                }
             }
-            m_logger.DebugFormat("End GetGroupPrincipal({0})", groupname);
-            return result;
+            return null;
         }
 
         public static GroupPrincipal GetGroupPrincipal(SecurityIdentifier sid)
         {
-            GroupPrincipal result = GroupPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Sid, sid.ToString());
-            return result;
+            using (PrincipalSearcher searcher = new PrincipalSearcher(new GroupPrincipal(m_machinePrincipal)))
+            {
+                PrincipalSearchResult<Principal> sr = searcher.FindAll();
+                foreach (Principal p in sr)
+                {
+                    if (p is GroupPrincipal)
+                    {
+                        GroupPrincipal group = (GroupPrincipal)p;
+                        if (group.Sid == sid)
+                            return group;
+                    }
+                }
+            }
+            return null;
         }
 
         public static DirectoryEntry GetUserDirectoryEntry(string username)
@@ -266,8 +306,6 @@ namespace pGina.Plugin.LocalMachine
             m_logger.Debug("SyncToLocalUser()");
             using (UserPrincipal user = CreateOrGetUserPrincipal(UserInfo))
             {
-                m_logger.DebugFormat("User principal: {0} {1} {2}", user.Name, user.Context.Options, user.ContextType);
-
                 // Force password and fullname match (redundant if we just created, but oh well)
                 SyncUserPrincipalInfo(user, UserInfo);
 
