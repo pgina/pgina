@@ -488,6 +488,7 @@ namespace pGina.Plugin.LocalMachine
                         if(userPrincipal == null)
                         {
                             // This dude doesn't exist!
+                            m_logger.DebugFormat("User {0} doesn't exist, not cleaning up.", user);
                             RemoveCleanupUser(user);
                             continue;
                         }

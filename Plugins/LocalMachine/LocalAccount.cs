@@ -45,7 +45,7 @@ namespace pGina.Plugin.LocalMachine
     {
         private static ILog m_logger = null; 
         private static DirectoryEntry m_sam = new DirectoryEntry("WinNT://" + Environment.MachineName + ",computer");
-        private static PrincipalContext m_machinePrincipal = new PrincipalContext(ContextType.Machine, Environment.MachineName);
+        private static PrincipalContext m_machinePrincipal = new PrincipalContext(ContextType.Machine);
         
         public class GroupSyncException : Exception 
         {
@@ -80,8 +80,19 @@ namespace pGina.Plugin.LocalMachine
 
         public static UserPrincipal GetUserPrincipal(string username)
         {
+            m_logger.DebugFormat("GetUserPrincipal({0})", username);
             if (string.IsNullOrEmpty(username)) return null;
-            return UserPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Name, username);
+
+            UserPrincipal result = null;
+            using (PrincipalSearcher searcher = new PrincipalSearcher(new UserPrincipal(m_machinePrincipal) { Name = username }))
+            {
+                Principal prin = searcher.FindOne();
+                if (prin is UserPrincipal) 
+                    result = (UserPrincipal)prin;
+            }
+
+            m_logger.DebugFormat("End GetUserPrincipal({0})", username);
+            return result;
         }
 
         public static UserPrincipal GetUserPrincipal(SecurityIdentifier sid)
@@ -91,13 +102,24 @@ namespace pGina.Plugin.LocalMachine
 
         public static GroupPrincipal GetGroupPrincipal(string groupname)
         {
+            m_logger.DebugFormat("GetGroupPrincipal({0})", groupname);
             if (string.IsNullOrEmpty(groupname)) return null;
-            return GroupPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Name, groupname);
+
+            GroupPrincipal result = null;
+            using(PrincipalSearcher searcher = new PrincipalSearcher(new GroupPrincipal(m_machinePrincipal, groupname))) 
+            {
+                Principal prin = searcher.FindOne();
+                if (prin is GroupPrincipal)
+                    result = (GroupPrincipal)prin;
+            }
+            m_logger.DebugFormat("End GetGroupPrincipal({0})", groupname);
+            return result;
         }
 
         public static GroupPrincipal GetGroupPrincipal(SecurityIdentifier sid)
         {
-            return GroupPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Sid, sid.ToString());
+            GroupPrincipal result = GroupPrincipal.FindByIdentity(m_machinePrincipal, IdentityType.Sid, sid.ToString());
+            return result;
         }
 
         public static DirectoryEntry GetUserDirectoryEntry(string username)
@@ -149,20 +171,10 @@ namespace pGina.Plugin.LocalMachine
 
         private bool IsUserInGroup(UserPrincipal user, GroupInformation groupInfo)
         {
-            if (groupInfo.SID != null)
+            using (GroupPrincipal group = GetGroupPrincipal(groupInfo.Name))
             {
-                using (GroupPrincipal group = GetGroupPrincipal(groupInfo.SID))
-                {
-                    return IsUserInGroup(user, group);
-                }
+                return IsUserInGroup(user, group);
             }
-            else
-            {
-                using (GroupPrincipal group = GetGroupPrincipal(groupInfo.Name))
-                {
-                    return IsUserInGroup(user, group);
-                }
-            }             
         }
 
         private GroupPrincipal CreateOrGetGroupPrincipal(GroupInformation groupInfo)
@@ -170,10 +182,7 @@ namespace pGina.Plugin.LocalMachine
             GroupPrincipal group = null;
 
             // If we have a SID, use that, otherwise name
-            if (groupInfo.SID != null)
-                group = GetGroupPrincipal(groupInfo.SID);
-            else
-                group = GetGroupPrincipal(groupInfo.Name);
+            group = GetGroupPrincipal(groupInfo.Name);
           
             if (group == null)
             {
@@ -195,7 +204,7 @@ namespace pGina.Plugin.LocalMachine
                     }
 
                     // We have to re-fetch to get changes made via underlying DE
-                    return GetGroupPrincipal(group.Sid);
+                    return GetGroupPrincipal(group.Name);
                 }
             }
             
@@ -254,8 +263,11 @@ namespace pGina.Plugin.LocalMachine
 
         public void SyncToLocalUser()
         {
+            m_logger.Debug("SyncToLocalUser()");
             using (UserPrincipal user = CreateOrGetUserPrincipal(UserInfo))
             {
+                m_logger.DebugFormat("User principal: {0} {1} {2}", user.Name, user.Context.Options, user.ContextType);
+
                 // Force password and fullname match (redundant if we just created, but oh well)
                 SyncUserPrincipalInfo(user, UserInfo);
 
@@ -267,25 +279,34 @@ namespace pGina.Plugin.LocalMachine
                     });
                     
                     // First remove from any local groups they aren't supposed to be in
-                    foreach (GroupPrincipal group in user.GetAuthorizationGroups())
+                    m_logger.Debug("Checking for groups to remove.");
+                    List<GroupPrincipal> localGroups = LocalAccount.GetGroups(user);
+                    foreach (GroupPrincipal group in localGroups)
                     {
+                        m_logger.DebugFormat("Remove {0}?", group.Name);
                         // Skip ignored sids
-                        if (ignoredSids.Contains(group.Sid)) continue;
-
-                        GroupInformation gi = new GroupInformation() { Name = group.Name, SID = group.Sid, Description = group.Description };
-                        if (!UserInfo.InGroup(gi))
+                        if (!ignoredSids.Contains(group.Sid))
                         {
-                            RemoveUserFromGroup(user, group);
+                            GroupInformation gi = new GroupInformation() { Name = group.Name, SID = group.Sid, Description = group.Description };
+                            if (!UserInfo.InGroup(gi))
+                            {
+                                m_logger.DebugFormat("Removing user {0} from group {1}", user.Name, group.Name);
+                                RemoveUserFromGroup(user, group);
+                            }
                         }
+                        group.Dispose();
                     }
 
                     // Now add to any they aren't already in that they should be
+                    m_logger.Debug("Checking for groups to add");
                     foreach (GroupInformation groupInfo in UserInfo.Groups)
                     {
+                        m_logger.DebugFormat("Add {0}?", groupInfo.Name);
                         if (!IsUserInGroup(user, groupInfo))
                         {
                             using (GroupPrincipal group = CreateOrGetGroupPrincipal(groupInfo))
                             {
+                                m_logger.DebugFormat("Adding user {0} to group {1}", user.Name, group.Name);
                                 AddUserToGroup(user, group);
                             }
                         }
@@ -295,7 +316,8 @@ namespace pGina.Plugin.LocalMachine
                 {
                     throw new GroupSyncException(e);
                 }
-            }       
+            }
+            m_logger.Debug("End SyncToLocalUser()");
         }
 
         public static void SyncUserInfoToLocalUser(UserInformation userInfo)
@@ -313,25 +335,22 @@ namespace pGina.Plugin.LocalMachine
                 SecurityIdentifier EveryoneSid = new SecurityIdentifier("S-1-1-0");
                 SecurityIdentifier AuthenticatedUsersSid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
 
-                using (PrincipalContext pc = new PrincipalContext(ContextType.Machine, Environment.MachineName))
+                if (LocalAccount.UserExists(userInfo.Username))
                 {
-                    using (UserPrincipal user = UserPrincipal.FindByIdentity(pc, IdentityType.Name, userInfo.Username))
+                    using (UserPrincipal user = LocalAccount.GetUserPrincipal(userInfo.Username))
                     {
-                        if (user != null)
+                        foreach (GroupPrincipal group in LocalAccount.GetGroups(user))
                         {
-                            foreach (GroupPrincipal group in user.GetAuthorizationGroups())
-                            {
-                                // Skip "Authenticated Users" and "Everyone" as these are generated
-                                if (group.Sid == EveryoneSid || group.Sid == AuthenticatedUsersSid)
-                                    continue;
+                            // Skip "Authenticated Users" and "Everyone" as these are generated
+                            if (group.Sid == EveryoneSid || group.Sid == AuthenticatedUsersSid)
+                                continue;
 
-                                userInfo.AddGroup(new GroupInformation()
-                                {
-                                    Name = group.Name,
-                                    Description = group.Description,
-                                    SID = group.Sid
-                                });
-                            }
+                            userInfo.AddGroup(new GroupInformation()
+                            {
+                                Name = group.Name,
+                                Description = group.Description,
+                                SID = group.Sid
+                            });
                         }
                     }
                 }
@@ -415,17 +434,46 @@ namespace pGina.Plugin.LocalMachine
         /// <returns>Whether or not the account with the given user name exists on the system</returns>
         public static bool UserExists(string strUserName)
         {
-            try
+            using (DirectoryEntry userEntry = LocalAccount.GetUserDirectoryEntry(strUserName))
             {
-                using (DirectoryEntry userEntry = m_sam.Children.Find(strUserName))
-                {
-                    return userEntry != null;
-                }
-            }
-            catch (Exception)
-            {
-                return false;
+                return userEntry != null;
             }
         }
+
+        /// <summary>
+        /// Returns a list of groups of which the user is a member.  It does so in a fashion that
+        /// may seem strange since one can call UserPrincipal.GetGroups, but seems to be much faster
+        /// in my tests.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        private static List<GroupPrincipal> GetGroups(UserPrincipal user)
+        {
+            List<GroupPrincipal> result = new List<GroupPrincipal>();
+
+            // Get all groups using a PrincipalSearcher and 
+            GroupPrincipal filter = new GroupPrincipal(m_machinePrincipal);
+            using (PrincipalSearcher searcher = new PrincipalSearcher(filter))
+            {
+                PrincipalSearchResult<Principal> sResult = searcher.FindAll();
+                foreach (Principal p in sResult)
+                {
+                    if (p is GroupPrincipal)
+                    {
+                        GroupPrincipal gp = (GroupPrincipal)p;
+                        if (user.IsMemberOf(gp))
+                            result.Add(gp);
+                        else
+                            gp.Dispose();
+                    }
+                    else
+                    {
+                        p.Dispose();
+                    }
+                }
+            }
+            return result;
+        }
+        
     }
 }
