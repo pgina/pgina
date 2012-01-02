@@ -248,6 +248,11 @@ namespace pGina.Plugin.LocalMachine
                             {
                                 m_logger.InfoFormat("Authenticated user: {0}", userInfo.Username);
                                 userInfo.Domain = Environment.MachineName;
+
+                                m_logger.Debug("AuthenticateUser: Mirroring group membership from SAM");
+                                LocalAccount.SyncLocalGroupsToUserInfo(userInfo);
+                                
+                                // Return success
                                 return new BooleanResult() { Success = true };
                             }
                         }
@@ -274,10 +279,14 @@ namespace pGina.Plugin.LocalMachine
         {
             // Some things we always do,
             bool mirrorGroups = Settings.Store.MirrorGroupsForAuthdUsers;   // Should we load users groups from SAM? We always do if we auth'd only
-            if (mirrorGroups || DidWeAuthThisUser(properties, true))
+            if (mirrorGroups && !DidWeAuthThisUser(properties, false))
             {
-                m_logger.DebugFormat("AuthorizeUser: Mirroring users group membership from SAM");
-                LocalAccount.SyncLocalGroupsToUserInfo(properties.GetTrackedSingle<UserInformation>());
+                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+                if (LocalAccount.UserExists(userInfo.Username))
+                {
+                    m_logger.DebugFormat("AuthorizeUser: Mirroring users group membership from SAM");
+                    LocalAccount.SyncLocalGroupsToUserInfo(userInfo);
+                }
             }
 
             // Do we need to do authorization?
