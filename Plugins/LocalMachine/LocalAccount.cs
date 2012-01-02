@@ -434,9 +434,16 @@ namespace pGina.Plugin.LocalMachine
         /// <returns>Whether or not the account with the given user name exists on the system</returns>
         public static bool UserExists(string strUserName)
         {
-            using (DirectoryEntry userEntry = LocalAccount.GetUserDirectoryEntry(strUserName))
+            try
             {
-                return userEntry != null;
+                using (DirectoryEntry userEntry = LocalAccount.GetUserDirectoryEntry(strUserName))
+                {
+                    return userEntry != null;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 
