@@ -512,7 +512,7 @@ BOOL WINAPI WlxGetConsoleSwitchCredentials(PVOID  pWlxContext, PVOID  pCredInfo)
 	return (pGina->GetConsoleSwitchCredentials(pCredInfo) ? TRUE : FALSE);
 }
 
-VOID WINAPI DebugEntryPoint()
+VOID WINAPI zDebugEntryPoint()
 {
 	DWORD fakeDllVersion = 0;
 	WlxNegotiate(WLX_VERSION_1_4, &fakeDllVersion);    

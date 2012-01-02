@@ -34,7 +34,7 @@
 int _tmain(int argc, _TCHAR* argv[])
 {
 	HINSTANCE hDll = LoadLibrary(L"pGinaGINA.dll");
-	FARPROC DebugEntryPoint = GetProcAddress(hDll, "DebugEntryPoint");
+	FARPROC DebugEntryPoint = GetProcAddress(hDll, "zDebugEntryPoint");
 	DebugEntryPoint();
 }
 
