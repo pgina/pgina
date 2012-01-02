@@ -104,18 +104,19 @@ namespace pGina.Plugin.LocalMachine
             lock (s_lock)
             {
                 string[] cleanupUsers = Settings.Store.CleanupUsers;
-                string filter = string.Format("{0}|@|", username);
+                string upperName = username.ToUpper();
+                string filter = string.Format("{0}|@|", upperName);
 
                 int foundIndex = FindString(cleanupUsers, filter);
                 if(foundIndex == -1)
                 {
                     List<string> users = cleanupUsers.ToList();
-                    users.Add(string.Format("{0}|@|{1}", username, DateTime.Now.ToBinary()));
+                    users.Add(string.Format("{0}|@|{1}", upperName, DateTime.Now.ToBinary()));
                     Settings.Store.CleanupUsers = users.ToArray();
                 }
                 else
                 {
-                    cleanupUsers[foundIndex] = string.Format("{0}|@|{1}", username, DateTime.Now.ToBinary());
+                    cleanupUsers[foundIndex] = string.Format("{0}|@|{1}", upperName, DateTime.Now.ToBinary());
                     Settings.Store.CleanupUsers = cleanupUsers;
                 }
             }
@@ -126,7 +127,8 @@ namespace pGina.Plugin.LocalMachine
             lock (s_lock)
             {
                 string[] cleanupUsers = Settings.Store.CleanupUsers;
-                string filter = string.Format("{0}|@|", username);
+                string upperName = username.ToUpper();
+                string filter = string.Format("{0}|@|", upperName);
 
                 int foundIndex = FindString(cleanupUsers, filter);
                 if (foundIndex != -1)
@@ -466,10 +468,10 @@ namespace pGina.Plugin.LocalMachine
                 if (user.Contains("\\"))
                 {
                     if (user.StartsWith(Environment.MachineName,StringComparison.CurrentCultureIgnoreCase))
-                        xformed.Add(user.Substring(user.IndexOf("\\") + 1));
+                        xformed.Add(user.Substring(user.IndexOf("\\") + 1).ToUpper());
                 }
                 else
-                    xformed.Add(user);
+                    xformed.Add(user.ToUpper());
             }
             return xformed;
         }
@@ -501,7 +503,7 @@ namespace pGina.Plugin.LocalMachine
                         }
 
                         // Is she logged in still?
-                        if (loggedOnUsers.Contains(user))
+                        if (loggedOnUsers.Contains(user.ToUpper()))
                             continue;
 
                         m_logger.DebugFormat("Cleaning up: {0}", user);
@@ -510,7 +512,7 @@ namespace pGina.Plugin.LocalMachine
                         {
                             if (scramblePasswords)
                                 LocalAccount.ScrambleUsersPassword(user);
-                            else if(removeProfiles)                            
+                            if(removeProfiles)                            
                                 LocalAccount.RemoveUserAndProfile(user);                                                         
                         }
                         catch(Exception e)
