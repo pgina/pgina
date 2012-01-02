@@ -62,8 +62,23 @@ namespace pGina.Service.Impl
 
         static Service()
         {
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);                        
             Framework.Init();            
         }
+
+        public static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs args)
+        {
+            try
+            {
+                ILog logger = LogManager.GetLogger("pGina.Service.Exception");
+                Exception e = args.ExceptionObject as Exception;
+                logger.ErrorFormat("CurrentDomain_UnhandledException: {0}", e);
+            }            
+            finally
+            {
+                Environment.Exit(-1);
+            }
+        }        
 
         private void HookUpAbstractionsLibraryLogging()
         {
@@ -114,26 +129,33 @@ namespace pGina.Service.Impl
         {
             m_logger.InfoFormat("SessionChange: {0} -> {1}", changeDescription.SessionId, changeDescription.Reason);
 
-            lock (m_sessionPropertyCache)
+            try
             {
-                foreach (IPluginEventNotifications plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
+                lock (m_sessionPropertyCache)
                 {
-                    try
+                    foreach (IPluginEventNotifications plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
                     {
-                        if (m_sessionPropertyCache.Exists(changeDescription.SessionId))
-                            plugin.SessionChange(changeDescription, m_sessionPropertyCache.Get(changeDescription.SessionId));
-                        else
-                            plugin.SessionChange(changeDescription, null);
+                        try
+                        {
+                            if (m_sessionPropertyCache.Exists(changeDescription.SessionId))
+                                plugin.SessionChange(changeDescription, m_sessionPropertyCache.Get(changeDescription.SessionId));
+                            else
+                                plugin.SessionChange(changeDescription, null);
+                        }
+                        catch (Exception e)
+                        {
+                            m_logger.ErrorFormat("Ignoring unhandled exception from {0}: {1}", plugin.Uuid, e);
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        m_logger.ErrorFormat("Ignoring unhandled exception from {0}: {1}", plugin.Uuid, e);
-                    }
-                }
 
-                // If this is a logout, remove from our map
-                if (changeDescription.Reason == SessionChangeReason.SessionLogoff && m_sessionPropertyCache.Exists(changeDescription.SessionId))
-                    m_sessionPropertyCache.Remove(changeDescription.SessionId);
+                    // If this is a logout, remove from our map
+                    if (changeDescription.Reason == SessionChangeReason.SessionLogoff && m_sessionPropertyCache.Exists(changeDescription.SessionId))
+                        m_sessionPropertyCache.Remove(changeDescription.SessionId);
+                }
+            }
+            catch (Exception e)
+            {
+                m_logger.ErrorFormat("Exception while handling SessionChange event: {0}", e);
             }
         }        
 
