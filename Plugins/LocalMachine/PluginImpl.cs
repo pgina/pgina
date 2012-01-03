@@ -506,7 +506,7 @@ namespace pGina.Plugin.LocalMachine
                         if (loggedOnUsers.Contains(user.ToUpper()))
                             continue;
 
-                        m_logger.DebugFormat("Cleaning up: {0}", user);
+                        m_logger.InfoFormat("Cleaning up: {0}", user);
                         
                         try
                         {

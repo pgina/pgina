@@ -1,5 +1,5 @@
 #define MyAppName "pGina"
-#define MyAppVersion "3.0.2"
+#define MyAppVersion "3.0.5.0"
 #define MyAppPublisher "pGina Team"
 #define MyAppURL "http://www.pgina.org/"
 #define MyAppExeName "pGina.Configuration.exe"
@@ -26,7 +26,7 @@
 AppID={{3D8D0F0D-7DBF-400C-9C44-00BD21986138}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
+AppVerName=pGina v{#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -35,14 +35,15 @@ DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=true
 LicenseFile=..\LICENSE
-OutputBaseFilename=pGinaSetup
+OutputBaseFilename=pGinaSetup-{#MyAppVersion}
 SetupIconFile=..\Installer\pgina.ico
 Compression=lzma/Max
 SolidCompression=true
 AppCopyright=pGina Team
-AppVerName=pGina v3.0.2
 ExtraDiskSpaceRequired=6
 DisableDirPage=auto
+AlwaysShowDirOnReadyPage=yes
+AlwaysShowGroupOnReadyPage=yes
 DisableProgramGroupPage=auto
 
 ArchitecturesInstallIn64BitMode=x64 ia64
