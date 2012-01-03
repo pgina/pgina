@@ -73,10 +73,10 @@ namespace pGina.Service.Impl
                 ILog logger = LogManager.GetLogger("pGina.Service.Exception");
                 Exception e = args.ExceptionObject as Exception;
                 logger.ErrorFormat("CurrentDomain_UnhandledException: {0}", e);
-            }            
-            finally
+            }
+            catch
             {
-                Environment.Exit(-1);
+                // don't kill the existing exception stack with one of our own
             }
         }        
 
@@ -106,6 +106,7 @@ namespace pGina.Service.Impl
             string pipeName = Core.Settings.Get.ServicePipeName;
             int maxClients = Core.Settings.Get.MaxClients;
             m_logger.DebugFormat("Service created - PipeName: {0} MaxClients: {1}", pipeName, maxClients);
+            m_logger.DebugFormat("System Info: {0}", Abstractions.Windows.OsInfo.OsDescription());
             m_server = new PipeServer(pipeName, maxClients, (Func<dynamic, dynamic>) HandleMessage);                
         }
 
