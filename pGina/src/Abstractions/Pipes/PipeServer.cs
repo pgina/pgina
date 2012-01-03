@@ -116,11 +116,25 @@ namespace Abstractions.Pipes
         
         private void ServerThread()
         {                        
-            PipeSecurity security = new PipeSecurity();                
-            // Anyone can talk to us
-            security.AddAccessRule(new PipeAccessRule("Users", PipeAccessRights.ReadWrite, AccessControlType.Allow)); 
-            // But only we have full control (including the 'create' right, which allows us to be the server side of this equation)
-            security.AddAccessRule(new PipeAccessRule(WindowsIdentity.GetCurrent().Owner, PipeAccessRights.FullControl, AccessControlType.Allow));
+            PipeSecurity security = new PipeSecurity();
+
+            using (WindowsIdentity myself = WindowsIdentity.GetCurrent())
+            {
+                try
+                {
+                    // Anyone can talk to us            
+                    LibraryLogging.Debug("Setting PipeAccess R/W for world: {0}", Abstractions.Windows.Security.GetWellknownSID(WellKnownSidType.WorldSid));
+                    security.AddAccessRule(new PipeAccessRule(Abstractions.Windows.Security.GetWellknownSID(WellKnownSidType.WorldSid), PipeAccessRights.ReadWrite, AccessControlType.Allow));
+
+                    // But only we have full control (including the 'create' right, which allows us to be the server side of this equation)
+                    LibraryLogging.Debug("Setting PipeAccess FullControl for myself: {0}", WindowsIdentity.GetCurrent().Name);
+                    security.AddAccessRule(new PipeAccessRule(WindowsIdentity.GetCurrent().Owner, PipeAccessRights.FullControl, AccessControlType.Allow));
+                }
+                catch (Exception e)
+                {
+                    LibraryLogging.Error("Unable to set all pipe access rules, the security of the pGina service pipe is in an unknown state!: {0}", e);
+                }
+            }
 
             while (Running)
             {
