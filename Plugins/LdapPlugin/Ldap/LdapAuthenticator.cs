@@ -132,6 +132,8 @@ namespace pGina.Plugin.Ldap
                             {
                                 m_logger.ErrorFormat("Exception ({0}) when binding for search: {1}", e.ErrorCode, e);
                             }
+
+                            return new BooleanResult { Success = false, Message = "Unable to contact LDAP server." };
                         }
                     }
 
@@ -154,14 +156,17 @@ namespace pGina.Plugin.Ldap
                             if (e.ErrorCode == 81)
                             {
                                 m_logger.ErrorFormat("Server unavailable: " + e.Message);
+                                return new BooleanResult { Success = false, Message = "Failed to contact LDAP server." };
                             }
                             else if (e.ErrorCode == 49)
                             {
                                 m_logger.ErrorFormat("Bind failed for LDAP DN {0}: invalid credentials.", userDN);
+                                return new BooleanResult { Success = false, Message = "Authentication via LDAP failed.  Invalid credentials." };
                             }
                             else
                             {
                                 m_logger.ErrorFormat("Exception ({0}) when binding for authentication: {1}", e.ErrorCode, e.Message);
+                                return new BooleanResult { Success = false, Message = "Authentication via LDAP failed: " + e.Message };
                             }
                         }
 
@@ -180,7 +185,7 @@ namespace pGina.Plugin.Ldap
                 }
             } // end using
 
-            return new BooleanResult{ Success = false };
+            return new BooleanResult{ Success = false, Message = "Authentication via LDAP failed." };
         }
 
         /// <summary>
