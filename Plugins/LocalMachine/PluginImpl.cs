@@ -449,8 +449,16 @@ namespace pGina.Plugin.LocalMachine
         {
             // Do background stuff
             lock(this)
-            {                
-                IterateCleanupUsers();
+            {
+                try
+                {
+                    IterateCleanupUsers();
+                }
+                catch (Exception e)
+                {
+                    // Log the exception and continue
+                    m_logger.ErrorFormat("Exception in IterateCleanupUsers {0}", e);
+                }
 
                 if (m_backgroundTimer != null)
                     m_backgroundTimer.Change(BackgroundTimeSpan, TimeSpan.FromMilliseconds(-1));
