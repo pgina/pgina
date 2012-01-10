@@ -484,7 +484,16 @@ namespace pGina.Plugin.LocalMachine
                 bool removeProfiles = Settings.Store.RemoveProfiles;
 
                 List<string> users = EligibleCleanupUsers();
-                List<string> loggedOnUsers = LoggedOnLocalUsers();
+                List<string> loggedOnUsers = null;
+                try
+                {
+                    loggedOnUsers = LoggedOnLocalUsers();
+                }
+                catch (System.ComponentModel.Win32Exception e)
+                {
+                    m_logger.ErrorFormat("Error (ignored) LoggedOnLocalUsers {0}", e);
+                    return;
+                }
 
                 m_logger.DebugFormat("IterateCleanupUsers Eligible users: {0}", string.Join(",",users));
                 m_logger.DebugFormat("IterateCleanupUsers loggedOnUsers: {0}", string.Join(",",loggedOnUsers));
@@ -527,12 +536,10 @@ namespace pGina.Plugin.LocalMachine
                             RemoveCleanupUser(user);
                         }
                     }
-                    catch (System.Runtime.InteropServices.COMException e)
+                    catch (Exception e)
                     {
-                        // This exception may occur when this is executing early in the boot process
-                        // and a needed service is not available to PrincipalSearcher (used within
-                        // LocalAccount.GetUserPrincipal).  We log the exception and ignore.
-                        m_logger.ErrorFormat("Caught (ignoring) COMException {0}", e);
+                        // If something goes wrong, we log the exception and ignore.
+                        m_logger.ErrorFormat("Caught (ignoring) Exception {0}", e);
                     }
                 }
             }
