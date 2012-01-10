@@ -490,40 +490,50 @@ namespace pGina.Plugin.LocalMachine
                 m_logger.DebugFormat("IterateCleanupUsers loggedOnUsers: {0}", string.Join(",",loggedOnUsers));
 
                 foreach (string user in users)
-                {                
-                    using(UserPrincipal userPrincipal = LocalAccount.GetUserPrincipal(user))
-                    {                   
-                        // Make sure there is a user to scramble!
-                        if(userPrincipal == null)
+                {
+                    try
+                    {
+                        using (UserPrincipal userPrincipal = LocalAccount.GetUserPrincipal(user))
                         {
-                            // This dude doesn't exist!
-                            m_logger.DebugFormat("User {0} doesn't exist, not cleaning up.", user);
+                            // Make sure there is a user to scramble!
+                            if (userPrincipal == null)
+                            {
+                                // This dude doesn't exist!
+                                m_logger.DebugFormat("User {0} doesn't exist, not cleaning up.", user);
+                                RemoveCleanupUser(user);
+                                continue;
+                            }
+
+                            // Is she logged in still?
+                            if (loggedOnUsers.Contains(user.ToUpper()))
+                                continue;
+
+                            m_logger.InfoFormat("Cleaning up: {0}", user);
+
+                            try
+                            {
+                                if (scramblePasswords)
+                                    LocalAccount.ScrambleUsersPassword(user);
+                                if (removeProfiles)
+                                    LocalAccount.RemoveUserAndProfile(user);
+                            }
+                            catch (Exception e)
+                            {
+                                m_logger.WarnFormat("Cleanup for {0} failed, will retry next time around. Error: {1}", user, e);
+                                continue;
+                            }
+
+                            // All done! No more cleanup for this user needed
                             RemoveCleanupUser(user);
-                            continue;
                         }
-
-                        // Is she logged in still?
-                        if (loggedOnUsers.Contains(user.ToUpper()))
-                            continue;
-
-                        m_logger.InfoFormat("Cleaning up: {0}", user);
-                        
-                        try
-                        {
-                            if (scramblePasswords)
-                                LocalAccount.ScrambleUsersPassword(user);
-                            if(removeProfiles)                            
-                                LocalAccount.RemoveUserAndProfile(user);                                                         
-                        }
-                        catch(Exception e)
-                        {
-                            m_logger.WarnFormat("Cleanup for {0} failed, will retry next time around. Error: {1}", user, e);
-                            continue;
-                        }
-
-                        // All done! No more cleanup for this user needed
-                        RemoveCleanupUser(user);
-                    }                                
+                    }
+                    catch (System.Runtime.InteropServices.COMException e)
+                    {
+                        // This exception may occur when this is executing early in the boot process
+                        // and a needed service is not available to PrincipalSearcher (used within
+                        // LocalAccount.GetUserPrincipal).  We log the exception and ignore.
+                        m_logger.ErrorFormat("Caught (ignoring) COMException {0}", e);
+                    }
                 }
             }
         }                
