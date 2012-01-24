@@ -42,10 +42,13 @@
             this.useSslCB = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.dbTB = new System.Windows.Forms.TextBox();
+            this.encBase64RB = new System.Windows.Forms.RadioButton();
+            this.encHexRB = new System.Windows.Forms.RadioButton();
+            this.label6 = new System.Windows.Forms.Label();
             this.tableTB = new System.Windows.Forms.TextBox();
+            this.dbTB = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.createTableBtn = new System.Windows.Forms.Button();
             this.testBtn = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
@@ -54,7 +57,7 @@
             // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(263, 265);
+            this.cancelButton.Location = new System.Drawing.Point(262, 290);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(81, 25);
             this.cancelButton.TabIndex = 0;
@@ -64,7 +67,7 @@
             // 
             // saveButton
             // 
-            this.saveButton.Location = new System.Drawing.Point(350, 265);
+            this.saveButton.Location = new System.Drawing.Point(349, 290);
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(82, 25);
             this.saveButton.TabIndex = 1;
@@ -179,25 +182,65 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.encBase64RB);
+            this.groupBox2.Controls.Add(this.encHexRB);
+            this.groupBox2.Controls.Add(this.label6);
             this.groupBox2.Controls.Add(this.tableTB);
             this.groupBox2.Controls.Add(this.dbTB);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Location = new System.Drawing.Point(12, 176);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(417, 84);
+            this.groupBox2.Size = new System.Drawing.Size(417, 108);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "User Database";
             // 
-            // label4
+            // encBase64RB
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(14, 22);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(94, 13);
-            this.label4.TabIndex = 0;
-            this.label4.Text = "MySQL Database:";
+            this.encBase64RB.AutoSize = true;
+            this.encBase64RB.Location = new System.Drawing.Point(215, 71);
+            this.encBase64RB.Name = "encBase64RB";
+            this.encBase64RB.Size = new System.Drawing.Size(64, 17);
+            this.encBase64RB.TabIndex = 6;
+            this.encBase64RB.TabStop = true;
+            this.encBase64RB.Text = "Base 64";
+            this.encBase64RB.UseVisualStyleBackColor = true;
+            // 
+            // encHexRB
+            // 
+            this.encHexRB.AutoSize = true;
+            this.encHexRB.Location = new System.Drawing.Point(123, 71);
+            this.encHexRB.Name = "encHexRB";
+            this.encHexRB.Size = new System.Drawing.Size(86, 17);
+            this.encHexRB.TabIndex = 5;
+            this.encHexRB.TabStop = true;
+            this.encHexRB.Text = "Hexadecimal";
+            this.encHexRB.UseVisualStyleBackColor = true;
+            this.encHexRB.CheckedChanged += new System.EventHandler(this.encHexRB_CheckedChanged);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(14, 73);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(103, 13);
+            this.label6.TabIndex = 4;
+            this.label6.Text = "Password encoding:";
+            // 
+            // tableTB
+            // 
+            this.tableTB.Location = new System.Drawing.Point(114, 45);
+            this.tableTB.Name = "tableTB";
+            this.tableTB.Size = new System.Drawing.Size(297, 20);
+            this.tableTB.TabIndex = 3;
+            // 
+            // dbTB
+            // 
+            this.dbTB.Location = new System.Drawing.Point(114, 19);
+            this.dbTB.Name = "dbTB";
+            this.dbTB.Size = new System.Drawing.Size(297, 20);
+            this.dbTB.TabIndex = 2;
             // 
             // label5
             // 
@@ -208,23 +251,18 @@
             this.label5.TabIndex = 1;
             this.label5.Text = "Table:";
             // 
-            // dbTB
+            // label4
             // 
-            this.dbTB.Location = new System.Drawing.Point(114, 19);
-            this.dbTB.Name = "dbTB";
-            this.dbTB.Size = new System.Drawing.Size(297, 20);
-            this.dbTB.TabIndex = 2;
-            // 
-            // tableTB
-            // 
-            this.tableTB.Location = new System.Drawing.Point(114, 45);
-            this.tableTB.Name = "tableTB";
-            this.tableTB.Size = new System.Drawing.Size(297, 20);
-            this.tableTB.TabIndex = 3;
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(14, 22);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(94, 13);
+            this.label4.TabIndex = 0;
+            this.label4.Text = "MySQL Database:";
             // 
             // createTableBtn
             // 
-            this.createTableBtn.Location = new System.Drawing.Point(96, 266);
+            this.createTableBtn.Location = new System.Drawing.Point(95, 291);
             this.createTableBtn.Name = "createTableBtn";
             this.createTableBtn.Size = new System.Drawing.Size(100, 24);
             this.createTableBtn.TabIndex = 14;
@@ -234,7 +272,7 @@
             // 
             // testBtn
             // 
-            this.testBtn.Location = new System.Drawing.Point(14, 266);
+            this.testBtn.Location = new System.Drawing.Point(13, 291);
             this.testBtn.Name = "testBtn";
             this.testBtn.Size = new System.Drawing.Size(76, 24);
             this.testBtn.TabIndex = 15;
@@ -246,7 +284,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(443, 306);
+            this.ClientSize = new System.Drawing.Size(443, 333);
             this.Controls.Add(this.testBtn);
             this.Controls.Add(this.createTableBtn);
             this.Controls.Add(this.groupBox2);
@@ -285,5 +323,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button createTableBtn;
         private System.Windows.Forms.Button testBtn;
+        private System.Windows.Forms.RadioButton encHexRB;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.RadioButton encBase64RB;
     }
 }

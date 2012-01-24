@@ -60,6 +60,14 @@ namespace pGina.Plugin.MySQLAuth
             this.dbTB.Text = Settings.Store.Database;
             bool useSsl = Settings.Store.UseSsl;
             this.useSslCB.Checked = useSsl;
+
+            int encodingInt = Settings.Store.HashEncoding;
+            Settings.HashEncoding encoding = (Settings.HashEncoding)encodingInt;
+
+            if (encoding == Settings.HashEncoding.HEX)
+                this.encHexRB.Checked = true;
+            else
+                this.encBase64RB.Checked = true;
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -97,6 +105,11 @@ namespace pGina.Plugin.MySQLAuth
             Settings.Store.Table = this.tableTB.Text.Trim();
             Settings.Store.Database = this.dbTB.Text.Trim();
             Settings.Store.UseSsl = this.useSslCB.Checked;
+
+            if (encHexRB.Checked)
+                Settings.Store.HashEncoding = (int)Settings.HashEncoding.HEX;
+            else
+                Settings.Store.HashEncoding = (int)Settings.HashEncoding.BASE_64;
 
             return true;
         }
@@ -287,6 +300,11 @@ namespace pGina.Plugin.MySQLAuth
             }
 
             return bldr.GetConnectionString(true);
+        }
+
+        private void encHexRB_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
