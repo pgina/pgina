@@ -44,9 +44,11 @@ namespace pGina.InstallUtil
         static readonly string PGINA_SERVICE_NAME = "pGina";
         static readonly string PGINA_SERVICE_EXE = "pGina.Service.ServiceHost.exe";
         static readonly string PGINA_CP_REGISTRATION_EXE = "pGina.CredentialProvider.Registration.exe";
+        static readonly string PGINA_CONFIG_EXE = "pGina.Configuration.exe";
         static readonly SecurityIdentifier ADMIN_GROUP = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
         static readonly SecurityIdentifier USERS_GROUP = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
         static readonly SecurityIdentifier SYSTEM_ACCT = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
+        static readonly SecurityIdentifier AUTHED_USERS = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
                    
         static Program()
         {
@@ -94,17 +96,54 @@ namespace pGina.InstallUtil
             SetRegistryAcls();
             InstallAndStartService();
             RegisterAndEnableCredentialProvider();
-            SetFileSystemAcls();
+
+            // Probably not necessary or useful...
+            //SetFileSystemAcls();
         }
 
         private static void DoPostUninstall()
         {
-            // TODO
+            // Uninstall service
+            if (ServiceInstalled())
+            {
+                StopService();
+                UninstallService();
+            }
+            else
+            {
+                m_logger.Info("pGina service is not installed, skipping uninstall.");
+            }
+
+            // Uninstall CP
+            UninstallCredentialProvider();
         }
 
         private static void SetFileSystemAcls()
         {
-            // TODO
+            if (!File.Exists(PGINA_CONFIG_EXE))
+            {
+                throw new Exception(string.Format("Unable to find configuration executable: {0}", PGINA_CONFIG_EXE));
+            }
+
+            m_logger.InfoFormat("Setting ACLs on {0}", PGINA_CONFIG_EXE);
+
+            FileSystemAccessRule userReadAndExecute = new FileSystemAccessRule(USERS_GROUP, FileSystemRights.ReadAndExecute, AccessControlType.Allow);
+            FileSystemAccessRule userRead = new FileSystemAccessRule(USERS_GROUP, FileSystemRights.Read, AccessControlType.Allow);
+            FileSystemAccessRule adminFull = new FileSystemAccessRule(ADMIN_GROUP, FileSystemRights.FullControl, AccessControlType.Allow);
+            FileSystemAccessRule systemFull = new FileSystemAccessRule(SYSTEM_ACCT, FileSystemRights.FullControl, AccessControlType.Allow);
+            FileSystemAccessRule authedUsersMod = new FileSystemAccessRule(AUTHED_USERS, FileSystemRights.Modify, AccessControlType.Allow);
+            FileSystemAccessRule usersMod = new FileSystemAccessRule(USERS_GROUP, FileSystemRights.Modify, AccessControlType.Allow);
+            FileSecurity fs = File.GetAccessControl(PGINA_CONFIG_EXE);
+
+            fs.SetAccessRuleProtection(true, false);
+
+            fs.RemoveAccessRuleAll(authedUsersMod);
+            fs.RemoveAccessRuleAll(usersMod);
+            fs.AddAccessRule(userReadAndExecute);
+            fs.AddAccessRule(adminFull);
+            fs.AddAccessRule(systemFull);
+
+            File.SetAccessControl(PGINA_CONFIG_EXE, fs);
         }
 
         private static void SetRegistryAcls()
@@ -183,6 +222,23 @@ namespace pGina.InstallUtil
             {
                 m_logger.ErrorFormat("Error enabling CP/GINA.");
                 throw new Exception("Error enabling CP/GINA.");
+            }
+        }
+
+        private static void UninstallCredentialProvider()
+        {
+            if (!File.Exists(PGINA_CP_REGISTRATION_EXE))
+            {
+                throw new Exception("The registration executable was not found.");
+            }
+
+            m_logger.Info("Uninstalling CP/GINA....");
+            Process p = Process.Start(PGINA_CP_REGISTRATION_EXE, "--mode uninstall");
+            p.WaitForExit();
+            if (p.ExitCode != 0)
+            {
+                m_logger.ErrorFormat("Error uninstalling CP/GINA.");
+                throw new Exception("Error uninstalling CP/GINA.");
             }
         }
 

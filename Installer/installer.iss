@@ -72,16 +72,11 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--install"
-Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--start"
-Filename: "{app}\pGina.CredentialProvider.Registration.exe"; Parameters: "--mode install"; WorkingDir: "{app}" 
-Filename: "{app}\pGina.CredentialProvider.Registration.exe"; Parameters: "--mode enable"; WorkingDir: "{app}"
+Filename: "{app}\pGina.InstallUtil.exe"; Parameters: "post-install"; StatusMsg: "Installing service, CP/GINA, and setting permissions..."; WorkingDir: "{app}"
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, "&", "&&")}}"; Flags: nowait postinstall skipifsilent runascurrentuser
 
 [UninstallRun]
-Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--uninstall"
-Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--stop"
-Filename: "{app}\pGina.CredentialProvider.Registration.exe"; Parameters: "--mode uninstall"; WorkingDir: "{app}"
+Filename: "{app}\pGina.InstallUtil.exe"; Parameters: "post-uninstall"; StatusMsg: "Removing service and CP/GINA..."; WorkingDir: "{app}"
 
 ; More custom stuff from [] for ensuring user gets everything needed
 #include "scripts\products.iss"
