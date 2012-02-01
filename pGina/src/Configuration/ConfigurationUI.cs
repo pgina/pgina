@@ -35,6 +35,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.ServiceProcess;
 using System.Reflection;
+using Microsoft.Win32;
 
 using pGina.Core;
 using pGina.Core.Messages;
@@ -72,7 +73,9 @@ namespace pGina.Configuration
         
         public ConfigurationUI()
         {
+            VerifyRegistryAccess();
             Framework.Init();
+           
             InitializeComponent();
             InitOptionsTabs();
             InitPluginsDGV();
@@ -81,6 +84,27 @@ namespace pGina.Configuration
             RefreshPluginLists();
             InitLiveLog();
             LoadGeneralSettings();            
+        }
+
+        private void VerifyRegistryAccess()
+        {
+            // Test write access
+            try
+            {
+                using (RegistryKey key = Registry.LocalMachine.CreateSubKey(
+                    pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot))
+                {
+                    key.SetValue("", "...");
+                    string value = (string)key.GetValue("");
+                    key.DeleteValue("");
+                }
+            }
+            catch (System.UnauthorizedAccessException e)
+            {
+                MessageBox.Show("Unable to access registry, good bye.",
+                    "Registry access error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Environment.Exit(1);
+            }
         }
 
         private void InitOptionsTabs()
