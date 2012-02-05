@@ -62,8 +62,16 @@ namespace pGina.Service.Impl
 
         static Service()
         {
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);                        
-            Framework.Init();            
+            try
+            {
+                AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+                Framework.Init();
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("pGina Service", ex.ToString(), EventLogEntryType.Error);
+                throw;
+            }
         }
 
         public static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs args)
@@ -103,11 +111,20 @@ namespace pGina.Service.Impl
 
         public Service()
         {
-            string pipeName = Core.Settings.Get.ServicePipeName;
-            int maxClients = Core.Settings.Get.MaxClients;
-            m_logger.DebugFormat("Service created - PipeName: {0} MaxClients: {1}", pipeName, maxClients);
-            m_logger.DebugFormat("System Info: {0}", Abstractions.Windows.OsInfo.OsDescription());
-            m_server = new PipeServer(pipeName, maxClients, (Func<dynamic, dynamic>) HandleMessage);                
+            try
+            {
+                string pipeName = Core.Settings.Get.ServicePipeName;
+                int maxClients = Core.Settings.Get.MaxClients;
+                m_logger.DebugFormat("Service created - PipeName: {0} MaxClients: {1}", pipeName, maxClients);
+                m_logger.DebugFormat("System Info: {0}", Abstractions.Windows.OsInfo.OsDescription());
+                m_server = new PipeServer(pipeName, maxClients, (Func<dynamic, dynamic>)HandleMessage);
+            }
+            catch (Exception e)
+            {
+                EventLog.WriteEntry("pGina Service", e.ToString(), EventLogEntryType.Error);
+                m_logger.ErrorFormat("Service startup error: {0}", e.ToString());
+                throw;
+            }
         }
 
         public void Start()
