@@ -94,12 +94,13 @@ namespace pGina.Configuration
                 using (RegistryKey key = Registry.LocalMachine.CreateSubKey(
                     pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot))
                 {
-                    key.SetValue("", "...");
-                    string value = (string)key.GetValue("");
-                    key.DeleteValue("");
+                    string name = "___test_name___";
+                    key.SetValue(name, "...");
+                    string value = (string)key.GetValue(name);
+                    key.DeleteValue(name);
                 }
             }
-            catch (System.UnauthorizedAccessException e)
+            catch (System.UnauthorizedAccessException)
             {
                 MessageBox.Show("Unable to access registry, good bye.",
                     "Registry access error", MessageBoxButtons.OK, MessageBoxIcon.Error);
