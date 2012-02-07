@@ -69,7 +69,7 @@ namespace pGina.Service.Impl
             }
             catch (Exception ex)
             {
-                EventLog.WriteEntry("pGina Service", ex.ToString(), EventLogEntryType.Error);
+                EventLog.WriteEntry("pGina", ex.ToString(), EventLogEntryType.Error);
                 throw;
             }
         }
@@ -118,10 +118,13 @@ namespace pGina.Service.Impl
                 m_logger.DebugFormat("Service created - PipeName: {0} MaxClients: {1}", pipeName, maxClients);
                 m_logger.DebugFormat("System Info: {0}", Abstractions.Windows.OsInfo.OsDescription());
                 m_server = new PipeServer(pipeName, maxClients, (Func<dynamic, dynamic>)HandleMessage);
+                m_logger.DebugFormat("Using plugin directories: ");
+                foreach (string dir in PluginDirectories)
+                    m_logger.DebugFormat("  {0}", dir); 
             }
             catch (Exception e)
             {
-                EventLog.WriteEntry("pGina Service", e.ToString(), EventLogEntryType.Error);
+                EventLog.WriteEntry("pGina", e.ToString(), EventLogEntryType.Error);
                 m_logger.ErrorFormat("Service startup error: {0}", e.ToString());
                 throw;
             }
