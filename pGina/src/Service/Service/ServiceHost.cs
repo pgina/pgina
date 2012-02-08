@@ -67,13 +67,25 @@ namespace Service
 
         protected override void OnStop()
         {
+            WaitForServiceInit();
             m_serviceThreadObj.Stop();
         }
 
         protected override void OnSessionChange(SessionChangeDescription changeDescription)
         {
             base.OnSessionChange(changeDescription);
+            WaitForServiceInit();
             m_serviceThreadObj.SessionChange(changeDescription);
+        }
+
+        private void WaitForServiceInit()
+        {
+            lock (this)
+            {
+                // If we are still initializing, wait
+                if (m_serviceThread.IsAlive)
+                    m_serviceThread.Join();
+            }
         }
     }
 }

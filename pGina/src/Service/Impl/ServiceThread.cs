@@ -25,10 +25,7 @@ namespace pGina.Service.Impl
 
         public void SessionChange(SessionChangeDescription desc)
         {
-            lock (this)
-            {
-                m_service.SessionChange(desc);
-            }
+            m_service.SessionChange(desc);
         }
     }
 }
