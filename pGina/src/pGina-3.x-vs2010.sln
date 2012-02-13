@@ -57,7 +57,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FakeWinlogon", "Tests\FakeW
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InstallUtility", "InstallUtility", "{71DC20C4-B3F2-4356-8342-13478676195C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallUtil", "InstallUtilility\InstallUtil.csproj", "{5F265440-93C2-454C-A3DD-19A027FD0C48}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallUtil", "InstallUtility\InstallUtil.csproj", "{5F265440-93C2-454C-A3DD-19A027FD0C48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -324,6 +324,7 @@ Global
 		{BF2FB9A8-E29B-48DC-98EE-9362319BF3E1}.Release|x86.ActiveCfg = Release|Win32
 		{BF2FB9A8-E29B-48DC-98EE-9362319BF3E1}.Release|x86.Build.0 = Release|Win32
 		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Debug|Win32.ActiveCfg = Debug|Any CPU
@@ -333,6 +334,7 @@ Global
 		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Debug|x86.Build.0 = Debug|Any CPU
 		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Release|Win32.ActiveCfg = Release|Any CPU
