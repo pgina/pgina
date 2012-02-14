@@ -1,10 +1,11 @@
-In master
+3.0.8.0 BETA (2012/02/13)
 ----------------------------
  - Added install utility to manage all post install/uninstall tasks.
  - Install utility sets ACLs on registry key to only allow SYSTEM/Admin access.
  - Log files moved to separate directory (default).
  - Service spawns thread to handle initialization so that service can
    respond immediately to the OS on startup.
+ - Fix configuration bug in LDAP Auth plugin (issue #95)
 
 3.0.7.0 BETA (2012/01/25)
 ----------------------------
