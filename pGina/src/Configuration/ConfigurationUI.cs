@@ -164,6 +164,9 @@ namespace pGina.Configuration
 
         private void LoadGeneralSettings()
         {
+            m_pginaVersionLbl.Text = "pGina " +
+                System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
             m_tileImageTxt.Text = Settings.Get.GetSetting("TileImage", null);
             LoadTileImagePreview();
             this.motdTB.Text = Settings.Get.GetSetting("Motd");
