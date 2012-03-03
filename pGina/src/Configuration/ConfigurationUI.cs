@@ -53,6 +53,14 @@ namespace pGina.Configuration
 {
     public partial class ConfigurationUI : Form
     {
+        private class DuplicatePluginDetectedException : System.Exception
+        {
+            public DuplicatePluginDetectedException(string Uuid, string Name) :
+                base(string.Format("Duplicate plugin {0} detected with UUID: {1}", Name, Uuid))
+            {
+            }
+        }
+
         private static readonly string PGINA_SERVICE_NAME = "pGina";
 
         // Plugin information keyed by Guid
@@ -81,7 +89,16 @@ namespace pGina.Configuration
             InitPluginsDGV();
             PopulatePluginDirs();
             InitOrderLists();
-            RefreshPluginLists();
+
+            try
+            {
+                RefreshPluginLists();
+            }
+            catch (DuplicatePluginDetectedException e)
+            {
+                MessageBox.Show(string.Format("Unable to load full plugin list: {0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
             InitLiveLog();
             LoadGeneralSettings();            
         }
@@ -519,6 +536,13 @@ namespace pGina.Configuration
                 for (int i = 0; i < plugins.Count; i++)
                 {
                     IPluginBase p = plugins[i];
+
+                    if (m_plugins.ContainsKey(p.Uuid.ToString()))
+                    {
+                        m_logger.ErrorFormat("Duplicate plugin: {0} with UUID: {1}", p.Name, p.Uuid);
+                        throw new DuplicatePluginDetectedException(p.Uuid.ToString(), p.Name);
+                    }
+
                     this.m_plugins.Add(p.Uuid.ToString(), p);
                     pluginsDG.Rows.Add(
                         new object[] { p.Name, false, false, false, false, p.Description, p.Version, p.Uuid.ToString() });
@@ -800,7 +824,15 @@ namespace pGina.Configuration
                     item.Tag = path;
                     lstPluginDirs.Items.Add(item);
                 }
-                this.RefreshPluginLists();
+
+                try
+                {
+                    this.RefreshPluginLists();
+                }
+                catch (DuplicatePluginDetectedException ex)
+                {
+                    MessageBox.Show(string.Format("Unable to load full plugin list: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
 
@@ -812,7 +844,15 @@ namespace pGina.Configuration
                 {
                     lstPluginDirs.Items.Remove(item);
                 }
-                this.RefreshPluginLists();
+
+                try
+                {
+                    this.RefreshPluginLists();
+                }
+                catch (DuplicatePluginDetectedException ex)
+                {
+                    MessageBox.Show(string.Format("Unable to load full plugin list: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }                
             }
         }
 
