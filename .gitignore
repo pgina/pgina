@@ -1,6 +1,8 @@
 *.suo
 *~
 *.user
+*.aps
+*.ipch
 
 # Log files
 *_log.txt
@@ -12,3 +14,6 @@ build/
 
 # Installer output
 Installer/Output
+
+# Installer pre-processor
+Installer/PreprocessedpGina0.iss
