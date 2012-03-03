@@ -51,6 +51,9 @@ namespace pGina.Plugin.MySQLAuth
 
             if (entry != null)
             {
+                m_logger.DebugFormat("Retrieved info for user {0} from MySQL.  Password uses {1}.",
+                    entry.Name, entry.HashAlg.ToString());
+
                 bool passwordOk = entry.VerifyPassword(userInfo.Password);
                 if (passwordOk)
                 {
@@ -139,37 +142,51 @@ namespace pGina.Plugin.MySQLAuth
                     if (rdr.HasRows)
                     {
                         rdr.Read();
-                        UserEntry entry = new UserEntry()
-                        {
-                            Name = rdr[0].ToString(),
-                            HashedPassword = rdr[2].ToString()
-                        };
+                        PasswordHashAlgorithm hashAlg;
+                        string uname = rdr[0].ToString();
+                        string hash = rdr[2].ToString();
                         switch (rdr[1].ToString())
                         {
                             case "NONE":
-                                entry.HashAlg = PasswordHashAlgorithm.NONE;
+                                hashAlg = PasswordHashAlgorithm.NONE;
                                 break;
                             case "MD5":
-                                entry.HashAlg = PasswordHashAlgorithm.MD5;
+                                hashAlg = PasswordHashAlgorithm.MD5;
+                                break;
+                            case "SMD5":
+                                hashAlg = PasswordHashAlgorithm.SMD5;
                                 break;
                             case "SHA1":
-                                entry.HashAlg = PasswordHashAlgorithm.SHA1;
+                                hashAlg = PasswordHashAlgorithm.SHA1;
+                                break;
+                            case "SSHA1":
+                                hashAlg = PasswordHashAlgorithm.SSHA1;
                                 break;
                             case "SHA256":
-                                entry.HashAlg = PasswordHashAlgorithm.SHA256;
+                                hashAlg = PasswordHashAlgorithm.SHA256;
+                                break;
+                            case "SSHA256":
+                                hashAlg = PasswordHashAlgorithm.SSHA256;
                                 break;
                             case "SHA512":
-                                entry.HashAlg = PasswordHashAlgorithm.SHA512;
+                                hashAlg = PasswordHashAlgorithm.SHA512;
+                                break;
+                            case "SSHA512":
+                                hashAlg = PasswordHashAlgorithm.SSHA512;
                                 break;
                             case "SHA384":
-                                entry.HashAlg = PasswordHashAlgorithm.SHA384;
+                                hashAlg = PasswordHashAlgorithm.SHA384;
+                                break;
+                            case "SSHA384":
+                                hashAlg = PasswordHashAlgorithm.SSHA384;
                                 break;
                             default:
                                 m_logger.ErrorFormat("Unrecognized hash algorithm: {0}", rdr[1].ToString());
                                 return null;
                         }
                         rdr.Close();
-                        return entry;
+
+                        return new UserEntry(uname, hashAlg, hash);
                     }
                     else
                     {

@@ -1,5 +1,5 @@
 #define MyAppName "pGina"
-#define MyAppVersion "3.0.2"
+#define MyAppVersion "3.0.8.0"
 #define MyAppPublisher "pGina Team"
 #define MyAppURL "http://www.pgina.org/"
 #define MyAppExeName "pGina.Configuration.exe"
@@ -26,7 +26,7 @@
 AppID={{3D8D0F0D-7DBF-400C-9C44-00BD21986138}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
+AppVerName={#MyAppName} v{#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -35,14 +35,15 @@ DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=true
 LicenseFile=..\LICENSE
-OutputBaseFilename=pGinaSetup
+OutputBaseFilename=pGinaSetup-{#MyAppVersion}
 SetupIconFile=..\Installer\pgina.ico
 Compression=lzma/Max
 SolidCompression=true
 AppCopyright=pGina Team
-AppVerName=pGina v3.0.2
 ExtraDiskSpaceRequired=6
 DisableDirPage=auto
+AlwaysShowDirOnReadyPage=yes
+AlwaysShowGroupOnReadyPage=yes
 DisableProgramGroupPage=auto
 
 ArchitecturesInstallIn64BitMode=x64 ia64
@@ -71,16 +72,11 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--install"
-Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--start"
-Filename: "{app}\pGina.CredentialProvider.Registration.exe"; Parameters: "--mode install"; WorkingDir: "{app}" 
-Filename: "{app}\pGina.CredentialProvider.Registration.exe"; Parameters: "--mode enable"; WorkingDir: "{app}"
+Filename: "{app}\pGina.InstallUtil.exe"; Parameters: "post-install"; StatusMsg: "Installing service, CP/GINA, and setting permissions..."; WorkingDir: "{app}"
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, "&", "&&")}}"; Flags: nowait postinstall skipifsilent runascurrentuser
 
 [UninstallRun]
-Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--uninstall"
-Filename: "{app}\pGina.Service.ServiceHost.exe"; Parameters: "--stop"
-Filename: "{app}\pGina.CredentialProvider.Registration.exe"; Parameters: "--mode uninstall"; WorkingDir: "{app}"
+Filename: "{app}\pGina.InstallUtil.exe"; Parameters: "post-uninstall"; StatusMsg: "Removing service and CP/GINA..."; WorkingDir: "{app}"
 
 ; More custom stuff from [] for ensuring user gets everything needed
 #include "scripts\products.iss"

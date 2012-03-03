@@ -426,11 +426,12 @@ namespace pGina
 				DWORD mySession = pGina::Helpers::GetCurrentSessionId();
 				std::wstring wtsDomain = pGina::Helpers::GetSessionDomainName(mySession);
 				std::wstring wtsUser = pGina::Helpers::GetSessionUsername(mySession);
+				std::wstring machineName = pGina::Helpers::GetMachineName();
 				std::wstring usernameFieldValue;
 
-				if(!wtsDomain.empty() && wtsDomain != pGina::Helpers::GetMachineName())
+				if(!wtsDomain.empty() && _wcsicmp(wtsDomain.c_str(), machineName.c_str()) != 0)
 				{
-					usernameFieldValue += wtsDomain;					
+					usernameFieldValue += wtsDomain;
 					usernameFieldValue += L"\\";
 				}
 

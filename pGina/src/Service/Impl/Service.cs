@@ -62,8 +62,16 @@ namespace pGina.Service.Impl
 
         static Service()
         {
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);                        
-            Framework.Init();            
+            try
+            {
+                AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+                Framework.Init();
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("pGina", ex.ToString(), EventLogEntryType.Error);
+                throw;
+            }
         }
 
         public static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs args)
@@ -103,11 +111,23 @@ namespace pGina.Service.Impl
 
         public Service()
         {
-            string pipeName = Core.Settings.Get.ServicePipeName;
-            int maxClients = Core.Settings.Get.MaxClients;
-            m_logger.DebugFormat("Service created - PipeName: {0} MaxClients: {1}", pipeName, maxClients);
-            m_logger.DebugFormat("System Info: {0}", Abstractions.Windows.OsInfo.OsDescription());
-            m_server = new PipeServer(pipeName, maxClients, (Func<dynamic, dynamic>) HandleMessage);                
+            try
+            {
+                string pipeName = Core.Settings.Get.ServicePipeName;
+                int maxClients = Core.Settings.Get.MaxClients;
+                m_logger.DebugFormat("Service created - PipeName: {0} MaxClients: {1}", pipeName, maxClients);
+                m_logger.DebugFormat("System Info: {0}", Abstractions.Windows.OsInfo.OsDescription());
+                m_server = new PipeServer(pipeName, maxClients, (Func<dynamic, dynamic>)HandleMessage);
+                m_logger.DebugFormat("Using plugin directories: ");
+                foreach (string dir in PluginDirectories)
+                    m_logger.DebugFormat("  {0}", dir); 
+            }
+            catch (Exception e)
+            {
+                EventLog.WriteEntry("pGina", e.ToString(), EventLogEntryType.Error);
+                m_logger.ErrorFormat("Service startup error: {0}", e.ToString());
+                throw;
+            }
         }
 
         public void Start()
@@ -232,10 +252,11 @@ namespace pGina.Service.Impl
             try
             {
                 PluginDriver sessionDriver = new PluginDriver();
-                sessionDriver.UserInformation.Username = msg.Username;
+                sessionDriver.UserInformation.Username = msg.Username.Trim();
                 sessionDriver.UserInformation.Password = msg.Password;
 
-                m_logger.DebugFormat("Processing LoginRequest for: {0} in session: {1} reason: {2}", msg.Username, msg.Session, msg.Reason);
+                m_logger.DebugFormat("Processing LoginRequest for: {0} in session: {1} reason: {2}", 
+                    sessionDriver.UserInformation.Username, msg.Session, msg.Reason);
                 BooleanResult result = sessionDriver.PerformLoginProcess();
 
                 if (msg.Reason == LoginRequestMessage.LoginReason.Login)

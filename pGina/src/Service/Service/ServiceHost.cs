@@ -32,6 +32,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
+using System.Threading;
 
 using pGina.Service.Impl;
 
@@ -41,33 +42,50 @@ namespace Service
 {
     public partial class pGinaServiceHost : ServiceBase
     {
-        pGina.Service.Impl.Service m_service = null;
-        ILog m_logger = LogManager.GetLogger("pGina.Service.ServiceHost");
+        private Thread m_serviceThread = null;
+        private pGina.Service.Impl.ServiceThread m_serviceThreadObj = null;
 
         public pGinaServiceHost()
         {
-            InitializeComponent();
-
-            m_service = new pGina.Service.Impl.Service();
-            m_logger.DebugFormat("Service created, using plugin directories: ");
-            foreach (string dir in m_service.PluginDirectories)
-                m_logger.DebugFormat("  {0}", dir);            
+            InitializeComponent();           
         }
 
         protected override void OnStart(string[] args)
         {
-            m_service.Start();
+            try
+            {
+                m_serviceThreadObj = new pGina.Service.Impl.ServiceThread();
+                m_serviceThread = new Thread(new ThreadStart(m_serviceThreadObj.Start));
+                m_serviceThread.Start();
+            }
+            catch (Exception e)
+            {
+                EventLog.WriteEntry("pGina", e.ToString(), EventLogEntryType.Error);
+                throw;
+            }
         }
 
         protected override void OnStop()
         {
-            m_service.Stop();
+            WaitForServiceInit();
+            m_serviceThreadObj.Stop();
         }
 
         protected override void OnSessionChange(SessionChangeDescription changeDescription)
         {
             base.OnSessionChange(changeDescription);
-            m_service.SessionChange(changeDescription);
+            WaitForServiceInit();
+            m_serviceThreadObj.SessionChange(changeDescription);
+        }
+
+        private void WaitForServiceInit()
+        {
+            lock (this)
+            {
+                // If we are still initializing, wait
+                if (m_serviceThread.IsAlive)
+                    m_serviceThread.Join();
+            }
         }
     }
 }

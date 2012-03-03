@@ -451,12 +451,23 @@ namespace Abstractions.WindowsApi
                     uint bytes = 0;
                     IntPtr userInfo = IntPtr.Zero;
                     IntPtr domainInfo = IntPtr.Zero;
-
-                    SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionInfo.SessionID, SafeNativeMethods.WTS_INFO_CLASS.WTSUserName, out userInfo, out bytes);
-                    SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionInfo.SessionID, SafeNativeMethods.WTS_INFO_CLASS.WTSDomainName, out domainInfo, out bytes);
-
+                    bool sResult = SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionInfo.SessionID, SafeNativeMethods.WTS_INFO_CLASS.WTSUserName, out userInfo, out bytes);
+                    if (!sResult)
+                    {
+                        throw new Win32Exception(Marshal.GetLastWin32Error(), "WTSQuerySessionInformation");
+                    }
                     string user = Marshal.PtrToStringAnsi(userInfo);
+                    SafeNativeMethods.WTSFreeMemory(userInfo);
+
+                    sResult = SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionInfo.SessionID, SafeNativeMethods.WTS_INFO_CLASS.WTSDomainName, out domainInfo, out bytes);
+                    if (!sResult)
+                    {
+                        throw new Win32Exception(Marshal.GetLastWin32Error(), "WTSQuerySessionInformation");
+                    }
+
                     string domain = Marshal.PtrToStringAnsi(domainInfo);
+                    SafeNativeMethods.WTSFreeMemory(domainInfo);
+                    
                     if (!string.IsNullOrEmpty(domain))
                     {
                         result.Add(string.Format("{0}\\{1}", domain, user));

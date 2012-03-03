@@ -266,7 +266,7 @@ namespace pGina.Plugin.Ldap
         {
             Settings.Store.LdapHost = Regex.Split(ldapHostTextBox.Text.Trim(), @"\s+"); 
             Settings.Store.LdapPort = Convert.ToInt32(ldapPortTextBox.Text.Trim());
-            Settings.Store.Timeout = Convert.ToInt32(timeoutTextBox.Text.Trim());
+            Settings.Store.LdapTimeout = Convert.ToInt32(timeoutTextBox.Text.Trim());
             Settings.Store.UseSsl = (useSslCheckBox.CheckState == CheckState.Checked);
             Settings.Store.RequireCert = (validateServerCertCheckBox.CheckState == CheckState.Checked);
             Settings.Store.ServerCertFile = sslCertFileTextBox.Text.Trim();

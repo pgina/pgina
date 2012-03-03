@@ -4,7 +4,7 @@ pGina is a pluggable Open Source GINA and CredentialProvider replacement.  Plugi
 
 ## License
 
-Copyright (c) 2011, pGina Team
+Copyright (c) 2012, pGina Team
 
 All Rights Reserved.
 

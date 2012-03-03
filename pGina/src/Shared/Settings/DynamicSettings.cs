@@ -35,7 +35,7 @@ namespace pGina.Shared.Settings
 {
     public class pGinaDynamicSettings : Abstractions.Settings.DynamicSettings
     {    
-        private const string pGinaRoot = @"SOFTWARE\pGina3";
+        public const string pGinaRoot = @"SOFTWARE\pGina3";
         public pGinaDynamicSettings() :
             base(pGinaRoot)
         {

@@ -33,6 +33,8 @@ namespace pGina.Plugin.MySQLAuth
 {
     class Settings
     {
+        public enum HashEncoding { HEX = 0, BASE_64 = 1 };
+
         private static dynamic m_settings = new pGina.Shared.Settings.pGinaDynamicSettings(PluginImpl.PluginUuid);
         public static dynamic Store
         {
@@ -48,6 +50,7 @@ namespace pGina.Plugin.MySQLAuth
             m_settings.SetDefaultEncryptedSetting("Password", "secret");
             m_settings.SetDefault("Database", "account_db");
             m_settings.SetDefault("Table", "users");
+            m_settings.SetDefault("HashEncoding", (int)HashEncoding.HEX);
         }
     }
 }

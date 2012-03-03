@@ -30,31 +30,76 @@ using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
 
+using log4net;
+
 namespace pGina.Plugin.MySQLAuth
 {
     enum PasswordHashAlgorithm
     {
-        NONE, MD5, SHA1, SHA256, SHA384, SHA512
+        NONE, MD5, SHA1, SHA256, SHA384, SHA512, SMD5, SSHA1, SSHA256, SSHA384, SSHA512
     }
 
     class UserEntry
     {
-        public string Name { get; set;  }
-        public PasswordHashAlgorithm HashAlg { get; set; }
-        public string HashedPassword { get; set; }
+        private ILog m_logger = LogManager.GetLogger("MySQLAuth.UserEntry");
+
+        private string m_hashedPass;
+        private PasswordHashAlgorithm m_hashAlg;
+        private string m_name;
+        private byte[] m_passBytes;
+
+        public string Name { get { return m_name; } }
+        public PasswordHashAlgorithm HashAlg { get { return m_hashAlg; } }
+        private string HashedPassword { get { return m_hashedPass; } }
+
+        public UserEntry(string uname, PasswordHashAlgorithm alg, string hashedPass)
+        {
+            m_name = uname;
+            m_hashAlg = alg;
+            m_hashedPass = hashedPass;
+            m_passBytes = this.Decode(m_hashedPass);
+        }
+
+        private byte[] Decode( string hash )
+        {
+            int encInt = Settings.Store.HashEncoding;
+            Settings.HashEncoding encoding = (Settings.HashEncoding)encInt;
+            if (encoding == Settings.HashEncoding.HEX)
+                return FromHexString(hash);
+            else if (encoding == Settings.HashEncoding.BASE_64)
+                return Convert.FromBase64String(hash);
+            else
+            {
+                m_logger.ErrorFormat("Unrecognized hash encoding!  This shouldn't happen.");
+                throw new Exception("Unrecognized hash encoding.");
+            }
+        }
 
         public bool VerifyPassword( string plainText )
         {
             if (plainText != null)
             {
-                string hashedPlainText = HashPlainText(plainText);
-
-                // If hash algorithm is NONE, we don't want to ignore case when comparing,
-                // otherwise, we are comparing hex strings, so case doesn't matter.
+                // If hash algorithm is NONE, just compare the strings
                 if (HashAlg == PasswordHashAlgorithm.NONE)
-                    return hashedPlainText.Equals(HashedPassword);
+                    return plainText.Equals(HashedPassword);
+
+                // Is it a salted hash?
+                if (HashAlg == PasswordHashAlgorithm.SMD5 ||
+                    HashAlg == PasswordHashAlgorithm.SSHA1 ||
+                    HashAlg == PasswordHashAlgorithm.SSHA256 ||
+                    HashAlg == PasswordHashAlgorithm.SSHA384 ||
+                    HashAlg == PasswordHashAlgorithm.SSHA512)
+                {
+                    return VerifySaltedPassword(plainText);
+                }
+
+                // If we're here, we have an unsalted hash to compare with, hash and compare
+                // the hashed bytes.
+                byte[] hashedPlainText = HashPlainText(plainText);
+                if (hashedPlainText != null)
+                    return hashedPlainText.SequenceEqual(m_passBytes);
                 else
-                    return StringComparer.OrdinalIgnoreCase.Equals(hashedPlainText, HashedPassword);
+                    return false;
             }
             else
             {
@@ -62,57 +107,90 @@ namespace pGina.Plugin.MySQLAuth
             }
         }
 
-        public string HashPlainText( string plainText )
+        private bool VerifySaltedPassword(string plainText)
         {
+            using (HashAlgorithm hasher = GetHasher())
+            {
+                if (hasher != null)
+                {
+                    if (hasher.HashSize % 8 != 0)
+                        m_logger.ErrorFormat("WARNING: hash size is not a multiple of 8.  Hashes may not be evaluated correctly!");
+
+                    int hashSizeBytes = hasher.HashSize / 8;
+
+                    if( m_passBytes.Length > hashSizeBytes )
+                    {
+                        // Get the salt
+                        byte[] salt = new byte[m_passBytes.Length - hashSizeBytes];
+                        Array.Copy(m_passBytes, hashSizeBytes, salt, 0, salt.Length);
+                        m_logger.DebugFormat("Found {1} byte salt: [{0}]", string.Join(",", salt), salt.Length);
+                        
+                        // Get the hash
+                        byte[] hashedPassAndSalt = new byte[hashSizeBytes];
+                        Array.Copy(m_passBytes, 0, hashedPassAndSalt, 0, hashSizeBytes);
+
+                        // Build an array with the plain text and the salt
+                        byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+                        byte[] plainTextAndSalt = new byte[salt.Length + plainTextBytes.Length];
+                        plainTextBytes.CopyTo(plainTextAndSalt, 0);
+                        salt.CopyTo(plainTextAndSalt, plainTextBytes.Length);
+
+                        // Compare the byte arrays
+                        byte[] hashedPlainTextAndSalt = hasher.ComputeHash(plainTextAndSalt);
+                        return hashedPlainTextAndSalt.SequenceEqual(hashedPassAndSalt);
+                    }
+                    else
+                    {
+                        m_logger.ErrorFormat("Found hash of length {0}, expected at least {1} bytes.",
+                            m_passBytes.Length, hashSizeBytes);
+                        throw new Exception("Hash length is too short, no salt found.");
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private byte[] HashPlainText( string plainText )
+        {
+            if (HashAlg == PasswordHashAlgorithm.NONE)
+                throw new Exception("Tried to hash a password when algorithm is NONE.");
+
             byte[] bytes = Encoding.UTF8.GetBytes(plainText);
             byte[] result = null;
-            HashAlgorithm hasher = null;
-            
+            using (HashAlgorithm hasher = GetHasher())
+            {
+                if( hasher != null )
+                    result = hasher.ComputeHash(bytes);
+            }
+
+            return result;
+        }
+
+        private HashAlgorithm GetHasher()
+        {
             switch (HashAlg)
             {
                 case PasswordHashAlgorithm.NONE:
-                    return plainText;
+                    return null;
                 case PasswordHashAlgorithm.MD5:
-                    using (hasher = MD5.Create())
-                    {
-                        result = hasher.ComputeHash(bytes);
-                    }
-                    break;
+                case PasswordHashAlgorithm.SMD5:
+                    return MD5.Create();
                 case PasswordHashAlgorithm.SHA1:
-                    using (hasher = SHA1.Create())
-                    {
-                        result = hasher.ComputeHash(bytes);
-                    }
-                    break;
+                case PasswordHashAlgorithm.SSHA1:
+                    return SHA1.Create();
                 case PasswordHashAlgorithm.SHA256:
-                    using (hasher = SHA256.Create())
-                    {
-                        result = hasher.ComputeHash(bytes);
-                    }
-                    break;
-
+                case PasswordHashAlgorithm.SSHA256:
+                    return SHA256.Create();
                 case PasswordHashAlgorithm.SHA512:
-                    using (hasher = SHA512.Create())
-                    {
-                        result = hasher.ComputeHash(bytes);
-                    }
-                    break;
-
+                case PasswordHashAlgorithm.SSHA512:
+                    return SHA512.Create();
                 case PasswordHashAlgorithm.SHA384:
-                    using (hasher = SHA384.Create())
-                    {
-                        result = hasher.ComputeHash(bytes);
-                    }
-                    break;
-            }
-
-            if (result != null)
-            {
-                return ToHexString(result);
-            }
-            else
-            {
-                return null;
+                case PasswordHashAlgorithm.SSHA384:
+                    return SHA384.Create();
+                default:
+                    m_logger.ErrorFormat("Unrecognized hash algorithm!");
+                    return null;
             }
         }
 
@@ -124,6 +202,27 @@ namespace pGina.Plugin.MySQLAuth
                 builder.Append(b.ToString("x2"));
             }
             return builder.ToString();
+        }
+
+        private byte[] FromHexString(string hex)
+        {
+            byte[] bytes = null;
+            if (hex.Length % 2 != 0)
+            {
+                hex = hex + "0";
+                bytes = new byte[hex.Length + 1 / 2];
+            }
+            else
+            {
+                bytes = new byte[hex.Length / 2];
+            }
+
+            for (int i = 0; i < hex.Length / 2; i++ )
+            {
+                bytes[i] = Convert.ToByte(hex.Substring(i*2, 2), 16);
+            }
+
+            return bytes;
         }
     }
 }

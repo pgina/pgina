@@ -35,6 +35,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.ServiceProcess;
 using System.Reflection;
+using Microsoft.Win32;
 
 using pGina.Core;
 using pGina.Core.Messages;
@@ -72,7 +73,9 @@ namespace pGina.Configuration
         
         public ConfigurationUI()
         {
+            VerifyRegistryAccess();
             Framework.Init();
+           
             InitializeComponent();
             InitOptionsTabs();
             InitPluginsDGV();
@@ -81,6 +84,28 @@ namespace pGina.Configuration
             RefreshPluginLists();
             InitLiveLog();
             LoadGeneralSettings();            
+        }
+
+        private void VerifyRegistryAccess()
+        {
+            // Test write access
+            try
+            {
+                using (RegistryKey key = Registry.LocalMachine.CreateSubKey(
+                    pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot))
+                {
+                    string name = "___test_name___";
+                    key.SetValue(name, "...");
+                    string value = (string)key.GetValue(name);
+                    key.DeleteValue(name);
+                }
+            }
+            catch (System.UnauthorizedAccessException)
+            {
+                MessageBox.Show("Unable to access registry, good bye.",
+                    "Registry access error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Environment.Exit(1);
+            }
         }
 
         private void InitOptionsTabs()
@@ -139,6 +164,9 @@ namespace pGina.Configuration
 
         private void LoadGeneralSettings()
         {
+            m_pginaVersionLbl.Text = "pGina " +
+                System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
             m_tileImageTxt.Text = Settings.Get.GetSetting("TileImage", null);
             LoadTileImagePreview();
             this.motdTB.Text = Settings.Get.GetSetting("Motd");
