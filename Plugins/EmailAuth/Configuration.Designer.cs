@@ -1,0 +1,244 @@
+﻿namespace pGina.Plugin.Email
+{
+    partial class Configuration
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            System.Windows.Forms.Label label1;
+            System.Windows.Forms.Label label2;
+            System.Windows.Forms.Label label3;
+            System.Windows.Forms.Label label4;
+            this.btnOk = new System.Windows.Forms.Button();
+            this.btnCancel = new System.Windows.Forms.Button();
+            this.protocolBox = new System.Windows.Forms.GroupBox();
+            this.imapButton = new System.Windows.Forms.RadioButton();
+            this.popButton = new System.Windows.Forms.RadioButton();
+            this.sslCheckBox = new System.Windows.Forms.CheckBox();
+            this.serverTextBox = new System.Windows.Forms.TextBox();
+            this.portTextBox = new System.Windows.Forms.TextBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.domainTextBox = new System.Windows.Forms.TextBox();
+            this.domainAppendCheckBox = new System.Windows.Forms.CheckBox();
+            label1 = new System.Windows.Forms.Label();
+            label2 = new System.Windows.Forms.Label();
+            label3 = new System.Windows.Forms.Label();
+            label4 = new System.Windows.Forms.Label();
+            this.protocolBox.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.CausesValidation = false;
+            label1.Location = new System.Drawing.Point(12, 12);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(49, 13);
+            label1.TabIndex = 5;
+            label1.Text = "Protocol:";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.CausesValidation = false;
+            label2.Location = new System.Drawing.Point(12, 37);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(82, 13);
+            label2.TabIndex = 7;
+            label2.Text = "Server Address:";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.CausesValidation = false;
+            label3.Location = new System.Drawing.Point(221, 37);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(29, 13);
+            label3.TabIndex = 8;
+            label3.Text = "Port:";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.CausesValidation = false;
+            label4.Location = new System.Drawing.Point(23, 39);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(46, 13);
+            label4.TabIndex = 14;
+            label4.Text = "Domain:";
+            // 
+            // btnOk
+            // 
+            this.btnOk.Location = new System.Drawing.Point(217, 137);
+            this.btnOk.Name = "btnOk";
+            this.btnOk.Size = new System.Drawing.Size(75, 23);
+            this.btnOk.TabIndex = 3;
+            this.btnOk.Text = "Save";
+            this.btnOk.UseVisualStyleBackColor = true;
+            this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
+            // 
+            // btnCancel
+            // 
+            this.btnCancel.Location = new System.Drawing.Point(136, 137);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(75, 23);
+            this.btnCancel.TabIndex = 4;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
+            // protocolBox
+            // 
+            this.protocolBox.Controls.Add(this.imapButton);
+            this.protocolBox.Controls.Add(this.popButton);
+            this.protocolBox.Location = new System.Drawing.Point(67, -2);
+            this.protocolBox.Name = "protocolBox";
+            this.protocolBox.Size = new System.Drawing.Size(116, 34);
+            this.protocolBox.TabIndex = 6;
+            this.protocolBox.TabStop = false;
+            // 
+            // imapButton
+            // 
+            this.imapButton.AutoSize = true;
+            this.imapButton.Location = new System.Drawing.Point(62, 12);
+            this.imapButton.Name = "imapButton";
+            this.imapButton.Size = new System.Drawing.Size(51, 17);
+            this.imapButton.TabIndex = 1;
+            this.imapButton.Text = "IMAP";
+            this.imapButton.UseVisualStyleBackColor = true;
+            this.imapButton.CheckedChanged += new System.EventHandler(this.changedProtocol);
+            // 
+            // popButton
+            // 
+            this.popButton.AutoSize = true;
+            this.popButton.Location = new System.Drawing.Point(3, 12);
+            this.popButton.Name = "popButton";
+            this.popButton.Size = new System.Drawing.Size(53, 17);
+            this.popButton.TabIndex = 0;
+            this.popButton.Text = "POP3";
+            this.popButton.UseVisualStyleBackColor = true;
+            this.popButton.CheckedChanged += new System.EventHandler(this.changedProtocol);
+            // 
+            // sslCheckBox
+            // 
+            this.sslCheckBox.AutoSize = true;
+            this.sslCheckBox.Checked = true;
+            this.sslCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.sslCheckBox.Location = new System.Drawing.Point(224, 11);
+            this.sslCheckBox.Name = "sslCheckBox";
+            this.sslCheckBox.Size = new System.Drawing.Size(68, 17);
+            this.sslCheckBox.TabIndex = 10;
+            this.sslCheckBox.Text = "Use SSL";
+            this.sslCheckBox.UseVisualStyleBackColor = true;
+            this.sslCheckBox.CheckedChanged += new System.EventHandler(this.changedProtocol);
+            // 
+            // serverTextBox
+            // 
+            this.serverTextBox.Location = new System.Drawing.Point(93, 33);
+            this.serverTextBox.Name = "serverTextBox";
+            this.serverTextBox.Size = new System.Drawing.Size(110, 20);
+            this.serverTextBox.TabIndex = 11;
+            // 
+            // portTextBox
+            // 
+            this.portTextBox.Location = new System.Drawing.Point(249, 33);
+            this.portTextBox.Name = "portTextBox";
+            this.portTextBox.Size = new System.Drawing.Size(36, 20);
+            this.portTextBox.TabIndex = 12;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.domainTextBox);
+            this.groupBox2.Controls.Add(label4);
+            this.groupBox2.Controls.Add(this.domainAppendCheckBox);
+            this.groupBox2.Location = new System.Drawing.Point(13, 58);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(279, 65);
+            this.groupBox2.TabIndex = 13;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Optional Settings";
+            // 
+            // domainTextBox
+            // 
+            this.domainTextBox.Enabled = false;
+            this.domainTextBox.Location = new System.Drawing.Point(70, 36);
+            this.domainTextBox.Name = "domainTextBox";
+            this.domainTextBox.Size = new System.Drawing.Size(120, 20);
+            this.domainTextBox.TabIndex = 15;
+            // 
+            // domainAppendCheckBox
+            // 
+            this.domainAppendCheckBox.AutoSize = true;
+            this.domainAppendCheckBox.Location = new System.Drawing.Point(6, 19);
+            this.domainAppendCheckBox.Name = "domainAppendCheckBox";
+            this.domainAppendCheckBox.Size = new System.Drawing.Size(169, 17);
+            this.domainAppendCheckBox.TabIndex = 1;
+            this.domainAppendCheckBox.Text = "Append Domain To Username";
+            this.domainAppendCheckBox.UseVisualStyleBackColor = true;
+            this.domainAppendCheckBox.CheckedChanged += new System.EventHandler(this.appendDomainCheckChange);
+            // 
+            // Configuration
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(306, 165);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.portTextBox);
+            this.Controls.Add(this.serverTextBox);
+            this.Controls.Add(this.sslCheckBox);
+            this.Controls.Add(label3);
+            this.Controls.Add(label2);
+            this.Controls.Add(this.protocolBox);
+            this.Controls.Add(label1);
+            this.Controls.Add(this.btnCancel);
+            this.Controls.Add(this.btnOk);
+            this.Name = "Configuration";
+            this.Text = "Email Auth Plugin Configuration";
+            this.protocolBox.ResumeLayout(false);
+            this.protocolBox.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.Button btnOk;
+        private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.GroupBox protocolBox;
+        private System.Windows.Forms.RadioButton imapButton;
+        private System.Windows.Forms.RadioButton popButton;
+        private System.Windows.Forms.CheckBox sslCheckBox;
+        private System.Windows.Forms.TextBox serverTextBox;
+        private System.Windows.Forms.TextBox portTextBox;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.CheckBox domainAppendCheckBox;
+        private System.Windows.Forms.TextBox domainTextBox;
+    }
+}

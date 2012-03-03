@@ -1,3 +1,7 @@
+Master Branch
+----------------------------
+ - Added EmailAuth plugin by Evan Horne
+
 3.0.8.0 BETA (2012/02/13)
 ----------------------------
  - Added install utility to manage all post install/uninstall tasks.
