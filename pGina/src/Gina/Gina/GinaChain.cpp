@@ -223,16 +223,21 @@ namespace pGina
 				dialog.Password(password);
 
 				int dialogResult = dialog.ShowDialog();
-				switch(dialogResult)
+				if(dialogResult == DialogLoggedOutSAS::SAS_ACTION_LOGON)
 				{
-				case DialogLoggedOutSAS::SAS_ACTION_LOGON:
+					// Harvest u/p for passing along to msgina
 					username = dialog.Username();
 					password = dialog.Password();
-					break;
-				
-				// If not LOGON, just return it to winlogon
-				default:
+				}
+				else if(dialogResult >= DialogLoggedOutSAS::SAS_ACTION_MIN && dialogResult <= DialogLoggedOutSAS::SAS_ACTION_MAX)
+				{
+					// Just do as told
 					return dialogResult;
+				}
+				else
+				{
+					// Unknown ret value, default to no action
+					return DialogLoggedOutSAS::SAS_ACTION_NONE;
 				}
 			}
 
