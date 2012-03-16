@@ -1,6 +1,9 @@
-Master Branch
+3.0.9.0 BETA (2012/03/10)
 ----------------------------
  - Added EmailAuth plugin by Evan Horne
+ - Fixed Issue #93 - GINA crashes if left at login window for several minutes
+ - Fixed Bug with SingleUser plugin password
+ - Fixed Issue #98 - Trim whitespace around username prior to login
 
 3.0.8.0 BETA (2012/02/13)
 ----------------------------

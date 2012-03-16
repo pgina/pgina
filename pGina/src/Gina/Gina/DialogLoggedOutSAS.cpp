@@ -78,7 +78,7 @@ namespace pGina
 
 			case IDC_SPECIAL:
 				{
-					std::wstring action = pGina::Registry::GetString(L"SpecialAction", L"Shutdown").c_str();
+					std::wstring action = pGina::Registry::GetString(L"SpecialAction", L"Shutdown");
 					if(_wcsicmp(action.c_str(), L"Shutdown") == 0)
 						FinishWithResult(SAS_ACTION_SHUTDOWN_POWER_OFF);
 					else if(_wcsicmp(action.c_str(), L"Reboot") == 0)
