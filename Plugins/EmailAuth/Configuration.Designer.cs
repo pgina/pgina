@@ -31,7 +31,7 @@
             System.Windows.Forms.Label label1;
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label3;
-            System.Windows.Forms.Label label4;
+            this.domainLabel = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.protocolBox = new System.Windows.Forms.GroupBox();
@@ -46,7 +46,6 @@
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
-            label4 = new System.Windows.Forms.Label();
             this.protocolBox.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -81,19 +80,19 @@
             label3.TabIndex = 8;
             label3.Text = "Port:";
             // 
-            // label4
+            // domainLabel
             // 
-            label4.AutoSize = true;
-            label4.CausesValidation = false;
-            label4.Location = new System.Drawing.Point(23, 39);
-            label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(46, 13);
-            label4.TabIndex = 14;
-            label4.Text = "Domain:";
+            this.domainLabel.AutoSize = true;
+            this.domainLabel.CausesValidation = false;
+            this.domainLabel.Location = new System.Drawing.Point(23, 39);
+            this.domainLabel.Name = "domainLabel";
+            this.domainLabel.Size = new System.Drawing.Size(46, 13);
+            this.domainLabel.TabIndex = 14;
+            this.domainLabel.Text = "Domain:";
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(217, 137);
+            this.btnOk.Location = new System.Drawing.Point(217, 132);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 3;
@@ -103,7 +102,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(136, 137);
+            this.btnCancel.Location = new System.Drawing.Point(136, 132);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 4;
@@ -154,7 +153,7 @@
             this.sslCheckBox.TabIndex = 10;
             this.sslCheckBox.Text = "Use SSL";
             this.sslCheckBox.UseVisualStyleBackColor = true;
-            this.sslCheckBox.CheckedChanged += new System.EventHandler(this.changedProtocol);
+            this.sslCheckBox.Click += new System.EventHandler(this.changedProtocol);
             // 
             // serverTextBox
             // 
@@ -173,11 +172,11 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.domainTextBox);
-            this.groupBox2.Controls.Add(label4);
+            this.groupBox2.Controls.Add(this.domainLabel);
             this.groupBox2.Controls.Add(this.domainAppendCheckBox);
             this.groupBox2.Location = new System.Drawing.Point(13, 58);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(279, 65);
+            this.groupBox2.Size = new System.Drawing.Size(279, 68);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Optional Settings";
@@ -199,13 +198,14 @@
             this.domainAppendCheckBox.TabIndex = 1;
             this.domainAppendCheckBox.Text = "Append Domain To Username";
             this.domainAppendCheckBox.UseVisualStyleBackColor = true;
-            this.domainAppendCheckBox.CheckedChanged += new System.EventHandler(this.appendDomainCheckChange);
+            this.domainAppendCheckBox.Click += new System.EventHandler(this.settingsChanged);
             // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(306, 165);
+            this.ClientSize = new System.Drawing.Size(296, 160);
+            this.ControlBox = false;
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.portTextBox);
             this.Controls.Add(this.serverTextBox);
@@ -216,7 +216,12 @@
             this.Controls.Add(label1);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "Configuration";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.Text = "Email Auth Plugin Configuration";
             this.protocolBox.ResumeLayout(false);
             this.protocolBox.PerformLayout();
@@ -240,5 +245,6 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.CheckBox domainAppendCheckBox;
         private System.Windows.Forms.TextBox domainTextBox;
+        private System.Windows.Forms.Label domainLabel;
     }
 }

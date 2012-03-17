@@ -31,11 +31,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using System.Timers;
 
 using System.Net;
 using System.Net.Sockets;
 using System.Net.Security;
 using System.Security.Authentication;
+using System.Security.Cryptography;
 using System.IO;
 
 using log4net;
@@ -43,6 +45,8 @@ using log4net;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using pGina.Shared.Settings;
+
+
 
 namespace pGina.Plugin.Email
 {
@@ -105,7 +109,6 @@ namespace pGina.Plugin.Email
 
                 // Place credentials into a NetworkCredentials object
                 NetworkCredential creds = new NetworkCredential(username, userInfo.Password);
-
                 
                 string server = Settings.Store.Server;
                 int port = Convert.ToInt32((string)Settings.Store.Port);
@@ -115,6 +118,8 @@ namespace pGina.Plugin.Email
                 //Connect to server
                 Stream stream = getNetworkStream(server, port, useSsl);
                 bool authenticated;
+
+                m_logger.DebugFormat("Have network stream...");
 
                 //Authenticate based on protocol
                 if (protocol == "POP3")
@@ -128,19 +133,16 @@ namespace pGina.Plugin.Email
             }
             catch (FormatException e)
             {   //Likely thrown if the port number can not be converted to an integer
-                m_logger.ErrorFormat("Format exception: {0}", e);
+                m_logger.ErrorFormat("Port number is not valid. Format exception: {0}", e);
                 return new BooleanResult() { Success = false, Message = "Port number is not valid." };
             }
-            catch (IOException e)
-            {   //Likely a read/write issue once connected.
-                m_logger.ErrorFormat("IO Exception: {0}", e);
-                return new BooleanResult() { Success = false, Message = "A Connection error occurred." };
-            }
-
-            catch (SocketException e)
-            {   //Likely issue during initiated connection
-                m_logger.ErrorFormat("Socket Exception error code: {0}, Trace: {1}", e.ErrorCode, e);
-                return new BooleanResult() { Success = false, Message = "A connection error occurred." };
+            catch (EMailAuthException e)
+            {
+                if (e.InnerException != null)
+                    m_logger.ErrorFormat("Error: \"{0}\" caught because \"{1}\"", e.Message, e.InnerException.Message);
+                else
+                    m_logger.ErrorFormat("Error: {0}", e.Message);
+                return new BooleanResult() { Success = false, Message = e.Message };
             }
 
             catch (Exception e)
@@ -148,11 +150,7 @@ namespace pGina.Plugin.Email
                 m_logger.ErrorFormat("Error: {0}", e.Message);
                 return new BooleanResult { Success = false, Message = "Unspecified Error occurred. " + e.Message };
             }
-            /*catch (Exception e)
-            {
-                m_logger.ErrorFormat("AuthenticateUser exception: {0}", e);
-                throw;  // Allow pGina service to catch and handle exception
-            }*/
+
         }
 
         public void Configure()
@@ -164,80 +162,197 @@ namespace pGina.Plugin.Email
         public void Starting() { }
         public void Stopping() { }
 
-        private string getResponse(System.IO.StreamReader reader)
-        {   //Keeps trying to grab input. Will throw exception if connection error occurs.
-            string output = null;
-            do { output = reader.ReadLine(); }
-            while (output == null);
-            return output;
-        }
-
+        /// <summary>
+        /// Attempts to open a network stream to the specified server.
+        /// </summary>
+        /// <param name="server">Server address</param>
+        /// <param name="port">Port number of server</param>
+        /// <param name="ssl">Whether SSL is enabled</param>
+        /// <returns>An open stream to the server.</returns>
         private Stream getNetworkStream(string server, int port, bool ssl)
         {   //Sets up network connection and returns the stream
+            m_logger.DebugFormat("Connecting to {0}:{1}, {2} SSL", server, port, ssl ? "using" : "not using");
             TcpClient socket = new TcpClient(server, port);
             NetworkStream ns = socket.GetStream();
             if (ssl)
             {
                 SslStream sns = new SslStream(ns, true);
-                m_logger.Debug("SSLStream opened, authenticating...");
                 sns.AuthenticateAsClient(server);
-                m_logger.DebugFormat("Authentication passed. Connected: {0}", socket.Connected);
                 return sns;
             }
-
-            m_logger.DebugFormat("Connected to server: {0}", socket.Connected);
             return ns;
         }
 
+        /// <summary>
+        /// Authenticates against a POP3 server.
+        /// If a timestamp is sent in the initial response, it assumes APOP is supported. 
+        /// </summary>
+        /// <param name="stream">Opened stream to POP3 server</param>
+        /// <param name="creds">Username/password</param>
+        /// <returns>True on success, false on failure</returns>
         private bool authPop3(System.IO.Stream stream, NetworkCredential creds)
-        {   //Sends username/password to POP3 server and verifies succesful login.
-            System.IO.StreamReader reader = new System.IO.StreamReader(stream);
-            System.IO.StreamWriter writer = new System.IO.StreamWriter(stream);
+        {
+            try
+            {
+                System.IO.StreamReader reader = new System.IO.StreamReader(stream);
+                System.IO.StreamWriter writer = new System.IO.StreamWriter(stream);
 
-            String resp = getResponse(reader);
-            m_logger.DebugFormat("Initially connected: {0}", resp);
+                String resp = getResponse(reader);
+                m_logger.DebugFormat("Initially connected: {0}", resp);
 
-            writer.WriteLine("USER {0}", creds.UserName);
-            writer.Flush();
+                if (!resp.StartsWith("+OK"))
+                    throw new EMailAuthException("Invalid response from server.");
 
-            resp = getResponse(reader);
-            m_logger.DebugFormat("USER resp: {0}", resp);
+                //Check the server welcome message for a timestamp to indicate APOP support
+                string apopHash = apopPass(resp, creds.Password);
+                if (apopHash != null)
+                {
+                    writer.WriteLine(string.Format("APOP {0} {1}", creds.UserName, apopHash));
+                    writer.Flush();
 
-            writer.WriteLine("PASS {0}", creds.Password);
-            writer.Flush();
+                    resp = getResponse(reader);
+                    m_logger.DebugFormat("APOP response: {0}", resp);
+                }
 
-            resp = getResponse(reader);
-            m_logger.DebugFormat("PASS resp: {0}", resp);
+                //No timestamp = no APOP support, sending plaintext
+                else
+                {
+                    writer.WriteLine("USER {0}", creds.UserName);
+                    writer.Flush();
 
-            writer.WriteLine("QUIT");
-            writer.Flush();
-            return resp.StartsWith("+OK");
+                    resp = getResponse(reader);
+                    m_logger.DebugFormat("USER resp: {0}", resp);
+
+                    writer.WriteLine("PASS {0}", creds.Password);
+                    writer.Flush();
+
+                    resp = getResponse(reader);
+                    m_logger.DebugFormat("PASS resp: {0}", resp);
+                }
+
+                //Say goodbye to server
+                writer.WriteLine("QUIT");
+                writer.Flush();
+                return resp.StartsWith("+OK");
+            }
+            catch (EMailAuthException){ throw; }
+            catch (Exception e)
+            {
+                throw new EMailAuthException("Error communicating with POP server.", e);
+            }
         }
 
-        
+        /// <summary>
+        /// Authenticates against an IMAP server.
+        /// Presently only supports plain text login. 
+        /// The use of AUTHENTICATE is not yet supported, so SSL is advised.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="creds"></param>
+        /// <returns></returns>
         private bool authImap(System.IO.Stream stream, NetworkCredential creds)
         {   //Sends username/password to IMAP server and verifies successful login.
-            System.IO.StreamReader reader = new System.IO.StreamReader(stream);
-            System.IO.StreamWriter writer = new System.IO.StreamWriter(stream);
-
-            String resp = getResponse(reader);
-
-
-            writer.WriteLine("li01 LOGIN {0} {1}", creds.UserName, creds.Password);
-            writer.Flush();
-
-            do //Read input until we get a response to li01 request
+            try
             {
-                resp = getResponse(reader);
-                m_logger.DebugFormat("Server response: {0}", resp);
-            } while (!resp.StartsWith("li01"));
+                System.IO.StreamReader reader = new System.IO.StreamReader(stream);
+                System.IO.StreamWriter writer = new System.IO.StreamWriter(stream);
 
-            //Tell server we're disconnecting
-            writer.WriteLine("lo01 LOGOUT");
-            writer.Flush();
+                String resp = getResponse(reader);
 
-            return resp.StartsWith("li01 OK");
+
+                writer.WriteLine("li01 LOGIN {0} {1}", creds.UserName, creds.Password);
+                writer.Flush();
+
+                do //Read input until we get a response to li01 request
+                {
+                    resp = getResponse(reader);
+                    m_logger.DebugFormat("Server response: {0}", resp);
+                } while (!resp.StartsWith("li01"));
+
+                //Tell server we're disconnecting
+                writer.WriteLine("lo01 LOGOUT");
+                writer.Flush();
+
+                return resp.StartsWith("li01 OK");
+            }
+            catch (EMailAuthException){ throw; }
+            catch (Exception e)
+            {
+                throw new EMailAuthException("Error communicating with IMAP server.", e);
+            }
         }
 
+        /// <summary>
+        /// Determines if the POP3 server supports APOP, and returns the authentication
+        /// hash if so. 
+        /// </summary>
+        /// <param name="resp">Initial response from the POP3 server</param>
+        /// <param name="password">Login password</param>
+        /// <returns>MD5 password if APOP is supported, null otherwise.</returns>
+        private string apopPass(string resp, string password)
+        {
+            //Determine if timestamp is present in the response
+            int bIndex = resp.LastIndexOf('<');
+            int eIndex = resp.LastIndexOf('>');
+
+            if (bIndex < 0 || eIndex < 0 || eIndex < bIndex)
+                return null;
+
+            string timestamp = resp.Substring(bIndex, eIndex - bIndex + 1);
+
+            MD5 md5 = MD5.Create();
+            byte[] passbytes = System.Text.Encoding.UTF8.GetBytes(timestamp + password);
+            byte[] hash = md5.ComputeHash(passbytes);
+
+            //Convert byte[] to hex string
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("x").PadLeft(2, '0'));
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Attempts to grab a response from the server. 
+        /// 
+        /// An EmailAuthException will be thrown if there is no response within 5 seconds
+        /// or if an IO error occurs. 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns>Response from the server</returns>
+        private string getResponse(System.IO.StreamReader reader)
+        {   //Keeps trying to grab input. Will throw exception if connection error occurs, 
+
+            Timer timer = new Timer(10000);
+            timer.AutoReset = false;
+            timer.Elapsed += new ElapsedEventHandler(delegate(object o, ElapsedEventArgs args)
+            {
+                throw new EMailAuthException("Server response timed out.");
+            });
+
+            timer.Start();
+            try
+            {
+                string output = null;
+                do { output = reader.ReadLine(); }
+                while (output == null);
+                timer.Stop();
+                return output;
+            }
+            catch (Exception e)
+            {
+                timer.Stop();
+                throw new EMailAuthException("Error reading from server.", e);
+            }
+
+        }
+
+    }
+
+    public class EMailAuthException : Exception
+    {
+        public EMailAuthException(string message) : base(message) { }
+        public EMailAuthException(string message, Exception inner) : base(message, inner) { }
     }
 }
