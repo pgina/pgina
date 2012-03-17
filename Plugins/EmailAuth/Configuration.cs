@@ -37,6 +37,7 @@ namespace pGina.Plugin.Email
             portTextBox.Text = Settings.Store.Port;
             domainAppendCheckBox.Checked = Settings.Store.AppendDomain;
             domainTextBox.Text = Settings.Store.Domain;
+            updateSettings();
         }
 
         private void StoreSettings()
@@ -100,10 +101,15 @@ namespace pGina.Plugin.Email
             this.Close();
         }
 
-        private void appendDomainCheckChange(object sender, EventArgs e)
+        private void settingsChanged(object sender, EventArgs e)
         {
-            domainTextBox.Enabled = domainAppendCheckBox.Checked;
+            updateSettings();
+        }
 
+        private void updateSettings()
+        {
+            domainLabel.Enabled = domainAppendCheckBox.Checked;
+            domainTextBox.Enabled = domainAppendCheckBox.Checked;
         }
 
         //Changes the default port value if the protocol or SSL status is changed
