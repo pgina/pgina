@@ -1,3 +1,7 @@
+In Master Branch
+---------------------------
+ - EmailAuth Plugin updates to 3.0.0.1
+
 3.0.9.0 BETA (2012/03/10)
 ----------------------------
  - Added EmailAuth plugin by Evan Horne
