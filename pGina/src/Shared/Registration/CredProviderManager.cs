@@ -474,6 +474,7 @@ namespace pGina.CredentialProvider.Registration
         {
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(this.ProviderKey))
             {
+                if (key == null) return false;
                 object value = key.GetValue("Disabled");
                 if (value == null) return true;
                 else
@@ -495,6 +496,7 @@ namespace pGina.CredentialProvider.Registration
         {
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(this.ProviderKey6432))
             {
+                if (key == null) return false;
                 object value = key.GetValue("Disabled");
                 if (value == null) return true;
                 else
