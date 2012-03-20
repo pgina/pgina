@@ -128,14 +128,18 @@ namespace pGina.Plugin.MySQLAuth
                 bldr.SslMode = MySqlSslMode.Required;
             string tableName = Settings.Store.Table;
 
+            string unameCol = Settings.Store.UsernameColumn;
+            string hashMethodCol = Settings.Store.HashMethodColumn;
+            string passwdCol = Settings.Store.PasswordColumn;
+
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(bldr.GetConnectionString(true)))
                 {
                     conn.Open();
 
-                    string query = string.Format("SELECT user, hash_method, password " +
-                        "FROM {0} WHERE user=@user", tableName);
+                    string query = string.Format("SELECT {1}, {2}, {3} " +
+                        "FROM {0} WHERE {1}=@user", tableName, unameCol, hashMethodCol, passwdCol);
                     MySqlCommand cmd = new MySqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@user", user);
                     MySqlDataReader rdr = cmd.ExecuteReader();

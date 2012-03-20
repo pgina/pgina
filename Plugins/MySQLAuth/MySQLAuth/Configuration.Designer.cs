@@ -51,23 +51,31 @@
             this.label4 = new System.Windows.Forms.Label();
             this.createTableBtn = new System.Windows.Forms.Button();
             this.testBtn = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.unameColTB = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.hashMethodColTB = new System.Windows.Forms.TextBox();
+            this.passwdColTB = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(262, 290);
+            this.cancelButton.Location = new System.Drawing.Point(352, 369);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(81, 25);
             this.cancelButton.TabIndex = 0;
-            this.cancelButton.Text = "Cancel";
+            this.cancelButton.Text = "Close";
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
             // saveButton
             // 
-            this.saveButton.Location = new System.Drawing.Point(349, 290);
+            this.saveButton.Location = new System.Drawing.Point(262, 369);
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(82, 25);
             this.saveButton.TabIndex = 1;
@@ -154,7 +162,7 @@
             // useSslCB
             // 
             this.useSslCB.AutoSize = true;
-            this.useSslCB.Location = new System.Drawing.Point(72, 124);
+            this.useSslCB.Location = new System.Drawing.Point(174, 48);
             this.useSslCB.Name = "useSslCB";
             this.useSslCB.Size = new System.Drawing.Size(68, 17);
             this.useSslCB.TabIndex = 11;
@@ -175,13 +183,14 @@
             this.groupBox1.Controls.Add(this.hostLabel);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(419, 158);
+            this.groupBox1.Size = new System.Drawing.Size(419, 130);
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "MySQL Server";
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.groupBox3);
             this.groupBox2.Controls.Add(this.encBase64RB);
             this.groupBox2.Controls.Add(this.encHexRB);
             this.groupBox2.Controls.Add(this.label6);
@@ -189,9 +198,9 @@
             this.groupBox2.Controls.Add(this.dbTB);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.label4);
-            this.groupBox2.Location = new System.Drawing.Point(12, 176);
+            this.groupBox2.Location = new System.Drawing.Point(12, 148);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(417, 108);
+            this.groupBox2.Size = new System.Drawing.Size(417, 215);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "User Database";
@@ -199,7 +208,7 @@
             // encBase64RB
             // 
             this.encBase64RB.AutoSize = true;
-            this.encBase64RB.Location = new System.Drawing.Point(215, 71);
+            this.encBase64RB.Location = new System.Drawing.Point(211, 187);
             this.encBase64RB.Name = "encBase64RB";
             this.encBase64RB.Size = new System.Drawing.Size(64, 17);
             this.encBase64RB.TabIndex = 6;
@@ -210,7 +219,7 @@
             // encHexRB
             // 
             this.encHexRB.AutoSize = true;
-            this.encHexRB.Location = new System.Drawing.Point(123, 71);
+            this.encHexRB.Location = new System.Drawing.Point(119, 187);
             this.encHexRB.Name = "encHexRB";
             this.encHexRB.Size = new System.Drawing.Size(86, 17);
             this.encHexRB.TabIndex = 5;
@@ -222,7 +231,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(14, 73);
+            this.label6.Location = new System.Drawing.Point(10, 189);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(103, 13);
             this.label6.TabIndex = 4;
@@ -262,7 +271,7 @@
             // 
             // createTableBtn
             // 
-            this.createTableBtn.Location = new System.Drawing.Point(95, 291);
+            this.createTableBtn.Location = new System.Drawing.Point(94, 370);
             this.createTableBtn.Name = "createTableBtn";
             this.createTableBtn.Size = new System.Drawing.Size(100, 24);
             this.createTableBtn.TabIndex = 14;
@@ -272,7 +281,7 @@
             // 
             // testBtn
             // 
-            this.testBtn.Location = new System.Drawing.Point(13, 291);
+            this.testBtn.Location = new System.Drawing.Point(12, 370);
             this.testBtn.Name = "testBtn";
             this.testBtn.Size = new System.Drawing.Size(76, 24);
             this.testBtn.TabIndex = 15;
@@ -280,11 +289,75 @@
             this.testBtn.UseVisualStyleBackColor = true;
             this.testBtn.Click += new System.EventHandler(this.testBtn_Click);
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(43, 23);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(58, 13);
+            this.label7.TabIndex = 7;
+            this.label7.Text = "Username:";
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.label9);
+            this.groupBox3.Controls.Add(this.passwdColTB);
+            this.groupBox3.Controls.Add(this.hashMethodColTB);
+            this.groupBox3.Controls.Add(this.label8);
+            this.groupBox3.Controls.Add(this.unameColTB);
+            this.groupBox3.Controls.Add(this.label7);
+            this.groupBox3.Location = new System.Drawing.Point(6, 73);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(404, 108);
+            this.groupBox3.TabIndex = 8;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Database Columns";
+            this.groupBox3.Enter += new System.EventHandler(this.groupBox3_Enter);
+            // 
+            // unameColTB
+            // 
+            this.unameColTB.Location = new System.Drawing.Point(108, 20);
+            this.unameColTB.Name = "unameColTB";
+            this.unameColTB.Size = new System.Drawing.Size(290, 20);
+            this.unameColTB.TabIndex = 8;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(29, 49);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(74, 13);
+            this.label8.TabIndex = 9;
+            this.label8.Text = "Hash Method:";
+            // 
+            // hashMethodColTB
+            // 
+            this.hashMethodColTB.Location = new System.Drawing.Point(108, 46);
+            this.hashMethodColTB.Name = "hashMethodColTB";
+            this.hashMethodColTB.Size = new System.Drawing.Size(290, 20);
+            this.hashMethodColTB.TabIndex = 10;
+            // 
+            // passwdColTB
+            // 
+            this.passwdColTB.Location = new System.Drawing.Point(109, 72);
+            this.passwdColTB.Name = "passwdColTB";
+            this.passwdColTB.Size = new System.Drawing.Size(289, 20);
+            this.passwdColTB.TabIndex = 11;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(47, 75);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(56, 13);
+            this.label9.TabIndex = 12;
+            this.label9.Text = "Password:";
+            // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(443, 333);
+            this.ClientSize = new System.Drawing.Size(443, 406);
             this.Controls.Add(this.testBtn);
             this.Controls.Add(this.createTableBtn);
             this.Controls.Add(this.groupBox2);
@@ -297,6 +370,8 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -326,5 +401,12 @@
         private System.Windows.Forms.RadioButton encHexRB;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.RadioButton encBase64RB;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.TextBox unameColTB;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox passwdColTB;
+        private System.Windows.Forms.TextBox hashMethodColTB;
+        private System.Windows.Forms.Label label8;
     }
 }

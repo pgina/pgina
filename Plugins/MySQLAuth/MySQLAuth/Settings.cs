@@ -46,11 +46,14 @@ namespace pGina.Plugin.MySQLAuth
             m_settings.SetDefault("Host", "localhost");
             m_settings.SetDefault("Port", 3306);
             m_settings.SetDefault("UseSsl", false);
-            m_settings.SetDefault("User", "mysql_admin_user");
+            m_settings.SetDefault("User", "pgina");
             m_settings.SetDefaultEncryptedSetting("Password", "secret");
             m_settings.SetDefault("Database", "account_db");
             m_settings.SetDefault("Table", "users");
             m_settings.SetDefault("HashEncoding", (int)HashEncoding.HEX);
+            m_settings.SetDefault("UsernameColumn", "user");
+            m_settings.SetDefault("HashMethodColumn", "hash_method");
+            m_settings.SetDefault("PasswordColumn", "password");
         }
     }
 }
