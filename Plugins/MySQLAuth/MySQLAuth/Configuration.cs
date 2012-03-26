@@ -60,6 +60,9 @@ namespace pGina.Plugin.MySQLAuth
             this.dbTB.Text = Settings.Store.Database;
             bool useSsl = Settings.Store.UseSsl;
             this.useSslCB.Checked = useSsl;
+            this.unameColTB.Text = Settings.Store.UsernameColumn;
+            this.hashMethodColTB.Text = Settings.Store.HashMethodColumn;
+            this.passwdColTB.Text = Settings.Store.PasswordColumn;
 
             int encodingInt = Settings.Store.HashEncoding;
             Settings.HashEncoding encoding = (Settings.HashEncoding)encodingInt;
@@ -105,6 +108,9 @@ namespace pGina.Plugin.MySQLAuth
             Settings.Store.Table = this.tableTB.Text.Trim();
             Settings.Store.Database = this.dbTB.Text.Trim();
             Settings.Store.UseSsl = this.useSslCB.Checked;
+            Settings.Store.UsernameColumn = this.unameColTB.Text.Trim();
+            Settings.Store.HashMethodColumn = this.hashMethodColTB.Text.Trim();
+            Settings.Store.PasswordColumn = this.passwdColTB.Text.Trim();
 
             if (encHexRB.Checked)
                 Settings.Store.HashEncoding = (int)Settings.HashEncoding.HEX;
@@ -191,17 +197,20 @@ namespace pGina.Plugin.MySQLAuth
                     bool userCol = false;
                     bool hashCol = false;
                     bool passCol = false;
+                    string unameColName = this.unameColTB.Text.Trim();
+                    string hashMethodColName = this.hashMethodColTB.Text.Trim();
+                    string passwdColName = this.passwdColTB.Text.Trim();
                     query = string.Format("DESCRIBE {0}", tableName);
                     cmd = new MySqlCommand(query, conn);
                     rdr = cmd.ExecuteReader();
                     while (rdr.Read())
                     {
                         string colName = rdr[0].ToString();
-                        if (colName.Equals("user", StringComparison.CurrentCultureIgnoreCase))
+                        if (colName.Equals(unameColName, StringComparison.CurrentCultureIgnoreCase))
                             userCol = true;
-                        else if (colName.Equals("hash_method", StringComparison.CurrentCultureIgnoreCase))
+                        else if (colName.Equals(hashMethodColName, StringComparison.CurrentCultureIgnoreCase))
                             hashCol = true;
-                        else if (colName.Equals("password", StringComparison.CurrentCultureIgnoreCase))
+                        else if (colName.Equals(passwdColName, StringComparison.CurrentCultureIgnoreCase))
                             passCol = true;
                     }
                     rdr.Close();
@@ -213,6 +222,12 @@ namespace pGina.Plugin.MySQLAuth
                     else
                     {
                         message += "\n  WARNING: Table schema looks incorrect, authentication operations may fail.";
+                        if (!userCol)
+                            message += string.Format("\n      Column '{0}' not found.", unameColName);
+                        if (!hashCol)
+                            message += string.Format("\n      Column '{0}' not found.", hashMethodColName);
+                        if (!passCol)
+                            message += string.Format("\n      Column '{0}' not found.", passwdColName);
                     }
                 }
 
@@ -242,11 +257,15 @@ namespace pGina.Plugin.MySQLAuth
 
                     if (!this.TableExists(tableName, conn))
                     {
+                        string unameCol = this.unameColTB.Text.Trim();
+                        string hashMethodCol = this.hashMethodColTB.Text.Trim();
+                        string passwdCol = this.passwdColTB.Text.Trim();
+
                         string sql = string.Format(
                             "CREATE TABLE {0} (" +
-                            "   user VARCHAR(128) PRIMARY KEY, " +
-                            "   hash_method TEXT, " +
-                            "   password TEXT )", tableName);
+                            "   {1} VARCHAR(128) PRIMARY KEY, " +
+                            "   {2} TEXT, " +
+                            "   {3} TEXT )", tableName, unameCol, hashMethodCol, passwdCol);
                         MySqlCommand cmd = new MySqlCommand(sql, conn);
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Table created.");
@@ -303,6 +322,11 @@ namespace pGina.Plugin.MySQLAuth
         }
 
         private void encHexRB_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox3_Enter(object sender, EventArgs e)
         {
 
         }
