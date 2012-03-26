@@ -1,4 +1,4 @@
-In Master Branch
+3.0.10 (2012/03/25)
 ---------------------------
  - EmailAuth Plugin updates to 3.0.0.1
  - Add UsernameMod plugin by Evan Horne
