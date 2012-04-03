@@ -62,6 +62,7 @@ namespace pGina.Plugin.Ldap
             m_settings.SetDefault("DoGroupAuthorization", false);
             m_settings.SetDefault("LdapLoginGroups", new string[] { });
             m_settings.SetDefault("LdapAdminGroup", "wheel");
+            m_settings.SetDefault("AllowEmptyPasswords", false);
         }
     }
 }

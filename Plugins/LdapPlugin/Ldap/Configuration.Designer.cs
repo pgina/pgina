@@ -50,13 +50,14 @@
             this.sslCertFileBrowseButton = new System.Windows.Forms.Button();
             this.sslCertFileTextBox = new System.Windows.Forms.TextBox();
             this.authenticationGroupBox = new System.Windows.Forms.GroupBox();
+            this.showPwCB = new System.Windows.Forms.CheckBox();
             this.searchPassTextBox = new System.Windows.Forms.TextBox();
             this.searchDnTextBox = new System.Windows.Forms.TextBox();
             this.searchContextsTextBox = new System.Windows.Forms.TextBox();
             this.searchFilterTextBox = new System.Windows.Forms.TextBox();
             this.dnPatternTextBox = new System.Windows.Forms.TextBox();
             this.cancelButton = new System.Windows.Forms.Button();
-            this.showPwCB = new System.Windows.Forms.CheckBox();
+            this.allowEmptyPwCB = new System.Windows.Forms.CheckBox();
             this.ldapServerGroupBox.SuspendLayout();
             this.authenticationGroupBox.SuspendLayout();
             this.SuspendLayout();
@@ -270,6 +271,7 @@
             // 
             // authenticationGroupBox
             // 
+            this.authenticationGroupBox.Controls.Add(this.allowEmptyPwCB);
             this.authenticationGroupBox.Controls.Add(this.showPwCB);
             this.authenticationGroupBox.Controls.Add(this.searchPassTextBox);
             this.authenticationGroupBox.Controls.Add(this.label3);
@@ -288,6 +290,17 @@
             this.authenticationGroupBox.TabIndex = 4;
             this.authenticationGroupBox.TabStop = false;
             this.authenticationGroupBox.Text = "Authentication";
+            // 
+            // showPwCB
+            // 
+            this.showPwCB.AutoSize = true;
+            this.showPwCB.Location = new System.Drawing.Point(581, 177);
+            this.showPwCB.Name = "showPwCB";
+            this.showPwCB.Size = new System.Drawing.Size(77, 17);
+            this.showPwCB.TabIndex = 12;
+            this.showPwCB.Text = "Show Text";
+            this.showPwCB.UseVisualStyleBackColor = true;
+            this.showPwCB.CheckedChanged += new System.EventHandler(this.showPwCB_CheckedChanged);
             // 
             // searchPassTextBox
             // 
@@ -337,16 +350,15 @@
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
-            // showPwCB
+            // allowEmptyPwCB
             // 
-            this.showPwCB.AutoSize = true;
-            this.showPwCB.Location = new System.Drawing.Point(581, 177);
-            this.showPwCB.Name = "showPwCB";
-            this.showPwCB.Size = new System.Drawing.Size(77, 17);
-            this.showPwCB.TabIndex = 12;
-            this.showPwCB.Text = "Show Text";
-            this.showPwCB.UseVisualStyleBackColor = true;
-            this.showPwCB.CheckedChanged += new System.EventHandler(this.showPwCB_CheckedChanged);
+            this.allowEmptyPwCB.AutoSize = true;
+            this.allowEmptyPwCB.Location = new System.Drawing.Point(136, 47);
+            this.allowEmptyPwCB.Name = "allowEmptyPwCB";
+            this.allowEmptyPwCB.Size = new System.Drawing.Size(137, 17);
+            this.allowEmptyPwCB.TabIndex = 13;
+            this.allowEmptyPwCB.Text = "Allow Empty Passwords";
+            this.allowEmptyPwCB.UseVisualStyleBackColor = true;
             // 
             // Configuration
             // 
@@ -397,5 +409,6 @@
         private System.Windows.Forms.Label timeoutLabel;
         private System.Windows.Forms.TextBox searchPassTextBox;
         private System.Windows.Forms.CheckBox showPwCB;
+        private System.Windows.Forms.CheckBox allowEmptyPwCB;
     }
 }

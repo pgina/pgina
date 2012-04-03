@@ -54,6 +54,15 @@ namespace pGina.Plugin.Ldap
 
         public BooleanResult Authenticate()
         {
+            // Check for empty password.  If configured to do so, we fail on 
+            // empty passwords.
+            bool allowEmpty = Settings.Store.AllowEmptyPasswords;
+            if (!allowEmpty && string.IsNullOrEmpty(m_creds.Password))
+            {
+                m_logger.Info("Authentication failed due to empty password.");
+                return new BooleanResult { Success = false, Message = "Authentication failed due to empty password." };
+            }
+
             // Generate username (if we're not doing a search for it)
             string userDN = null;
             bool doSearch = Settings.Store.DoSearch;

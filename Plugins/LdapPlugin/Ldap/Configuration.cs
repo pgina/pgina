@@ -103,6 +103,8 @@ namespace pGina.Plugin.Ldap
             string searchPw = Settings.Store.GetEncryptedSetting("SearchPW");
             searchPassTextBox.Text = searchPw;
 
+            bool allowEmpty = Settings.Store.AllowEmptyPasswords;
+            this.allowEmptyPwCB.Checked = allowEmpty;
         }
 
         private void sslCertFileBrowseButton_Click(object sender, EventArgs e)
@@ -276,6 +278,7 @@ namespace pGina.Plugin.Ldap
             Settings.Store.SearchContexts = Regex.Split(searchContextsTextBox.Text.Trim(), @"\s*\r?\n\s*");
             Settings.Store.SearchDN = searchDnTextBox.Text.Trim();
             Settings.Store.SetEncryptedSetting("SearchPW", searchPassTextBox.Text);
+            Settings.Store.AllowEmptyPasswords = this.allowEmptyPwCB.Checked;
         }
 
         private void showPwCB_CheckedChanged(object sender, EventArgs e)
