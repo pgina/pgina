@@ -49,6 +49,9 @@ namespace pGina.Plugin.Ldap
             LoadSettings();
             UpdateSslElements();
             UpdateAuthenticationElements();
+
+            this.authzRuleMemberComboBox.SelectedIndex = 0;
+            this.authzRuleActionComboBox.SelectedIndex = 0;
         }
 
         private void LoadSettings()
@@ -155,20 +158,16 @@ namespace pGina.Plugin.Ldap
 
         private void UpdateAuthenticationElements()
         {
-            if (searchForDnCheckBox.CheckState == CheckState.Checked)
+            if (searchForDnCheckBox.Checked)
             {
                 searchFilterTextBox.Enabled = true;
                 searchContextsTextBox.Enabled = true;
-                searchDnTextBox.Enabled = true;
-                searchPassTextBox.Enabled = true;
                 dnPatternTextBox.Enabled = false;
             }
-            else if( searchForDnCheckBox.CheckState == CheckState.Unchecked )
+            else
             {
                 searchFilterTextBox.Enabled = false;
                 searchContextsTextBox.Enabled = false;
-                searchDnTextBox.Enabled = false;
-                searchPassTextBox.Enabled = false;
                 dnPatternTextBox.Enabled = true;
             }
         }
