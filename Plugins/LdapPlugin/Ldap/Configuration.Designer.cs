@@ -60,17 +60,26 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.authTabPage = new System.Windows.Forms.TabPage();
             this.authzTabPage = new System.Windows.Forms.TabPage();
+            this.label7 = new System.Windows.Forms.Label();
+            this.authzDefaultDenyRB = new System.Windows.Forms.RadioButton();
+            this.authzDefaultAllowRB = new System.Windows.Forms.RadioButton();
+            this.authzRuleAddButton = new System.Windows.Forms.Button();
+            this.authzRulesListBox = new System.Windows.Forms.ListBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.authzLocalGroupsListBox = new System.Windows.Forms.ListBox();
+            this.addLocalGroupRuleButton = new System.Windows.Forms.Button();
+            this.authzRuleLocalGroupTB = new System.Windows.Forms.TextBox();
+            this.authzRuleActionComboBox = new System.Windows.Forms.ComboBox();
             this.authzRuleGroupTB = new System.Windows.Forms.TextBox();
             this.authzRuleMemberComboBox = new System.Windows.Forms.ComboBox();
             this.groupMemberAttrTB = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.groupDNPattern = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.authzRuleActionComboBox = new System.Windows.Forms.ComboBox();
-            this.authzRuleLocalGroupTB = new System.Windows.Forms.TextBox();
-            this.addAuthzRuleButton = new System.Windows.Forms.Button();
-            this.authzRulesListBox = new System.Windows.Forms.ListBox();
-            this.label6 = new System.Windows.Forms.Label();
+            this.authzRuleDownBtn = new System.Windows.Forms.Button();
+            this.authzRuleUpBtn = new System.Windows.Forms.Button();
+            this.authzRuleDeleteBtn = new System.Windows.Forms.Button();
+            this.authzLocalGroupDeleteBtn = new System.Windows.Forms.Button();
             this.ldapServerGroupBox.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.authTabPage.SuspendLayout();
@@ -79,7 +88,7 @@
             // 
             // saveButton
             // 
-            this.saveButton.Location = new System.Drawing.Point(607, 461);
+            this.saveButton.Location = new System.Drawing.Point(607, 501);
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(81, 26);
             this.saveButton.TabIndex = 0;
@@ -333,7 +342,7 @@
             this.searchContextsTextBox.Multiline = true;
             this.searchContextsTextBox.Name = "searchContextsTextBox";
             this.searchContextsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.searchContextsTextBox.Size = new System.Drawing.Size(462, 45);
+            this.searchContextsTextBox.Size = new System.Drawing.Size(462, 89);
             this.searchContextsTextBox.TabIndex = 6;
             // 
             // searchFilterTextBox
@@ -352,7 +361,7 @@
             // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(524, 461);
+            this.cancelButton.Location = new System.Drawing.Point(524, 501);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(76, 26);
             this.cancelButton.TabIndex = 5;
@@ -367,7 +376,7 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 170);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(675, 285);
+            this.tabControl1.Size = new System.Drawing.Size(675, 325);
             this.tabControl1.TabIndex = 6;
             // 
             // authTabPage
@@ -383,16 +392,25 @@
             this.authTabPage.Location = new System.Drawing.Point(4, 22);
             this.authTabPage.Name = "authTabPage";
             this.authTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.authTabPage.Size = new System.Drawing.Size(667, 259);
+            this.authTabPage.Size = new System.Drawing.Size(667, 299);
             this.authTabPage.TabIndex = 0;
             this.authTabPage.Text = "Authentication";
             this.authTabPage.UseVisualStyleBackColor = true;
             // 
             // authzTabPage
             // 
-            this.authzTabPage.Controls.Add(this.label6);
+            this.authzTabPage.Controls.Add(this.authzLocalGroupDeleteBtn);
+            this.authzTabPage.Controls.Add(this.authzRuleDeleteBtn);
+            this.authzTabPage.Controls.Add(this.authzRuleDownBtn);
+            this.authzTabPage.Controls.Add(this.authzRuleUpBtn);
+            this.authzTabPage.Controls.Add(this.label7);
+            this.authzTabPage.Controls.Add(this.authzDefaultDenyRB);
+            this.authzTabPage.Controls.Add(this.authzDefaultAllowRB);
+            this.authzTabPage.Controls.Add(this.authzRuleAddButton);
             this.authzTabPage.Controls.Add(this.authzRulesListBox);
-            this.authzTabPage.Controls.Add(this.addAuthzRuleButton);
+            this.authzTabPage.Controls.Add(this.label6);
+            this.authzTabPage.Controls.Add(this.authzLocalGroupsListBox);
+            this.authzTabPage.Controls.Add(this.addLocalGroupRuleButton);
             this.authzTabPage.Controls.Add(this.authzRuleLocalGroupTB);
             this.authzTabPage.Controls.Add(this.authzRuleActionComboBox);
             this.authzTabPage.Controls.Add(this.authzRuleGroupTB);
@@ -404,14 +422,107 @@
             this.authzTabPage.Location = new System.Drawing.Point(4, 22);
             this.authzTabPage.Name = "authzTabPage";
             this.authzTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.authzTabPage.Size = new System.Drawing.Size(667, 259);
+            this.authzTabPage.Size = new System.Drawing.Size(667, 299);
             this.authzTabPage.TabIndex = 1;
             this.authzTabPage.Text = "Authorization";
             this.authzTabPage.UseVisualStyleBackColor = true;
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(354, 273);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(44, 13);
+            this.label7.TabIndex = 15;
+            this.label7.Text = "Default:";
+            // 
+            // authzDefaultDenyRB
+            // 
+            this.authzDefaultDenyRB.AutoSize = true;
+            this.authzDefaultDenyRB.Location = new System.Drawing.Point(460, 271);
+            this.authzDefaultDenyRB.Name = "authzDefaultDenyRB";
+            this.authzDefaultDenyRB.Size = new System.Drawing.Size(50, 17);
+            this.authzDefaultDenyRB.TabIndex = 14;
+            this.authzDefaultDenyRB.TabStop = true;
+            this.authzDefaultDenyRB.Text = "Deny";
+            this.authzDefaultDenyRB.UseVisualStyleBackColor = true;
+            // 
+            // authzDefaultAllowRB
+            // 
+            this.authzDefaultAllowRB.AutoSize = true;
+            this.authzDefaultAllowRB.Location = new System.Drawing.Point(404, 271);
+            this.authzDefaultAllowRB.Name = "authzDefaultAllowRB";
+            this.authzDefaultAllowRB.Size = new System.Drawing.Size(50, 17);
+            this.authzDefaultAllowRB.TabIndex = 13;
+            this.authzDefaultAllowRB.TabStop = true;
+            this.authzDefaultAllowRB.Text = "Allow";
+            this.authzDefaultAllowRB.UseVisualStyleBackColor = true;
+            // 
+            // authzRuleAddButton
+            // 
+            this.authzRuleAddButton.Location = new System.Drawing.Point(480, 92);
+            this.authzRuleAddButton.Name = "authzRuleAddButton";
+            this.authzRuleAddButton.Size = new System.Drawing.Size(71, 23);
+            this.authzRuleAddButton.TabIndex = 12;
+            this.authzRuleAddButton.Text = "Add Rule";
+            this.authzRuleAddButton.UseVisualStyleBackColor = true;
+            // 
+            // authzRulesListBox
+            // 
+            this.authzRulesListBox.FormattingEnabled = true;
+            this.authzRulesListBox.Location = new System.Drawing.Point(335, 118);
+            this.authzRulesListBox.Name = "authzRulesListBox";
+            this.authzRulesListBox.Size = new System.Drawing.Size(285, 147);
+            this.authzRulesListBox.TabIndex = 11;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(7, 95);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(96, 13);
+            this.label6.TabIndex = 10;
+            this.label6.Text = "Add to local group:";
+            // 
+            // authzLocalGroupsListBox
+            // 
+            this.authzLocalGroupsListBox.FormattingEnabled = true;
+            this.authzLocalGroupsListBox.Location = new System.Drawing.Point(3, 118);
+            this.authzLocalGroupsListBox.Name = "authzLocalGroupsListBox";
+            this.authzLocalGroupsListBox.Size = new System.Drawing.Size(288, 147);
+            this.authzLocalGroupsListBox.TabIndex = 9;
+            // 
+            // addLocalGroupRuleButton
+            // 
+            this.addLocalGroupRuleButton.Location = new System.Drawing.Point(220, 90);
+            this.addLocalGroupRuleButton.Name = "addLocalGroupRuleButton";
+            this.addLocalGroupRuleButton.Size = new System.Drawing.Size(71, 23);
+            this.addLocalGroupRuleButton.TabIndex = 8;
+            this.addLocalGroupRuleButton.Text = "Add Rule";
+            this.addLocalGroupRuleButton.UseVisualStyleBackColor = true;
+            // 
+            // authzRuleLocalGroupTB
+            // 
+            this.authzRuleLocalGroupTB.Location = new System.Drawing.Point(109, 92);
+            this.authzRuleLocalGroupTB.Name = "authzRuleLocalGroupTB";
+            this.authzRuleLocalGroupTB.Size = new System.Drawing.Size(105, 20);
+            this.authzRuleLocalGroupTB.TabIndex = 7;
+            // 
+            // authzRuleActionComboBox
+            // 
+            this.authzRuleActionComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.authzRuleActionComboBox.FormattingEnabled = true;
+            this.authzRuleActionComboBox.Items.AddRange(new object[] {
+            "allow.",
+            "deny."});
+            this.authzRuleActionComboBox.Location = new System.Drawing.Point(409, 92);
+            this.authzRuleActionComboBox.Name = "authzRuleActionComboBox";
+            this.authzRuleActionComboBox.Size = new System.Drawing.Size(65, 21);
+            this.authzRuleActionComboBox.TabIndex = 6;
+            // 
             // authzRuleGroupTB
             // 
-            this.authzRuleGroupTB.Location = new System.Drawing.Point(146, 63);
+            this.authzRuleGroupTB.Location = new System.Drawing.Point(320, 63);
             this.authzRuleGroupTB.Name = "authzRuleGroupTB";
             this.authzRuleGroupTB.Size = new System.Drawing.Size(145, 20);
             this.authzRuleGroupTB.TabIndex = 5;
@@ -421,11 +532,11 @@
             this.authzRuleMemberComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.authzRuleMemberComboBox.FormattingEnabled = true;
             this.authzRuleMemberComboBox.Items.AddRange(new object[] {
-            "If member of:",
-            "If not member of:"});
-            this.authzRuleMemberComboBox.Location = new System.Drawing.Point(6, 63);
+            "If member of LDAP group:",
+            "If not member of LDAP group:"});
+            this.authzRuleMemberComboBox.Location = new System.Drawing.Point(137, 63);
             this.authzRuleMemberComboBox.Name = "authzRuleMemberComboBox";
-            this.authzRuleMemberComboBox.Size = new System.Drawing.Size(134, 21);
+            this.authzRuleMemberComboBox.Size = new System.Drawing.Size(177, 21);
             this.authzRuleMemberComboBox.TabIndex = 4;
             // 
             // groupMemberAttrTB
@@ -460,57 +571,47 @@
             this.label4.TabIndex = 0;
             this.label4.Text = "Group DN Pattern";
             // 
-            // authzRuleActionComboBox
+            // authzRuleDownBtn
             // 
-            this.authzRuleActionComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.authzRuleActionComboBox.FormattingEnabled = true;
-            this.authzRuleActionComboBox.Items.AddRange(new object[] {
-            "add to local group:",
-            "authorize.",
-            "fail authorization."});
-            this.authzRuleActionComboBox.Location = new System.Drawing.Point(297, 63);
-            this.authzRuleActionComboBox.Name = "authzRuleActionComboBox";
-            this.authzRuleActionComboBox.Size = new System.Drawing.Size(138, 21);
-            this.authzRuleActionComboBox.TabIndex = 6;
+            this.authzRuleDownBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.DownArrowSolid;
+            this.authzRuleDownBtn.Location = new System.Drawing.Point(627, 214);
+            this.authzRuleDownBtn.Name = "authzRuleDownBtn";
+            this.authzRuleDownBtn.Size = new System.Drawing.Size(32, 34);
+            this.authzRuleDownBtn.TabIndex = 17;
+            this.authzRuleDownBtn.UseVisualStyleBackColor = true;
             // 
-            // authzRuleLocalGroupTB
+            // authzRuleUpBtn
             // 
-            this.authzRuleLocalGroupTB.Location = new System.Drawing.Point(447, 64);
-            this.authzRuleLocalGroupTB.Name = "authzRuleLocalGroupTB";
-            this.authzRuleLocalGroupTB.Size = new System.Drawing.Size(105, 20);
-            this.authzRuleLocalGroupTB.TabIndex = 7;
+            this.authzRuleUpBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.UpArrowSolid;
+            this.authzRuleUpBtn.Location = new System.Drawing.Point(627, 133);
+            this.authzRuleUpBtn.Name = "authzRuleUpBtn";
+            this.authzRuleUpBtn.Size = new System.Drawing.Size(32, 34);
+            this.authzRuleUpBtn.TabIndex = 16;
+            this.authzRuleUpBtn.UseVisualStyleBackColor = true;
             // 
-            // addAuthzRuleButton
+            // authzRuleDeleteBtn
             // 
-            this.addAuthzRuleButton.Location = new System.Drawing.Point(558, 62);
-            this.addAuthzRuleButton.Name = "addAuthzRuleButton";
-            this.addAuthzRuleButton.Size = new System.Drawing.Size(71, 23);
-            this.addAuthzRuleButton.TabIndex = 8;
-            this.addAuthzRuleButton.Text = "Add Rule";
-            this.addAuthzRuleButton.UseVisualStyleBackColor = true;
+            this.authzRuleDeleteBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.delete;
+            this.authzRuleDeleteBtn.Location = new System.Drawing.Point(627, 173);
+            this.authzRuleDeleteBtn.Name = "authzRuleDeleteBtn";
+            this.authzRuleDeleteBtn.Size = new System.Drawing.Size(32, 34);
+            this.authzRuleDeleteBtn.TabIndex = 18;
+            this.authzRuleDeleteBtn.UseVisualStyleBackColor = true;
             // 
-            // authzRulesListBox
+            // authzLocalGroupDeleteBtn
             // 
-            this.authzRulesListBox.FormattingEnabled = true;
-            this.authzRulesListBox.Location = new System.Drawing.Point(62, 91);
-            this.authzRulesListBox.Name = "authzRulesListBox";
-            this.authzRulesListBox.Size = new System.Drawing.Size(567, 95);
-            this.authzRulesListBox.TabIndex = 9;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(19, 91);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(37, 13);
-            this.label6.TabIndex = 10;
-            this.label6.Text = "Rules:";
+            this.authzLocalGroupDeleteBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.delete;
+            this.authzLocalGroupDeleteBtn.Location = new System.Drawing.Point(297, 173);
+            this.authzLocalGroupDeleteBtn.Name = "authzLocalGroupDeleteBtn";
+            this.authzLocalGroupDeleteBtn.Size = new System.Drawing.Size(32, 34);
+            this.authzLocalGroupDeleteBtn.TabIndex = 19;
+            this.authzLocalGroupDeleteBtn.UseVisualStyleBackColor = true;
             // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(700, 499);
+            this.ClientSize = new System.Drawing.Size(700, 539);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.ldapServerGroupBox);
@@ -567,10 +668,19 @@
         private System.Windows.Forms.ComboBox authzRuleMemberComboBox;
         private System.Windows.Forms.TextBox groupMemberAttrTB;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Button addAuthzRuleButton;
+        private System.Windows.Forms.Button addLocalGroupRuleButton;
         private System.Windows.Forms.TextBox authzRuleLocalGroupTB;
         private System.Windows.Forms.ComboBox authzRuleActionComboBox;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.ListBox authzLocalGroupsListBox;
         private System.Windows.Forms.ListBox authzRulesListBox;
+        private System.Windows.Forms.Button authzRuleAddButton;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.RadioButton authzDefaultDenyRB;
+        private System.Windows.Forms.RadioButton authzDefaultAllowRB;
+        private System.Windows.Forms.Button authzRuleDownBtn;
+        private System.Windows.Forms.Button authzRuleUpBtn;
+        private System.Windows.Forms.Button authzLocalGroupDeleteBtn;
+        private System.Windows.Forms.Button authzRuleDeleteBtn;
     }
 }
