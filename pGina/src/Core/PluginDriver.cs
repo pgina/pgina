@@ -104,16 +104,9 @@ namespace pGina.Core
         {
             try
             {
-                m_logger.DebugFormat("Performing login process");
-                BooleanResult result = AuthenticateUser();
-                if (!result.Success)
-                    return result;
-
-                result = AuthorizeUser();
-                if (!result.Success)
-                    return result;
-
-                result = GatewayProcess();                
+                BeginChain();
+                BooleanResult result = ExecuteLoginChain();
+                EndChain();
                 return result;
             }
             catch (Exception e)
@@ -121,7 +114,42 @@ namespace pGina.Core
                 // We catch exceptions at a high level here and report failure in these cases,
                 //  with the exception details as our message for now
                 m_logger.ErrorFormat("Exception during login process: {0}", e);
-                return new BooleanResult() { Success = false, Message = string.Format("Exception occurred: {0}", e) };
+                return new BooleanResult() { Success = false, Message = string.Format("Unhandled exception during login: {0}", e) };
+            }
+        }
+
+        private BooleanResult ExecuteLoginChain()
+        {
+            m_logger.DebugFormat("Performing login process");
+            BooleanResult result = AuthenticateUser();
+            if (!result.Success)
+                return result;
+
+            result = AuthorizeUser();
+            if (!result.Success)
+                return result;
+
+            result = GatewayProcess();                
+            return result;
+        }
+
+        public void BeginChain()
+        {
+            List<IStatefulPlugin> plugins = PluginLoader.GetEnabledStatefulPlugins();
+            m_logger.DebugFormat("Begin login chain, {0} stateful plugin(s).", plugins.Count);
+            foreach (IStatefulPlugin plugin in plugins)
+            {
+                plugin.BeginChain(m_properties);
+            }
+        }
+
+        public void EndChain()
+        {
+            List<IStatefulPlugin> plugins = PluginLoader.GetEnabledStatefulPlugins();
+            m_logger.DebugFormat("End login chain, {0} stateful plugin(s).", plugins.Count);
+            foreach (IStatefulPlugin plugin in plugins)
+            {
+                plugin.EndChain(m_properties);
             }
         }
 

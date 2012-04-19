@@ -119,4 +119,27 @@ namespace pGina.Shared.Interfaces
         void SessionChange(SessionChangeDescription changeDescription, Types.SessionProperties properties);                
     }
 
+    /// <summary>
+    /// Plugins that want to have some persistent state between stages can implement this
+    /// interface.  BeginChain will be called at the beginning of a login process and
+    /// EndChain will be called when the login process completes (regardless of which stage
+    /// causes the login to fail).  Plugins can store any state associated with the login in
+    /// the SessionProperties object provided as a parameter.
+    /// </summary>
+    public interface IStatefulPlugin : IPluginBase
+    {
+        /// <summary>
+        /// Called prior to authentication for every login.
+        /// </summary>
+        /// <param name="props"></param>
+        void BeginChain(Types.SessionProperties props);
+
+        /// <summary>
+        /// Called at the end of a login process regardless of success or failure,
+        /// and regardless of what stage caused the login to fail.
+        /// </summary>
+        /// <param name="props"></param>
+        void EndChain(Types.SessionProperties props);
+    }
+
 }

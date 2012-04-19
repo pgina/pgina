@@ -178,6 +178,32 @@ namespace pGina.Core
             get { return m_plugins; }
         }
 
+        /// <summary>
+        /// Returns stateful plugins that are enabled in at least one of the three
+        /// stages in the login chain.
+        /// </summary>
+        /// <returns></returns>
+        public static List<IStatefulPlugin> GetEnabledStatefulPlugins()
+        {
+            List<IStatefulPlugin> list = new List<IStatefulPlugin>();
+
+            foreach (IPluginBase plugin in m_plugins)
+            {
+                int pluginMask = Settings.Get.GetSetting(plugin.Uuid.ToString());
+                if ( plugin is IStatefulPlugin && 
+                        (
+                        IsEnabledFor<IPluginAuthentication>(pluginMask) ||
+                        IsEnabledFor<IPluginAuthorization>(pluginMask) ||
+                        IsEnabledFor<IPluginAuthenticationGateway>(pluginMask)
+                        )
+                   )
+                {
+                    list.Add(plugin as IStatefulPlugin);
+                }
+            }
+            return list;
+        }
+
         public static List<T> GetPluginsOfType<T>(bool enabledOnly) where T : class, IPluginBase
         {
             List<T> pluginList = new List<T>();
