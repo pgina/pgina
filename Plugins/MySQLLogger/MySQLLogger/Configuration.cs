@@ -47,18 +47,19 @@ namespace pGina.Plugin.MySqlLogger
 
         private void InitUI()
         {
-            
-            if (LoggerMode.SESSION == (LoggerMode)Enum.Parse(typeof(LoggerMode), (string)Settings.Store.LoggerMode))
+            LoggerMode mode = (LoggerMode)Enum.Parse(typeof(LoggerMode), (string)Settings.Store.LoggerMode);
+            if (LoggerMode.SESSION == mode)
                 sessionModeButton.Checked = true;
             else
                 eventModeButton.Checked = true;
 
             string host = Settings.Store.Host;
             this.hostTB.Text = host;
-            string port = Settings.Store.Port;
+            string port = string.Format("{0}", Settings.Store.Port); //Might be stored as an int
             this.portTB.Text = port;
             string db = Settings.Store.Database;
             this.dbTB.Text = db;
+
             string table = Settings.Store.Table;
             this.tableTB.Text = table;
             string user = Settings.Store.User;
@@ -85,8 +86,7 @@ namespace pGina.Plugin.MySqlLogger
             setting = Settings.Store.EvtRemoteDisconnect;
             this.remoteDisconnectEvtCB.Checked = setting;
 
-            setting = Settings.Store.UseModifiedName;
-            this.useModNameCB.Checked = setting;
+            this.useModNameCB.Checked = Settings.Store.UseModifiedName;
 
             updateUIOnModeChange();
         }
