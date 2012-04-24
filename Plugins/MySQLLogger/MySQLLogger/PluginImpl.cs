@@ -32,6 +32,8 @@ using System.ComponentModel;
 
 using pGina.Shared.Interfaces;
 using pGina.Shared.Settings;
+using pGina.Shared.Types;
+
 using Abstractions.WindowsApi;
 using log4net;
 
@@ -39,14 +41,15 @@ using MySql.Data.MySqlClient;
 
 namespace pGina.Plugin.MySqlLogger
 {
+    enum LoggerMode { EVENT, SESSION };
+
     public class PluginImpl : IPluginConfiguration, IPluginEventNotifications
     {
         public static readonly Guid PluginUuid = new Guid("B68CF064-9299-4765-AC08-ACB49F93F892");
         private ILog m_logger = LogManager.GetLogger("MySqlLoggerPlugin");
-        public static readonly string TABLE_NAME = "pGinaLog";
-        private SessionCache m_usernameCache = new SessionCache();
+        //public static readonly string TABLE_NAME = "pGinaLog";
 
-        public static readonly string UNKNOWN_USERNAME = "--Unknown--";
+        
 
         public string Description
         {
@@ -79,226 +82,23 @@ namespace pGina.Plugin.MySqlLogger
 
         public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, pGina.Shared.Types.SessionProperties properties)
         {
-            m_logger.DebugFormat("SessionChange({0})", changeDescription.Reason.ToString());
-
-            string msg = null;
-
-            switch (changeDescription.Reason)
-            {
-                case System.ServiceProcess.SessionChangeReason.SessionLogon:
-                    msg = LogonEvent(changeDescription.SessionId);
-                    break;
-                case System.ServiceProcess.SessionChangeReason.SessionLogoff:
-                    msg = LogoffEvent(changeDescription.SessionId);
-                    break;
-                case System.ServiceProcess.SessionChangeReason.SessionLock:
-                    msg = SessionLockEvent(changeDescription.SessionId);
-                    break;
-                case System.ServiceProcess.SessionChangeReason.SessionUnlock:
-                    msg = SessionUnlockEvent(changeDescription.SessionId);
-                    break;
-                case System.ServiceProcess.SessionChangeReason.SessionRemoteControl:
-                    msg = SesionRemoteControlEvent(changeDescription.SessionId);
-                    break;
-                case System.ServiceProcess.SessionChangeReason.ConsoleConnect:
-                    msg = ConsoleConnectEvent(changeDescription.SessionId);
-                    break;
-                case System.ServiceProcess.SessionChangeReason.ConsoleDisconnect:
-                    msg = ConsoleDisconnectEvent(changeDescription.SessionId);
-                    break;
-                case System.ServiceProcess.SessionChangeReason.RemoteConnect:
-                    msg = RemoteConnectEvent(changeDescription.SessionId);
-                    break;
-                case System.ServiceProcess.SessionChangeReason.RemoteDisconnect:
-                    msg = RemoteDisconnectEvent(changeDescription.SessionId);
-                    break;
-            }
-
-            if (!string.IsNullOrEmpty(msg))
-            {
-                m_logger.Debug(msg);
-
-                // Log to DB
-                try
-                {
-                    using (DbLogger log = DbLogger.Connect())
-                    {
-                        log.Log(msg);
-                    }
-                }
-                catch (MySqlException e)
-                {
-                    if (e.Number == 1042)
-                        m_logger.ErrorFormat("Unable to connect to host: {0}", Settings.Store.Host);
-                    else
-                        m_logger.Error(e.ToString());
-                }
-                catch (Exception e)
-                {
-                    m_logger.ErrorFormat("Error logging to DB: {0}", e);
-                }
-            }
+            m_logger.DebugFormat("SessionChange({0}) - ID: {1}", changeDescription.Reason.ToString(), changeDescription.SessionId);
+            LoggerMode type = (LoggerMode)Enum.Parse(typeof(LoggerMode), (string)Settings.Store.LoggerMode);
+            ILoggerMode mode = LoggerModeFactory.getLoggerMode(type);
+            mode.Log(changeDescription, properties);
+            
         }
 
         public void Starting()
         {
-            this.m_usernameCache.Clear();
+
         }
 
         public void Stopping()
         {
-            this.m_usernameCache.Clear();
+
         }
 
-        private string LogonEvent(int sessionId)
-        {
-            bool okToLog = Settings.Store.EvtLogon;
-
-            // Get the username
-            string userName = SessionCache.TryHardToGetUserName(sessionId, 20, 500);
-
-            // Since the username is not available at logoff time, we cache it
-            // (tied to the session ID) so that we can get it back at the logoff
-            // event.
-            if (userName != null)
-                m_usernameCache.Add(sessionId, userName);
-            else
-                userName = UNKNOWN_USERNAME;
-
-            if (okToLog)
-                return string.Format("[{0}] Logon user: {1}", sessionId, userName);
-
-            return "";
-        }
-
-        private string LogoffEvent(int sessionId)
-        {
-            bool okToLog = Settings.Store.EvtLogoff;
-            string userName = "";
-
-            userName = m_usernameCache.Get(sessionId);
-            // Delete the username from the cache because we are logging off?
-
-            if (userName == null)
-                userName = UNKNOWN_USERNAME;
-
-            if (okToLog)
-                return string.Format("[{0}] Logoff user: {1}", sessionId, userName);
-
-            return "";
-        }
-
-        private string ConsoleConnectEvent(int sessionId)
-        {
-            bool okToLog = Settings.Store.EvtConsoleConnect;
-            string userName = "";
-
-            userName = this.m_usernameCache.Get(sessionId);
-            if (userName == null)
-                userName = UNKNOWN_USERNAME;
-
-
-            if (okToLog)
-                return string.Format("[{0}] Console connect user: {1}", sessionId, userName);
-
-            return "";
-        }
-
-        private string ConsoleDisconnectEvent(int sessionId)
-        {
-            bool okToLog = Settings.Store.EvtConsoleDisconnect;
-            string userName = "";
-
-            userName = this.m_usernameCache.Get(sessionId);
-            if (userName == null)
-                userName = UNKNOWN_USERNAME;
-
-
-            if (okToLog)
-                return string.Format("[{0}] Console disconnect user: {1}", sessionId, userName);
-
-            return "";
-        }
-
-        private string RemoteDisconnectEvent(int sessionId)
-        {
-            bool okToLog = Settings.Store.EvtRemoteDisconnect;
-            string userName = "";
-
-            userName = this.m_usernameCache.Get(sessionId);
-            if (userName == null)
-                userName = UNKNOWN_USERNAME;
-
-
-            if (okToLog)
-                return string.Format("[{0}] Remote disconnect user: {1}", sessionId, userName);
-
-            return "";
-        }
-
-        private string RemoteConnectEvent(int sessionId)
-        {
-            bool okToLog = Settings.Store.EvtRemoteConnect;
-            string userName = "";
-
-            userName = this.m_usernameCache.Get(sessionId);
-            if (userName == null)
-                userName = UNKNOWN_USERNAME;
-
-
-            if (okToLog)
-                return string.Format("[{0}] Remote connect user: {1}", sessionId, userName);
-
-            return "";
-        }
-
-        private string SesionRemoteControlEvent(int sessionId)
-        {
-            bool okToLog = Settings.Store.EvtRemoteControl;
-            string userName = "";
-
-            userName = this.m_usernameCache.Get(sessionId);
-            if (userName == null)
-                userName = UNKNOWN_USERNAME;
-
-            
-            if (okToLog)
-                return string.Format("[{0}] Remote control user: {1}", sessionId, userName);
-
-            return "";
-        }
-
-        private string SessionUnlockEvent(int sessionId)
-        {
-            bool okToLog = Settings.Store.EvtUnlock;
-            string userName = "";
-
-            userName = this.m_usernameCache.Get(sessionId);
-            if (userName == null)
-                userName = UNKNOWN_USERNAME;
-
-
-            if (okToLog)
-                return string.Format("[{0}] Session unlock user: {1}", sessionId, userName);
-
-            return "";
-        }
-
-        private string SessionLockEvent(int sessionId)
-        {
-            bool okToLog = Settings.Store.EvtLock;
-            string userName = "";
-
-            userName = this.m_usernameCache.Get(sessionId);
-            if (userName == null)
-                userName = UNKNOWN_USERNAME;
-
-
-            if (okToLog)
-                return string.Format("[{0}] Session lock user: {1}", sessionId, userName);
-
-            return "";
-        }
 
     }
 }

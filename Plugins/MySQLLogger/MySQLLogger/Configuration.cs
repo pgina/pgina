@@ -47,12 +47,20 @@ namespace pGina.Plugin.MySqlLogger
 
         private void InitUI()
         {
+            
+            if (LoggerMode.SESSION == (LoggerMode)Enum.Parse(typeof(LoggerMode), (string)Settings.Store.LoggerMode))
+                sessionModeButton.Checked = true;
+            else
+                eventModeButton.Checked = true;
+
             string host = Settings.Store.Host;
             this.hostTB.Text = host;
-            int port = Settings.Store.Port;
-            this.portTB.Text = Convert.ToString(port);
+            string port = Settings.Store.Port;
+            this.portTB.Text = port;
             string db = Settings.Store.Database;
             this.dbTB.Text = db;
+            string table = Settings.Store.Table;
+            this.tableTB.Text = table;
             string user = Settings.Store.User;
             this.userTB.Text = user;
             string pass = Settings.Store.GetEncryptedSetting("Password");
@@ -76,6 +84,11 @@ namespace pGina.Plugin.MySqlLogger
             this.remoteConnectEvtCB.Checked = setting;
             setting = Settings.Store.EvtRemoteDisconnect;
             this.remoteDisconnectEvtCB.Checked = setting;
+
+            setting = Settings.Store.UseModifiedName;
+            this.useModNameCB.Checked = setting;
+
+            updateUIOnModeChange();
         }
 
         private void okBtn_Click(object sender, EventArgs e)
@@ -97,8 +110,8 @@ namespace pGina.Plugin.MySqlLogger
         {
             try
             {
-                int port = Convert.ToInt32(this.portTB.Text);
-                Settings.Store.Port = port;
+                int port = Convert.ToInt32((String)this.portTB.Text.Trim());
+                Settings.Store.Port = this.portTB.Text.Trim();
             }
             catch (FormatException)
             {
@@ -106,8 +119,11 @@ namespace pGina.Plugin.MySqlLogger
                 return false;
             }
 
+            Settings.Store.LoggerMode = (sessionModeButton.Checked ? LoggerMode.SESSION : LoggerMode.EVENT);
+
             Settings.Store.Host = this.hostTB.Text.Trim();
             Settings.Store.Database = this.dbTB.Text.Trim();
+            Settings.Store.Table = this.tableTB.Text.Trim();
             Settings.Store.User = this.userTB.Text.Trim();
             Settings.Store.SetEncryptedSetting("Password", this.passwdTB.Text);
 
@@ -120,68 +136,53 @@ namespace pGina.Plugin.MySqlLogger
             Settings.Store.EvtRemoteControl = this.remoteControlEvtCB.Checked;
             Settings.Store.EvtRemoteConnect = this.remoteConnectEvtCB.Checked;
             Settings.Store.EvtRemoteDisconnect = this.remoteDisconnectEvtCB.Checked;
+
+            Settings.Store.UseModifiedName = this.useModNameCB.Checked;
+
             return true;
         }
 
         private void testButton_Click(object sender, EventArgs e)
         {
-            string connStr = this.BuildConnectionString();
-            if (connStr == null) return;
+            if (!Save()) //Will pop up a message box with appropriate error.
+                return;
             try
             {
-                using (MySqlConnection conn = new MySqlConnection(connStr))
-                {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("SHOW TABLES", conn);
-                    bool tableExists = false;
-                    MySqlDataReader rdr = cmd.ExecuteReader();
-                    while (rdr.Read())
-                    {
-                        if (Convert.ToString(rdr[0]) == PluginImpl.TABLE_NAME)
-                            tableExists = true;
-                    }
-                    rdr.Close();
-                    if (tableExists)
-                        MessageBox.Show("Connection successful and table exists.");
-                    else
-                    {
-                        string message = "Connection was successful, but no table exists.  Click \"Create Table\" to create the required table.";
-                        MessageBox.Show(message);
-                    }
-                }
+                LoggerMode type = (LoggerMode)Enum.Parse(typeof(LoggerMode), (string)Settings.Store.LoggerMode);
+                ILoggerMode mode = LoggerModeFactory.getLoggerMode(type);
+                string msg = mode.TestTable();
+                MessageBox.Show(msg);
             }
-            catch (MySqlException ex)
+            catch (Exception ex)
             {
-                MessageBox.Show(String.Format("Connection failed: {0}", ex.Message));
+                MessageBox.Show(String.Format("The following error occurred: {0}", ex.Message));
             }
         }
 
         private void createTableBtn_Click(object sender, EventArgs e)
         {
-            string connStr = this.BuildConnectionString();
-            if (connStr == null) return;
+            if (!Save())
+                return;
             try
             {
-                using (MySqlConnection conn = new MySqlConnection(connStr))
-                {
-                    conn.Open();
-                    string sql = string.Format(
-                        "CREATE TABLE {0} (" +
-                        "   TimeStamp DATETIME, " +
-                        "   Host TINYTEXT, " +
-                        "   Ip VARCHAR(15), " +
-                        "   Machine TINYTEXT, " +
-                        "   Message TEXT )", PluginImpl.TABLE_NAME);
-                    MySqlCommand cmd = new MySqlCommand(sql, conn);
-                    cmd.ExecuteNonQuery();
-                    
-                    MessageBox.Show("Table created.");
-                }
+                LoggerMode type = (LoggerMode)Enum.Parse(typeof(LoggerMode), (string)Settings.Store.LoggerMode);
+                ILoggerMode mode = LoggerModeFactory.getLoggerMode(type);
+                string msg = mode.CreateTable();
+                MessageBox.Show(msg);
             }
-            catch (MySqlException ex)
+            catch (Exception ex)
             {
-                MessageBox.Show(String.Format("Error: {0}", ex.Message));
+                MessageBox.Show("The following error occurred: {0}", ex.Message);
             }
+
+        }
+
+        private void updateUIOnModeChange()
+        {   //Enables/disables the events box based on the mode selected.
+            if (eventModeButton.Checked)
+                eventsBox.Enabled = true;
+            else
+                eventsBox.Enabled = false;
         }
 
         private void showPassCB_CheckedChanged(object sender, EventArgs e)
@@ -189,29 +190,12 @@ namespace pGina.Plugin.MySqlLogger
             this.passwdTB.UseSystemPasswordChar = !this.showPassCB.Checked;
         }
 
-        private string BuildConnectionString()
+        private void ModeChange(object sender, EventArgs e)
         {
-
-            uint port = 0;
-            try
-            {
-                port = Convert.ToUInt32(this.portTB.Text);
-            }
-            catch (FormatException)
-            {
-                MessageBox.Show("Invalid port number.");
-                return null;
-            }
-
-            MySqlConnectionStringBuilder bldr = new MySqlConnectionStringBuilder();
-            bldr.Server = this.hostTB.Text.Trim();
-            bldr.Port = port;
-            bldr.UserID = this.userTB.Text.Trim();
-            bldr.Database = this.dbTB.Text.Trim();
-            bldr.Password = this.passwdTB.Text;
-
-            return bldr.GetConnectionString(true);
+            updateUIOnModeChange();
         }
+
+
 
     }
 }

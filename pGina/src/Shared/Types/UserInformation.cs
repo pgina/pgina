@@ -42,6 +42,7 @@ namespace pGina.Shared.Types
         public string Password { get; set; }
         public string Description { get; set; }
         public string Fullname { get; set; }
+        public string OriginalUsername { get; set; }
 
         public UserInformation()
         {

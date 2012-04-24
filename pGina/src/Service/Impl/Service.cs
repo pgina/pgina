@@ -253,6 +253,7 @@ namespace pGina.Service.Impl
             {
                 PluginDriver sessionDriver = new PluginDriver();
                 sessionDriver.UserInformation.Username = msg.Username.Trim();
+                sessionDriver.UserInformation.OriginalUsername = sessionDriver.UserInformation.Username;
                 sessionDriver.UserInformation.Password = msg.Password;
 
                 m_logger.DebugFormat("Processing LoginRequest for: {0} in session: {1} reason: {2}", 
