@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("pGina Ldap Plugin")]
-[assembly: AssemblyDescription("LDAP authentication plugin for pGina")]
+[assembly: AssemblyDescription("LDAP plugin for pGina")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("pGina Team")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Copyright pGina Team 2011")]
+[assembly: AssemblyCopyright("Copyright pGina Team 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyFileVersion("3.0.0.0")]
+[assembly: AssemblyVersion("3.1.0.1")]
+[assembly: AssemblyFileVersion("3.1.0.1")]

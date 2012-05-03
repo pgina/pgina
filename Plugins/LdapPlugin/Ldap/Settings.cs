@@ -52,17 +52,24 @@ namespace pGina.Plugin.Ldap
             m_settings.SetDefault("LdapTimeout", 10);
             m_settings.SetDefault("UseSsl", false);
             m_settings.SetDefault("RequireCert", false);
-            m_settings.SetDefault("ServerCertFile", "");
-            m_settings.SetDefault("DoSearch", false);
-            m_settings.SetDefault("SearchContexts", new string[] { });
-            m_settings.SetDefault("SearchFilter", "");
-            m_settings.SetDefault("DnPattern", "uid=%u,dc=example,dc=com");
+            m_settings.SetDefault("ServerCertFile", "");            
             m_settings.SetDefault("SearchDN", "");
             m_settings.SetDefaultEncryptedSetting("SearchPW", "");
-            m_settings.SetDefault("DoGroupAuthorization", false);
-            m_settings.SetDefault("LdapLoginGroups", new string[] { });
-            m_settings.SetDefault("LdapAdminGroup", "wheel");
+            m_settings.SetDefault("GroupDnPattern", "gid=%g,ou=Group,dc=example,dc=com");
+            m_settings.SetDefault("GroupMemberAttrib", "memberUid");
+
+            // Authentication
             m_settings.SetDefault("AllowEmptyPasswords", false);
+            m_settings.SetDefault("DnPattern", "uid=%u,dc=example,dc=com");
+            m_settings.SetDefault("DoSearch", false);
+            m_settings.SetDefault("SearchFilter", "");
+            m_settings.SetDefault("SearchContexts", new string[] { });
+
+            // Authorization
+            m_settings.SetDefault("GroupAuthzRules", new string[] { (new GroupAuthzRule(true)).ToRegString() });
+
+            // Gateway
+            m_settings.SetDefault("GroupGatewayRules", new string[] { });
         }
     }
 }

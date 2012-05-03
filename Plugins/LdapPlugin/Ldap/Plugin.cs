@@ -54,12 +54,12 @@ namespace pGina.Plugin.Ldap
 
         public string Name
         {
-            get { return "LDAP Authentication"; }
+            get { return "LDAP"; }
         }
 
         public string Description
         {
-            get { return "A plugin that authenticates logins via an LDAP server."; }
+            get { return "Uses a LDAP server as a data source for authentication and/or group authorization."; }
         }
 
         public string Version

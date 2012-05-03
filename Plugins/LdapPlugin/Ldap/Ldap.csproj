@@ -61,6 +61,7 @@
     <Compile Include="Configuration.Designer.cs">
       <DependentUpon>Configuration.cs</DependentUpon>
     </Compile>
+    <Compile Include="GroupRules.cs" />
     <Compile Include="LdapAuthenticator.cs" />
     <Compile Include="LdapServer.cs" />
     <Compile Include="Plugin.cs" />
