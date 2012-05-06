@@ -101,10 +101,19 @@
     <Compile Include="ConfigurationUI.Designer.cs">
       <DependentUpon>ConfigurationUI.cs</DependentUpon>
     </Compile>
+    <Compile Include="LogViewWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LogViewWindow.Designer.cs">
+      <DependentUpon>LogViewWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ConfigurationUI.resx">
       <DependentUpon>ConfigurationUI.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LogViewWindow.resx">
+      <DependentUpon>LogViewWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -172,6 +181,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\arrow-right-3.png" />
+    <None Include="Resources\redx.png" />
+    <None Include="Resources\grayBar.png" />
+    <None Include="Resources\greenCheckMark.png" />
     <Content Include="Resources\pgina_icons.ico" />
     <None Include="Resources\pginalogo.bmp" />
   </ItemGroup>

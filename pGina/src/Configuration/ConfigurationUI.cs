@@ -48,6 +48,7 @@ using Abstractions.Logging;
 using Abstractions.Pipes;
 
 using log4net;
+using pGina.Shared.Types;
 
 namespace pGina.Configuration
 {
@@ -78,6 +79,8 @@ namespace pGina.Configuration
         private const string AUTHORIZATION_COLUMN = "Authorization";
         private const string GATEWAY_COLUMN = "Gateway";
         private const string NOTIFICATION_COLUMN = "Notification";
+
+        private LogViewWindow logWindow = null;
         
         public ConfigurationUI()
         {
@@ -99,7 +102,7 @@ namespace pGina.Configuration
                 MessageBox.Show(string.Format("Unable to load full plugin list: {0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
-            InitLiveLog();
+            InitSimulationTab();
             LoadGeneralSettings();            
         }
 
@@ -336,11 +339,26 @@ namespace pGina.Configuration
             }
         }
 
-        private void InitLiveLog()
+        private void InitSimulationTab()
         {
-            m_liveLog.HeaderStyle = ColumnHeaderStyle.Nonclickable;
-            m_liveLog.Columns[0].Width = m_liveLog.Width - 5;
-            m_liveLog.Columns[0].Text = null;
+            // Set up columns in simPluginResultsListView
+            this.simPluginResultsListView.Columns.Add("Stage", -2, HorizontalAlignment.Left);
+            this.simPluginResultsListView.Columns.Add("Plugin", -2, HorizontalAlignment.Left);
+            this.simPluginResultsListView.Columns.Add("Result", -2, HorizontalAlignment.Left);
+            this.simPluginResultsListView.Columns.Add("Message", -2, HorizontalAlignment.Left);
+            this.simPluginResultsListView.LabelEdit = false;
+            this.simPluginResultsListView.GridLines = true;
+            this.simPluginResultsListView.View = View.Details;
+
+            this.logWindow = new LogViewWindow();
+            this.logWindow.FormClosing += new FormClosingEventHandler(logWindow_FormClosing);
+            ResetStageStatus();
+        }
+
+        void logWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            this.logWindow.Hide();
+            e.Cancel = true;  // Don't dispose the window.  We might show it again later.
         }
 
         private void InitOrderLists()
@@ -876,9 +894,6 @@ namespace pGina.Configuration
         private void simMethodChanged(object sender, EventArgs e)
         {            
             btnLaunchCredUI.Enabled = (sender == m_radioCredUI);
-            chkIgnoreAuthenticateError.Enabled = (sender == m_radioEmulate);
-            chkIgnoreAuthzError.Enabled = (sender == m_radioEmulate);            
-            chkIgnoreGateway.Enabled = (sender == m_radioEmulate);
         }
 
         private void authenticateBtnUp_Click(object sender, EventArgs e)
@@ -935,9 +950,8 @@ namespace pGina.Configuration
             System.Net.NetworkCredential credential = pInvokes.GetCredentials("Simulated Login", "Please enter your credentials...");
             if (credential != null)
             {
-                m_lblAuthResult.Text = "Success";
-                m_lblAuthorizeResult.Text = "Success";
-                m_lblGatewayResult.Text = "Success";
+                ResetStageStatus();
+
                 m_usernameResult.Text = credential.UserName;
                 m_domainResult.Text = credential.Domain;
                 m_passwordResult.Text = credential.Password;
@@ -961,19 +975,18 @@ namespace pGina.Configuration
 
         private void SimLogHandler(string message)
         {
-            m_liveLog.Items.Add(new ListViewItem(new string[] { message }));
+            this.logWindow.LogTextBox.AppendText(message);
         }
 
         private void ResetSimUI()
         {
-            m_message.Text = null;
-            m_liveLog.Items.Clear();
-            m_lblAuthorizeResult.Text = null;
-            m_lblAuthResult.Text = null;
-            m_lblGatewayResult.Text = null;
+            this.simFinalResultMessageTB.Text = null;
+            this.simPluginResultsListView.Items.Clear();
+            ResetStageStatus();
             m_usernameResult.Text = null;
             m_domainResult.Text = null;
             m_passwordResult.Text = null;
+            this.logWindow.LogTextBox.Text = "";
         }
 
         private void btnSimGo_Click(object sender, EventArgs e)
@@ -1032,14 +1045,13 @@ namespace pGina.Configuration
                                 return requestMsg.ToExpando();                                
                             case MessageType.LoginResponse:
                                 LoginResponseMessage responseMsg = new LoginResponseMessage(m);
-                                SetLabelStatus(m_lblAuthResult, responseMsg.Result);
                                 m_usernameResult.Text = responseMsg.Username;
                                 m_passwordResult.Text = responseMsg.Password;
                                 m_domainResult.Text = responseMsg.Domain;
+                                SetStageStatus(this.simFinalResultPB, responseMsg.Result);
                                 if (responseMsg.Message != null)
                                 {
-                                    m_message.Text += responseMsg.Message;
-                                    m_message.Text += "\r\n";
+                                    this.simFinalResultMessageTB.Text = responseMsg.Message;
                                 }
                                 // Respond with a disconnect, we're done
                                 return (new EmptyMessage(MessageType.Disconnect).ToExpando());
@@ -1064,93 +1076,99 @@ namespace pGina.Configuration
         }
 
         private void DoInternalSimulation()
-        {            
+        {
+            Color successColor = Color.FromArgb(150, 255, 150);
+            Color failColor = Color.FromArgb(255, 150, 150);
 
             PluginDriver sessionDriver = new PluginDriver();
             sessionDriver.UserInformation.Username = m_username.Text;
             sessionDriver.UserInformation.Password = m_password.Text;
 
-            // We could use PerformLoginProcess, but we want to know what each
-            // stage reports, so we basically duplicate it here to know whats goin on.
-            bool authenticated = false;
-            bool authorized = false;
-            bool gatewayed = false;
-            
-            PluginDriver.Starting();
+            this.simPluginResultsListView.Items.Clear();
 
-            try
-            {
-                Shared.Types.BooleanResult result = sessionDriver.AuthenticateUser();
-                authenticated = result.Success;
-                if (result.Message != null)
-                {
-                    m_message.Text += result.Message;
-                    m_message.Text += "\r\n";
-                }
-            }
-            catch (Exception ex)
-            {
-                m_logger.ErrorFormat("Exception during authenticate: {0}", ex);
-            }
+            // Execute the login process
+            BooleanResult finalResult = sessionDriver.PerformLoginProcess();
 
-            if (authenticated || chkIgnoreAuthenticateError.Checked)
+            // Get the authentication results
+            PluginActivityInformation actInfo = sessionDriver.SessionProperties.GetTrackedSingle<PluginActivityInformation>();
+            bool authed = false;
+            foreach (Guid uuid in actInfo.GetAuthenticationPlugins())
             {
-                try
-                {
-                    Shared.Types.BooleanResult result = sessionDriver.AuthorizeUser();
-                    authorized = result.Success;
-                    if (result.Message != null)
-                    {
-                        m_message.Text += result.Message;
-                        m_message.Text += "\r\n";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    m_logger.ErrorFormat("Exception during authorize: {0}", ex);
-                }
+                BooleanResult result = actInfo.GetAuthenticationResult(uuid);
+                IPluginAuthentication plugin = actInfo.LoadedAuthenticationPlugins.Find(
+                    delegate(IPluginAuthentication p) { return uuid == p.Uuid; }
+                    );
+                ListViewItem item = new ListViewItem(
+                    new string[] { "Authentication", plugin.Name, result.Success.ToString(), result.Message });
+                if (result.Success) item.BackColor = successColor;
+                else item.BackColor = failColor;
+                this.simPluginResultsListView.Items.Add(item);
+                authed = authed || result.Success;
             }
 
-            if (authorized || chkIgnoreAuthzError.Checked)
+            // Get the authorization results
+            bool authzed = true;  // Default is true
+            foreach (Guid uuid in actInfo.GetAuthorizationPlugins())
             {
-                try
-                {
-                    Shared.Types.BooleanResult result = sessionDriver.GatewayProcess();
-                    gatewayed = result.Success;
-                    if (result.Message != null)
-                    {
-                        m_message.Text += result.Message;
-                        m_message.Text += "\r\n";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    m_logger.ErrorFormat("Exception during gateway: {0}", ex);
-                }
+                BooleanResult result = actInfo.GetAuthorizationResult(uuid);
+                IPluginAuthorization plugin = actInfo.LoadedAuthorizationPlugins.Find(
+                    delegate(IPluginAuthorization p) { return uuid == p.Uuid; }
+                    );
+                ListViewItem item = new ListViewItem(
+                    new string[] { "Authorization", plugin.Name, result.Success.ToString(), result.Message });
+                if (result.Success) item.BackColor = successColor;
+                else item.BackColor = failColor;
+                this.simPluginResultsListView.Items.Add(item);
+                authzed = authzed && result.Success;
             }
 
-            SetLabelStatus(m_lblAuthResult, authenticated);
-            SetLabelStatus(m_lblAuthorizeResult, authorized);
-            SetLabelStatus(m_lblGatewayResult, gatewayed);
+            // Get the gateway results
+            bool gatewayed = true;
+            foreach (Guid uuid in actInfo.GetGatewayPlugins())
+            {
+                BooleanResult result = actInfo.GetGatewayResult(uuid);
+                IPluginAuthenticationGateway plugin = actInfo.LoadedAuthenticationGatewayPlugins.Find(
+                    delegate(IPluginAuthenticationGateway p) { return uuid == p.Uuid; });
+                ListViewItem item = new ListViewItem(
+                    new string[] { "Gateway", plugin.Name, result.Success.ToString(), result.Message });
+                if (result.Success) item.BackColor = successColor;
+                else item.BackColor = failColor;
+                this.simPluginResultsListView.Items.Add(item);
+                gatewayed = gatewayed && result.Success;
+            }
+
+            this.simPluginResultsListView.AutoResizeColumn(0, ColumnHeaderAutoResizeStyle.ColumnContent);
+            this.simPluginResultsListView.AutoResizeColumn(1, ColumnHeaderAutoResizeStyle.ColumnContent);
+            this.simPluginResultsListView.AutoResizeColumn(2, ColumnHeaderAutoResizeStyle.HeaderSize);
+            this.simPluginResultsListView.AutoResizeColumn(3, ColumnHeaderAutoResizeStyle.ColumnContent);
+
+            // Update stage results
+            SetStageStatus(this.simAuthResultPB, authed);
+            SetStageStatus(this.simAuthzResultPB, authzed);
+            SetStageStatus(this.simGatewayResultPB, gatewayed);
+
             m_usernameResult.Text = sessionDriver.UserInformation.Username;
             m_domainResult.Text = sessionDriver.UserInformation.Domain;
             m_passwordResult.Text = sessionDriver.UserInformation.Password;
 
-            // Simplify, now that we've reported actual result to the UI
-            authenticated |= chkIgnoreAuthenticateError.Checked;
-            authorized |= chkIgnoreAuthzError.Checked;
-            gatewayed |= chkIgnoreGateway.Checked;            
-            
-            PluginDriver.Stopping();
+            SetStageStatus(this.simFinalResultPB, finalResult.Success);
+            this.simFinalResultMessageTB.Text = finalResult.Message;
         }
 
-
-        private void SetLabelStatus(Label lbl, bool success)
+        private void SetStageStatus(PictureBox pb, bool success)
         {
             if (success)
-                lbl.Text = "Success";
+                pb.Image = Configuration.Properties.Resources.greenCheckMark;
             else
-                lbl.Text = "Failure";
+                pb.Image = Configuration.Properties.Resources.redx;
+        }
+
+        private void ResetStageStatus()
+        {
+            this.simAuthResultPB.Image = Configuration.Properties.Resources.grayBar;
+            this.simAuthzResultPB.Image = Configuration.Properties.Resources.grayBar;
+            this.simGatewayResultPB.Image = Configuration.Properties.Resources.grayBar;
+            this.simFinalResultPB.Image = Configuration.Properties.Resources.grayBar;
         }
 
         private void btnImageBrowse_Click(object sender, EventArgs e)
@@ -1188,9 +1206,7 @@ namespace pGina.Configuration
                     m_tileImage.Image = pGina.Configuration.Properties.Resources.pginalogo;
                 }
 
-                m_lblAuthorizeResult.Text = null;
-                m_lblAuthResult.Text = null;
-                m_lblGatewayResult.Text = null;
+                ResetStageStatus();
             }
         }
 
@@ -1202,29 +1218,6 @@ namespace pGina.Configuration
         private void m_lblGatewayResult_TextChanged(object sender, EventArgs e)
         {
             HandleLabelTextChange((Label)sender);
-        }
-
-        private void m_liveLog_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button == System.Windows.Forms.MouseButtons.Right)
-            {
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.Filter = "Text File (.txt)|*.txt|All Files (*.*)|*.*";
-                sfd.CheckPathExists = true;
-
-                if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    using (StreamWriter file = new StreamWriter(sfd.FileName))
-                    {
-                        foreach (ListViewItem item in m_liveLog.SelectedItems)
-                        {
-                            file.WriteLine(item.Text.TrimEnd(new char[] { '\n' }));                            
-                        }                        
-                    }
-
-                    MessageBox.Show(string.Format("File saved successfully: {0}", sfd.FileName), "Log Export", MessageBoxButtons.OK);
-                }
-            }
         }
 
         private void pluginsDG_DoubleClick(object sender, EventArgs e)
@@ -1379,6 +1372,11 @@ namespace pGina.Configuration
         private void showTextResultPasswordCB_CheckedChanged(object sender, EventArgs e)
         {
             this.m_passwordResult.UseSystemPasswordChar = ! this.showTextResultPasswordCB.Checked;
+        }
+
+        private void viewLogBtn_Click(object sender, EventArgs e)
+        {
+            this.logWindow.Visible = true;
         }
     }
 }
