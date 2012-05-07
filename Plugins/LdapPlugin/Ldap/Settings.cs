@@ -55,7 +55,7 @@ namespace pGina.Plugin.Ldap
             m_settings.SetDefault("ServerCertFile", "");            
             m_settings.SetDefault("SearchDN", "");
             m_settings.SetDefaultEncryptedSetting("SearchPW", "");
-            m_settings.SetDefault("GroupDnPattern", "gid=%g,ou=Group,dc=example,dc=com");
+            m_settings.SetDefault("GroupDnPattern", "cn=%g,ou=Group,dc=example,dc=com");
             m_settings.SetDefault("GroupMemberAttrib", "memberUid");
 
             // Authentication
