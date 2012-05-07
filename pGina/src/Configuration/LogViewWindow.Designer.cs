@@ -40,6 +40,8 @@
             this.logTextArea.Location = new System.Drawing.Point(12, 12);
             this.logTextArea.Multiline = true;
             this.logTextArea.Name = "logTextArea";
+            this.logTextArea.ReadOnly = true;
+            this.logTextArea.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.logTextArea.Size = new System.Drawing.Size(827, 492);
             this.logTextArea.TabIndex = 0;
             // 
