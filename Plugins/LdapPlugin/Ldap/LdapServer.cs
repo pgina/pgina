@@ -34,6 +34,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Net;
 using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace pGina.Plugin.Ldap
 {
@@ -71,27 +73,39 @@ namespace pGina.Plugin.Ldap
         /// </summary>
         public int Timeout { get; set; }
 
-        /// <summary>
-        /// Create a connection to the LDAP server at the given host and port.
-        /// </summary>
-        /// <param name="host">The FQDN or IP of the LDAP host.</param>
-        /// <param name="port">The port number of the LDAP host.</param>
-        /// <param name="useSsl">Whether or not to use SSL.</param>
-        /// <param name="verifyCert">Whether or not to verify the server certificate.</param>
-        /// <param name="cert">A certificate to verify against the server's certificate (can be null).  If this is null,
-        /// and verifyCert is true, then the server's cert is verified with the Windows certificate store.</param>
-        public LdapServer(string[] hosts, int port, bool useSsl, bool verifyCert, X509Certificate2 cert) 
+        public LdapServer()
         {
-            m_logger.DebugFormat("Initializing LdapServer host(s): [{0}], port: {1}, useSSL = {2}, verifyCert = {3}",
-                string.Join(", ", hosts), port, useSsl, verifyCert);
             m_conn = null;
+            m_cert = null;
+            Timeout = Settings.Store.LdapTimeout;
+            m_useSsl = Settings.Store.UseSsl;
+            m_verifyCert = Settings.Store.RequireCert;
+            string certFile = Settings.Store.ServerCertFile;
+            if (m_useSsl && m_verifyCert)
+            {
+                if (File.Exists(certFile))
+                {
+                    m_logger.DebugFormat("Loading server certificate: {0}", certFile);
+                    m_cert = new X509Certificate2(certFile);
+                }
+                else
+                {
+                    m_logger.ErrorFormat("Certificate file {0} not found.", certFile);
+                    throw new Exception("Server certificate not found");
+                }
+            }
+
+            string[] hosts = Settings.Store.LdapHost;
+            int port = Settings.Store.LdapPort;
             m_serverIdentifier = new LdapDirectoryIdentifier(hosts, port, false, false);
-            m_useSsl = useSsl;
-            m_verifyCert = verifyCert;
-            m_cert = cert;
+
+            m_logger.DebugFormat("Initializing LdapServer host(s): [{0}], port: {1}, useSSL = {2}, verifyCert = {3}",
+                string.Join(", ", hosts), port, m_useSsl, m_verifyCert);
+
+            this.Connect();
         }
 
-        public void Connect(int timeout)
+        private void Connect()
         {
             // Are we re-connecting?  If so, close the previous connection.
             if (m_conn != null)
@@ -100,8 +114,8 @@ namespace pGina.Plugin.Ldap
             }
 
             m_conn = new LdapConnection(m_serverIdentifier);
-            m_conn.Timeout = new System.TimeSpan(0,0,timeout);
-            m_logger.DebugFormat("Timeout set to {0} seconds.", timeout);
+            m_conn.Timeout = new System.TimeSpan(0,0,Timeout);
+            m_logger.DebugFormat("Timeout set to {0} seconds.", Timeout);
             m_conn.SessionOptions.ProtocolVersion = 3;
             m_conn.SessionOptions.SecureSocketLayer = m_useSsl;
             if( m_useSsl )
@@ -196,6 +210,17 @@ namespace pGina.Plugin.Ldap
             }
         }
 
+        public void BindForSearch()
+        {
+            string searchDn = Settings.Store.SearchDN;
+            string searchPw = Settings.Store.GetEncryptedSetting("SearchPW");
+
+            if (string.IsNullOrEmpty(searchDn))
+                this.Bind();
+            else
+                this.Bind(new NetworkCredential(searchDn, searchPw));
+        }
+
         /// <summary>
         /// Try to bind to the LDAP server with the given credentials.  This uses
         /// basic authentication.  Throws LdapException if the bind fails.
@@ -256,6 +281,33 @@ namespace pGina.Plugin.Ldap
             }
 
             return null;
+        }
+
+        public bool MemberOfGroup(string user, string group)
+        {
+            string groupDn = Settings.Store.GroupDnPattern;
+            string groupAttribute = Settings.Store.GroupMemberAttrib;
+
+            if (string.IsNullOrEmpty(groupDn))
+                throw new Exception("Can't resolve group DN, group DN pattern missing.");
+
+            if (string.IsNullOrEmpty(groupAttribute))
+                throw new Exception("Can't resolve group membership, group attribute missing.");
+
+            groupDn = Regex.Replace(groupDn, @"\%g", group);
+            string filter = string.Format("({0}={1})", groupAttribute, user);
+            m_logger.DebugFormat("Searching for group membership, DN: {0}  Filter: {1}", groupDn, filter);
+            try
+            {
+                SearchRequest req = new SearchRequest(groupDn, filter, SearchScope.Base, null);
+                SearchResponse resp = (SearchResponse)m_conn.SendRequest(req);
+                return resp.Entries.Count > 0;
+            }
+            catch (DirectoryOperationException e)
+            {
+                m_logger.ErrorFormat("Error when checking for group membership: {0}", e.Message);
+                return false;
+            }
         }
 
         public void Dispose()

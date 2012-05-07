@@ -46,10 +46,12 @@ namespace pGina.Plugin.Ldap
     {
         private ILog m_logger = LogManager.GetLogger("LdapAuthenticator");
         private NetworkCredential m_creds;
+        private LdapServer m_serv;
 
-        public LdapAuthenticator(NetworkCredential creds)
+        public LdapAuthenticator(NetworkCredential creds, LdapServer serv)
         {
             m_creds = creds;
+            m_serv = serv;
         }
 
         public BooleanResult Authenticate()
@@ -66,133 +68,91 @@ namespace pGina.Plugin.Ldap
             // Generate username (if we're not doing a search for it)
             string userDN = null;
             bool doSearch = Settings.Store.DoSearch;
-            if ( ! doSearch )
+            if (!doSearch)
             {
                 userDN = CreateUserDN();
             }
-
-            X509Certificate2 serverCert = null;
-            bool useSsl = Settings.Store.UseSsl;
-            bool requireCert = Settings.Store.RequireCert;
-            string certFile = Settings.Store.ServerCertFile;
-            if( useSsl && requireCert && certFile.Length > 0 ) 
+            
+            try
             {
-                if (File.Exists(certFile))
+                // If we're searching, attempt to bind with the search credentials, or anonymously
+                if (doSearch)
                 {
-                    m_logger.DebugFormat("Loading server certificate: {0}", certFile);
-                    serverCert = new X509Certificate2(certFile);
+                    // Set this to null (should be null anyway) because we are going to search
+                    // for it.
+                    userDN = null;
+                    try
+                    {
+                        // Attempt to bind in order to do the search
+                        m_serv.BindForSearch();
+
+                        // If we get here, a bind was successful, so we can search for the user's DN
+                        userDN = FindUserDN();
+                    }
+                    catch (LdapException e)
+                    {
+                        if (e.ErrorCode == 81)
+                        {
+                            m_logger.ErrorFormat("Server unavailable: {0}", e.Message);
+                        }
+                        else if (e.ErrorCode == 49)
+                        {
+                            m_logger.ErrorFormat("Bind failed: invalid credentials.");
+                        }
+                        else
+                        {
+                            m_logger.ErrorFormat("Exception ({0}) when binding for search: {1}", e.ErrorCode, e);
+                        }
+
+                        return new BooleanResult { Success = false, Message = "Unable to contact LDAP server." };
+                    }
+                }
+
+                // If we've got a userDN, attempt to authenticate the user
+                if (userDN != null)
+                {
+                    try
+                    {
+                        // Attempt to bind with the user's LDAP credentials
+                        m_logger.DebugFormat("Attempting to bind with DN {0}", userDN);
+                        NetworkCredential ldapCredential = new NetworkCredential(userDN, m_creds.Password);
+                        m_serv.Bind(ldapCredential);
+
+                        // If we get here, the authentication was successful, we're done!
+                        m_logger.DebugFormat("LDAP DN {0} successfully bound to server, return success", ldapCredential.UserName);
+                        return new BooleanResult { Success = true };
+                    }
+                    catch (LdapException e)
+                    {
+                        if (e.ErrorCode == 81)
+                        {
+                            m_logger.ErrorFormat("Server unavailable: " + e.Message);
+                            return new BooleanResult { Success = false, Message = "Failed to contact LDAP server." };
+                        }
+                        else if (e.ErrorCode == 49)
+                        {
+                            m_logger.ErrorFormat("Bind failed for LDAP DN {0}: invalid credentials.", userDN);
+                            return new BooleanResult { Success = false, Message = "Authentication via LDAP failed.  Invalid credentials." };
+                        }
+                        else
+                        {
+                            m_logger.ErrorFormat("Exception ({0}) when binding for authentication: {1}", e.ErrorCode, e.Message);
+                            return new BooleanResult { Success = false, Message = "Authentication via LDAP failed: " + e.Message };
+                        }
+                    }
+                } // end if(userDN != null)
+            }
+            catch (Exception e)
+            {
+                if (e is LdapException)
+                {
+                    m_logger.ErrorFormat("LdapException ({0}): {1}", ((LdapException)e).ErrorCode, e);
                 }
                 else
                 {
-                    m_logger.ErrorFormat("Certificate file {0} not found, giving up.", certFile);
-                    return new BooleanResult{ Success = false, Message = "Server certificate not found" };
+                    m_logger.DebugFormat("Exception: {0}", e);
                 }
             }
-
-            string[] hosts = Settings.Store.LdapHost;
-            int port = Settings.Store.LdapPort;
-            using (LdapServer serv = new LdapServer(hosts, port, useSsl, requireCert, serverCert))
-            {
-                try
-                {
-                    // Connect.  Note that this always succeeds whether or not the server is 
-                    // actually available.  It not clear to me whether this actually talks to the server at all.  
-                    // The timeout only seems to take effect when binding.
-                    int timeout = Settings.Store.LdapTimeout;
-                    serv.Connect(timeout);
-
-                    // If we're searching, attempt to bind with the search credentials, or anonymously
-                    if (doSearch)
-                    {
-                        // Set this to null (should be null anyway) because we are going to search
-                        // for it.
-                        userDN = null;
-                        try
-                        {
-                            // Attempt to bind in order to do the search
-                            string searchDN = Settings.Store.SearchDN;
-                            string searchPW = Settings.Store.GetEncryptedSetting("SearchPW");
-                            if (searchDN.Length > 0)
-                            {
-                                NetworkCredential creds = new NetworkCredential(searchDN, searchPW);
-                                m_logger.DebugFormat("Attempting to bind with DN: {0} for search", creds.UserName);
-                                serv.Bind(creds);
-                            }
-                            else
-                            {
-                                m_logger.DebugFormat("Attempting to bind anonymously for search.");
-                                serv.Bind();
-                            }
-
-                            // If we get here, a bind was successful, so we can search for the user's DN
-                            userDN = FindUserDN(serv);
-                        }
-                        catch (LdapException e)
-                        {
-                            if (e.ErrorCode == 81)
-                            {
-                                m_logger.ErrorFormat("Server unavailable: {0}", e.Message);
-                            }
-                            else if (e.ErrorCode == 49)
-                            {
-                                m_logger.ErrorFormat("Bind failed: invalid credentials.");
-                            }
-                            else
-                            {
-                                m_logger.ErrorFormat("Exception ({0}) when binding for search: {1}", e.ErrorCode, e);
-                            }
-
-                            return new BooleanResult { Success = false, Message = "Unable to contact LDAP server." };
-                        }
-                    }
-
-                    // If we've got a userDN, attempt to authenticate the user
-                    if (userDN != null)
-                    {
-                        try
-                        {
-                            // Attempt to bind with the user's LDAP credentials
-                            m_logger.DebugFormat("Attempting to bind with DN {0}", userDN);
-                            NetworkCredential ldapCredential = new NetworkCredential(userDN, m_creds.Password);
-                            serv.Bind(ldapCredential);
-
-                            // If we get here, the authentication was successful, we're done!
-                            m_logger.DebugFormat("LDAP DN {0} successfully bound to server, return success", ldapCredential.UserName);
-                            return new BooleanResult { Success = true };
-                        }
-                        catch (LdapException e)
-                        {
-                            if (e.ErrorCode == 81)
-                            {
-                                m_logger.ErrorFormat("Server unavailable: " + e.Message);
-                                return new BooleanResult { Success = false, Message = "Failed to contact LDAP server." };
-                            }
-                            else if (e.ErrorCode == 49)
-                            {
-                                m_logger.ErrorFormat("Bind failed for LDAP DN {0}: invalid credentials.", userDN);
-                                return new BooleanResult { Success = false, Message = "Authentication via LDAP failed.  Invalid credentials." };
-                            }
-                            else
-                            {
-                                m_logger.ErrorFormat("Exception ({0}) when binding for authentication: {1}", e.ErrorCode, e.Message);
-                                return new BooleanResult { Success = false, Message = "Authentication via LDAP failed: " + e.Message };
-                            }
-                        }
-
-                    } // end if(userDN != null)
-                }
-                catch (Exception e)
-                {
-                    if (e is LdapException)
-                    {
-                        m_logger.ErrorFormat("LdapException ({0}): {1}", ((LdapException)e).ErrorCode, e);
-                    }
-                    else
-                    {
-                        m_logger.DebugFormat("Exception: {0}", e);
-                    }
-                }
-            } // end using
 
             return new BooleanResult{ Success = false, Message = "Authentication via LDAP failed." };
         }
@@ -203,9 +163,8 @@ namespace pGina.Plugin.Ldap
         /// The search filter is taken from Settings.Store.SearchFilter.  If all
         /// searches fail, this method returns null.
         /// </summary>
-        /// <param name="serv">The LdapServer to use when performing the search.</param>
         /// <returns>The DN of the first object found, or null if searches fail.</returns>
-        private string FindUserDN(LdapServer serv)
+        private string FindUserDN()
         {
             string filter = CreateSearchFilter();
 
@@ -217,7 +176,7 @@ namespace pGina.Plugin.Ldap
                 string dn = null;
                 try
                 {
-                    dn = serv.FindFirstDN(context, filter);
+                    dn = m_serv.FindFirstDN(context, filter);
                 }
                 catch (DirectoryOperationException e)
                 {

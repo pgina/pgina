@@ -292,15 +292,6 @@ namespace pGina.Plugin.Ldap
                 return false;
             }
 
-            if ( (searchForDnCheckBox.Checked ||
-                authzRulesListBox.Items.Count > 0 ||
-                gatewayRulesListBox.Items.Count > 0) && 
-                string.IsNullOrEmpty(searchDnTextBox.Text.Trim()) )
-            {
-                MessageBox.Show("WARNING: You should provide a Search DN when \n" +
-                    " \"Search for DN\" is enabled or using a group authorization \n" +
-                    " or gateway rule.");
-            }
             if ((authzRulesListBox.Items.Count > 0 ||
                 gatewayRulesListBox.Items.Count > 0) && (
                 string.IsNullOrEmpty(this.groupDNPattern.Text.Trim()) ||
