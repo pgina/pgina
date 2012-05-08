@@ -260,6 +260,7 @@ namespace pGina.Plugin.LocalMachine
                 using (user = new UserPrincipal(m_machinePrincipal))
                 {
                     user.Name = userInfo.Username;
+                    user.SetPassword(userInfo.Password);
                     user.Save();
 
                     // Sync via DE
