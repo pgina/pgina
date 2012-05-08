@@ -1,8 +1,12 @@
-3.0.11 (2012/04/07)
+3.0.11.1 (2012/05/08)
+---------------------------
+ - Bug fix for systems with password security policies (#126)
+
+3.0.11.0 (2012/04/07)
 ---------------------------
  - LDAP plugin option to always fail on empty passwords (#118)
 
-3.0.10 (2012/03/25)
+3.0.10.0 (2012/03/25)
 ---------------------------
  - EmailAuth Plugin updates to 3.0.0.1
  - Add UsernameMod plugin by Evan Horne
