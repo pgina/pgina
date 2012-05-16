@@ -21,7 +21,7 @@ namespace pGina.Plugin.LocalMachine
             m_settings.SetDefault("AuthzLocalGroupsOnly", false);        // Require group membership in following list
             m_settings.SetDefault("AuthzLocalGroups", new string[] { }); // Only users in these groups (in their UserInformation, not in SAM!) can be authorized
             m_settings.SetDefault("AuthzApplyToAllUsers", true);         // Authorize *all* users according to above rules, if false - non-admin/group checks are only done for users *we* authenticated            
-            m_settings.SetDefault("MirrorGroupsForAuthdUsers", false);   // Load users groups from local SAM into userInfo
+            m_settings.SetDefault("MirrorGroupsForAuthdUsers", true);    // Load users groups from local SAM into userInfo
             
             // Gateway step settings                        
             m_settings.SetDefault("GroupCreateFailIsFail", true);        // Do we fail gateway if group create/add fails?            
