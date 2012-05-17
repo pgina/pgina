@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -33,9 +33,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Reflection;
 using Microsoft.Win32;
 
 using log4net;
+using System.Configuration.Install;
 
 namespace pGina.InstallUtil
 {
@@ -43,17 +45,32 @@ namespace pGina.InstallUtil
     {
         static readonly string PGINA_SERVICE_NAME = "pGina";
         static readonly string PGINA_SERVICE_EXE = "pGina.Service.ServiceHost.exe";
-        static readonly string PGINA_CP_REGISTRATION_EXE = "pGina.CredentialProvider.Registration.exe";
         static readonly string PGINA_CONFIG_EXE = "pGina.Configuration.exe";
-        static readonly SecurityIdentifier ADMIN_GROUP = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
-        static readonly SecurityIdentifier USERS_GROUP = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
-        static readonly SecurityIdentifier SYSTEM_ACCT = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
-        static readonly SecurityIdentifier AUTHED_USERS = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
-                   
+        
+        // Initalized in the static constructor
+        static readonly SecurityIdentifier ADMIN_GROUP;
+        static readonly SecurityIdentifier USERS_GROUP;
+        static readonly SecurityIdentifier SYSTEM_ACCT;
+        static readonly SecurityIdentifier AUTHED_USERS;
+        private static readonly string INSTALL_UTIL_PATH;
+        private static readonly string PGINA_SERVICE_FULL_PATH;
+        
         static Program()
         {
             // Init logging
             pGina.Shared.Logging.Logging.Init();
+            
+            // Intialize readonly variables
+
+            PGINA_SERVICE_FULL_PATH = Path.Combine(
+               Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), PGINA_SERVICE_EXE);
+            INSTALL_UTIL_PATH = Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(),
+                "installutil.exe");
+
+            ADMIN_GROUP = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
+            USERS_GROUP = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+            SYSTEM_ACCT = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
+            AUTHED_USERS = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
         }
 
         static ILog m_logger = LogManager.GetLogger("pGina.InstallUtil");
@@ -201,45 +218,26 @@ namespace pGina.InstallUtil
 
         private static void RegisterAndEnableCredentialProvider()
         {
-            if (!File.Exists(PGINA_CP_REGISTRATION_EXE))
-            {
-                throw new Exception("The registration executable was not found.");
-            }
+            pGina.CredentialProvider.Registration.CredProviderManager cpManager =
+                pGina.CredentialProvider.Registration.CredProviderManager.GetManager();
 
             m_logger.Info("Registering CP/GINA....");
-            Process p = Process.Start(PGINA_CP_REGISTRATION_EXE, "--mode install");
-            p.WaitForExit();
-            if (p.ExitCode != 0)
-            {
-                m_logger.ErrorFormat("Error registering CP/GINA.");
-                throw new Exception("Error registering CP/GINA.");
-            }
+            cpManager.CpInfo.OpMode = CredentialProvider.Registration.OperationMode.INSTALL;
+            cpManager.ExecuteDefaultAction();
 
             m_logger.Info("Enabling CP/GINA...");
-            p = Process.Start(PGINA_CP_REGISTRATION_EXE, "--mode enable");
-            p.WaitForExit();
-            if (p.ExitCode != 0)
-            {
-                m_logger.ErrorFormat("Error enabling CP/GINA.");
-                throw new Exception("Error enabling CP/GINA.");
-            }
+            cpManager.CpInfo.OpMode = CredentialProvider.Registration.OperationMode.ENABLE;
+            cpManager.ExecuteDefaultAction();
         }
 
         private static void UninstallCredentialProvider()
         {
-            if (!File.Exists(PGINA_CP_REGISTRATION_EXE))
-            {
-                throw new Exception("The registration executable was not found.");
-            }
+            pGina.CredentialProvider.Registration.CredProviderManager cpManager =
+                pGina.CredentialProvider.Registration.CredProviderManager.GetManager();
 
             m_logger.Info("Uninstalling CP/GINA....");
-            Process p = Process.Start(PGINA_CP_REGISTRATION_EXE, "--mode uninstall");
-            p.WaitForExit();
-            if (p.ExitCode != 0)
-            {
-                m_logger.ErrorFormat("Error uninstalling CP/GINA.");
-                throw new Exception("Error uninstalling CP/GINA.");
-            }
+            cpManager.CpInfo.OpMode = CredentialProvider.Registration.OperationMode.UNINSTALL;
+            cpManager.ExecuteDefaultAction();
         }
 
         private static void InstallAndStartService()
@@ -280,51 +278,65 @@ namespace pGina.InstallUtil
                         pGinaService.Stop();
                     }
                 }
+                else
+                    throw new Exception("pGina service not installed");
             }
         }
 
         private static void StartService()
         {
-            m_logger.InfoFormat("Starting pGina service...");
-            Process p = new Process();
-            p.StartInfo.FileName = PGINA_SERVICE_EXE;
-            p.StartInfo.Arguments = "--start";
-            p.Start();
-            p.WaitForExit();
-            if (p.ExitCode != 0)
+            using (ServiceController pGinaService = GetServiceController())
             {
-                m_logger.ErrorFormat("Failed to start service (exit code {0}).", p.ExitCode);
-                throw new Exception("Failed to start service.");
+                if (pGinaService != null)
+                {
+                    if ( pGinaService.Status != ServiceControllerStatus.Running )
+                    {
+                        m_logger.InfoFormat("Starting pGina service...");
+                        pGinaService.Start();
+                    }
+                }
+                else
+                    throw new Exception("pGina service not installed");
             }
         }
 
         private static void UninstallService()
         {
             m_logger.InfoFormat("Uninstalling pGina service...");
-            Process p = new Process();
-            p.StartInfo.FileName = PGINA_SERVICE_EXE;
-            p.StartInfo.Arguments = "--uninstall";
-            p.Start();
-            p.WaitForExit();
-            if (p.ExitCode != 0)
+
+            // If we can find the .NET installutil.exe, run that, otherwise, use 
+            // ManagedInstallerClass (not recommended by MSDN, but works).
+            if (File.Exists(INSTALL_UTIL_PATH))
             {
-                m_logger.ErrorFormat("Failed to uninstall service (exit code {0}).", p.ExitCode);
-                throw new Exception("Failed to uninstall pGina service.");
+                // Need quotes around the path when calling installutil.exe
+                string[] args = { "/u", string.Format("\"{0}\"", PGINA_SERVICE_FULL_PATH) };
+                // Call the .NET installutil.exe
+                CallInstallUtil(args);   
+            }
+            else
+            {
+                m_logger.DebugFormat("Can't find .NET installutil.exe ({0}), trying ManagedInstallerClass.InstallHelper", INSTALL_UTIL_PATH);
+                ManagedInstallerClass.InstallHelper(new string[] { "/u", PGINA_SERVICE_FULL_PATH });
             }
         }
 
         private static void InstallService()
         {
             m_logger.InfoFormat("Installing pGina service...");
-            Process p = new Process();
-            p.StartInfo.FileName = PGINA_SERVICE_EXE;
-            p.StartInfo.Arguments = "--install";
-            p.Start();
-            p.WaitForExit();
-            if (p.ExitCode != 0)
+
+            // If we can find the .NET installutil.exe, run that, otherwise, use 
+            // ManagedInstallerClass (not recommended by MSDN, but works).
+            if (File.Exists(INSTALL_UTIL_PATH))
             {
-                m_logger.ErrorFormat("Failed to install service (exit code {0}).", p.ExitCode);
-                throw new Exception("Service installation failed.");
+                // Need quotes around the path when calling installutil.exe
+                string[] args = { string.Format( "\"{0}\"", PGINA_SERVICE_FULL_PATH ) };
+                // Call the .NET installutil.exe
+                CallInstallUtil(args);
+            }
+            else
+            {
+                m_logger.DebugFormat("Can't find .NET installutil.exe ({0}), trying ManagedInstallerClass.InstallHelper", INSTALL_UTIL_PATH);
+                ManagedInstallerClass.InstallHelper(new string[] {PGINA_SERVICE_FULL_PATH});
             }
         }
 
@@ -355,6 +367,40 @@ namespace pGina.InstallUtil
                 m_logger.DebugFormat("    Propagation: {0}", ar.PropagationFlags);
                 m_logger.DebugFormat("      Inherited? {0}", ar.IsInherited);
             }
+        }
+
+        private static void CallInstallUtil(string[] args)
+        {
+            Process proc = new Process();
+            proc.StartInfo.FileName = INSTALL_UTIL_PATH;
+            proc.StartInfo.Arguments = String.Join(" ", args);
+            proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            proc.StartInfo.RedirectStandardOutput = true;
+            proc.StartInfo.RedirectStandardError = true;
+            proc.ErrorDataReceived += new DataReceivedEventHandler(proc_ErrorDataReceived);
+            proc.OutputDataReceived += new DataReceivedEventHandler(proc_OutputDataReceived);
+            proc.StartInfo.UseShellExecute = false;
+
+            proc.Start();
+            proc.BeginOutputReadLine();
+            proc.BeginErrorReadLine();
+            proc.WaitForExit();
+
+            //  ---check result---
+            if (proc.ExitCode != 0)
+            {
+                throw new Exception(String.Format("InstallUtil error -- code {0}", proc.ExitCode));
+            }
+        }
+
+        static void proc_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            m_logger.Info(e.Data);
+        }
+
+        static void proc_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            m_logger.Error(e.Data);
         }
     }
 }

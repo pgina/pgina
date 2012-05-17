@@ -99,8 +99,11 @@ namespace pGina.CredentialProvider.Registration
 
         public static FileInfo Find64BitDll(string path, string baseName)
         {
+            if (! baseName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+                baseName += ".dll";
+
             // Check path directory
-            string fullPath = String.Format(@"{0}\{1}.dll", path, baseName);
+            string fullPath = Path.Combine(path, baseName);
             if (File.Exists(fullPath))
             {
                 if (DllUtils.Is64BitDll(fullPath))
@@ -108,7 +111,7 @@ namespace pGina.CredentialProvider.Registration
             }
 
             // Check x64 subdirectory
-            fullPath = String.Format(@"{0}\x64\{1}.dll", path, baseName);
+            fullPath = Path.Combine(path, "x64", baseName);
             if (File.Exists(fullPath))
             {
                 if (DllUtils.Is64BitDll(fullPath))
@@ -120,8 +123,11 @@ namespace pGina.CredentialProvider.Registration
 
         public static FileInfo Find32BitDll(string path, string baseName)
         {
+            if (!baseName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+                baseName += ".dll";
+
             // Check path directory
-            string fullPath = String.Format(@"{0}\{1}.dll",path, baseName);
+            string fullPath = Path.Combine(path, baseName);
             if (File.Exists(fullPath))
             {
                 if (!DllUtils.Is64BitDll(fullPath))
@@ -129,7 +135,7 @@ namespace pGina.CredentialProvider.Registration
             }
 
             // Check Win32 subdirectory
-            fullPath = String.Format(@"{0}\Win32\{1}.dll", path, baseName);
+            fullPath = Path.Combine(path, "Win32", baseName);
             if (File.Exists(fullPath))
             {
                 if (!DllUtils.Is64BitDll(fullPath))
