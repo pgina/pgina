@@ -1,3 +1,7 @@
+3.0.11.2 (2012/05/16)
+---------------------------
+ - Add some additional logging in install mode.
+
 3.0.11.1 (2012/05/08)
 ---------------------------
  - Bug fix for systems with password security policies (#126)
