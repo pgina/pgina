@@ -103,6 +103,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared\Shared.csproj">
+      <Project>{0EEFBC3F-4DFD-42F6-888E-1A28F4EFEFE3}</Project>
+      <Name>Shared</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Impl\Impl.csproj">
       <Project>{62A03CD6-356A-491F-A0A5-781C7649DA1C}</Project>
       <Name>Impl</Name>

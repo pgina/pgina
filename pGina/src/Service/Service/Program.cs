@@ -46,22 +46,37 @@ namespace Service
         {
             if (System.Environment.UserInteractive)
             {
-                ILog m_log = LogManager.GetLogger("Service Install");  
-                string parameter = string.Concat(args);
-                switch (parameter)
+                // Initalize logging and grab a logger
+                pGina.Shared.Logging.Logging.Init();
+                ILog m_log = LogManager.GetLogger("Service Install");
+
+                try
                 {
-                    case "--install":
-                        ManagedInstallerClass.InstallHelper(new string[] { Assembly.GetExecutingAssembly().Location });
-                        break;
-                    case "--uninstall":
-                        ManagedInstallerClass.InstallHelper(new string[] { "/u", Assembly.GetExecutingAssembly().Location });
-                        break;
-                    case "--start":
-                        Start(args);
-                        break;
-                    case "--stop":
-                        Stop();
-                        break;
+                    string parameter = string.Concat(args);
+                    switch (parameter)
+                    {
+                        case "--install":
+                            m_log.DebugFormat("Installing service...");
+                            ManagedInstallerClass.InstallHelper(new string[] { Assembly.GetExecutingAssembly().Location });
+                            break;
+                        case "--uninstall":
+                            m_log.DebugFormat("Uninstalling service...");
+                            ManagedInstallerClass.InstallHelper(new string[] { "/u", Assembly.GetExecutingAssembly().Location });
+                            break;
+                        case "--start":
+                            m_log.Debug("Starting service...");
+                            Start(args);
+                            break;
+                        case "--stop":
+                            m_log.Debug("Stopping service...");
+                            Stop();
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    m_log.ErrorFormat("Uncaught exception in UserInteractive mode: {0}", e);
+                    Environment.Exit(1);
                 }
             }
             else
