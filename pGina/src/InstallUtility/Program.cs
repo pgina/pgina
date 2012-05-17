@@ -203,11 +203,6 @@ namespace pGina.InstallUtil
 
         private static void RegisterAndEnableCredentialProvider()
         {
-            if (!File.Exists(PGINA_CP_REGISTRATION_EXE))
-            {
-                throw new Exception("The registration executable was not found.");
-            }
-
             pGina.CredentialProvider.Registration.CredProviderManager cpManager =
                 pGina.CredentialProvider.Registration.CredProviderManager.GetManager();
 
@@ -222,11 +217,6 @@ namespace pGina.InstallUtil
 
         private static void UninstallCredentialProvider()
         {
-            if (!File.Exists(PGINA_CP_REGISTRATION_EXE))
-            {
-                throw new Exception("The registration executable was not found.");
-            }
-
             pGina.CredentialProvider.Registration.CredProviderManager cpManager =
                 pGina.CredentialProvider.Registration.CredProviderManager.GetManager();
 
