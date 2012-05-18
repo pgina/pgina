@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -45,17 +45,32 @@ namespace pGina.InstallUtil
     {
         static readonly string PGINA_SERVICE_NAME = "pGina";
         static readonly string PGINA_SERVICE_EXE = "pGina.Service.ServiceHost.exe";
-        static readonly string PGINA_CP_REGISTRATION_EXE = "pGina.CredentialProvider.Registration.exe";
         static readonly string PGINA_CONFIG_EXE = "pGina.Configuration.exe";
-        static readonly SecurityIdentifier ADMIN_GROUP = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
-        static readonly SecurityIdentifier USERS_GROUP = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
-        static readonly SecurityIdentifier SYSTEM_ACCT = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
-        static readonly SecurityIdentifier AUTHED_USERS = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
-                   
+        
+        // Initalized in the static constructor
+        static readonly SecurityIdentifier ADMIN_GROUP;
+        static readonly SecurityIdentifier USERS_GROUP;
+        static readonly SecurityIdentifier SYSTEM_ACCT;
+        static readonly SecurityIdentifier AUTHED_USERS;
+        private static readonly string INSTALL_UTIL_PATH;
+        private static readonly string PGINA_SERVICE_FULL_PATH;
+        
         static Program()
         {
             // Init logging
             pGina.Shared.Logging.Logging.Init();
+            
+            // Intialize readonly variables
+
+            PGINA_SERVICE_FULL_PATH = Path.Combine(
+               Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), PGINA_SERVICE_EXE);
+            INSTALL_UTIL_PATH = Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(),
+                "installutil.exe");
+
+            ADMIN_GROUP = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
+            USERS_GROUP = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+            SYSTEM_ACCT = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
+            AUTHED_USERS = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
         }
 
         static ILog m_logger = LogManager.GetLogger("pGina.InstallUtil");
@@ -288,19 +303,41 @@ namespace pGina.InstallUtil
         private static void UninstallService()
         {
             m_logger.InfoFormat("Uninstalling pGina service...");
-            string[] args = { "/u", "\"" + Path.Combine(
-                Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location ), PGINA_SERVICE_EXE) + "\"" };
-            //ManagedInstallerClass.InstallHelper(args);
-            CallInstallUtil(args);
+
+            // If we can find the .NET installutil.exe, run that, otherwise, use 
+            // ManagedInstallerClass (not recommended by MSDN, but works).
+            if (File.Exists(INSTALL_UTIL_PATH))
+            {
+                // Need quotes around the path when calling installutil.exe
+                string[] args = { "/u", string.Format("\"{0}\"", PGINA_SERVICE_FULL_PATH) };
+                // Call the .NET installutil.exe
+                CallInstallUtil(args);   
+            }
+            else
+            {
+                m_logger.DebugFormat("Can't find .NET installutil.exe ({0}), trying ManagedInstallerClass.InstallHelper", INSTALL_UTIL_PATH);
+                ManagedInstallerClass.InstallHelper(new string[] { "/u", PGINA_SERVICE_FULL_PATH });
+            }
         }
 
         private static void InstallService()
         {
             m_logger.InfoFormat("Installing pGina service...");
-            string[] args = { "\"" + Path.Combine(
-                Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location ), PGINA_SERVICE_EXE) + "\"" };
-            //ManagedInstallerClass.InstallHelper(args);
-            CallInstallUtil(args);
+
+            // If we can find the .NET installutil.exe, run that, otherwise, use 
+            // ManagedInstallerClass (not recommended by MSDN, but works).
+            if (File.Exists(INSTALL_UTIL_PATH))
+            {
+                // Need quotes around the path when calling installutil.exe
+                string[] args = { string.Format( "\"{0}\"", PGINA_SERVICE_FULL_PATH ) };
+                // Call the .NET installutil.exe
+                CallInstallUtil(args);
+            }
+            else
+            {
+                m_logger.DebugFormat("Can't find .NET installutil.exe ({0}), trying ManagedInstallerClass.InstallHelper", INSTALL_UTIL_PATH);
+                ManagedInstallerClass.InstallHelper(new string[] {PGINA_SERVICE_FULL_PATH});
+            }
         }
 
         private static ServiceController GetServiceController()
@@ -332,13 +369,10 @@ namespace pGina.InstallUtil
             }
         }
 
-        private static readonly string INSTALL_UTIL_PATH = 
-            System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
-
         private static void CallInstallUtil(string[] args)
         {
             Process proc = new Process();
-            proc.StartInfo.FileName = Path.Combine(INSTALL_UTIL_PATH, "installutil.exe");
+            proc.StartInfo.FileName = INSTALL_UTIL_PATH;
             proc.StartInfo.Arguments = String.Join(" ", args);
             proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             proc.StartInfo.RedirectStandardOutput = true;
