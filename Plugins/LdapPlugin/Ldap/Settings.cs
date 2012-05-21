@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -67,6 +67,8 @@ namespace pGina.Plugin.Ldap
 
             // Authorization
             m_settings.SetDefault("GroupAuthzRules", new string[] { (new GroupAuthzRule(true)).ToRegString() });
+            m_settings.SetDefault("AuthzRequireAuth", false);
+            m_settings.SetDefault("AuthzAllowOnError", true);
 
             // Gateway
             m_settings.SetDefault("GroupGatewayRules", new string[] { });

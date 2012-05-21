@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.DirectoryServices.Protocols;
 
 using log4net;
 
@@ -77,6 +78,11 @@ namespace pGina.Plugin.Ldap
         
         public BooleanResult AuthenticateUser(Shared.Types.SessionProperties properties)
         {
+            // Get the LdapServer object from the session properties (created in BeginChain)
+            LdapServer server = properties.GetTrackedSingle<LdapServer>();
+            if (server == null)
+                return new BooleanResult() { Success = false, Message = "Internal error: LdapServer object not available" };
+
             try
             {
                 m_logger.DebugFormat("AuthenticateUser({0})", properties.Id.ToString());
@@ -87,17 +93,38 @@ namespace pGina.Plugin.Ldap
                 NetworkCredential creds = new NetworkCredential(userInfo.Username, userInfo.Password);
 
                 // Authenticate the login
-                LdapServer server = properties.GetTrackedSingle<LdapServer>();
-                if (server == null)
-                    return new BooleanResult() { Success = false, Message = "Internal error: LdapServer object not available" };
-
                 m_logger.DebugFormat("Attempting authentication for {0}", creds.UserName);
                 LdapAuthenticator authenticator = new LdapAuthenticator(creds, server);
                 return authenticator.Authenticate();
             }
             catch (Exception e)
             {
-                m_logger.ErrorFormat("AuthenticateUser exception: {0}", e);
+                if (e is LdapException)
+                {
+                    LdapException ldapEx = (e as LdapException);
+                    
+                    if (ldapEx.ErrorCode == 81)
+                    {
+                        // Server can't be contacted, set server object to null
+                        m_logger.ErrorFormat("Server unavailable: {0}, {1}", ldapEx.ServerErrorMessage, e.Message);
+                        server.Close();
+                        properties.AddTrackedSingle<LdapServer>(null);
+                        return new BooleanResult { Success = false, Message = "Failed to contact LDAP server." };
+                    }
+                    else if (ldapEx.ErrorCode == 49)
+                    {
+                        // This is invalid credentials, return false, but server object should remain connected
+                        m_logger.ErrorFormat("LDAP bind failed: invalid credentials.");
+                        return new BooleanResult { Success = false, Message = "Authentication via LDAP failed. Invalid credentials." };
+                    }
+                }
+
+                // This is an unexpected error, so set LdapServer object to null, because
+                // subsequent stages shouldn't use it, and this indicates to later stages
+                // that this stage failed unexpectedly.
+                server.Close();
+                properties.AddTrackedSingle<LdapServer>(null);
+                m_logger.ErrorFormat("Exception in LDAP authentication: {0}", e);
                 throw;  // Allow pGina service to catch and handle exception
             }
         }        
@@ -136,18 +163,56 @@ namespace pGina.Plugin.Ldap
         public BooleanResult AuthorizeUser(SessionProperties properties)
         {
             m_logger.Debug("LDAP Plugin Authorization");
+
+            bool requireAuth = Settings.Store.AuthzRequireAuth;
+
+            // Get the authz rules from registry
+            List<GroupAuthzRule> rules = GroupRuleLoader.GetAuthzRules();
+            if (rules.Count == 0)
+            {
+                throw new Exception("No authorizaition rules found.");
+            }
+            
+            // Get the LDAP server object
+            LdapServer serv = properties.GetTrackedSingle<LdapServer>();
+
+            // If LDAP server object is not found, then something went wrong in authentication.
+            // We allow or deny based on setting
+            if (serv == null)
+            {
+                m_logger.ErrorFormat("AuthorizeUser: Internal error, LdapServer object not available.");
+
+                // LdapServer is not available, allow or deny based on settings.
+                return new BooleanResult() 
+                {
+                    Success = Settings.Store.AuthzAllowOnError, 
+                    Message = "LDAP server unavailable." 
+                };
+            }
+
+            // If we require authorization, and we failed to auth this user, then we
+            // fail authorization.  Note that we do this AFTER checking the LDAP server object
+            // because we may want to succeed if the authentication failed due to server
+            // being unavailable.
+            if (requireAuth)
+            {
+                PluginActivityInformation actInfo = properties.GetTrackedSingle<PluginActivityInformation>();
+                BooleanResult ldapResult = actInfo.GetAuthenticationResult(this.Uuid);
+                if (!ldapResult.Success)
+                {
+                    return new BooleanResult()
+                    {
+                        Success = false,
+                        Message = "Denying user because LDAP authentication failed."
+                    };
+                }
+            }
+
+            // Apply the authorization rules
             try
             {
                 UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
                 string user = userInfo.Username;
-                LdapServer serv = properties.GetTrackedSingle<LdapServer>();
-                if (serv == null)
-                {
-                    m_logger.ErrorFormat("AuthorizeUser: Internal error, LdapServer object not available.");
-                    return new BooleanResult() { Success = false, Message = "LDAP server not available" };
-                }
-
-                List<GroupAuthzRule> rules = GroupRuleLoader.GetAuthzRules();
                 
                 // Bind for searching if we have rules to process.  If there's only one, it's the
                 // default rule which doesn't require searching the LDAP tree.
@@ -183,18 +248,45 @@ namespace pGina.Plugin.Ldap
                             };
                     }
                 }
+
+                // We should never get this far because the last rule in the list should always be a match,
+                // but if for some reason we do, return success.
+                return new BooleanResult() { Success = true, Message = "" };
             }
             catch (Exception e)
             {
+                if (e is LdapException)
+                {
+                    LdapException ldapEx = (e as LdapException);
+
+                    if (ldapEx.ErrorCode == 81)
+                    {
+                        // Server can't be contacted, set server object to null
+                        m_logger.ErrorFormat("Server unavailable: {0}, {1}", ldapEx.ServerErrorMessage, e.Message);
+                        serv.Close();
+                        properties.AddTrackedSingle<LdapServer>(null);
+                        return new BooleanResult 
+                        { 
+                            Success = Settings.Store.AuthzAllowOnError, 
+                            Message = "Failed to contact LDAP server." 
+                        };
+                    }
+                    else if (ldapEx.ErrorCode == 49)
+                    {
+                        // This is invalid credentials, return false, but server object should remain connected
+                        m_logger.ErrorFormat("LDAP bind failed: invalid credentials.");
+                        return new BooleanResult 
+                        { 
+                            Success = false, 
+                            Message = "Authorization via LDAP failed. Invalid credentials." 
+                        };
+                    }
+                }
+
+                // Unexpected error, let the PluginDriver catch
                 m_logger.ErrorFormat("Error during authorization: {0}", e);
-
-                // Error causes failure to authorize
-                return new BooleanResult() { Success = false, Message = e.Message };
+                throw;
             }
-
-            // We should never get this far because the last rule in the list should always be a match,
-            // but if for some reason we do, return success.
-            return new BooleanResult() { Success = true, Message = "" };
         }
 
         public BooleanResult AuthenticatedUserGateway(SessionProperties properties)
@@ -202,16 +294,23 @@ namespace pGina.Plugin.Ldap
             m_logger.Debug("LDAP Plugin Gateway");
             List<string> addedGroups = new List<string>();
 
+            LdapServer serv = properties.GetTrackedSingle<LdapServer>();
+
+            // If the server is unavailable, we go ahead and succeed anyway.
+            if (serv == null)
+            {
+                m_logger.ErrorFormat("AuthenticatedUserGateway: Internal error, LdapServer object not available.");
+                return new BooleanResult() 
+                { 
+                    Success = true, 
+                    Message = "LDAP server not available" 
+                };
+            }
+
             try
             {
                 UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
                 string user = userInfo.Username;
-                LdapServer serv = properties.GetTrackedSingle<LdapServer>();
-                if (serv == null)
-                {
-                    m_logger.ErrorFormat("AuthenticatedUserGateway: Internal error, LdapServer object not available.");
-                    return new BooleanResult() { Success = false, Message = "LDAP server not available" };
-                }
 
                 List<GroupGatewayRule> rules = GroupRuleLoader.GetGatewayRules();
                 bool boundToServ = false;

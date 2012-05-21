@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Configuration));
             this.saveButton = new System.Windows.Forms.Button();
             this.ldapHostDescriptionLabel = new System.Windows.Forms.Label();
             this.ldapHostTextBox = new System.Windows.Forms.TextBox();
@@ -47,6 +48,8 @@
             this.timeoutLabel = new System.Windows.Forms.Label();
             this.timeoutTextBox = new System.Windows.Forms.TextBox();
             this.searchDnTextBox = new System.Windows.Forms.TextBox();
+            this.authzRequireAuthCB = new System.Windows.Forms.CheckBox();
+            this.authzAllowOnErrorCB = new System.Windows.Forms.CheckBox();
             this.ldapServerGroupBox = new System.Windows.Forms.GroupBox();
             this.showPwCB = new System.Windows.Forms.CheckBox();
             this.searchPassTextBox = new System.Windows.Forms.TextBox();
@@ -76,13 +79,13 @@
             this.authzRuleGroupTB = new System.Windows.Forms.TextBox();
             this.authzRuleMemberComboBox = new System.Windows.Forms.ComboBox();
             this.gatewayTabPage = new System.Windows.Forms.TabPage();
+            this.gatwayRemoteGroupTB = new System.Windows.Forms.TextBox();
             this.gatewayRuleGroupMemberCB = new System.Windows.Forms.ComboBox();
             this.gatewayRuleDeleteBtn = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.gatewayLocalGroupTB = new System.Windows.Forms.TextBox();
             this.gatewayRulesListBox = new System.Windows.Forms.ListBox();
             this.addGatewayGroupRuleButton = new System.Windows.Forms.Button();
-            this.gatwayRemoteGroupTB = new System.Windows.Forms.TextBox();
             this.ldapServerGroupBox.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.authTabPage.SuspendLayout();
@@ -269,6 +272,29 @@
             this.descriptionToolTip.SetToolTip(this.searchDnTextBox, "Optional.  Used when searching for group \r\nmembership and other search operations" +
                     "\r\n");
             // 
+            // authzRequireAuthCB
+            // 
+            this.authzRequireAuthCB.AutoSize = true;
+            this.authzRequireAuthCB.Location = new System.Drawing.Point(181, 9);
+            this.authzRequireAuthCB.Name = "authzRequireAuthCB";
+            this.authzRequireAuthCB.Size = new System.Drawing.Size(202, 17);
+            this.authzRequireAuthCB.TabIndex = 19;
+            this.authzRequireAuthCB.Text = "Deny when LDAP authentication fails";
+            this.descriptionToolTip.SetToolTip(this.authzRequireAuthCB, resources.GetString("authzRequireAuthCB.ToolTip"));
+            this.authzRequireAuthCB.UseVisualStyleBackColor = true;
+            // 
+            // authzAllowOnErrorCB
+            // 
+            this.authzAllowOnErrorCB.AutoSize = true;
+            this.authzAllowOnErrorCB.Location = new System.Drawing.Point(400, 9);
+            this.authzAllowOnErrorCB.Name = "authzAllowOnErrorCB";
+            this.authzAllowOnErrorCB.Size = new System.Drawing.Size(184, 17);
+            this.authzAllowOnErrorCB.TabIndex = 20;
+            this.authzAllowOnErrorCB.Text = "Allow when server is unreachable";
+            this.descriptionToolTip.SetToolTip(this.authzAllowOnErrorCB, "When the LDAP server is down or another unexpected error \r\noccurs, authorization " +
+                    "succeeds if this is checked. ");
+            this.authzAllowOnErrorCB.UseVisualStyleBackColor = true;
+            // 
             // ldapServerGroupBox
             // 
             this.ldapServerGroupBox.Controls.Add(this.showPwCB);
@@ -440,6 +466,8 @@
             // 
             // authzTabPage
             // 
+            this.authzTabPage.Controls.Add(this.authzAllowOnErrorCB);
+            this.authzTabPage.Controls.Add(this.authzRequireAuthCB);
             this.authzTabPage.Controls.Add(this.authzRuleDeleteBtn);
             this.authzTabPage.Controls.Add(this.authzRuleDownBtn);
             this.authzTabPage.Controls.Add(this.authzRuleUpBtn);
@@ -586,6 +614,13 @@
             this.gatewayTabPage.Text = "Gateway";
             this.gatewayTabPage.UseVisualStyleBackColor = true;
             // 
+            // gatwayRemoteGroupTB
+            // 
+            this.gatwayRemoteGroupTB.Location = new System.Drawing.Point(209, 207);
+            this.gatwayRemoteGroupTB.Name = "gatwayRemoteGroupTB";
+            this.gatwayRemoteGroupTB.Size = new System.Drawing.Size(131, 20);
+            this.gatwayRemoteGroupTB.TabIndex = 21;
+            // 
             // gatewayRuleGroupMemberCB
             // 
             this.gatewayRuleGroupMemberCB.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -594,7 +629,7 @@
             "If member of LDAP group:",
             "If not member of LDAP group:",
             "Always:"});
-            this.gatewayRuleGroupMemberCB.Location = new System.Drawing.Point(10, 161);
+            this.gatewayRuleGroupMemberCB.Location = new System.Drawing.Point(10, 207);
             this.gatewayRuleGroupMemberCB.Name = "gatewayRuleGroupMemberCB";
             this.gatewayRuleGroupMemberCB.Size = new System.Drawing.Size(185, 21);
             this.gatewayRuleGroupMemberCB.TabIndex = 20;
@@ -603,7 +638,7 @@
             // gatewayRuleDeleteBtn
             // 
             this.gatewayRuleDeleteBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.delete;
-            this.gatewayRuleDeleteBtn.Location = new System.Drawing.Point(622, 54);
+            this.gatewayRuleDeleteBtn.Location = new System.Drawing.Point(622, 89);
             this.gatewayRuleDeleteBtn.Name = "gatewayRuleDeleteBtn";
             this.gatewayRuleDeleteBtn.Size = new System.Drawing.Size(32, 34);
             this.gatewayRuleDeleteBtn.TabIndex = 19;
@@ -613,7 +648,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(346, 164);
+            this.label6.Location = new System.Drawing.Point(346, 210);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(95, 13);
             this.label6.TabIndex = 10;
@@ -621,7 +656,7 @@
             // 
             // gatewayLocalGroupTB
             // 
-            this.gatewayLocalGroupTB.Location = new System.Drawing.Point(447, 161);
+            this.gatewayLocalGroupTB.Location = new System.Drawing.Point(447, 207);
             this.gatewayLocalGroupTB.Name = "gatewayLocalGroupTB";
             this.gatewayLocalGroupTB.Size = new System.Drawing.Size(105, 20);
             this.gatewayLocalGroupTB.TabIndex = 7;
@@ -631,25 +666,18 @@
             this.gatewayRulesListBox.FormattingEnabled = true;
             this.gatewayRulesListBox.Location = new System.Drawing.Point(6, 6);
             this.gatewayRulesListBox.Name = "gatewayRulesListBox";
-            this.gatewayRulesListBox.Size = new System.Drawing.Size(610, 147);
+            this.gatewayRulesListBox.Size = new System.Drawing.Size(610, 186);
             this.gatewayRulesListBox.TabIndex = 9;
             // 
             // addGatewayGroupRuleButton
             // 
-            this.addGatewayGroupRuleButton.Location = new System.Drawing.Point(558, 159);
+            this.addGatewayGroupRuleButton.Location = new System.Drawing.Point(558, 205);
             this.addGatewayGroupRuleButton.Name = "addGatewayGroupRuleButton";
             this.addGatewayGroupRuleButton.Size = new System.Drawing.Size(71, 23);
             this.addGatewayGroupRuleButton.TabIndex = 8;
             this.addGatewayGroupRuleButton.Text = "Add Rule";
             this.addGatewayGroupRuleButton.UseVisualStyleBackColor = true;
             this.addGatewayGroupRuleButton.Click += new System.EventHandler(this.addGatewayGroupRuleButton_Click);
-            // 
-            // gatwayRemoteGroupTB
-            // 
-            this.gatwayRemoteGroupTB.Location = new System.Drawing.Point(209, 161);
-            this.gatwayRemoteGroupTB.Name = "gatwayRemoteGroupTB";
-            this.gatwayRemoteGroupTB.Size = new System.Drawing.Size(131, 20);
-            this.gatwayRemoteGroupTB.TabIndex = 21;
             // 
             // Configuration
             // 
@@ -731,5 +759,7 @@
         private System.Windows.Forms.TabPage gatewayTabPage;
         private System.Windows.Forms.ComboBox gatewayRuleGroupMemberCB;
         private System.Windows.Forms.TextBox gatwayRemoteGroupTB;
+        private System.Windows.Forms.CheckBox authzRequireAuthCB;
+        private System.Windows.Forms.CheckBox authzAllowOnErrorCB;
     }
 }

@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -123,7 +123,9 @@ namespace pGina.Plugin.Ldap
             this.authzRuleMemberComboBox.SelectedIndex = 0;
             this.authzRuleActionComboBox.SelectedIndex = 0;
 
-            // Save rules
+            this.authzRequireAuthCB.Checked = Settings.Store.AuthzRequireAuth;
+            this.authzAllowOnErrorCB.Checked = Settings.Store.AuthzAllowOnError;
+
             List<GroupAuthzRule> lst = GroupRuleLoader.GetAuthzRules();
             // The last one should be the default rule
             if (lst.Count > 0 && 
@@ -326,6 +328,8 @@ namespace pGina.Plugin.Ldap
             Settings.Store.SearchContexts = Regex.Split(searchContextsTextBox.Text.Trim(), @"\s*\r?\n\s*");
             
             // Authorization
+            Settings.Store.AuthzRequireAuth = this.authzRequireAuthCB.Checked;
+            Settings.Store.AuthzAllowOnError = this.authzAllowOnErrorCB.Checked;
             List<GroupAuthzRule> lst = new List<GroupAuthzRule>();
             foreach (Object item in this.authzRulesListBox.Items)
             {
