@@ -123,6 +123,7 @@
   <data name="authzRequireAuthCB.ToolTip" xml:space="preserve">
     <value>If the LDAP plugin fails to authenticate the user in the authentication
 stage, then always fail authorization.  This denies any login even when
-another authentication plugin succeeds (such as Local Machine). </value>
+another authentication plugin succeeds (such as Local Machine).   This
+option is ignored if LDAP is not enabled for authentication.</value>
   </data>
 </root>

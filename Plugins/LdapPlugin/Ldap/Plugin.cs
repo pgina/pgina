@@ -197,14 +197,23 @@ namespace pGina.Plugin.Ldap
             if (requireAuth)
             {
                 PluginActivityInformation actInfo = properties.GetTrackedSingle<PluginActivityInformation>();
-                BooleanResult ldapResult = actInfo.GetAuthenticationResult(this.Uuid);
-                if (!ldapResult.Success)
+                try
                 {
-                    return new BooleanResult()
+                    BooleanResult ldapResult = actInfo.GetAuthenticationResult(this.Uuid);
+                    if (!ldapResult.Success)
                     {
-                        Success = false,
-                        Message = "Denying user because LDAP authentication failed."
-                    };
+                        m_logger.InfoFormat("Deny because LDAP auth failed, and configured to require LDAP auth.");
+                        return new BooleanResult()
+                        {
+                            Success = false,
+                            Message = "Deny because LDAP authentication failed."
+                        };
+                    }
+                }
+                catch (KeyNotFoundException)
+                {
+                    // The plugin is not enabled for authentication
+                    m_logger.DebugFormat("LDAP is not enabled for authentication, and authz is configured to require authentication.");
                 }
             }
 
