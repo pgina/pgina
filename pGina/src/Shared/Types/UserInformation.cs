@@ -34,13 +34,45 @@ namespace pGina.Shared.Types
 {
     public class UserInformation
     {
+        /// <summary>
+        /// The list of groups for the user account
+        /// </summary>
         public List<GroupInformation> Groups { get; set; }
+
         // Currently ignored if plugin sets this.. but possibly useful if we go LSA in the future...
-        public SecurityIdentifier SID { get; set; } 
+        /// <summary>
+        /// The SID for the user (currently ignored)
+        /// </summary>
+        public SecurityIdentifier SID { get; set; }
+        
+        /// <summary>
+        /// The username provided by the user.
+        /// </summary>
+        public string OriginalUsername { get; set; } 
+ 
+        /// <summary>
+        /// The username
+        /// </summary>
         public string Username { get; set; }
-        public string Domain { get; set; }      // Null == local machine
+
+        /// <summary>
+        /// The domain (a null value indicates that this is a local account).
+        /// </summary>
+        public string Domain { get; set; } 
+
+        /// <summary>
+        /// The password
+        /// </summary>
         public string Password { get; set; }
+
+        /// <summary>
+        /// Description of this user
+        /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        /// The full name associated with this user account.
+        /// </summary>
         public string Fullname { get; set; }
 
         public UserInformation()
