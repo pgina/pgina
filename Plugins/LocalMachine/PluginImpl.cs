@@ -244,19 +244,18 @@ namespace pGina.Plugin.LocalMachine
                 {
                     if (LocalAccount.UserExists(userInfo.Username))
                     {
-                        using (PrincipalContext pc = new PrincipalContext(ContextType.Machine, Environment.MachineName))
+                        // We use a pInvoke here instead of using PrincipalContext.ValidateCredentials
+                        // due to the fact that the latter will throw an exception when the network is disconnected.
+                        if (Abstractions.WindowsApi.pInvokes.ValidateCredentials(userInfo.Username, userInfo.Password))
                         {
-                            if (pc.ValidateCredentials(userInfo.Username, userInfo.Password))
-                            {
-                                m_logger.InfoFormat("Authenticated user: {0}", userInfo.Username);
-                                userInfo.Domain = Environment.MachineName;
+                            m_logger.InfoFormat("Authenticated user: {0}", userInfo.Username);
+                            userInfo.Domain = Environment.MachineName;
 
-                                m_logger.Debug("AuthenticateUser: Mirroring group membership from SAM");
-                                LocalAccount.SyncLocalGroupsToUserInfo(userInfo);
-                                
-                                // Return success
-                                return new BooleanResult() { Success = true };
-                            }
+                            m_logger.Debug("AuthenticateUser: Mirroring group membership from SAM");
+                            LocalAccount.SyncLocalGroupsToUserInfo(userInfo);
+
+                            // Return success
+                            return new BooleanResult() { Success = true };
                         }
                     }
                     else
