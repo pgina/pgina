@@ -751,7 +751,7 @@ namespace Abstractions.WindowsApi
         }
 
         /// <summary>
-        /// Attempts to validate the user's credentials for a local account using 
+        /// Attempts to validate the user's credentials using 
         /// a pInvoke to LogonUser.
         /// </summary>
         /// <param name="username">The username</param>
@@ -760,7 +760,7 @@ namespace Abstractions.WindowsApi
         /// <returns>True if the account credentials are valid</returns>
         public static bool ValidateCredentials(string username, string domain, string password)
         {
-            IntPtr hToken;
+            IntPtr hToken = IntPtr.Zero;
             bool result = SafeNativeMethods.LogonUser(username, domain, password,
                 (int)SafeNativeMethods.LogonType.LOGON32_LOGON_NETWORK,
                 (int)SafeNativeMethods.LogonProvider.LOGON32_PROVIDER_DEFAULT,
