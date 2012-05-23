@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -90,9 +90,21 @@ namespace pGina.Core
 
             m_logger.DebugFormat("Resolving dependency {0} for {1}.", fileName, 
                 args.RequestingAssembly.FullName);
-            
+
+            // Check sanity of the location
+            string requestorPath = args.RequestingAssembly.Location;
+            if (string.IsNullOrEmpty(requestorPath))
+            {
+                requestorPath = args.RequestingAssembly.CodeBase;
+                if (string.IsNullOrEmpty(requestorPath))
+                {
+                    m_logger.ErrorFormat("Unable to resolve dependency for {0}", args.Name);
+                    return null;
+                }
+            }
+
             // Look for the assembly in the same directory as the plugin that is loading the assembly
-            DirectoryInfo dir = Directory.GetParent(args.RequestingAssembly.Location);
+            DirectoryInfo dir = Directory.GetParent(requestorPath);
             string path = Path.Combine(dir.FullName, fileName);
 
             m_logger.DebugFormat("Looking for: {0}", path);
