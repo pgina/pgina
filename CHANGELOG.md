@@ -1,3 +1,10 @@
+3.0.12.0 (2012/05/29)
+---------------------------
+ - Installer enhancements: internal changes, less noisy at post install
+ - Fix issue with web services (#127)
+ - Fix issue with failure when network is disconnected (#128)
+ - Change default setting for Local Machine authorization stage (#119)
+
 3.0.11.2 (2012/05/16)
 ---------------------------
  - Add some additional logging in install mode.
