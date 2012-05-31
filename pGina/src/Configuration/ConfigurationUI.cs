@@ -189,7 +189,14 @@ namespace pGina.Configuration
 
             m_tileImageTxt.Text = Settings.Get.GetSetting("TileImage", null);
             LoadTileImagePreview();
+
+            // Load MOTD settings
+            this.enableMotdCB.Checked = Settings.Get.EnableMotd;
             this.motdTB.Text = Settings.Get.GetSetting("Motd");
+            this.motdTB.Enabled = this.enableMotdCB.Checked;
+
+            // Service status checkbox
+            this.logonUiShowServiceStatusCB.Checked = Settings.Get.ShowServiceStatusInLogonUi;
 
             // Make sure that the pGina service is installed
             foreach( ServiceController ctrl in ServiceController.GetServices() )
@@ -788,7 +795,13 @@ namespace pGina.Configuration
 
             Core.Settings.Get.TileImage = m_tileImageTxt.Text;
             this.LoadTileImagePreview();
+
+            // MOTD stuff
+            Settings.Get.EnableMotd = this.enableMotdCB.Checked;
             Settings.Get.Motd = this.motdTB.Text.Trim();
+
+            // Service status checkbox
+            Settings.Get.ShowServiceStatusInLogonUi = this.logonUiShowServiceStatusCB.Checked;
 
             if (Abstractions.Windows.OsInfo.IsVistaOrLater())
                 this.SaveCpSettings();
@@ -1377,6 +1390,11 @@ namespace pGina.Configuration
         private void viewLogBtn_Click(object sender, EventArgs e)
         {
             this.logWindow.Visible = true;
+        }
+
+        private void enableMotdCB_CheckedChanged(object sender, EventArgs e)
+        {
+            this.motdTB.Enabled = this.enableMotdCB.Checked;
         }
     }
 }

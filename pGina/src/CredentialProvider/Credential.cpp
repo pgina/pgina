@@ -371,7 +371,9 @@ namespace pGina
 			m_usageFlags(0)
 		{
 			AddDllReference();
-			pGina::Service::StateHelper::AddTarget(this);
+
+			if( pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
+				pGina::Service::StateHelper::AddTarget(this);
 		}
 		
 		Credential::~Credential()
@@ -440,10 +442,23 @@ namespace pGina
 				SHStrDupW(usernameFieldValue.c_str(), &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
 			}
 
-
 			if(password != NULL)
 			{				
 				SHStrDupW(password, &(m_fields->fields[m_fields->passwordFieldIdx].wstr));
+			}
+
+			// Hide MOTD field if not enabled
+			if( ! pGina::Registry::GetBool(L"EnableMotd", true) )
+				if( m_usageScenario == CPUS_LOGON )
+					m_fields->fields[CredProv::LUIFI_MOTD].fieldStatePair.fieldState = CPFS_HIDDEN;
+
+			// Hide service status if configured to do so
+			if( ! pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
+			{
+				if( m_usageScenario == CPUS_UNLOCK_WORKSTATION )
+					m_fields->fields[CredProv::LOIFI_STATUS].fieldStatePair.fieldState = CPFS_HIDDEN;
+				else if( m_usageScenario == CPUS_LOGON )
+					m_fields->fields[CredProv::LUIFI_STATUS].fieldStatePair.fieldState = CPFS_HIDDEN;
 			}
 		}
 

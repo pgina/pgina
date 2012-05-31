@@ -83,12 +83,17 @@ namespace pGina
 		{		
 			AddDllReference();
 
-			pGina::Service::StateHelper::AddTarget(this);
-			pGina::Service::StateHelper::Start();
+			if( pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
+			{
+				pDEBUG(L"Starting service state helper thread");
+				pGina::Service::StateHelper::AddTarget(this);
+				pGina::Service::StateHelper::Start();
+			}
 		}
 
 		Provider::~Provider()
-		{			
+		{
+			pDEBUG(L"Stopping service state helper thread (if necessary)");
 			pGina::Service::StateHelper::RemoveTarget(this);
 			pGina::Service::StateHelper::Stop();
 

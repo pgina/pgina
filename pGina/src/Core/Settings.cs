@@ -51,11 +51,13 @@ namespace pGina.Core
             s_settings.SetDefault("MaxClients", 25);
             s_settings.SetDefault("TraceMsgTraffic", false);            
             s_settings.SetDefault("SessionHelperExe", "pGina.Service.SessionHelper.exe");
+            s_settings.SetDefault("EnableMotd", true);
             s_settings.SetDefault("Motd", "pGina Version: %v");
             s_settings.SetDefault("GinaPassthru", false);
             s_settings.SetDefault("ChainedGinaPath", "MSGINA.DLL");
             s_settings.SetDefault("EnableSpecialActionButton", false);
             s_settings.SetDefault("SpecialAction", "Shutdown");
+            s_settings.SetDefault("ShowServiceStatusInLogonUi", true);
 
             // Default setup is local machine plugin as enabled for auth and gateway
             s_settings.SetDefault("IPluginAuthentication_Order", new string[] { "12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D" });
