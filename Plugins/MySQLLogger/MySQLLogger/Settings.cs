@@ -46,11 +46,16 @@ namespace pGina.Plugin.MySqlLogger
         static Settings()
         {
             // Set defaults
+            //m_settings.SetDefault("LoggerMode", LoggerMode.EVENT);
+            m_settings.SetDefault("EventMode", true);
+            m_settings.SetDefault("SessionMode", false);
             m_settings.SetDefault("Host", "localhost");
             m_settings.SetDefault("Port", 3306);
             m_settings.SetDefault("User", "pGina");
             m_settings.SetDefaultEncryptedSetting("Password", "secret", null);
             m_settings.SetDefault("Database", "pGinaDB");
+            m_settings.SetDefault("SessionTable", "");
+            m_settings.SetDefault("EventTable", "pGinaLog");
 
             m_settings.SetDefault("EvtLogon", true);
             m_settings.SetDefault("EvtLogoff", true);
@@ -61,6 +66,8 @@ namespace pGina.Plugin.MySqlLogger
             m_settings.SetDefault("EvtRemoteControl", false);
             m_settings.SetDefault("EvtRemoteConnect", false);
             m_settings.SetDefault("EvtRemoteDisconnect", false);
+
+            m_settings.SetDefault("UseModifiedName", false);
         }
 
     }
