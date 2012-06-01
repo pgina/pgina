@@ -24,8 +24,9 @@ namespace pGina.Plugin.SingleUser
             m_txtUser.Text = Settings.Store.Username;
             m_txtDomain.Text = Settings.Store.Domain;
             m_txtPass.Text = Settings.Store.GetEncryptedSetting("Password", null);
-            m_chkRequirePlugin.Checked = Settings.Store.RequirePlugins;
-            m_chkRequireAnyPlugin.Checked = Settings.Store.RequireAnyPlugins;
+            substituteCB.Checked = Settings.Store.RequirePlugins;
+            allRB.Checked = Settings.Store.RequireAllPlugins;
+            anyRB.Checked = !allRB.Checked;
             string[] plugins = Settings.Store.RequiredPluginList;
 
             foreach (string uuid in plugins)
@@ -38,17 +39,12 @@ namespace pGina.Plugin.SingleUser
 
         public bool SaveSettings()
         {
-            if (m_chkRequireAnyPlugin.Checked && m_chkRequirePlugin.Checked)
-            {
-                MessageBox.Show("You may not have both \"Require All Plugins\" and \"Require Any Plugins\" checked.");
-                return false;
-            }
-
             Settings.Store.Username = m_txtUser.Text;
             Settings.Store.Domain = m_txtDomain.Text;
             Settings.Store.SetEncryptedSetting("Password", m_txtPass.Text, null);
-            Settings.Store.RequirePlugins = m_chkRequirePlugin.Checked;
-            Settings.Store.RequireAnyPlugins = m_chkRequireAnyPlugin.Checked;
+            Settings.Store.RequirePlugins = substituteCB.Checked;
+            Settings.Store.RequireAllPlugins = allRB.Checked;
+            
 
             List<string> uuids = new List<string>();
             foreach (DataGridViewRow row in m_dgv.Rows)
@@ -81,16 +77,14 @@ namespace pGina.Plugin.SingleUser
 
         private void requirePluginCheckChange(object sender, EventArgs e)
         {
-            if (sender == m_chkRequireAnyPlugin && m_chkRequireAnyPlugin.Checked)
-                m_chkRequirePlugin.Checked = false;
-            else if (sender == m_chkRequirePlugin && m_chkRequirePlugin.Checked)
-                m_chkRequireAnyPlugin.Checked = false;
             maskUI();
         }
 
         private void maskUI()
         {
-            m_dgv.Enabled = m_chkRequireAnyPlugin.Checked || m_chkRequirePlugin.Checked;
+            anyRB.Enabled = substituteCB.Checked;
+            allRB.Enabled = substituteCB.Checked;
+            m_dgv.Enabled = substituteCB.Checked;
         }
     }
 }

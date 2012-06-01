@@ -36,16 +36,18 @@
             this.m_txtUser = new System.Windows.Forms.TextBox();
             this.m_txtDomain = new System.Windows.Forms.TextBox();
             this.m_txtPass = new System.Windows.Forms.TextBox();
-            this.m_chkRequirePlugin = new System.Windows.Forms.CheckBox();
             this.m_dgv = new System.Windows.Forms.DataGridView();
             this.PluginUuid = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.m_chkRequireAnyPlugin = new System.Windows.Forms.CheckBox();
+            this.substituteCB = new System.Windows.Forms.CheckBox();
+            this.anyRB = new System.Windows.Forms.RadioButton();
+            this.allRB = new System.Windows.Forms.RadioButton();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.m_dgv)).BeginInit();
             this.SuspendLayout();
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(212, 260);
+            this.btnOk.Location = new System.Drawing.Point(206, 262);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 3;
@@ -55,7 +57,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(293, 260);
+            this.btnCancel.Location = new System.Drawing.Point(287, 262);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 4;
@@ -94,14 +96,14 @@
             // 
             this.m_txtUser.Location = new System.Drawing.Point(88, 22);
             this.m_txtUser.Name = "m_txtUser";
-            this.m_txtUser.Size = new System.Drawing.Size(159, 20);
+            this.m_txtUser.Size = new System.Drawing.Size(274, 20);
             this.m_txtUser.TabIndex = 8;
             // 
             // m_txtDomain
             // 
             this.m_txtDomain.Location = new System.Drawing.Point(88, 48);
             this.m_txtDomain.Name = "m_txtDomain";
-            this.m_txtDomain.Size = new System.Drawing.Size(159, 20);
+            this.m_txtDomain.Size = new System.Drawing.Size(274, 20);
             this.m_txtDomain.TabIndex = 9;
             // 
             // m_txtPass
@@ -109,20 +111,9 @@
             this.m_txtPass.Location = new System.Drawing.Point(88, 74);
             this.m_txtPass.Name = "m_txtPass";
             this.m_txtPass.PasswordChar = '*';
-            this.m_txtPass.Size = new System.Drawing.Size(159, 20);
+            this.m_txtPass.Size = new System.Drawing.Size(274, 20);
             this.m_txtPass.TabIndex = 10;
             this.m_txtPass.UseSystemPasswordChar = true;
-            // 
-            // m_chkRequirePlugin
-            // 
-            this.m_chkRequirePlugin.AutoSize = true;
-            this.m_chkRequirePlugin.Location = new System.Drawing.Point(16, 114);
-            this.m_chkRequirePlugin.Name = "m_chkRequirePlugin";
-            this.m_chkRequirePlugin.Size = new System.Drawing.Size(354, 17);
-            this.m_chkRequirePlugin.TabIndex = 11;
-            this.m_chkRequirePlugin.Text = "Only substitute when ALL of the following plugins have authenticated:";
-            this.m_chkRequirePlugin.UseVisualStyleBackColor = true;
-            this.m_chkRequirePlugin.CheckedChanged += new System.EventHandler(this.requirePluginCheckChange);
             // 
             // m_dgv
             // 
@@ -141,25 +132,58 @@
             this.PluginUuid.HeaderText = "Plugin Unique ID";
             this.PluginUuid.Name = "PluginUuid";
             // 
-            // m_chkRequireAnyPlugin
+            // substituteCB
             // 
-            this.m_chkRequireAnyPlugin.AutoSize = true;
-            this.m_chkRequireAnyPlugin.Location = new System.Drawing.Point(16, 138);
-            this.m_chkRequireAnyPlugin.Name = "m_chkRequireAnyPlugin";
-            this.m_chkRequireAnyPlugin.Size = new System.Drawing.Size(357, 17);
-            this.m_chkRequireAnyPlugin.TabIndex = 13;
-            this.m_chkRequireAnyPlugin.Text = "Only substitute when ANY of the following plugins have authenticated:";
-            this.m_chkRequireAnyPlugin.UseVisualStyleBackColor = true;
-            this.m_chkRequireAnyPlugin.CheckedChanged += new System.EventHandler(this.requirePluginCheckChange);
+            this.substituteCB.AutoSize = true;
+            this.substituteCB.Location = new System.Drawing.Point(13, 117);
+            this.substituteCB.Name = "substituteCB";
+            this.substituteCB.Size = new System.Drawing.Size(103, 17);
+            this.substituteCB.TabIndex = 13;
+            this.substituteCB.Text = "Only substitute if";
+            this.substituteCB.UseVisualStyleBackColor = true;
+            this.substituteCB.CheckedChanged += new System.EventHandler(this.requirePluginCheckChange);
+            // 
+            // anyRB
+            // 
+            this.anyRB.AutoSize = true;
+            this.anyRB.Location = new System.Drawing.Point(117, 115);
+            this.anyRB.Name = "anyRB";
+            this.anyRB.Size = new System.Drawing.Size(42, 17);
+            this.anyRB.TabIndex = 14;
+            this.anyRB.TabStop = true;
+            this.anyRB.Text = "any";
+            this.anyRB.UseVisualStyleBackColor = true;
+            // 
+            // allRB
+            // 
+            this.allRB.AutoSize = true;
+            this.allRB.Location = new System.Drawing.Point(161, 115);
+            this.allRB.Name = "allRB";
+            this.allRB.Size = new System.Drawing.Size(35, 17);
+            this.allRB.TabIndex = 15;
+            this.allRB.TabStop = true;
+            this.allRB.Text = "all";
+            this.allRB.UseVisualStyleBackColor = true;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(198, 117);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(133, 13);
+            this.label4.TabIndex = 16;
+            this.label4.Text = "plugins listed below match.";
             // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(380, 297);
-            this.Controls.Add(this.m_chkRequireAnyPlugin);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.allRB);
+            this.Controls.Add(this.anyRB);
+            this.Controls.Add(this.substituteCB);
             this.Controls.Add(this.m_dgv);
-            this.Controls.Add(this.m_chkRequirePlugin);
             this.Controls.Add(this.m_txtPass);
             this.Controls.Add(this.m_txtDomain);
             this.Controls.Add(this.m_txtUser);
@@ -186,9 +210,11 @@
         private System.Windows.Forms.TextBox m_txtUser;
         private System.Windows.Forms.TextBox m_txtDomain;
         private System.Windows.Forms.TextBox m_txtPass;
-        private System.Windows.Forms.CheckBox m_chkRequirePlugin;
         private System.Windows.Forms.DataGridView m_dgv;
         private System.Windows.Forms.DataGridViewTextBoxColumn PluginUuid;
-        private System.Windows.Forms.CheckBox m_chkRequireAnyPlugin;
+        private System.Windows.Forms.CheckBox substituteCB;
+        private System.Windows.Forms.RadioButton anyRB;
+        private System.Windows.Forms.RadioButton allRB;
+        private System.Windows.Forms.Label label4;
     }
 }
