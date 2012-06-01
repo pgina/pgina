@@ -24,22 +24,27 @@ namespace pGina.Plugin.SingleUser
             m_txtUser.Text = Settings.Store.Username;
             m_txtDomain.Text = Settings.Store.Domain;
             m_txtPass.Text = Settings.Store.GetEncryptedSetting("Password", null);
-            m_chkRequirePlugin.Checked = Settings.Store.RequirePlugins;
+            substituteCB.Checked = Settings.Store.RequirePlugins;
+            allRB.Checked = Settings.Store.RequireAllPlugins;
+            anyRB.Checked = !allRB.Checked;
             string[] plugins = Settings.Store.RequiredPluginList;
 
             foreach (string uuid in plugins)
             {
                 m_dgv.Rows.Add(new string[] { uuid });
             }
-            MaskUi();
+
+            maskUI();
         }
 
-        public void UiToSettings()
+        public bool SaveSettings()
         {
             Settings.Store.Username = m_txtUser.Text;
             Settings.Store.Domain = m_txtDomain.Text;
             Settings.Store.SetEncryptedSetting("Password", m_txtPass.Text, null);
-            Settings.Store.RequirePlugins = m_chkRequirePlugin.Checked;
+            Settings.Store.RequirePlugins = substituteCB.Checked;
+            Settings.Store.RequireAllPlugins = allRB.Checked;
+            
 
             List<string> uuids = new List<string>();
             foreach (DataGridViewRow row in m_dgv.Rows)
@@ -49,18 +54,19 @@ namespace pGina.Plugin.SingleUser
             }
 
             Settings.Store.RequiredPluginList = uuids.ToArray();
+
+            return true;
         }
 
-        public void MaskUi()
-        {
-            m_dgv.Enabled = m_chkRequirePlugin.Checked;
-        }
+
 
         private void btnOk_Click(object sender, EventArgs e)
         {
-            UiToSettings();
-            this.DialogResult = System.Windows.Forms.DialogResult.OK;                       
-            this.Close();
+            if (SaveSettings())
+            {
+                this.DialogResult = System.Windows.Forms.DialogResult.OK;
+                this.Close();
+            }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -69,9 +75,16 @@ namespace pGina.Plugin.SingleUser
             this.Close();
         }
 
-        private void m_chkRequirePlugin_CheckedChanged(object sender, EventArgs e)
+        private void requirePluginCheckChange(object sender, EventArgs e)
         {
-            MaskUi();
+            maskUI();
+        }
+
+        private void maskUI()
+        {
+            anyRB.Enabled = substituteCB.Checked;
+            allRB.Enabled = substituteCB.Checked;
+            m_dgv.Enabled = substituteCB.Checked;
         }
     }
 }
