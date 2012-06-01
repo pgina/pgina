@@ -104,6 +104,7 @@ namespace pGina.Plugin.SingleUser
             string domain = Settings.Store.Domain;
             string password = Settings.Store.GetEncryptedSetting("Password", null);
             bool requirePlugins = Settings.Store.RequirePlugins;
+            bool requireAnyPlugins = Settings.Store.RequireAnyPlugins;
             string[] pluginList = Settings.Store.RequiredPluginList;
 
             // Do we have to check for a specific plugin(s)?
@@ -118,6 +119,21 @@ namespace pGina.Plugin.SingleUser
                             return new BooleanResult() { Success = true };  // Silent bypass
                     }
                 }
+            }
+
+            //Do we have to verify if any plugin matches?
+            if (requireAnyPlugins && pluginList.Length > 0)
+            {
+                bool matchFound = false;
+                foreach (string pluginUuid in pluginList)
+                {
+                    matchFound = DidPluginAuth(pluginUuid,properties);
+                    if(matchFound)
+                        break;
+                }
+
+                if (!matchFound)
+                    return new BooleanResult() { Success = true }; //Silent bypass
             }
 
             // Substitute

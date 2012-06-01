@@ -39,12 +39,13 @@
             this.m_chkRequirePlugin = new System.Windows.Forms.CheckBox();
             this.m_dgv = new System.Windows.Forms.DataGridView();
             this.PluginUuid = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.m_chkRequireAnyPlugin = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.m_dgv)).BeginInit();
             this.SuspendLayout();
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(212, 237);
+            this.btnOk.Location = new System.Drawing.Point(212, 260);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 3;
@@ -54,7 +55,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(293, 237);
+            this.btnCancel.Location = new System.Drawing.Point(293, 260);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 4;
@@ -117,11 +118,11 @@
             this.m_chkRequirePlugin.AutoSize = true;
             this.m_chkRequirePlugin.Location = new System.Drawing.Point(16, 114);
             this.m_chkRequirePlugin.Name = "m_chkRequirePlugin";
-            this.m_chkRequirePlugin.Size = new System.Drawing.Size(345, 17);
+            this.m_chkRequirePlugin.Size = new System.Drawing.Size(354, 17);
             this.m_chkRequirePlugin.TabIndex = 11;
-            this.m_chkRequirePlugin.Text = "Only substitute when all of the following plugins have authenticated:";
+            this.m_chkRequirePlugin.Text = "Only substitute when ALL of the following plugins have authenticated:";
             this.m_chkRequirePlugin.UseVisualStyleBackColor = true;
-            this.m_chkRequirePlugin.CheckedChanged += new System.EventHandler(this.m_chkRequirePlugin_CheckedChanged);
+            this.m_chkRequirePlugin.CheckedChanged += new System.EventHandler(this.requirePluginCheckChange);
             // 
             // m_dgv
             // 
@@ -129,7 +130,7 @@
             this.m_dgv.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.PluginUuid});
             this.m_dgv.Enabled = false;
-            this.m_dgv.Location = new System.Drawing.Point(16, 137);
+            this.m_dgv.Location = new System.Drawing.Point(16, 160);
             this.m_dgv.Name = "m_dgv";
             this.m_dgv.Size = new System.Drawing.Size(346, 79);
             this.m_dgv.TabIndex = 12;
@@ -140,11 +141,23 @@
             this.PluginUuid.HeaderText = "Plugin Unique ID";
             this.PluginUuid.Name = "PluginUuid";
             // 
+            // m_chkRequireAnyPlugin
+            // 
+            this.m_chkRequireAnyPlugin.AutoSize = true;
+            this.m_chkRequireAnyPlugin.Location = new System.Drawing.Point(16, 138);
+            this.m_chkRequireAnyPlugin.Name = "m_chkRequireAnyPlugin";
+            this.m_chkRequireAnyPlugin.Size = new System.Drawing.Size(357, 17);
+            this.m_chkRequireAnyPlugin.TabIndex = 13;
+            this.m_chkRequireAnyPlugin.Text = "Only substitute when ANY of the following plugins have authenticated:";
+            this.m_chkRequireAnyPlugin.UseVisualStyleBackColor = true;
+            this.m_chkRequireAnyPlugin.CheckedChanged += new System.EventHandler(this.requirePluginCheckChange);
+            // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(380, 272);
+            this.ClientSize = new System.Drawing.Size(380, 297);
+            this.Controls.Add(this.m_chkRequireAnyPlugin);
             this.Controls.Add(this.m_dgv);
             this.Controls.Add(this.m_chkRequirePlugin);
             this.Controls.Add(this.m_txtPass);
@@ -176,5 +189,6 @@
         private System.Windows.Forms.CheckBox m_chkRequirePlugin;
         private System.Windows.Forms.DataGridView m_dgv;
         private System.Windows.Forms.DataGridViewTextBoxColumn PluginUuid;
+        private System.Windows.Forms.CheckBox m_chkRequireAnyPlugin;
     }
 }

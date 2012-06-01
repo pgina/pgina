@@ -48,6 +48,7 @@ namespace pGina.Plugin.SingleUser
             m_settings.SetDefault("Domain", Environment.MachineName);
             m_settings.SetDefaultEncryptedSetting("Password", "");            
             m_settings.SetDefault("RequirePlugins", false);
+            m_settings.SetDefault("RequireAnyPlugins", false);
             m_settings.SetDefault("RequiredPluginList", new string[] { });
         }
 
