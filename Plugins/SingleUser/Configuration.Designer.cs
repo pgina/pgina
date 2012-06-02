@@ -47,7 +47,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(206, 262);
+            this.btnOk.Location = new System.Drawing.Point(314, 262);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 3;
@@ -57,7 +57,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(287, 262);
+            this.btnCancel.Location = new System.Drawing.Point(395, 262);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 4;
@@ -121,9 +121,9 @@
             this.m_dgv.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.PluginUuid});
             this.m_dgv.Enabled = false;
-            this.m_dgv.Location = new System.Drawing.Point(16, 160);
+            this.m_dgv.Location = new System.Drawing.Point(12, 138);
             this.m_dgv.Name = "m_dgv";
-            this.m_dgv.Size = new System.Drawing.Size(346, 79);
+            this.m_dgv.Size = new System.Drawing.Size(458, 118);
             this.m_dgv.TabIndex = 12;
             // 
             // PluginUuid
@@ -135,7 +135,7 @@
             // substituteCB
             // 
             this.substituteCB.AutoSize = true;
-            this.substituteCB.Location = new System.Drawing.Point(13, 117);
+            this.substituteCB.Location = new System.Drawing.Point(12, 115);
             this.substituteCB.Name = "substituteCB";
             this.substituteCB.Size = new System.Drawing.Size(103, 17);
             this.substituteCB.TabIndex = 13;
@@ -146,7 +146,7 @@
             // anyRB
             // 
             this.anyRB.AutoSize = true;
-            this.anyRB.Location = new System.Drawing.Point(117, 115);
+            this.anyRB.Location = new System.Drawing.Point(117, 114);
             this.anyRB.Name = "anyRB";
             this.anyRB.Size = new System.Drawing.Size(42, 17);
             this.anyRB.TabIndex = 14;
@@ -157,7 +157,7 @@
             // allRB
             // 
             this.allRB.AutoSize = true;
-            this.allRB.Location = new System.Drawing.Point(161, 115);
+            this.allRB.Location = new System.Drawing.Point(161, 114);
             this.allRB.Name = "allRB";
             this.allRB.Size = new System.Drawing.Size(35, 17);
             this.allRB.TabIndex = 15;
@@ -168,17 +168,17 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(198, 117);
+            this.label4.Location = new System.Drawing.Point(198, 116);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(133, 13);
+            this.label4.Size = new System.Drawing.Size(272, 13);
             this.label4.TabIndex = 16;
-            this.label4.Text = "plugins listed below match.";
+            this.label4.Text = "of the following plugins have successfully authenticated.";
             // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(380, 297);
+            this.ClientSize = new System.Drawing.Size(482, 297);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.allRB);
             this.Controls.Add(this.anyRB);
