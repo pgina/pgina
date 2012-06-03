@@ -42,11 +42,13 @@
             this.cpRegisteredTB = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
             this.servGB = new System.Windows.Forms.GroupBox();
+            this.logonUiShowServiceStatusCB = new System.Windows.Forms.CheckBox();
             this.serviceStopBtn = new System.Windows.Forms.Button();
             this.serviceStartBtn = new System.Windows.Forms.Button();
             this.serviceStatusTB = new System.Windows.Forms.TextBox();
             this.servStatusLabel = new System.Windows.Forms.Label();
             this.motdGB = new System.Windows.Forms.GroupBox();
+            this.enableMotdCB = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
             this.motdTB = new System.Windows.Forms.TextBox();
             this.motdLabel = new System.Windows.Forms.Label();
@@ -134,8 +136,6 @@
             this.btnApply = new System.Windows.Forms.Button();
             this.btnOkay = new System.Windows.Forms.Button();
             this.m_pginaVersionLbl = new System.Windows.Forms.Label();
-            this.enableMotdCB = new System.Windows.Forms.CheckBox();
-            this.logonUiShowServiceStatusCB = new System.Windows.Forms.CheckBox();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
             this.groupBox14.SuspendLayout();
@@ -289,6 +289,16 @@
             this.servGB.TabStop = false;
             this.servGB.Text = "pGina Service";
             // 
+            // logonUiShowServiceStatusCB
+            // 
+            this.logonUiShowServiceStatusCB.AutoSize = true;
+            this.logonUiShowServiceStatusCB.Location = new System.Drawing.Point(12, 19);
+            this.logonUiShowServiceStatusCB.Name = "logonUiShowServiceStatusCB";
+            this.logonUiShowServiceStatusCB.Size = new System.Drawing.Size(175, 17);
+            this.logonUiShowServiceStatusCB.TabIndex = 4;
+            this.logonUiShowServiceStatusCB.Text = "Show service status in logon UI";
+            this.logonUiShowServiceStatusCB.UseVisualStyleBackColor = true;
+            // 
             // serviceStopBtn
             // 
             this.serviceStopBtn.Location = new System.Drawing.Point(139, 69);
@@ -338,6 +348,17 @@
             this.motdGB.TabIndex = 1;
             this.motdGB.TabStop = false;
             this.motdGB.Text = "MOTD";
+            // 
+            // enableMotdCB
+            // 
+            this.enableMotdCB.AutoSize = true;
+            this.enableMotdCB.Location = new System.Drawing.Point(11, 19);
+            this.enableMotdCB.Name = "enableMotdCB";
+            this.enableMotdCB.Size = new System.Drawing.Size(94, 17);
+            this.enableMotdCB.TabIndex = 3;
+            this.enableMotdCB.Text = "Enable MOTD";
+            this.enableMotdCB.UseVisualStyleBackColor = true;
+            this.enableMotdCB.CheckedChanged += new System.EventHandler(this.enableMotdCB_CheckedChanged);
             // 
             // label12
             // 
@@ -1289,27 +1310,6 @@
             this.m_pginaVersionLbl.Size = new System.Drawing.Size(72, 13);
             this.m_pginaVersionLbl.TabIndex = 5;
             this.m_pginaVersionLbl.Text = "pGina version";
-            // 
-            // enableMotdCB
-            // 
-            this.enableMotdCB.AutoSize = true;
-            this.enableMotdCB.Location = new System.Drawing.Point(11, 19);
-            this.enableMotdCB.Name = "enableMotdCB";
-            this.enableMotdCB.Size = new System.Drawing.Size(94, 17);
-            this.enableMotdCB.TabIndex = 3;
-            this.enableMotdCB.Text = "Enable MOTD";
-            this.enableMotdCB.UseVisualStyleBackColor = true;
-            this.enableMotdCB.CheckedChanged += new System.EventHandler(this.enableMotdCB_CheckedChanged);
-            // 
-            // logonUiShowServiceStatusCB
-            // 
-            this.logonUiShowServiceStatusCB.AutoSize = true;
-            this.logonUiShowServiceStatusCB.Location = new System.Drawing.Point(12, 19);
-            this.logonUiShowServiceStatusCB.Name = "logonUiShowServiceStatusCB";
-            this.logonUiShowServiceStatusCB.Size = new System.Drawing.Size(175, 17);
-            this.logonUiShowServiceStatusCB.TabIndex = 4;
-            this.logonUiShowServiceStatusCB.Text = "Show service status in logon UI";
-            this.logonUiShowServiceStatusCB.UseVisualStyleBackColor = true;
             // 
             // ConfigurationUI
             // 
