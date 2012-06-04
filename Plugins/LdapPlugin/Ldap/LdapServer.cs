@@ -83,16 +83,12 @@ namespace pGina.Plugin.Ldap
             string certFile = Settings.Store.ServerCertFile;
             if (m_useSsl && m_verifyCert)
             {
-                if (File.Exists(certFile))
+                if ( !string.IsNullOrEmpty(certFile) && File.Exists(certFile))
                 {
                     m_logger.DebugFormat("Loading server certificate: {0}", certFile);
                     m_cert = new X509Certificate2(certFile);
                 }
-                else
-                {
-                    m_logger.ErrorFormat("Certificate file {0} not found.", certFile);
-                    throw new Exception("Server certificate not found");
-                }
+                m_logger.DebugFormat("Certificate file not provided or not found, will validate against Windows store.", certFile);
             }
 
             string[] hosts = Settings.Store.LdapHost;
@@ -148,11 +144,17 @@ namespace pGina.Plugin.Ldap
             if (m_cert == null)
             {
                 m_logger.Debug("Verifying server cert with Windows store.");
-                // Use default policy
-                X509ChainPolicy policy = new X509ChainPolicy();
-
-                // Validation against the user's certificate store
-                X509CertificateValidator validator = X509CertificateValidator.CreateChainTrustValidator(false, policy);
+                
+                // We set the RevocationMode to NoCheck because most custom (self-generated) CAs
+                // do not work properly with revocation lists.  This is slightly less secure, but
+                // the most common use case for this plugin probably doesn't rely on revocation
+                // lists.
+                X509ChainPolicy policy = new X509ChainPolicy() { 
+                    RevocationMode = X509RevocationMode.NoCheck 
+                };
+                
+                // Create a validator using the policy
+                X509CertificateValidator validator = X509CertificateValidator.CreatePeerOrChainTrustValidator(false,policy);
                 try
                 {
                     validator.Validate(serverCert);
@@ -161,9 +163,9 @@ namespace pGina.Plugin.Ldap
                     m_logger.Debug("Server certificate verification succeeded.");
                     return true;
                 }
-                catch (SecurityTokenValidationException)
+                catch (SecurityTokenValidationException e)
                 {
-                    m_logger.Debug("Server certificate validation failed.");
+                    m_logger.ErrorFormat("Server certificate validation failed: {0}", e.Message);
                     return false;
                 }
             }
