@@ -134,11 +134,18 @@ namespace pGina.Plugin.Ldap
             if (m_cert == null)
             {
                 m_logger.Debug("Verifying server cert with Windows store.");
-                // Use default policy
-                X509ChainPolicy policy = new X509ChainPolicy();
+                
+                // We set the RevocationMode to NoCheck because most custom (self-generated) CAs
+                // do not work properly with revocation lists.  This is slightly less secure, but
+                // the most common use case for this plugin probably doesn't rely on revocation
+                // lists.
+                X509ChainPolicy policy = new X509ChainPolicy()
+                {
+                    RevocationMode = X509RevocationMode.NoCheck
+                };
 
                 // Validation against the user's certificate store
-                X509CertificateValidator validator = X509CertificateValidator.CreateChainTrustValidator(false, policy);
+                X509CertificateValidator validator = X509CertificateValidator.CreatePeerOrChainTrustValidator(false, policy);
                 try
                 {
                     validator.Validate(serverCert);
@@ -147,9 +154,9 @@ namespace pGina.Plugin.Ldap
                     m_logger.Debug("Server certificate verification succeeded.");
                     return true;
                 }
-                catch (SecurityTokenValidationException)
+                catch (SecurityTokenValidationException e)
                 {
-                    m_logger.Debug("Server certificate validation failed.");
+                    m_logger.ErrorFormat("Server certificate validation failed: {0}", e.Message);
                     return false;
                 }
             }
