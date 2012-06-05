@@ -1,3 +1,8 @@
+3.0.12.1 (2012/06/05)
+---------------------------
+ - Fix for custom CA certs in Windows store (#107)
+ - Icon improvements
+
 3.0.12.0 (2012/05/29)
 ---------------------------
  - Installer enhancements: internal changes, less noisy at post install
