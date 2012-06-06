@@ -1,4 +1,28 @@
-3.0.10 (2012/03/25)
+3.0.12.1 (2012/06/05)
+---------------------------
+ - Fix for custom CA certs in Windows store (#107)
+ - Icon improvements
+
+3.0.12.0 (2012/05/29)
+---------------------------
+ - Installer enhancements: internal changes, less noisy at post install
+ - Fix issue with web services (#127)
+ - Fix issue with failure when network is disconnected (#128)
+ - Change default setting for Local Machine authorization stage (#119)
+
+3.0.11.2 (2012/05/16)
+---------------------------
+ - Add some additional logging in install mode.
+
+3.0.11.1 (2012/05/08)
+---------------------------
+ - Bug fix for systems with password security policies (#126)
+
+3.0.11.0 (2012/04/07)
+---------------------------
+ - LDAP plugin option to always fail on empty passwords (#118)
+
+3.0.10.0 (2012/03/25)
 ---------------------------
  - EmailAuth Plugin updates to 3.0.0.1
  - Add UsernameMod plugin by Evan Horne
