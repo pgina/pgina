@@ -1,3 +1,14 @@
+3.1.0.0 BETA (2012/06/05)
+---------------------------
+ - Simulator reworked to include individual plugin information
+ - MySQL Logger plugin numerous changes (Oooska)
+ - Single User Login plugin provides more flexibility in options (Oooksa)
+ - LDAP plugin includes support for group authorization and adding/removing
+   from local groups.
+ - Add IStatefulPlugin interface to plugin API
+ - MySQL auth plugin includes configurable column names
+ - Make MOTD and service status display optional (in Credential Providers)
+
 3.0.12.1 (2012/06/05)
 ---------------------------
  - Fix for custom CA certs in Windows store (#107)
