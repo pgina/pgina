@@ -42,8 +42,6 @@ namespace pGina
 		{
 			if(!m_username.empty()) SetItemText(IDC_USERNAME_TXT, m_username.c_str());
 			if(!m_password.empty()) SetItemText(IDC_PASSWORD_TXT, m_password.c_str());
-			std::wstring motd = pGina::Transactions::TileUi::GetDynamicLabel(L"MOTD");
-			SetItemText(IDC_MOTD, motd.c_str());
 			ApplyLogoImage();
 			SetFocusItem(IDC_USERNAME_TXT);
 
@@ -56,10 +54,29 @@ namespace pGina
 			else
 				DisableItem(IDC_SPECIAL);			
 
-			SetServiceStatus();
+			// Service status
+			if( pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
+			{
+				SetServiceStatus();
 
-			// Start a timer to update service status
-			m_statusTimerId = StartTimer(pGina::Registry::GetDword(L"PingSleepTime", 5000));
+				// Start a timer to update service status
+				m_statusTimerId = StartTimer(pGina::Registry::GetDword(L"PingSleepTime", 5000));
+			}
+			else
+			{
+				DisableItem(IDC_STATUS);
+			}
+
+			// MOTD
+			if( pGina::Registry::GetBool(L"EnableMotd", true) )
+			{
+				std::wstring motd = pGina::Transactions::TileUi::GetDynamicLabel(L"MOTD");
+				SetItemText(IDC_MOTD, motd.c_str());
+			}
+			else
+			{
+				DisableItem(IDC_MOTD);
+			}
 		}
 
 		bool DialogLoggedOutSAS::Command(int itemId)
@@ -96,14 +113,17 @@ namespace pGina
 		
 		void DialogLoggedOutSAS::SetServiceStatus()
 		{
-			bool up = pGina::Transactions::Service::Ping();
-			if(up)
+			if( pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
 			{
-				SetItemText(IDC_STATUS, L"Service Status: Connected");
-			}
-			else
-			{
-				SetItemText(IDC_STATUS, L"Service Status: Disconnected");
+				bool up = pGina::Transactions::Service::Ping();
+				if(up)
+				{
+					SetItemText(IDC_STATUS, L"Service Status: Connected");
+				}
+				else
+				{
+					SetItemText(IDC_STATUS, L"Service Status: Disconnected");
+				}
 			}
 		}
 
