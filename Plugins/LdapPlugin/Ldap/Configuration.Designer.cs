@@ -359,6 +359,8 @@
             this.sslCertFileTextBox.Name = "sslCertFileTextBox";
             this.sslCertFileTextBox.Size = new System.Drawing.Size(463, 20);
             this.sslCertFileTextBox.TabIndex = 8;
+            this.descriptionToolTip.SetToolTip(this.sslCertFileTextBox, "Optional:  If left empty, the certificate will be validated\r\nagainst the Windows " +
+                    "certificate store.");
             // 
             // groupMemberAttrTB
             // 
@@ -366,6 +368,7 @@
             this.groupMemberAttrTB.Name = "groupMemberAttrTB";
             this.groupMemberAttrTB.Size = new System.Drawing.Size(135, 20);
             this.groupMemberAttrTB.TabIndex = 3;
+            this.descriptionToolTip.SetToolTip(this.groupMemberAttrTB, "The attribute that stores the group\'s membership.");
             // 
             // groupDNPattern
             // 
@@ -373,6 +376,8 @@
             this.groupDNPattern.Name = "groupDNPattern";
             this.groupDNPattern.Size = new System.Drawing.Size(326, 20);
             this.groupDNPattern.TabIndex = 1;
+            this.descriptionToolTip.SetToolTip(this.groupDNPattern, "A pattern that describes how to generate a group DN\r\nfrom a group name.  Use %g a" +
+                    "s a place holder for the \r\ngroup name.");
             // 
             // label5
             // 
@@ -400,6 +405,8 @@
             this.allowEmptyPwCB.Size = new System.Drawing.Size(137, 17);
             this.allowEmptyPwCB.TabIndex = 13;
             this.allowEmptyPwCB.Text = "Allow Empty Passwords";
+            this.descriptionToolTip.SetToolTip(this.allowEmptyPwCB, "When selected, empty passwords are used in bind\r\nattempts.  Otherwise, an empty p" +
+                    "assword causes\r\nauthentication to immediately fail.");
             this.allowEmptyPwCB.UseVisualStyleBackColor = true;
             // 
             // searchContextsTextBox
@@ -424,6 +431,8 @@
             this.dnPatternTextBox.Name = "dnPatternTextBox";
             this.dnPatternTextBox.Size = new System.Drawing.Size(463, 20);
             this.dnPatternTextBox.TabIndex = 1;
+            this.descriptionToolTip.SetToolTip(this.dnPatternTextBox, "Pattern used to generate a DN from a user name.  Use\r\n%u as a placeholder for the" +
+                    " user name.");
             // 
             // cancelButton
             // 
