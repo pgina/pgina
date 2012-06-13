@@ -190,7 +190,7 @@ namespace pGina.Plugin.Ldap
                 };
             }
 
-            // If we require authorization, and we failed to auth this user, then we
+            // If we require authentication, and we failed to auth this user, then we
             // fail authorization.  Note that we do this AFTER checking the LDAP server object
             // because we may want to succeed if the authentication failed due to server
             // being unavailable.
