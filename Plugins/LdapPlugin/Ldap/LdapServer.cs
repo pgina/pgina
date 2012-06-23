@@ -297,7 +297,30 @@ namespace pGina.Plugin.Ldap
                 throw new Exception("Can't resolve group membership, group attribute missing.");
 
             groupDn = Regex.Replace(groupDn, @"\%g", group);
-            string filter = string.Format("({0}={1})", groupAttribute, user);
+
+            string target = user;
+
+            // If the group attribute is "uniqueMember" or "member" then the LDAP server
+            // is using groupOfUniqueNames or groupOfNames object class.  The group
+            // list uses full DNs instead of just uids, so we need to expand the
+            // username to the full DN.
+            if (groupAttribute.Equals("uniqueMember", StringComparison.CurrentCultureIgnoreCase) ||
+                groupAttribute.Equals("member", StringComparison.CurrentCultureIgnoreCase))
+            {
+                // Try to generate the full DN for the user using the
+                // LdapAuthenticator.
+                m_logger.DebugFormat("Attempting to generate DN for user {0}", user);
+                LdapAuthenticator auth = new LdapAuthenticator(
+                    new NetworkCredential(user, ""), this);
+                target = auth.GetUserDN();
+                if (target == null)
+                {
+                    m_logger.Error("Unable to generate DN for user, using username.");
+                    target = user;
+                }
+            }
+
+            string filter = string.Format("({0}={1})", groupAttribute, target);
             m_logger.DebugFormat("Searching for group membership, DN: {0}  Filter: {1}", groupDn, filter);
             try
             {

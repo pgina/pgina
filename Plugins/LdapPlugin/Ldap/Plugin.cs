@@ -25,7 +25,6 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -33,9 +32,7 @@ using System.DirectoryServices.Protocols;
 
 using log4net;
 
-using pGina.Shared;
 using pGina.Shared.Interfaces;
-using pGina.Shared.Settings;
 using pGina.Shared.Types;
 
 namespace pGina.Plugin.Ldap

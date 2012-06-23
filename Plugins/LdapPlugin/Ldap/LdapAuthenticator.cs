@@ -65,27 +65,9 @@ namespace pGina.Plugin.Ldap
                 return new BooleanResult { Success = false, Message = "Authentication failed due to empty password." };
             }
 
-            // Generate username (if we're not doing a search for it)
-            string userDN = null;
-            bool doSearch = Settings.Store.DoSearch;
-            if (!doSearch)
-            {
-                userDN = CreateUserDN();
-            }
+            // Get the user's DN
+            string userDN = GetUserDN();
             
-            // If we're searching, attempt to bind with the search credentials, or anonymously
-            if (doSearch)
-            {
-                // Set this to null (should be null anyway) because we are going to search
-                // for it.
-                userDN = null;
-                // Attempt to bind in order to do the search
-                m_serv.BindForSearch();
-
-                // If we get here, a bind was successful, so we can search for the user's DN
-                userDN = FindUserDN();
-            }
-
             // If we've got a userDN, attempt to authenticate the user
             if (userDN != null)
             {
@@ -101,6 +83,24 @@ namespace pGina.Plugin.Ldap
             else
             {
                 throw new Exception("Unable to determine a user DN for authentication.");
+            }
+        }
+
+        public string GetUserDN()
+        {
+            bool doSearch = Settings.Store.DoSearch;
+            if (!doSearch)
+            {
+                return CreateUserDN();
+            }
+            else
+            // If we're searching, attempt to bind with the search credentials, or anonymously
+            {
+                // Attempt to bind in order to do the search
+                m_serv.BindForSearch();
+
+                // If we get here, a bind was successful, so we can search for the user's DN
+                return FindUserDN();
             }
         }
 
@@ -173,6 +173,5 @@ namespace pGina.Plugin.Ldap
 
             return result;
         }
-
     }
 }
