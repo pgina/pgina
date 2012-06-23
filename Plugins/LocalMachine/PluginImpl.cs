@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,11 @@ using pGina.Shared.Types;
 
 namespace pGina.Plugin.LocalMachine
 {
+    public enum ScramblePasswordsMode
+    {
+        LOCAL_MACHINE_AUTH_FAIL,
+        ALL_EXCEPT_SOME
+    }
 
     public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration
     {
@@ -186,19 +191,49 @@ namespace pGina.Plugin.LocalMachine
             }
 
             try
-            {   
-                // If this user doesn't already exist, and we are supposed to clean up after ourselves,
-                //  make note of the username!
-                if( ! LocalAccount.UserExists(userInfo.Username) )
+            {
+                bool scramble = Settings.Store.ScramblePasswords;
+                bool remove = Settings.Store.RemoveProfiles;
+
+                if (remove)
                 {
-                    bool scramble = Settings.Store.ScramblePasswords;
-                    bool remove = Settings.Store.RemoveProfiles;
-                    if (scramble || remove)
-                    {                        
+                    // If this user doesn't already exist, and we are supposed to clean up after ourselves,
+                    //  make note of the username!
+                    if (!LocalAccount.UserExists(userInfo.Username))
+                    {
+                        m_logger.DebugFormat("Marking for deletion: {0}", userInfo.Username);
                         AddCleanupUser(userInfo.Username);
                     }
                 }
-       
+
+                // If we are configured to scramble passwords
+                if (scramble)
+                {
+                    string smode = Settings.Store.ScramblePasswordsMode;
+                    ScramblePasswordsMode mode = (ScramblePasswordsMode)Enum.Parse(typeof(ScramblePasswordsMode), smode);
+                    switch (mode)
+                    {
+                        case ScramblePasswordsMode.LOCAL_MACHINE_AUTH_FAIL:
+                            // Scramble the password only if we did not authenticate this user
+                            if (!DidWeAuthThisUser(properties, false))
+                            {
+                                m_logger.DebugFormat("Mode LOCAL_MACHINE_AUTH_FAIL: marking for scramble: {0}", userInfo.Username);
+                                AddCleanupUser(userInfo.Username);
+                            }
+                            break;
+                        case ScramblePasswordsMode.ALL_EXCEPT_SOME:
+                            // Scramble the password only if the user is not in the list
+                            // of exceptions.
+                            string[] exceptions = Settings.Store.ScramblePasswordsExceptions;
+                            if (!exceptions.Contains(userInfo.Username,StringComparer.CurrentCultureIgnoreCase))
+                            {
+                                m_logger.DebugFormat("Mode ALL_EXCEPT_SOME: marking for scramble: {0}", userInfo.Username);
+                                AddCleanupUser(userInfo.Username);
+                            }
+                            break;
+                    }
+                }
+                
                 m_logger.DebugFormat("AuthenticatedUserGateway({0}) for user: {1}", properties.Id.ToString(), userInfo.Username);
                 LocalAccount.SyncUserInfoToLocalUser(userInfo);
             }

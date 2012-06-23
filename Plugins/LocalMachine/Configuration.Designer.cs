@@ -38,18 +38,23 @@
             this.m_chkAuthzLocalAdmin = new System.Windows.Forms.CheckBox();
             this.m_chkAuthzAll = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.m_chkRemoveProfile = new System.Windows.Forms.CheckBox();
+            this.m_chkScramble = new System.Windows.Forms.CheckBox();
             this.m_chkGroupFailIsFAIL = new System.Windows.Forms.CheckBox();
             this.m_groupsDgv = new System.Windows.Forms.DataGridView();
             this.Group = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_btnSave = new System.Windows.Forms.Button();
             this.m_btnClose = new System.Windows.Forms.Button();
-            this.m_chkScramble = new System.Windows.Forms.CheckBox();
-            this.m_chkRemoveProfile = new System.Windows.Forms.CheckBox();
+            this.m_scrambleLocalMachineFailRB = new System.Windows.Forms.RadioButton();
+            this.m_scrambleAllExceptRB = new System.Windows.Forms.RadioButton();
+            this.m_scrambleAllExceptDGV = new System.Windows.Forms.DataGridView();
+            this.Username = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_localGroupDgv)).BeginInit();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_groupsDgv)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.m_scrambleAllExceptDGV)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -81,7 +86,7 @@
             this.groupBox2.Controls.Add(this.m_chkAuthzAll);
             this.groupBox2.Location = new System.Drawing.Point(12, 73);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(343, 230);
+            this.groupBox2.Size = new System.Drawing.Size(343, 333);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Authorization";
@@ -114,7 +119,7 @@
             this.LocalGroup});
             this.m_localGroupDgv.Location = new System.Drawing.Point(15, 113);
             this.m_localGroupDgv.Name = "m_localGroupDgv";
-            this.m_localGroupDgv.Size = new System.Drawing.Size(311, 100);
+            this.m_localGroupDgv.Size = new System.Drawing.Size(311, 200);
             this.m_localGroupDgv.TabIndex = 2;
             // 
             // LocalGroup
@@ -145,16 +150,42 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.m_scrambleAllExceptDGV);
+            this.groupBox3.Controls.Add(this.m_scrambleAllExceptRB);
+            this.groupBox3.Controls.Add(this.m_scrambleLocalMachineFailRB);
             this.groupBox3.Controls.Add(this.m_chkRemoveProfile);
             this.groupBox3.Controls.Add(this.m_chkScramble);
             this.groupBox3.Controls.Add(this.m_chkGroupFailIsFAIL);
             this.groupBox3.Controls.Add(this.m_groupsDgv);
             this.groupBox3.Location = new System.Drawing.Point(361, 13);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(343, 290);
+            this.groupBox3.Size = new System.Drawing.Size(343, 393);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Gateway";
+            // 
+            // m_chkRemoveProfile
+            // 
+            this.m_chkRemoveProfile.AutoSize = true;
+            this.m_chkRemoveProfile.Location = new System.Drawing.Point(15, 42);
+            this.m_chkRemoveProfile.Name = "m_chkRemoveProfile";
+            this.m_chkRemoveProfile.Size = new System.Drawing.Size(248, 30);
+            this.m_chkRemoveProfile.TabIndex = 8;
+            this.m_chkRemoveProfile.Text = "Remove account and profile after logout when \r\naccount doesn\'t exist prior to log" +
+    "on.";
+            this.m_chkRemoveProfile.UseVisualStyleBackColor = true;
+            this.m_chkRemoveProfile.CheckedChanged += new System.EventHandler(this.m_chkRemoveProfile_CheckedChanged);
+            // 
+            // m_chkScramble
+            // 
+            this.m_chkScramble.AutoSize = true;
+            this.m_chkScramble.Location = new System.Drawing.Point(15, 78);
+            this.m_chkScramble.Name = "m_chkScramble";
+            this.m_chkScramble.Size = new System.Drawing.Size(212, 17);
+            this.m_chkScramble.TabIndex = 7;
+            this.m_chkScramble.Text = "Scramble password after logout when...";
+            this.m_chkScramble.UseVisualStyleBackColor = true;
+            this.m_chkScramble.CheckedChanged += new System.EventHandler(this.m_chkScramble_CheckedChanged);
             // 
             // m_chkGroupFailIsFAIL
             // 
@@ -171,9 +202,9 @@
             this.m_groupsDgv.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.m_groupsDgv.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Group});
-            this.m_groupsDgv.Location = new System.Drawing.Point(15, 173);
+            this.m_groupsDgv.Location = new System.Drawing.Point(15, 262);
             this.m_groupsDgv.Name = "m_groupsDgv";
-            this.m_groupsDgv.Size = new System.Drawing.Size(311, 100);
+            this.m_groupsDgv.Size = new System.Drawing.Size(311, 111);
             this.m_groupsDgv.TabIndex = 5;
             // 
             // Group
@@ -184,7 +215,7 @@
             // 
             // m_btnSave
             // 
-            this.m_btnSave.Location = new System.Drawing.Point(544, 318);
+            this.m_btnSave.Location = new System.Drawing.Point(533, 412);
             this.m_btnSave.Name = "m_btnSave";
             this.m_btnSave.Size = new System.Drawing.Size(75, 23);
             this.m_btnSave.TabIndex = 3;
@@ -194,7 +225,7 @@
             // 
             // m_btnClose
             // 
-            this.m_btnClose.Location = new System.Drawing.Point(629, 318);
+            this.m_btnClose.Location = new System.Drawing.Point(618, 412);
             this.m_btnClose.Name = "m_btnClose";
             this.m_btnClose.Size = new System.Drawing.Size(75, 23);
             this.m_btnClose.TabIndex = 4;
@@ -202,33 +233,51 @@
             this.m_btnClose.UseVisualStyleBackColor = true;
             this.m_btnClose.Click += new System.EventHandler(this.m_btnClose_Click);
             // 
-            // m_chkScramble
+            // m_scrambleLocalMachineFailRB
             // 
-            this.m_chkScramble.AutoSize = true;
-            this.m_chkScramble.Location = new System.Drawing.Point(15, 42);
-            this.m_chkScramble.Name = "m_chkScramble";
-            this.m_chkScramble.Size = new System.Drawing.Size(174, 17);
-            this.m_chkScramble.TabIndex = 7;
-            this.m_chkScramble.Text = "Scramble password after logout";
-            this.m_chkScramble.UseVisualStyleBackColor = true;
-            this.m_chkScramble.CheckedChanged += new System.EventHandler(this.m_chkScramble_CheckedChanged);
+            this.m_scrambleLocalMachineFailRB.AutoSize = true;
+            this.m_scrambleLocalMachineFailRB.Location = new System.Drawing.Point(37, 101);
+            this.m_scrambleLocalMachineFailRB.Name = "m_scrambleLocalMachineFailRB";
+            this.m_scrambleLocalMachineFailRB.Size = new System.Drawing.Size(276, 17);
+            this.m_scrambleLocalMachineFailRB.TabIndex = 9;
+            this.m_scrambleLocalMachineFailRB.TabStop = true;
+            this.m_scrambleLocalMachineFailRB.Text = "LocalMachine authentication fails or doesn\'t execute.";
+            this.m_scrambleLocalMachineFailRB.UseVisualStyleBackColor = true;
+            this.m_scrambleLocalMachineFailRB.CheckedChanged += new System.EventHandler(this.m_scrambleLocalMachineFailRB_CheckedChanged);
             // 
-            // m_chkRemoveProfile
+            // m_scrambleAllExceptRB
             // 
-            this.m_chkRemoveProfile.AutoSize = true;
-            this.m_chkRemoveProfile.Location = new System.Drawing.Point(15, 65);
-            this.m_chkRemoveProfile.Name = "m_chkRemoveProfile";
-            this.m_chkRemoveProfile.Size = new System.Drawing.Size(216, 17);
-            this.m_chkRemoveProfile.TabIndex = 8;
-            this.m_chkRemoveProfile.Text = "Remove account and profile after logout";
-            this.m_chkRemoveProfile.UseVisualStyleBackColor = true;
-            this.m_chkRemoveProfile.CheckedChanged += new System.EventHandler(this.m_chkRemoveProfile_CheckedChanged);
+            this.m_scrambleAllExceptRB.AutoSize = true;
+            this.m_scrambleAllExceptRB.Location = new System.Drawing.Point(37, 124);
+            this.m_scrambleAllExceptRB.Name = "m_scrambleAllExceptRB";
+            this.m_scrambleAllExceptRB.Size = new System.Drawing.Size(197, 17);
+            this.m_scrambleAllExceptRB.TabIndex = 10;
+            this.m_scrambleAllExceptRB.TabStop = true;
+            this.m_scrambleAllExceptRB.Text = "username is not one of the following:";
+            this.m_scrambleAllExceptRB.UseVisualStyleBackColor = true;
+            this.m_scrambleAllExceptRB.CheckedChanged += new System.EventHandler(this.m_scrambleAllExceptRB_CheckedChanged);
+            // 
+            // m_scrambleAllExceptDGV
+            // 
+            this.m_scrambleAllExceptDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.m_scrambleAllExceptDGV.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Username});
+            this.m_scrambleAllExceptDGV.Location = new System.Drawing.Point(54, 148);
+            this.m_scrambleAllExceptDGV.Name = "m_scrambleAllExceptDGV";
+            this.m_scrambleAllExceptDGV.Size = new System.Drawing.Size(271, 84);
+            this.m_scrambleAllExceptDGV.TabIndex = 11;
+            // 
+            // Username
+            // 
+            this.Username.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Username.HeaderText = "Username";
+            this.Username.Name = "Username";
             // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(720, 354);
+            this.ClientSize = new System.Drawing.Size(720, 447);
             this.Controls.Add(this.m_btnClose);
             this.Controls.Add(this.m_btnSave);
             this.Controls.Add(this.groupBox3);
@@ -244,6 +293,7 @@
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_groupsDgv)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.m_scrambleAllExceptDGV)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -267,5 +317,9 @@
         private System.Windows.Forms.CheckBox m_chkGroupFailIsFAIL;
         private System.Windows.Forms.CheckBox m_chkScramble;
         private System.Windows.Forms.CheckBox m_chkRemoveProfile;
+        private System.Windows.Forms.DataGridView m_scrambleAllExceptDGV;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Username;
+        private System.Windows.Forms.RadioButton m_scrambleAllExceptRB;
+        private System.Windows.Forms.RadioButton m_scrambleLocalMachineFailRB;
     }
 }

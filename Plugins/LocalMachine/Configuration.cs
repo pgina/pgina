@@ -1,4 +1,30 @@
-﻿using System;
+﻿/*
+	Copyright (c) 2012, pGina Team
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+		* Redistributions of source code must retain the above copyright
+		  notice, this list of conditions and the following disclaimer.
+		* Redistributions in binary form must reproduce the above copyright
+		  notice, this list of conditions and the following disclaimer in the
+		  documentation and/or other materials provided with the distribution.
+		* Neither the name of the pGina Team nor the names of its contributors 
+		  may be used to endorse or promote products derived from this software without 
+		  specific prior written permission.
+
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+	DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -29,12 +55,26 @@ namespace pGina.Plugin.LocalMachine
             string[] MandatoryGroups = Settings.Store.MandatoryGroups;
             bool ScramblePasswords = Settings.Store.ScramblePasswords;
             bool RemoveProfiles = Settings.Store.RemoveProfiles;
+            string mode = Settings.Store.ScramblePasswordsMode;
+            ScramblePasswordsMode scrambleMode = (ScramblePasswordsMode)Enum.Parse( 
+                typeof(ScramblePasswordsMode), mode);
+            string[] scrambleExceptions = Settings.Store.ScramblePasswordsExceptions;
 
             m_chkAlwaysAuth.Checked = AlwaysAuthenticate;
             m_chkAuthzLocalAdmin.Checked = AuthzLocalAdminsOnly;
             m_chkAuthzRequireLocal.Checked = AuthzLocalGroupsOnly;
             m_chkScramble.Checked = ScramblePasswords;
             m_chkRemoveProfile.Checked = RemoveProfiles;
+
+            switch( scrambleMode )
+            {
+                case ScramblePasswordsMode.LOCAL_MACHINE_AUTH_FAIL:
+                    m_scrambleLocalMachineFailRB.Checked = true;
+                    break;
+                case ScramblePasswordsMode.ALL_EXCEPT_SOME:
+                    m_scrambleAllExceptRB.Checked = true;
+                    break;
+            }
 
             foreach (string group in AuthzLocalGroups)
             {
@@ -50,7 +90,13 @@ namespace pGina.Plugin.LocalMachine
                 m_groupsDgv.Rows.Add(new string[] { group });
             }
 
+            foreach (string user in scrambleExceptions)
+            {
+                m_scrambleAllExceptDGV.Rows.Add(new string[] { user });
+            }
+
             MaskAuthzUi();
+            MaskGatewayUi();
         }
 
         public void UiToSettings()
@@ -60,6 +106,11 @@ namespace pGina.Plugin.LocalMachine
             Settings.Store.AuthzLocalGroupsOnly = m_chkAuthzRequireLocal.Checked;
             Settings.Store.ScramblePasswords = m_chkScramble.Checked;
             Settings.Store.RemoveProfiles = m_chkRemoveProfile.Checked;
+
+            if( m_scrambleAllExceptRB.Checked )
+                Settings.Store.ScramblePasswordsMode = ScramblePasswordsMode.ALL_EXCEPT_SOME.ToString();
+            if( m_scrambleLocalMachineFailRB.Checked )
+                Settings.Store.ScramblePasswordsMode = ScramblePasswordsMode.LOCAL_MACHINE_AUTH_FAIL.ToString();
 
             List<string> localGroups = new List<string>();
             foreach (DataGridViewRow row in m_localGroupDgv.Rows)
@@ -88,6 +139,18 @@ namespace pGina.Plugin.LocalMachine
                 Settings.Store.MandatoryGroups = mandatory.ToArray();
             else
                 Settings.Store.MandatoryGroups = new string[] { };
+
+            List<string> exceptions = new List<string>();
+            foreach (DataGridViewRow row in m_scrambleAllExceptDGV.Rows)
+            {
+                if (row.Cells[0].Value != null)
+                    exceptions.Add((string)row.Cells[0].Value);
+            }
+
+            if (exceptions.Count > 0)
+                Settings.Store.ScramblePasswordsExceptions = exceptions.ToArray();
+            else
+                Settings.Store.ScramblePasswordsExceptions = new string[] { };
         }
 
         public void MaskAuthzUi()
@@ -95,6 +158,22 @@ namespace pGina.Plugin.LocalMachine
             m_localGroupDgv.Enabled = m_chkAuthzRequireLocal.Checked;
             if (m_chkScramble.Checked) m_chkRemoveProfile.Checked = false;
             if (m_chkRemoveProfile.Checked) m_chkScramble.Checked = false;
+        }
+
+        public void MaskGatewayUi()
+        {
+            if (m_chkScramble.Checked)
+            {
+                m_scrambleAllExceptRB.Enabled = true;
+                m_scrambleLocalMachineFailRB.Enabled = true;
+                m_scrambleAllExceptDGV.Enabled = m_scrambleAllExceptRB.Checked;
+            }
+            else
+            {
+                m_scrambleAllExceptRB.Enabled = false;
+                m_scrambleLocalMachineFailRB.Enabled = false;
+                m_scrambleAllExceptDGV.Enabled = false;
+            }
         }
 
         private void m_chkAuthzRequireLocal_CheckedChanged(object sender, EventArgs e)
@@ -116,11 +195,22 @@ namespace pGina.Plugin.LocalMachine
         private void m_chkScramble_CheckedChanged(object sender, EventArgs e)
         {
             if (m_chkScramble.Checked) m_chkRemoveProfile.Checked = false;
+            MaskGatewayUi();
         }
 
         private void m_chkRemoveProfile_CheckedChanged(object sender, EventArgs e)
         {
             if (m_chkRemoveProfile.Checked) m_chkScramble.Checked = false;
+        }
+
+        private void m_scrambleLocalMachineFailRB_CheckedChanged(object sender, EventArgs e)
+        {
+            MaskGatewayUi();
+        }
+
+        private void m_scrambleAllExceptRB_CheckedChanged(object sender, EventArgs e)
+        {
+            MaskGatewayUi();
         }
     }
 }
