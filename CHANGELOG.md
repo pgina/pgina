@@ -1,3 +1,12 @@
+3.1.1.0 BETA (2012/06/23)
+---------------------------
+ - LocalMachine plugin: change functionality of the scramble passwords
+   option.  (#136)
+ - LDAP plugin: support groupOfUniqueNames and groupOfNames object
+   classes.  (#135)
+ - LDAP plugin: better tool-tips
+ - GINA support for optional MOTD and service status.
+
 3.1.0.0 BETA (2012/06/05)
 ---------------------------
  - Simulator reworked to include individual plugin information
