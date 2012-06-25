@@ -86,13 +86,9 @@ namespace pGina.Plugin.Ldap
                 Shared.Types.UserInformation userInfo = properties.GetTrackedSingle<Shared.Types.UserInformation>();
                 m_logger.DebugFormat("Received username: {0}", userInfo.Username);
 
-                // Place credentials into a NetworkCredentials object
-                NetworkCredential creds = new NetworkCredential(userInfo.Username, userInfo.Password);
-
                 // Authenticate the login
-                m_logger.DebugFormat("Attempting authentication for {0}", creds.UserName);
-                LdapAuthenticator authenticator = new LdapAuthenticator(creds, server);
-                return authenticator.Authenticate();
+                m_logger.DebugFormat("Attempting authentication for {0}", userInfo.Username);
+                return server.Authenticate(userInfo.Username, userInfo.Password);
             }
             catch (Exception e)
             {
@@ -107,12 +103,6 @@ namespace pGina.Plugin.Ldap
                         server.Close();
                         properties.AddTrackedSingle<LdapServer>(null);
                         return new BooleanResult { Success = false, Message = "Failed to contact LDAP server." };
-                    }
-                    else if (ldapEx.ErrorCode == 49)
-                    {
-                        // This is invalid credentials, return false, but server object should remain connected
-                        m_logger.ErrorFormat("LDAP bind failed: invalid credentials.");
-                        return new BooleanResult { Success = false, Message = "Authentication via LDAP failed. Invalid credentials." };
                     }
                 }
 

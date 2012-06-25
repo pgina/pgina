@@ -36,6 +36,7 @@ using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Text.RegularExpressions;
+using pGina.Shared.Types;
 
 namespace pGina.Plugin.Ldap
 {
@@ -218,8 +219,10 @@ namespace pGina.Plugin.Ldap
             string searchPw = Settings.Store.GetEncryptedSetting("SearchPW");
 
             if (string.IsNullOrEmpty(searchDn))
+                // Bind anonymously
                 this.Bind();
             else
+                // Bind with credentials
                 this.Bind(new NetworkCredential(searchDn, searchPw));
         }
 
@@ -307,12 +310,9 @@ namespace pGina.Plugin.Ldap
             if (groupAttribute.Equals("uniqueMember", StringComparison.CurrentCultureIgnoreCase) ||
                 groupAttribute.Equals("member", StringComparison.CurrentCultureIgnoreCase))
             {
-                // Try to generate the full DN for the user using the
-                // LdapAuthenticator.
+                // Try to generate the full DN for the user.
                 m_logger.DebugFormat("Attempting to generate DN for user {0}", user);
-                LdapAuthenticator auth = new LdapAuthenticator(
-                    new NetworkCredential(user, ""), this);
-                target = auth.GetUserDN();
+                target = this.GetUserDN(user);
                 if (target == null)
                 {
                     m_logger.Error("Unable to generate DN for user, using username.");
@@ -338,6 +338,141 @@ namespace pGina.Plugin.Ldap
         public void Dispose()
         {
             this.Close();
+        }
+
+        /// <summary>
+        /// Attempt to authenticate the user by binding to the LDAP server.
+        /// </summary>
+        /// <returns></returns>
+        public BooleanResult Authenticate(string uname, string password)
+        {
+            // Check for empty password.  If configured to do so, we fail on 
+            // empty passwords.
+            bool allowEmpty = Settings.Store.AllowEmptyPasswords;
+            if (!allowEmpty && string.IsNullOrEmpty(password))
+            {
+                m_logger.Info("Authentication failed due to empty password.");
+                return new BooleanResult { Success = false, Message = "Authentication failed due to empty password." };
+            }
+
+            // Get the user's DN
+            string userDN = GetUserDN(uname);
+
+            // If we've got a userDN, attempt to authenticate the user
+            if (userDN != null)
+            {
+                // Attempt to bind with the user's LDAP credentials
+                m_logger.DebugFormat("Attempting to bind with DN {0}", userDN);
+                NetworkCredential ldapCredential = new NetworkCredential(userDN, password);
+
+                try
+                {
+                    this.Bind(ldapCredential);
+                }
+                catch (LdapException e)
+                {
+                    // 49 is invalid credentials
+                    if (e.ErrorCode == 49)
+                    {
+                        m_logger.ErrorFormat("LDAP bind failed: invalid credentials.");
+                        return new BooleanResult { Success = false, Message = "Authentication via LDAP failed. Invalid credentials." };
+                    }
+
+                    // Let caller handle other kinds of exceptions
+                    throw;
+                }
+
+                // If we get here, the authentication was successful, we're done!
+                m_logger.DebugFormat("LDAP DN {0} successfully bound to server, return success", ldapCredential.UserName);
+                return new BooleanResult { Success = true };
+            } // end if(userDN != null)
+            else
+            {
+                m_logger.ErrorFormat("Unable to determine DN for: {0}", uname);
+                return new BooleanResult { Success = false, Message = "Unable to determine the user's LDAP DN for authentication." };
+            }
+        }
+
+        public string GetUserDN(string uname)
+        {
+            bool doSearch = Settings.Store.DoSearch;
+            if (!doSearch)
+            {
+                return CreateUserDN(uname);
+            }
+            else
+            {
+                return FindUserDN(uname);
+            }
+        }
+
+        /// <summary>
+        /// Attempts to find the DN for the user by searching a set of LDAP trees.
+        /// The base DN for each of the trees is retrieved from Settings.Store.SearchContexts.
+        /// The search filter is taken from Settings.Store.SearchFilter.  If all
+        /// searches fail, this method returns null.
+        /// </summary>
+        /// <returns>The DN of the first object found, or null if searches fail.</returns>
+        private string FindUserDN(string uname)
+        {
+            // Attempt to bind in order to do the search
+            this.BindForSearch();
+
+            string filter = CreateSearchFilter(uname);
+
+            m_logger.DebugFormat("Searching for DN using filter {0}", filter);
+            string[] contexts = Settings.Store.SearchContexts;
+            foreach (string context in contexts)
+            {
+                m_logger.DebugFormat("Searching context {0}", context);
+                string dn = null;
+                try
+                {
+                    dn = this.FindFirstDN(context, filter);
+                }
+                catch (DirectoryOperationException e)
+                {
+                    m_logger.ErrorFormat("DirectoryOperationException: {0}", e.Message);
+                }
+                if (dn != null)
+                {
+                    m_logger.DebugFormat("Found DN: {0}", dn);
+                    return dn;
+                }
+            }
+
+            m_logger.DebugFormat("No DN found in any of the contexts.");
+            return null;
+        }
+
+        /// <summary>
+        /// This generates the DN for the user assuming that a pattern has
+        /// been provided.  This assumes that Settings.Store.DnPattern has
+        /// a valid DN pattern.
+        /// </summary>
+        /// <returns>A DN that can be used for binding with LDAP server.</returns>
+        private string CreateUserDN(string uname)
+        {
+            string result = Settings.Store.DnPattern;
+
+            // Replace the username
+            result = Regex.Replace(result, @"\%u", uname);
+
+            return result;
+        }
+
+        /// <summary>
+        /// This generates the search filter to be used when searching for the DN
+        /// </summary>
+        /// <returns>A search filter.</returns>
+        private string CreateSearchFilter(string uname)
+        {
+            string result = Settings.Store.SearchFilter;
+
+            // Replace the username
+            result = Regex.Replace(result, @"\%u", uname);
+
+            return result;
         }
     }
 }

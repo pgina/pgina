@@ -62,7 +62,6 @@
       <DependentUpon>Configuration.cs</DependentUpon>
     </Compile>
     <Compile Include="GroupRules.cs" />
-    <Compile Include="LdapAuthenticator.cs" />
     <Compile Include="LdapServer.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
