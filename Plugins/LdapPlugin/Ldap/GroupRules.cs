@@ -97,7 +97,7 @@ namespace pGina.Plugin.Ldap
         }
     }
 
-    abstract class GroupRule
+    public abstract class GroupRule
     {
         public string Group { get { return m_group; } }
         protected string m_group;
@@ -126,7 +126,7 @@ namespace pGina.Plugin.Ldap
         public abstract string ToRegString();
     }
 
-    class GroupAuthzRule : GroupRule
+    public class GroupAuthzRule : GroupRule
     {
         public bool AllowOnMatch { get { return m_allowOnMatch; } }
         private bool m_allowOnMatch;
@@ -181,7 +181,7 @@ namespace pGina.Plugin.Ldap
         }
     }
 
-    class GroupGatewayRule : GroupRule
+    public class GroupGatewayRule : GroupRule
     {
         public string LocalGroup { get { return m_localGroup; } }
         private string m_localGroup;

@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2FCCB288-F6BB-484A-9681-D3864BD05F60}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <ProjectGuid>{D48E4857-D4EB-4140-8F7D-D73C4713CCF0}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>pGina.Plugin.Ldap.Tests</RootNamespace>
-    <AssemblyName>pGina.Plugin.Ldap.Test</AssemblyName>
+    <RootNamespace>pGina.Plugin.Ldap.Test</RootNamespace>
+    <AssemblyName>pGina.Plugin.Ldap.LdapTests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -30,20 +30,25 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>pGina.Plugin.Ldap.Tests.Program</StartupObject>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Abstractions">
       <HintPath>..\..\SDK\Abstractions.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\..\lib\nunit\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.mocks">
+      <HintPath>..\..\lib\nunit\nunit.mocks.dll</HintPath>
+    </Reference>
     <Reference Include="pGina.Shared">
       <HintPath>..\..\SDK\pGina.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="pnunit.framework">
+      <HintPath>..\..\lib\nunit\pnunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.DirectoryServices.Protocols" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,8 +56,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LdapTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RunConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ldap\Ldap.csproj">

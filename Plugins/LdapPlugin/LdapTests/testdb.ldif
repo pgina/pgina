@@ -1,0 +1,96 @@
+version: 1
+
+dn: dc=example,dc=com
+objectClass: top
+objectClass: domain
+dc: example
+
+dn: ou=People,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: People
+
+dn: uid=kirkj,ou=People,dc=example,dc=com
+objectClass: person
+objectClass: top
+objectClass: posixAccount
+cn: James Kirk
+gidNumber: 200
+homeDirectory: /home/kirkj
+sn: Kirk
+uid: kirkj
+uidNumber: 1000
+userPassword:: e1NTSEF9V2ZvS1R5NXNqSllEUDZsb0hpRGNWYTl2djBPeW9Lb1RkZGhFNVE9P
+ Q==
+
+dn: ou=Group,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: Group
+
+dn: cn=admin,ou=Group,dc=example,dc=com
+objectClass: top
+objectClass: posixGroup
+cn: admin
+gidNumber: 1000
+memberUid: pgina
+
+dn: uid=spock,ou=People,dc=example,dc=com
+objectClass: person
+objectClass: top
+objectClass: posixAccount
+cn: Spock Spork
+gidNumber: 200
+homeDirectory: /home/kirkj
+sn: Spock
+uid: spock
+uidNumber: 1001
+userPassword:: e1NTSEF9V2ZvS1R5NXNqSllEUDZsb0hpRGNWYTl2djBPeW9Lb1RkZGhFNVE9P
+ Q==
+
+dn: uid=uhura,ou=People,dc=example,dc=com
+objectClass: person
+objectClass: top
+objectClass: posixAccount
+cn: Ltd. Uhura
+gidNumber: 200
+homeDirectory: /home/kirkj
+sn: Uhura
+uid: uhura
+uidNumber: 1002
+userPassword:: e1NTSEF9V2ZvS1R5NXNqSllEUDZsb0hpRGNWYTl2djBPeW9Lb1RkZGhFNVE9P
+ Q==
+
+dn: cn=bad,ou=Group,dc=example,dc=com
+objectClass: top
+objectClass: posixGroup
+cn: bad
+gidNumber: 1001
+memberUid: kirkj
+
+dn: uid=pgina,ou=People,dc=example,dc=com
+objectClass: person
+objectClass: top
+objectClass: posixAccount
+cn: pgina
+gidNumber: 200
+homeDirectory: /home/kirkj
+sn: pgina
+uid: pgina
+uidNumber: 1003
+userPassword:: e1NTSEF9V2ZvS1R5NXNqSllEUDZsb0hpRGNWYTl2djBPeW9Lb1RkZGhFNVE9P
+ Q==
+
+dn: cn=test,ou=Group,dc=example,dc=com
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: test
+uniqueMember: uid=kirkj,ou=People,dc=example,dc=com
+
+dn: cn=good,ou=Group,dc=example,dc=com
+objectClass: top
+objectClass: posixGroup
+cn: good
+gidNumber: 1003
+memberUid: spock
+
