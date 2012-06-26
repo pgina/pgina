@@ -135,7 +135,7 @@ namespace pGina.Plugin.Ldap
             }
             catch (Exception e)
             {
-                m_logger.ErrorFormat("Failed to create LdapServer: {0}", e.Message);
+                m_logger.ErrorFormat("Failed to create LdapServer: {0}", e);
                 props.AddTrackedSingle<LdapServer>(null);
             }
         }
@@ -200,7 +200,12 @@ namespace pGina.Plugin.Ldap
                 catch (KeyNotFoundException)
                 {
                     // The plugin is not enabled for authentication
-                    m_logger.DebugFormat("LDAP is not enabled for authentication, and authz is configured to require authentication.");
+                    m_logger.ErrorFormat("LDAP is not enabled for authentication, and authz is configured to require authentication.");
+                    return new BooleanResult
+                    {
+                        Success = false,
+                        Message = "Deny because LDAP auth did not execute, and configured to require LDAP auth."
+                    };
                 }
             }
 
