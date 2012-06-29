@@ -105,6 +105,7 @@ namespace pGina.CredentialProvider.Registration
         public override void Install()
         {
             FileInfo dll = null;
+
             if (Abstractions.Windows.OsInfo.Is64Bit())
             {
                 dll = DllUtils.Find64BitDll(this.CpInfo.Path, this.CpInfo.ShortName);
@@ -211,6 +212,7 @@ namespace pGina.CredentialProvider.Registration
         static readonly string PROVIDER_KEY_BASE = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers";
         static readonly string CLSID_BASE = @"CLSID";
         static readonly string PROVIDER_KEY_BASE_6432 = @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers";
+        static readonly string WINDIR = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
 
         // The registry keys
         string ProviderKey 
@@ -235,7 +237,17 @@ namespace pGina.CredentialProvider.Registration
             // Defaults for pGina Credential Provider
             this.CpInfo.ProviderGuid = new Guid("{D0BEFEFB-3D2C-44DA-BBAD-3B2D04557246}");
             this.CpInfo.ShortName = "pGinaCredentialProvider";
-        }        
+        }
+
+        private string GetCpDllPath()
+        {
+            return Path.Combine(WINDIR, "System32", CpInfo.ShortName + ".dll");
+        }
+
+        private string GetCpDllPath6432()
+        {
+            return Path.Combine(WINDIR, "Syswow64", CpInfo.ShortName + ".dll");
+        }
 
         public override void Install()
         {
@@ -248,8 +260,8 @@ namespace pGina.CredentialProvider.Registration
             {
                 FileInfo x64Dll = DllUtils.Find64BitDll(CpInfo.Path, CpInfo.ShortName);
                 FileInfo x32Dll = DllUtils.Find32BitDll(CpInfo.Path, CpInfo.ShortName);
-                string destination64 = String.Format(@"C:\Windows\System32\{0}.dll", CpInfo.ShortName);
-                string destination32 = String.Format(@"C:\Windows\Syswow64\{0}.dll", CpInfo.ShortName);
+                string destination64 = GetCpDllPath();
+                string destination32 = GetCpDllPath6432();
 
                 if (x64Dll == null && x32Dll == null)
                 {
@@ -288,7 +300,7 @@ namespace pGina.CredentialProvider.Registration
             else
             {
                 FileInfo x32Dll = DllUtils.Find32BitDll(CpInfo.Path, CpInfo.ShortName);
-                string destination = String.Format(@"C:\Windows\System32\{0}.dll", CpInfo.ShortName);
+                string destination = GetCpDllPath();
 
                 if (x32Dll != null)
                 {
@@ -331,9 +343,9 @@ namespace pGina.CredentialProvider.Registration
                 CpInfo.ShortName,
                 CpInfo.ProviderGuid.ToString());
 
-            string dll = String.Format(@"C:\Windows\System32\{0}.dll", CpInfo.ShortName);
-            string dll6432 = String.Format(@"C:\Windows\Syswow64\{0}.dll", CpInfo.ShortName);
-
+            string dll = GetCpDllPath();
+            string dll6432 = GetCpDllPath6432();
+            
             if (File.Exists(dll))
             {
                 m_logger.DebugFormat("Deleting: {0}", dll);
@@ -341,8 +353,8 @@ namespace pGina.CredentialProvider.Registration
             }
             if (File.Exists(dll6432))
             {
-                m_logger.DebugFormat("Deleting: {0}", dll);
-                File.Delete(dll);
+                m_logger.DebugFormat("Deleting: {0}", dll6432);
+                File.Delete(dll6432);
             }
 
             string guid = "{" + CpInfo.ProviderGuid.ToString() + "}";
