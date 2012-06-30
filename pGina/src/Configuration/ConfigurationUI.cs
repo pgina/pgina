@@ -858,6 +858,13 @@ namespace pGina.Configuration
         private void btnApply_Click(object sender, EventArgs e)
         {
             SaveSettings();
+            MessageBox.Show("Settings written to registry.", "Settings Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void btnSaveAndClose_Click(object sender, EventArgs e)
+        {
+            SaveSettings();
+            this.Close();
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -1468,6 +1475,5 @@ namespace pGina.Configuration
             m_logger.Debug("Key not found, or is not a password provider.");
             return false;
         }
-
     }
 }
