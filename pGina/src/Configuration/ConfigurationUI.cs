@@ -62,6 +62,11 @@ namespace pGina.Configuration
             }
         }
 
+        private class MissingBuiltInCredProvException : System.Exception 
+        {
+            public MissingBuiltInCredProvException(string message) : base(message) { }
+        }
+
         private static readonly string PGINA_SERVICE_NAME = "pGina";
 
         // Plugin information keyed by Guid
@@ -144,15 +149,28 @@ namespace pGina.Configuration
 
         private void InitCpOptions()
         {
-            CredentialProvider.Registration.Settings msProviderSettings = new CredentialProvider.Registration.Settings()
+            try
             {
-                ProviderGuid = new Guid("{6f45dc1e-5384-457a-bc13-2cd81b0d28ed}"),
-                ShortName = "PasswordProvider",
-            };
+                Guid builtInCredProvUuid = FindBuiltInCredProvGuid();
 
-            CredentialProvider.Registration.CredProviderManager manager = CredentialProvider.Registration.CredProviderManager.GetManager();
-            manager.CpInfo = msProviderSettings;
-            chkMSProvider.Checked = manager.Enabled();
+                CredentialProvider.Registration.Settings msProviderSettings = new CredentialProvider.Registration.Settings()
+                {
+                    ProviderGuid = builtInCredProvUuid,
+                    ShortName = "PasswordProvider",
+                };
+
+                CredentialProvider.Registration.CredProviderManager manager = CredentialProvider.Registration.CredProviderManager.GetManager();
+                manager.CpInfo = msProviderSettings;
+                chkMSProvider.Checked = manager.Enabled();
+            }
+            catch (MissingBuiltInCredProvException)
+            {
+                MessageBox.Show(
+                    "Unable to find built-in Credential Provider!", 
+                    "Built-in Credential Provider Not Found",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                chkMSProvider.Enabled = false;
+            }
         }
 
         private void InitGinaOptions()
@@ -1350,27 +1368,37 @@ namespace pGina.Configuration
 
         private void SaveCpSettings()
         {
-            CredentialProvider.Registration.Settings msProviderSettings = new CredentialProvider.Registration.Settings()
+            try
             {
-                ProviderGuid = new Guid("{6f45dc1e-5384-457a-bc13-2cd81b0d28ed}"),
-                ShortName = "PasswordProvider",
-            };
+                Guid builtInCredProvUuid = FindBuiltInCredProvGuid();
 
-            CredentialProvider.Registration.CredProviderManager manager = CredentialProvider.Registration.CredProviderManager.GetManager();
-            manager.CpInfo = msProviderSettings;
-            bool currentState = manager.Enabled();
-
-            if (chkMSProvider.Checked != currentState)
-            {
-                if (chkMSProvider.Checked)
-                    manager.Enable();
-                else
+                CredentialProvider.Registration.Settings msProviderSettings = new CredentialProvider.Registration.Settings()
                 {
-                    if (MessageBox.Show("You have chosen to disable the built-in password provider, are you sure?", "Really?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == System.Windows.Forms.DialogResult.Yes)
+                    ProviderGuid = builtInCredProvUuid,
+                    ShortName = "PasswordProvider",
+                };
+
+                CredentialProvider.Registration.CredProviderManager manager = CredentialProvider.Registration.CredProviderManager.GetManager();
+                manager.CpInfo = msProviderSettings;
+                bool currentState = manager.Enabled();
+
+                if (chkMSProvider.Checked != currentState)
+                {
+                    if (chkMSProvider.Checked)
+                        manager.Enable();
+                    else
                     {
-                        manager.Disable();
+                        if (MessageBox.Show("You have chosen to disable the built-in password provider, are you sure?", "Really?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == System.Windows.Forms.DialogResult.Yes)
+                        {
+                            manager.Disable();
+                        }
                     }
                 }
+            }
+            catch (MissingBuiltInCredProvException)
+            {
+                // Do nothing, because the built-in CP was not found.  User should have been
+                // warned about this already (see InitCpOptions)
             }
         }
 
@@ -1396,5 +1424,50 @@ namespace pGina.Configuration
         {
             this.motdTB.Enabled = this.enableMotdCB.Checked;
         }
+
+        private Guid FindBuiltInCredProvGuid()
+        {
+            // Windows 8 {60b78e88-ead8-445c-9cfd-0b87f74ea6cd}
+            Guid win8uuid = new Guid("{60b78e88-ead8-445c-9cfd-0b87f74ea6cd}");
+            // Windows 7 {6f45dc1e-5384-457a-bc13-2cd81b0d28ed}
+            Guid win7uuid = new Guid("{6f45dc1e-5384-457a-bc13-2cd81b0d28ed}");
+
+            // We could do this by determining the OS and returning the known
+            // CP GUID, but instead, we check the registry to see which key
+            // exists.  Either way would probably work, but I prefer to look for
+            // an existing registry key.  :)
+
+            // Check for Windows 7 built-in credential provider
+            if (IsRegisteredBuiltInCredProv(win7uuid)) return win7uuid;
+
+            // Check for Windows 8 built-in credential provider
+            if (IsRegisteredBuiltInCredProv(win8uuid)) return win8uuid;
+            
+            throw new MissingBuiltInCredProvException("Unable to find built-in Credential Provider");
+        }
+
+        private bool IsRegisteredBuiltInCredProv(Guid uuid)
+        {
+            string keyBase = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers";
+            string key = string.Format(@"{0}\{{{1}}}", keyBase, uuid.ToString());
+            m_logger.DebugFormat("Looking for: {0}", key);
+            using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(key))
+            {
+                if (rk != null)
+                {
+                    string defValue = (string)rk.GetValue("");
+                    m_logger.DebugFormat("Default value: {0}", defValue);
+                    if (defValue != null && defValue.Equals("PasswordProvider", StringComparison.CurrentCultureIgnoreCase))
+                        return true;
+                }
+                else
+                {
+                    m_logger.Debug("Not found!");
+                }
+            }
+            m_logger.Debug("Key not found, or is not a password provider.");
+            return false;
+        }
+
     }
 }
