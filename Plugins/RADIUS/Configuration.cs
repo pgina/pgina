@@ -25,14 +25,19 @@ namespace pGina.Plugin.RADIUS
 
         private bool save()
         {
-            int port = 0;
+            int authport = 0;
+            int acctport = 0;
             int timeout = 0;
+            int retry = 0;
+            
             try
             {
-                port = Convert.ToInt32(portTB.Text.Trim());
+                authport = Convert.ToInt32(authPortTB.Text.Trim());
+                acctport = Convert.ToInt32(acctPortTB.Text.Trim());
                 timeout = (int)(1000 * Convert.ToDouble(timeoutTB.Text.Trim()));
-                if (port <= 0 || timeout <= 0)
-                    throw new FormatException("Port and Timeout must be greater than 0");
+                retry = Convert.ToInt32(retryTB.Text.Trim());
+                if (authport <= 0 || acctport <= 0 || timeout <= 0 || retry <= 0)
+                    throw new FormatException("Ports, Retry and Timeout values must be values greater than 0");
             }
             catch (FormatException)
             {
@@ -40,21 +45,42 @@ namespace pGina.Plugin.RADIUS
                 return false;
             }
 
+            MachineIdentifier machineId = MachineIdentifier.IP_Address;
+            if (machineNameButton.Checked) 
+                machineId = MachineIdentifier.Machine_Name;
+            else if (bothButton.Checked) 
+                machineId = MachineIdentifier.Both;
+
             Settings.Store.Server = serverTB.Text.Trim();
-            Settings.Store.Port = port;
+            Settings.Store.AuthPort = authport;
+            Settings.Store.AcctPort = acctport;
             Settings.Store.SetEncryptedSetting("SharedSecret", secretTB.Text);
             Settings.Store.Timeout = timeout;
+            Settings.Store.Retry = retry;
+            Settings.Store.UseModifiedName = useModifiedNameCB.Checked;
+            Settings.Store.IPSuggestion = ipAddrSuggestionTB.Text.Trim();
+            Settings.Store.MachineIdentifier = (int)machineId;
             return true;
         }
 
         private void load()
         {
             serverTB.Text = Settings.Store.Server;
-            portTB.Text = String.Format("{0}", (int)Settings.Store.Port);
+            authPortTB.Text = String.Format("{0}", (int)Settings.Store.AuthPort);
+            acctPortTB.Text = String.Format("{0}", (int)Settings.Store.AcctPort);
             secretTB.Text = Settings.Store.GetEncryptedSetting("SharedSecret") ;
-
-           
             timeoutTB.Text = String.Format("{0:0.00}", (int)Settings.Store.Timeout / 1000.0);
+            retryTB.Text = String.Format("{0}", (int)Settings.Store.Retry);
+            ipAddrSuggestionTB.Text = Settings.Store.IPSuggestion;
+            useModifiedNameCB.Checked = Settings.Store.UseModifiedName;
+
+            MachineIdentifier mid = (MachineIdentifier)((int)Settings.Store.MachineIdentifier);
+            if (mid == MachineIdentifier.IP_Address)
+                ipAddressButton.Checked = true;
+            else if (mid == MachineIdentifier.Machine_Name)
+                machineNameButton.Checked = true;
+            else
+                bothButton.Checked = true;
         }
 
         private void btnOk_Click(object sender, EventArgs e)

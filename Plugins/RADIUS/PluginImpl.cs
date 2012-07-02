@@ -28,7 +28,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System.Net;
 
 using log4net;
 
@@ -38,12 +40,19 @@ using pGina.Shared.Settings;
 
 namespace pGina.Plugin.RADIUS
 {
-    public class RADIUSPlugin : IPluginConfiguration, IPluginAuthentication
+
+    //TODO: Keep track of sessionID, needs to be unique for each session, but be maintained through auth and accounting
+
+    enum MachineIdentifier { IP_Address = 0, Machine_Name, Both}
+
+    public class RADIUSPlugin : IPluginConfiguration, IPluginAuthentication, IPluginEventNotifications
     {
         private ILog m_logger = LogManager.GetLogger("RADIUSPlugin");
         public static Guid SimpleUuid = new Guid("{350047A0-2D0B-4E24-9F99-16CD18D6B142}");
         private string m_defaultDescription = "A RADIUS Authentication and Accounting Plugin";
         private dynamic m_settings = null;
+
+        private Dictionary<string, string> sessionIDs;
 
         public RADIUSPlugin()
         {
@@ -55,11 +64,13 @@ namespace pGina.Plugin.RADIUS
                 
                 m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
             }
+
+            
         }        
 
         public string Name
         {
-            get { return "RADIUS"; }
+            get { return "RADIUS Plugin"; }
         }
 
         public string Description
@@ -79,28 +90,103 @@ namespace pGina.Plugin.RADIUS
         {
             get { return SimpleUuid; }
         }
-        
+
+        //Authenticates user
         BooleanResult IPluginAuthentication.AuthenticateUser(SessionProperties properties)
         {
+
+            m_logger.DebugFormat("AuthenticateUser({0})", properties.Id.ToString());
+
+            // Get user info
+            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+
             try
             {
-                m_logger.DebugFormat("AuthenticateUser({0})", properties.Id.ToString());
-
-                // Get user info
-                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-
-                RADIUSClient client = new RADIUSClient();
-                client.server = "192.168.1.5";
-                client.port = 1812;
-                client.sharedKey = "testing123";
-                client.timeout = 3000;
-
-                return new BooleanResult() { Success = client.Authenticate(userInfo.Username, userInfo.Password) };
+                RADIUSClient client = GetClient(null); //No session ID is required for auth, only accounting
+                bool result = client.Authenticate(userInfo.Username, userInfo.Password);
+                if (result)
+                    return new BooleanResult() { Success = result };
+                return new BooleanResult() { Success = result, Message = "Invalid username or password." };
+            }
+            catch (RADIUSException re)
+            {
+                m_logger.Error("An error occurred during while authenticating.", re);
+                return new BooleanResult() { Success = false, Message = re.Message };
             }
             catch (Exception e)
             {
-                m_logger.ErrorFormat("AuthenticateUser exception: {0}", e);
-                throw;  // Allow pGina service to catch and handle exception
+                m_logger.Error("An unexpected error occurred while authenticating.", e);
+                throw e;
+            }
+        }
+
+        //Processes accounting on logon/logoff
+        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, pGina.Shared.Types.SessionProperties properties)
+        {
+            string username = null;
+            if ((bool)Settings.Store.UseModifiedName)
+                username = properties.GetTrackedSingle<UserInformation>().Username;
+            else
+                username = properties.GetTrackedSingle<UserInformation>().OriginalUsername;
+
+            if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
+            {
+                //Create a new unique id for this accounting session and store it
+                String sessionId = Guid.NewGuid().ToString();
+                sessionIDs.Add(username, sessionId);
+
+                //Determine which plugin authenticated the user (if any)
+                PluginActivityInformation pai = properties.GetTrackedSingle<PluginActivityInformation>();
+                Packet.Acct_AuthenticType authSource = Packet.Acct_AuthenticType.Not_Specified;
+                IEnumerable<Guid> authPlugins = pai.GetAuthenticationPlugins();
+                Guid LocalMachinePluginGuid = new Guid("{12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D}");
+                foreach (Guid guid in authPlugins)
+                {
+                    if (pai.GetAuthenticationResult(guid).Success)
+                    {
+                        if (guid == SimpleUuid)
+                            authSource = Packet.Acct_AuthenticType.RADIUS;
+                        else if (guid == LocalMachinePluginGuid)
+                            authSource = Packet.Acct_AuthenticType.Local;
+                        else
+                            authSource = Packet.Acct_AuthenticType.Remote;
+                        break;
+                    }
+                }                
+
+                try
+                {
+                    RADIUSClient client = GetClient(sessionId);
+                    client.startAccounting(username, authSource);
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("Error starting accounting.", e);
+                }
+
+            }
+            
+            else if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
+            {
+                //Check if guid was stored from accounting start request (if not, no point in sending a stop request)
+                string sessionId = sessionIDs.ContainsKey(username) ? sessionIDs[username] : null;
+                if (sessionId == null)
+                {
+                    m_logger.ErrorFormat("Error sending accounting stop request. No guid available for {0}", username);
+                    return;
+                } //Remove the session id since we're logging off
+                sessionIDs.Remove(username);
+
+                try
+                {
+                    RADIUSClient client = GetClient(sessionId);
+                    client.stopAccounting(username, Packet.Acct_Terminate_CauseType.User_Request);
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("Error performing accounting stop.", e);
+                    return;
+                }
             }
         }
 
@@ -110,7 +196,59 @@ namespace pGina.Plugin.RADIUS
             conf.ShowDialog();
         }
 
-        public void Starting() { }
+        public void Starting() { sessionIDs = new Dictionary<string, string>(); }
         public void Stopping() { }
+
+
+        //Returns the client instantiated based on registry settings
+        private RADIUSClient GetClient(string sessionId)
+        {
+            string server = Settings.Store.Server;
+            int authport = Settings.Store.AuthPort;
+            int acctport = Settings.Store.AcctPort;
+            string sharedKey = Settings.Store.GetEncryptedSetting("SharedSecret");
+            int timeout = Settings.Store.Timeout;
+            int retry = Settings.Store.Retry;
+                
+            MachineIdentifier mid = (MachineIdentifier)((int)Settings.Store.MachineIdentifier);
+            byte[] ipAddr = null;
+            string machineName = null;
+
+            if(mid == MachineIdentifier.Machine_Name || mid == MachineIdentifier.Both)
+                machineName = Environment.MachineName;
+            if(mid == MachineIdentifier.IP_Address || mid == MachineIdentifier.Both)
+                ipAddr = getIPAddress();
+
+            
+            RADIUSClient client = new RADIUSClient(server, authport, acctport, sharedKey, timeout, retry, sessionId, ipAddr, machineName);
+
+
+            return client;
+        }
+        
+        //Returns the current IPv4 address
+        //If ipAddressRegex is set, this will attempt to return the first address that matches the expression
+        //Otherwise it returns the first viable IP address or 0.0.0.0 if no viable address is found
+        private byte[] getIPAddress()
+        {
+            string ipAddressRegex = Settings.Store.IPSuggestion;
+            IPAddress[] ipList = Dns.GetHostAddresses("");
+            IPAddress fallback = null;
+            // Grab the first IPv4 address in the list
+            foreach (IPAddress addr in ipList)
+            {
+                if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    if (fallback == null)
+                        fallback = addr; //Grab the first viable IP address as a fallback
+                    if (ipAddressRegex != null && Regex.Match(addr.ToString(), ipAddressRegex).Success)
+                        return addr.GetAddressBytes();
+                }
+            }
+
+            if (fallback != null)
+                return fallback.GetAddressBytes();
+            return new byte[] { 0, 0, 0, 0 };
+        }
     }
 }
