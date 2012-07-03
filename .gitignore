@@ -3,6 +3,8 @@
 *.user
 *.aps
 *.ipch
+*.sdf
+*.opensdf
 
 # Log files
 *_log.txt
