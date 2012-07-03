@@ -1,3 +1,9 @@
+3.1.2.0 BETA (2012/07/02)
+---------------------------
+ - New RADIUS plugin (Oooksa)
+ - Fix: install Cred Prov using env (#137)
+ - Configuration UI tweaks
+
 3.1.1.0 BETA (2012/06/23)
 ---------------------------
  - LocalMachine plugin: change functionality of the scramble passwords
