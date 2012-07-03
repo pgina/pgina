@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Diagnostics;
 using System.Net;
 
@@ -37,6 +38,7 @@ using log4net;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using pGina.Shared.Settings;
+
 
 namespace pGina.Plugin.RADIUS
 {
@@ -53,6 +55,7 @@ namespace pGina.Plugin.RADIUS
         private dynamic m_settings = null;
 
         private Dictionary<string, string> sessionIDs;
+        private Object sessionIDLock;
 
         public RADIUSPlugin()
         {
@@ -133,7 +136,10 @@ namespace pGina.Plugin.RADIUS
             {
                 //Create a new unique id for this accounting session and store it
                 String sessionId = Guid.NewGuid().ToString();
-                sessionIDs.Add(username, sessionId);
+                lock (sessionIDLock)
+                {
+                    sessionIDs.Add(username, sessionId);
+                }
 
                 //Determine which plugin authenticated the user (if any)
                 PluginActivityInformation pai = properties.GetTrackedSingle<PluginActivityInformation>();
@@ -169,13 +175,18 @@ namespace pGina.Plugin.RADIUS
             else if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
             {
                 //Check if guid was stored from accounting start request (if not, no point in sending a stop request)
-                string sessionId = sessionIDs.ContainsKey(username) ? sessionIDs[username] : null;
-                if (sessionId == null)
+                string sessionId = null;
+                lock (sessionIDLock)
                 {
-                    m_logger.ErrorFormat("Error sending accounting stop request. No guid available for {0}", username);
-                    return;
-                } //Remove the session id since we're logging off
-                sessionIDs.Remove(username);
+                    sessionId = sessionIDs.ContainsKey(username) ? sessionIDs[username] : null;
+
+                    if (sessionId == null)
+                    {
+                        m_logger.ErrorFormat("Error sending accounting stop request. No guid available for {0}", username);
+                        return;
+                    } //Remove the session id since we're logging off
+                    sessionIDs.Remove(username);
+                }
 
                 try
                 {
@@ -196,7 +207,11 @@ namespace pGina.Plugin.RADIUS
             conf.ShowDialog();
         }
 
-        public void Starting() { sessionIDs = new Dictionary<string, string>(); }
+        public void Starting() 
+        { 
+            sessionIDs = new Dictionary<string, string>();
+            sessionIDLock = new Object();
+        }
         public void Stopping() { }
 
 
