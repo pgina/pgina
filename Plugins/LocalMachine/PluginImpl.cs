@@ -49,9 +49,6 @@ namespace pGina.Plugin.LocalMachine
 
     public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration
     {
-        // Static lock so all instances in a process can mutex on a setting (ala CleanupUsers)
-        private static object s_lock = new object();
-
         // Per-instance logger
         private ILog m_logger = LogManager.GetLogger("LocalMachine");
 
@@ -103,67 +100,6 @@ namespace pGina.Plugin.LocalMachine
 
             return -1;
         }
-
-        private void AddCleanupUser(string username)
-        {
-            lock (s_lock)
-            {
-                string[] cleanupUsers = Settings.Store.CleanupUsers;
-                string upperName = username.ToUpper();
-                string filter = string.Format("{0}|@|", upperName);
-
-                int foundIndex = FindString(cleanupUsers, filter);
-                if(foundIndex == -1)
-                {
-                    List<string> users = cleanupUsers.ToList();
-                    users.Add(string.Format("{0}|@|{1}", upperName, DateTime.Now.ToBinary()));
-                    Settings.Store.CleanupUsers = users.ToArray();
-                }
-                else
-                {
-                    cleanupUsers[foundIndex] = string.Format("{0}|@|{1}", upperName, DateTime.Now.ToBinary());
-                    Settings.Store.CleanupUsers = cleanupUsers;
-                }
-            }
-        }
-
-        private void RemoveCleanupUser(string username)
-        {
-            lock (s_lock)
-            {
-                string[] cleanupUsers = Settings.Store.CleanupUsers;
-                string upperName = username.ToUpper();
-                string filter = string.Format("{0}|@|", upperName);
-
-                int foundIndex = FindString(cleanupUsers, filter);
-                if (foundIndex != -1)
-                {
-                    List<string> users = cleanupUsers.ToList();
-                    users.Remove(cleanupUsers[foundIndex]);
-                    Settings.Store.CleanupUsers = users.ToArray();
-                }
-            }
-        }
-
-        private List<string> EligibleCleanupUsers()
-        {
-            lock (s_lock)
-            {
-                string[] cleanupUsers = Settings.Store.CleanupUsers;
-                List<string> result = new List<string>();
-                foreach (string fullstr in cleanupUsers)
-                {
-                    string username = fullstr.Substring(0, fullstr.IndexOf("|@|"));
-                    DateTime timestamp = DateTime.FromBinary(long.Parse(fullstr.Substring(fullstr.IndexOf("|@|") + 3)));
-
-                    if ((DateTime.Now - timestamp) > TimeSpan.FromSeconds(30))
-                    {
-                        result.Add(username);
-                    }
-                }
-                return result;
-            }
-        }
         
         public BooleanResult AuthenticatedUserGateway(SessionProperties properties)
         {
@@ -202,7 +138,7 @@ namespace pGina.Plugin.LocalMachine
                     if (!LocalAccount.UserExists(userInfo.Username))
                     {
                         m_logger.DebugFormat("Marking for deletion: {0}", userInfo.Username);
-                        AddCleanupUser(userInfo.Username);
+                        CleanupTasks.AddTask(new CleanupTask(userInfo.Username, CleanupAction.DELETE_PROFILE));
                     }
                 }
 
@@ -218,7 +154,7 @@ namespace pGina.Plugin.LocalMachine
                             if (!DidWeAuthThisUser(properties, false))
                             {
                                 m_logger.DebugFormat("Mode LOCAL_MACHINE_AUTH_FAIL: marking for scramble: {0}", userInfo.Username);
-                                AddCleanupUser(userInfo.Username);
+                                CleanupTasks.AddTask( new CleanupTask(userInfo.Username, CleanupAction.SCRAMBLE_PASSWORD) );
                             }
                             break;
                         case ScramblePasswordsMode.ALL_EXCEPT_SOME:
@@ -228,7 +164,7 @@ namespace pGina.Plugin.LocalMachine
                             if (!exceptions.Contains(userInfo.Username,StringComparer.CurrentCultureIgnoreCase))
                             {
                                 m_logger.DebugFormat("Mode ALL_EXCEPT_SOME: marking for scramble: {0}", userInfo.Username);
-                                AddCleanupUser(userInfo.Username);
+                                CleanupTasks.AddTask(new CleanupTask(userInfo.Username, CleanupAction.SCRAMBLE_PASSWORD));
                             }
                             break;
                     }
@@ -522,10 +458,7 @@ namespace pGina.Plugin.LocalMachine
         {
             lock(this)
             {
-                bool scramblePasswords = Settings.Store.ScramblePasswords;
-                bool removeProfiles = Settings.Store.RemoveProfiles;
-
-                List<string> users = EligibleCleanupUsers();
+                List<CleanupTask> tasks = CleanupTasks.GetEligibleTasks();
                 List<string> loggedOnUsers = null;
                 try
                 {
@@ -537,45 +470,53 @@ namespace pGina.Plugin.LocalMachine
                     return;
                 }
 
-                m_logger.DebugFormat("IterateCleanupUsers Eligible users: {0}", string.Join(",",users));
+                m_logger.DebugFormat("IterateCleanupUsers Eligible users: {0}", string.Join(",",tasks));
                 m_logger.DebugFormat("IterateCleanupUsers loggedOnUsers: {0}", string.Join(",",loggedOnUsers));
 
-                foreach (string user in users)
+                foreach (CleanupTask task in tasks)
                 {
                     try
                     {
-                        using (UserPrincipal userPrincipal = LocalAccount.GetUserPrincipal(user))
+                        using (UserPrincipal userPrincipal = LocalAccount.GetUserPrincipal(task.UserName))
                         {
-                            // Make sure there is a user to scramble!
+                            // Make sure the user exists
                             if (userPrincipal == null)
                             {
                                 // This dude doesn't exist!
-                                m_logger.DebugFormat("User {0} doesn't exist, not cleaning up.", user);
-                                RemoveCleanupUser(user);
+                                m_logger.DebugFormat("User {0} doesn't exist, not cleaning up.", task.UserName);
+                                CleanupTasks.RemoveTaskForUser(task.UserName);
                                 continue;
                             }
 
                             // Is she logged in still?
-                            if (loggedOnUsers.Contains(user.ToUpper()))
+                            if (loggedOnUsers.Contains(task.UserName, StringComparer.CurrentCultureIgnoreCase))
                                 continue;
 
-                            m_logger.InfoFormat("Cleaning up: {0}", user);
+                            m_logger.InfoFormat("Cleaning up: {0} -> {1}", task.UserName, task.Action);
 
                             try
                             {
-                                if (scramblePasswords)
-                                    LocalAccount.ScrambleUsersPassword(user);
-                                if (removeProfiles)
-                                    LocalAccount.RemoveUserAndProfile(user);
+                                switch (task.Action)
+                                {
+                                    case CleanupAction.SCRAMBLE_PASSWORD:
+                                        LocalAccount.ScrambleUsersPassword(task.UserName);
+                                        break;
+                                    case CleanupAction.DELETE_PROFILE:
+                                        LocalAccount.RemoveUserAndProfile(task.UserName);
+                                        break;
+                                    default:
+                                        m_logger.ErrorFormat("Unrecognized action: {0}, skipping user {1}", task.Action, task.UserName);
+                                        throw new Exception();
+                                }
                             }
                             catch (Exception e)
                             {
-                                m_logger.WarnFormat("Cleanup for {0} failed, will retry next time around. Error: {1}", user, e);
+                                m_logger.WarnFormat("Cleanup for {0} failed, will retry next time around. Error: {1}", task.UserName, e);
                                 continue;
                             }
 
                             // All done! No more cleanup for this user needed
-                            RemoveCleanupUser(user);
+                            CleanupTasks.RemoveTaskForUser(task.UserName);
                         }
                     }
                     catch (Exception e)

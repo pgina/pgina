@@ -156,8 +156,6 @@ namespace pGina.Plugin.LocalMachine
         public void MaskAuthzUi()
         {
             m_localGroupDgv.Enabled = m_chkAuthzRequireLocal.Checked;
-            if (m_chkScramble.Checked) m_chkRemoveProfile.Checked = false;
-            if (m_chkRemoveProfile.Checked) m_chkScramble.Checked = false;
         }
 
         public void MaskGatewayUi()
@@ -194,13 +192,12 @@ namespace pGina.Plugin.LocalMachine
 
         private void m_chkScramble_CheckedChanged(object sender, EventArgs e)
         {
-            if (m_chkScramble.Checked) m_chkRemoveProfile.Checked = false;
             MaskGatewayUi();
         }
 
         private void m_chkRemoveProfile_CheckedChanged(object sender, EventArgs e)
         {
-            if (m_chkRemoveProfile.Checked) m_chkScramble.Checked = false;
+            
         }
 
         private void m_scrambleLocalMachineFailRB_CheckedChanged(object sender, EventArgs e)
