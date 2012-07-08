@@ -147,7 +147,7 @@ namespace pGina.Plugin.LocalMachine
                     {
                         // If configured to do so, we check to see if this plugin failed
                         // to auth this user, and only scramble in that case
-                        bool scrambleWhenLMFail = Settings.Store.ScramblePasswordsWhenLMFails;
+                        bool scrambleWhenLMFail = Settings.Store.ScramblePasswordsWhenLMAuthFails;
                         if (scrambleWhenLMFail)
                         {
                             // Scramble the password only if we did not authenticate this user

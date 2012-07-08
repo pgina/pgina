@@ -55,7 +55,7 @@ namespace pGina.Plugin.LocalMachine
             string[] MandatoryGroups = Settings.Store.MandatoryGroups;
             bool ScramblePasswords = Settings.Store.ScramblePasswords;
             bool RemoveProfiles = Settings.Store.RemoveProfiles;
-            bool scrWhenLMFail = Settings.Store.ScramblePasswordsWhenLMFails;
+            bool scrWhenLMFail = Settings.Store.ScramblePasswordsWhenLMAuthFails;
             string[] scrambleExceptions = Settings.Store.ScramblePasswordsExceptions;
 
             m_chkAlwaysAuth.Checked = AlwaysAuthenticate;
@@ -95,7 +95,7 @@ namespace pGina.Plugin.LocalMachine
             Settings.Store.AuthzLocalGroupsOnly = m_chkAuthzRequireLocal.Checked;
             Settings.Store.ScramblePasswords = m_chkScramble.Checked;
             Settings.Store.RemoveProfiles = m_chkRemoveProfile.Checked;
-            Settings.Store.ScramblePasswordsWhenLMFails = m_chkScrambleWhenLMFails.Checked;
+            Settings.Store.ScramblePasswordsWhenLMAuthFails = m_chkScrambleWhenLMFails.Checked;
 
             List<string> localGroups = new List<string>();
             foreach (DataGridViewRow row in m_localGroupDgv.Rows)

@@ -54,7 +54,7 @@ namespace pGina.Plugin.LocalMachine
             m_settings.SetDefault("MandatoryGroups", new string[] { });  // *All* users are added to these groups (by name)
             m_settings.SetDefault("RemoveProfiles", false);              // Do we remove accounts/profiles after logout?
             m_settings.SetDefault("ScramblePasswords", false);           // Do we scramble users passwords after logout?
-            m_settings.SetDefault("ScramblePasswordsWhenLMFails", true); // Only scramble when LM fails or doesnt execute
+            m_settings.SetDefault("ScramblePasswordsWhenLMAuthFails", true); // Only scramble when LM fails or doesnt execute
             m_settings.SetDefault("ScramblePasswordsExceptions", new string[] { });
 
             // Cleanup thread settings (not user configurable)
