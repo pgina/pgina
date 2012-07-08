@@ -38,6 +38,8 @@
             this.m_chkAuthzLocalAdmin = new System.Windows.Forms.CheckBox();
             this.m_chkAuthzAll = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.m_scrambleAllExceptDGV = new System.Windows.Forms.DataGridView();
+            this.Username = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_chkRemoveProfile = new System.Windows.Forms.CheckBox();
             this.m_chkScramble = new System.Windows.Forms.CheckBox();
             this.m_chkGroupFailIsFAIL = new System.Windows.Forms.CheckBox();
@@ -45,16 +47,14 @@
             this.Group = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_btnSave = new System.Windows.Forms.Button();
             this.m_btnClose = new System.Windows.Forms.Button();
-            this.m_scrambleLocalMachineFailRB = new System.Windows.Forms.RadioButton();
-            this.m_scrambleAllExceptRB = new System.Windows.Forms.RadioButton();
-            this.m_scrambleAllExceptDGV = new System.Windows.Forms.DataGridView();
-            this.Username = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.m_chkScrambleWhenLMFails = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_localGroupDgv)).BeginInit();
             this.groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.m_groupsDgv)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.m_scrambleAllExceptDGV)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.m_groupsDgv)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -150,9 +150,9 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label1);
+            this.groupBox3.Controls.Add(this.m_chkScrambleWhenLMFails);
             this.groupBox3.Controls.Add(this.m_scrambleAllExceptDGV);
-            this.groupBox3.Controls.Add(this.m_scrambleAllExceptRB);
-            this.groupBox3.Controls.Add(this.m_scrambleLocalMachineFailRB);
             this.groupBox3.Controls.Add(this.m_chkRemoveProfile);
             this.groupBox3.Controls.Add(this.m_chkScramble);
             this.groupBox3.Controls.Add(this.m_chkGroupFailIsFAIL);
@@ -164,15 +164,31 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Gateway";
             // 
+            // m_scrambleAllExceptDGV
+            // 
+            this.m_scrambleAllExceptDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.m_scrambleAllExceptDGV.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Username});
+            this.m_scrambleAllExceptDGV.Location = new System.Drawing.Point(54, 154);
+            this.m_scrambleAllExceptDGV.Name = "m_scrambleAllExceptDGV";
+            this.m_scrambleAllExceptDGV.Size = new System.Drawing.Size(271, 84);
+            this.m_scrambleAllExceptDGV.TabIndex = 11;
+            // 
+            // Username
+            // 
+            this.Username.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Username.HeaderText = "Username";
+            this.Username.Name = "Username";
+            // 
             // m_chkRemoveProfile
             // 
             this.m_chkRemoveProfile.AutoSize = true;
             this.m_chkRemoveProfile.Location = new System.Drawing.Point(15, 42);
             this.m_chkRemoveProfile.Name = "m_chkRemoveProfile";
-            this.m_chkRemoveProfile.Size = new System.Drawing.Size(248, 30);
+            this.m_chkRemoveProfile.Size = new System.Drawing.Size(290, 30);
             this.m_chkRemoveProfile.TabIndex = 8;
-            this.m_chkRemoveProfile.Text = "Remove account and profile after logout when \r\naccount doesn\'t exist prior to log" +
-    "on.";
+            this.m_chkRemoveProfile.Text = "Remove account and profile after logout when account \r\ndoes not exist prior to lo" +
+    "gon.";
             this.m_chkRemoveProfile.UseVisualStyleBackColor = true;
             this.m_chkRemoveProfile.CheckedChanged += new System.EventHandler(this.m_chkRemoveProfile_CheckedChanged);
             // 
@@ -181,9 +197,9 @@
             this.m_chkScramble.AutoSize = true;
             this.m_chkScramble.Location = new System.Drawing.Point(15, 78);
             this.m_chkScramble.Name = "m_chkScramble";
-            this.m_chkScramble.Size = new System.Drawing.Size(212, 17);
+            this.m_chkScramble.Size = new System.Drawing.Size(177, 17);
             this.m_chkScramble.TabIndex = 7;
-            this.m_chkScramble.Text = "Scramble password after logout when...";
+            this.m_chkScramble.Text = "Scramble password after logout.";
             this.m_chkScramble.UseVisualStyleBackColor = true;
             this.m_chkScramble.CheckedChanged += new System.EventHandler(this.m_chkScramble_CheckedChanged);
             // 
@@ -233,45 +249,24 @@
             this.m_btnClose.UseVisualStyleBackColor = true;
             this.m_btnClose.Click += new System.EventHandler(this.m_btnClose_Click);
             // 
-            // m_scrambleLocalMachineFailRB
+            // m_chkScrambleWhenLMFails
             // 
-            this.m_scrambleLocalMachineFailRB.AutoSize = true;
-            this.m_scrambleLocalMachineFailRB.Location = new System.Drawing.Point(37, 101);
-            this.m_scrambleLocalMachineFailRB.Name = "m_scrambleLocalMachineFailRB";
-            this.m_scrambleLocalMachineFailRB.Size = new System.Drawing.Size(276, 17);
-            this.m_scrambleLocalMachineFailRB.TabIndex = 9;
-            this.m_scrambleLocalMachineFailRB.TabStop = true;
-            this.m_scrambleLocalMachineFailRB.Text = "LocalMachine authentication fails or doesn\'t execute.";
-            this.m_scrambleLocalMachineFailRB.UseVisualStyleBackColor = true;
-            this.m_scrambleLocalMachineFailRB.CheckedChanged += new System.EventHandler(this.m_scrambleLocalMachineFailRB_CheckedChanged);
+            this.m_chkScrambleWhenLMFails.AutoSize = true;
+            this.m_chkScrambleWhenLMFails.Location = new System.Drawing.Point(37, 101);
+            this.m_chkScrambleWhenLMFails.Name = "m_chkScrambleWhenLMFails";
+            this.m_chkScrambleWhenLMFails.Size = new System.Drawing.Size(297, 30);
+            this.m_chkScrambleWhenLMFails.TabIndex = 12;
+            this.m_chkScrambleWhenLMFails.Text = "Only scramble when LocalMachine authentication fails or \r\ndoes not execute.";
+            this.m_chkScrambleWhenLMFails.UseVisualStyleBackColor = true;
             // 
-            // m_scrambleAllExceptRB
+            // label1
             // 
-            this.m_scrambleAllExceptRB.AutoSize = true;
-            this.m_scrambleAllExceptRB.Location = new System.Drawing.Point(37, 124);
-            this.m_scrambleAllExceptRB.Name = "m_scrambleAllExceptRB";
-            this.m_scrambleAllExceptRB.Size = new System.Drawing.Size(197, 17);
-            this.m_scrambleAllExceptRB.TabIndex = 10;
-            this.m_scrambleAllExceptRB.TabStop = true;
-            this.m_scrambleAllExceptRB.Text = "username is not one of the following:";
-            this.m_scrambleAllExceptRB.UseVisualStyleBackColor = true;
-            this.m_scrambleAllExceptRB.CheckedChanged += new System.EventHandler(this.m_scrambleAllExceptRB_CheckedChanged);
-            // 
-            // m_scrambleAllExceptDGV
-            // 
-            this.m_scrambleAllExceptDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.m_scrambleAllExceptDGV.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Username});
-            this.m_scrambleAllExceptDGV.Location = new System.Drawing.Point(54, 148);
-            this.m_scrambleAllExceptDGV.Name = "m_scrambleAllExceptDGV";
-            this.m_scrambleAllExceptDGV.Size = new System.Drawing.Size(271, 84);
-            this.m_scrambleAllExceptDGV.TabIndex = 11;
-            // 
-            // Username
-            // 
-            this.Username.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Username.HeaderText = "Username";
-            this.Username.Name = "Username";
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(51, 135);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(246, 13);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "Never scramble the passwords for these accounts:";
             // 
             // Configuration
             // 
@@ -292,8 +287,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.m_localGroupDgv)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.m_groupsDgv)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.m_scrambleAllExceptDGV)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.m_groupsDgv)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -319,7 +314,7 @@
         private System.Windows.Forms.CheckBox m_chkRemoveProfile;
         private System.Windows.Forms.DataGridView m_scrambleAllExceptDGV;
         private System.Windows.Forms.DataGridViewTextBoxColumn Username;
-        private System.Windows.Forms.RadioButton m_scrambleAllExceptRB;
-        private System.Windows.Forms.RadioButton m_scrambleLocalMachineFailRB;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox m_chkScrambleWhenLMFails;
     }
 }

@@ -55,9 +55,7 @@ namespace pGina.Plugin.LocalMachine
             string[] MandatoryGroups = Settings.Store.MandatoryGroups;
             bool ScramblePasswords = Settings.Store.ScramblePasswords;
             bool RemoveProfiles = Settings.Store.RemoveProfiles;
-            string mode = Settings.Store.ScramblePasswordsMode;
-            ScramblePasswordsMode scrambleMode = (ScramblePasswordsMode)Enum.Parse( 
-                typeof(ScramblePasswordsMode), mode);
+            bool scrWhenLMFail = Settings.Store.ScramblePasswordsWhenLMFails;
             string[] scrambleExceptions = Settings.Store.ScramblePasswordsExceptions;
 
             m_chkAlwaysAuth.Checked = AlwaysAuthenticate;
@@ -65,16 +63,7 @@ namespace pGina.Plugin.LocalMachine
             m_chkAuthzRequireLocal.Checked = AuthzLocalGroupsOnly;
             m_chkScramble.Checked = ScramblePasswords;
             m_chkRemoveProfile.Checked = RemoveProfiles;
-
-            switch( scrambleMode )
-            {
-                case ScramblePasswordsMode.LOCAL_MACHINE_AUTH_FAIL:
-                    m_scrambleLocalMachineFailRB.Checked = true;
-                    break;
-                case ScramblePasswordsMode.ALL_EXCEPT_SOME:
-                    m_scrambleAllExceptRB.Checked = true;
-                    break;
-            }
+            m_chkScrambleWhenLMFails.Checked = scrWhenLMFail;
 
             foreach (string group in AuthzLocalGroups)
             {
@@ -106,11 +95,7 @@ namespace pGina.Plugin.LocalMachine
             Settings.Store.AuthzLocalGroupsOnly = m_chkAuthzRequireLocal.Checked;
             Settings.Store.ScramblePasswords = m_chkScramble.Checked;
             Settings.Store.RemoveProfiles = m_chkRemoveProfile.Checked;
-
-            if( m_scrambleAllExceptRB.Checked )
-                Settings.Store.ScramblePasswordsMode = ScramblePasswordsMode.ALL_EXCEPT_SOME.ToString();
-            if( m_scrambleLocalMachineFailRB.Checked )
-                Settings.Store.ScramblePasswordsMode = ScramblePasswordsMode.LOCAL_MACHINE_AUTH_FAIL.ToString();
+            Settings.Store.ScramblePasswordsWhenLMFails = m_chkScrambleWhenLMFails.Checked;
 
             List<string> localGroups = new List<string>();
             foreach (DataGridViewRow row in m_localGroupDgv.Rows)
@@ -140,6 +125,7 @@ namespace pGina.Plugin.LocalMachine
             else
                 Settings.Store.MandatoryGroups = new string[] { };
 
+            // Gather the exceptions list and store 
             List<string> exceptions = new List<string>();
             foreach (DataGridViewRow row in m_scrambleAllExceptDGV.Rows)
             {
@@ -162,14 +148,12 @@ namespace pGina.Plugin.LocalMachine
         {
             if (m_chkScramble.Checked)
             {
-                m_scrambleAllExceptRB.Enabled = true;
-                m_scrambleLocalMachineFailRB.Enabled = true;
-                m_scrambleAllExceptDGV.Enabled = m_scrambleAllExceptRB.Checked;
+                m_chkScrambleWhenLMFails.Enabled = true;
+                m_scrambleAllExceptDGV.Enabled = true;
             }
             else
             {
-                m_scrambleAllExceptRB.Enabled = false;
-                m_scrambleLocalMachineFailRB.Enabled = false;
+                m_chkScrambleWhenLMFails.Enabled = false;
                 m_scrambleAllExceptDGV.Enabled = false;
             }
         }
@@ -200,14 +184,5 @@ namespace pGina.Plugin.LocalMachine
             
         }
 
-        private void m_scrambleLocalMachineFailRB_CheckedChanged(object sender, EventArgs e)
-        {
-            MaskGatewayUi();
-        }
-
-        private void m_scrambleAllExceptRB_CheckedChanged(object sender, EventArgs e)
-        {
-            MaskGatewayUi();
-        }
     }
 }
