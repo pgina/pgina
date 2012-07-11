@@ -126,6 +126,8 @@ namespace pGina.Plugin.RADIUS
         //Processes accounting on logon/logoff
         public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, pGina.Shared.Types.SessionProperties properties)
         {
+            m_logger.DebugFormat("SessionChange({0})", properties.Id.ToString());
+
             string username = null;
             if ((bool)Settings.Store.UseModifiedName)
                 username = properties.GetTrackedSingle<UserInformation>().Username;
@@ -167,7 +169,7 @@ namespace pGina.Plugin.RADIUS
                 }
                 catch (Exception e)
                 {
-                    m_logger.ErrorFormat("Error starting accounting.", e);
+                    m_logger.Error("Error occurred while starting accounting.", e);
                 }
 
             }
@@ -195,7 +197,7 @@ namespace pGina.Plugin.RADIUS
                 }
                 catch (Exception e)
                 {
-                    m_logger.ErrorFormat("Error performing accounting stop.", e);
+                    m_logger.Error("Error occurred while stopping accounting.", e);
                     return;
                 }
             }
