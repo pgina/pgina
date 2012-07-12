@@ -207,6 +207,9 @@ namespace pGina.Plugin.LocalMachine
             // exception if it is thrown.  I throw in a sanity check because there's no
             // guarantee that MoveNext will actually move the enumerator forward when an
             // exception occurs, although it has done so in my tests.
+            //
+            // For additional details, see the following bug:
+            // https://connect.microsoft.com/VisualStudio/feedback/details/453812/principaloperationexception-when-enumerating-the-collection-groupprincipal-members
 
             PrincipalCollection members = group.Members;
             bool ok = true;
