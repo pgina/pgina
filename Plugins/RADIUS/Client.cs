@@ -5,6 +5,7 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 
+using log4net;
 
 /* This class conforms to the following RFCs:
  * RFC 2865 - Remote Authentication Dial In User Service (RADIUS) - http://tools.ietf.org/html/rfc2865
@@ -41,6 +42,8 @@ namespace pGina.Plugin.RADIUS
         public string ipAddressRegex { get; set; }
         
         private static Random r = new Random();
+        private ILog m_logger = LogManager.GetLogger("RADIUSPlugin");
+
 
         public RADIUSClient(string server, int authport, int acctingport, string sharedKey, string NAS_Id) : 
             this(server, authport, acctingport, sharedKey, timeout: 3000, retry: 3, sessionId:null, NAS_IP_Address:null, NAS_Identifier: NAS_Id) 
@@ -93,7 +96,8 @@ namespace pGina.Plugin.RADIUS
                 authPacket.addRawAttribute(Packet.AttributeType.NAS_IP_Address, NAS_IP_Address);
             if (NAS_Identifier != null)
                 authPacket.addAttribute(Packet.AttributeType.NAS_Identifier, NAS_Identifier);
-            
+
+            m_logger.DebugFormat("Attempting to send {0} for user {1}", authPacket.code, username);
 
             int retryCt = 0;
             while (true)
@@ -115,6 +119,8 @@ namespace pGina.Plugin.RADIUS
 
                     client.Close();
 
+                    m_logger.DebugFormat("Received authentication response: {0} for user {1}", responsePacket.code, username);
+
                     if (responsePacket.code == Packet.Code.Access_Accept)
                     {
                         this.authenticated = true;
@@ -128,6 +134,7 @@ namespace pGina.Plugin.RADIUS
                 //SocketException is thrown if the  server does not respond by end of timeout
                 catch (SocketException se)
                 {
+                    m_logger.DebugFormat("Authentication attempt {0}/{1} failed. Reason: {2}", retryCt+1, maxRetries, se.Message); 
                     retryCt++;
                     if (retryCt >= maxRetries)
                         throw new RADIUSException(String.Format("No response from server after {0} tries.", maxRetries), se);
@@ -162,7 +169,7 @@ namespace pGina.Plugin.RADIUS
             if (authType != Packet.Acct_AuthenticType.Not_Specified)
                 accountingRequest.addAttribute(Packet.AttributeType.Acct_Authentic, (int)authType);
 
-            
+            m_logger.DebugFormat("Attempting to send {0} for user {1}", accountingRequest.code, username);
             int retryCt = 0;
             while (true)
             {
@@ -188,12 +195,15 @@ namespace pGina.Plugin.RADIUS
 
                     client.Close();
 
+                    m_logger.DebugFormat("Received accounting response: {0} for user {1}", responsePacket.code, username);
+
                     return responsePacket.code == Packet.Code.Accounting_Response;
                 }
 
                 //SocketException is thrown if the  server does not respond by end of timeout
                 catch (SocketException se)
                 {
+                    m_logger.DebugFormat("Accounting start attempt {0}/{1} failed. Reason: {2}", retryCt + 1, maxRetries, se.Message); 
                     retryCt++;
                     if (retryCt >= maxRetries)
                         throw new RADIUSException(String.Format("No response from server after {0} tries.", maxRetries), se);
@@ -222,6 +232,7 @@ namespace pGina.Plugin.RADIUS
             client.Client.SendTimeout = timeout;
             client.Client.ReceiveTimeout = timeout;
 
+            m_logger.DebugFormat("Attempting to send {0} for user {1}", accountingRequest.code, username);
             int retryCt = 0;
             while (true)
             {
@@ -242,11 +253,14 @@ namespace pGina.Plugin.RADIUS
 
                     client.Close();
 
+                    m_logger.DebugFormat("Received accounting response: {0} for user {1}", responsePacket.code, username);
+
                     return responsePacket.code == Packet.Code.Accounting_Response;
                     //SocketException is thrown if the  server does not respond by end of timeout
                 }
                 catch (SocketException se)
                 {
+                    m_logger.DebugFormat("Accounting stop attempt {0}/{1} failed. Reason: {2}", retryCt + 1, maxRetries, se.Message); 
                     retryCt++;
                     if (retryCt >= maxRetries)
                         throw new RADIUSException(String.Format("No response from server after {0} tries.", maxRetries), se);
