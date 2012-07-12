@@ -193,15 +193,46 @@ namespace pGina.Plugin.LocalMachine
         }
 
         // Non recursive group check (immediate membership only currently)
-        private bool IsUserInGroup(UserPrincipal user, GroupPrincipal group)
+        private static bool IsUserInGroup(UserPrincipal user, GroupPrincipal group)
         {
             if (user == null || group == null) return false;
 
-            foreach (Principal principal in group.Members)
+            // This may seem a convoluted and strange way to check group membership.  
+            // Especially because I could just call user.IsMemberOf(group).  
+            // The reason for all of this is that IsMemberOf will throw an exception
+            // if there is an unresolvable SID in the list of group members.  Unfortunately,
+            // even looping over the members with a standard foreach loop doesn't allow
+            // for catching the exception and continuing.  Therefore, we need to use the
+            // IEnumerator object and iterate through the members carefully, catching the
+            // exception if it is thrown.  I throw in a sanity check because there's no
+            // guarantee that MoveNext will actually move the enumerator forward when an
+            // exception occurs, although it has done so in my tests.
+
+            PrincipalCollection members = group.Members;
+            bool ok = true;
+            int errorCount = 0;  // This is a sanity check in case the loop gets out of control
+            IEnumerator<Principal> membersEnum = members.GetEnumerator();
+            while (ok)
             {
-                if (principal is UserPrincipal)
+                try { ok = membersEnum.MoveNext(); }
+                catch (PrincipalOperationException)
                 {
-                    if (principal.Sid == user.Sid)
+                    m_logger.ErrorFormat("PrincipalOperationException when checking group membership for user {0} in group {1}." +
+                        "  This usually means that you have an unresolvable SID as a group member." +
+                        "  I strongly recommend that you fix this problem as soon as possible by removing the SID from the group. " +
+                        "  Ignoring the exception and continuing.",
+                        user.Name, group.Name);
+                    errorCount++;
+                    continue;
+                }
+
+                if (errorCount > 1000) return false;  // Sanity check to avoid infinite loops
+
+                if (ok)
+                {
+                    Principal principal = membersEnum.Current;
+
+                    if (principal is UserPrincipal && principal.Sid == user.Sid)
                         return true;
                 }
             }
@@ -507,7 +538,7 @@ namespace pGina.Plugin.LocalMachine
                     if (p is GroupPrincipal)
                     {
                         GroupPrincipal gp = (GroupPrincipal)p;
-                        if (user.IsMemberOf(gp))
+                        if (LocalAccount.IsUserInGroup(user, gp))
                             result.Add(gp);
                         else
                             gp.Dispose();
