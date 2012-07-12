@@ -1,3 +1,10 @@
+3.1.3.0 BETA (2012/07/12)
+---------------------------
+ - RADIUS plugin: Improved logging and thread safety (Oooska)
+ - Fix: crash when unresolvable SIDs exist in groups (#121)
+ - LocalMachine plugin: make options more flexible for password scrambling
+   and profile deletion.
+
 3.1.2.0 BETA (2012/07/02)
 ---------------------------
  - New RADIUS plugin (Oooksa)
