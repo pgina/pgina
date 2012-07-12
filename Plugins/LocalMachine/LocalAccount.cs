@@ -225,16 +225,18 @@ namespace pGina.Plugin.LocalMachine
                         "  I strongly recommend that you fix this problem as soon as possible by removing the SID from the group. " +
                         "  Ignoring the exception and continuing.",
                         user.Name, group.Name);
+
+                    // Sanity check to avoid infinite loops
                     errorCount++;
+                    if (errorCount > 1000) return false;  
+                    
                     continue;
                 }
-
-                if (errorCount > 1000) return false;  // Sanity check to avoid infinite loops
-
+                
                 if (ok)
                 {
                     Principal principal = membersEnum.Current;
-
+                    
                     if (principal is UserPrincipal && principal.Sid == user.Sid)
                         return true;
                 }
