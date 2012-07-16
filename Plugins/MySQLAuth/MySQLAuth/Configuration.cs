@@ -56,7 +56,7 @@ namespace pGina.Plugin.MySQLAuth
             this.portTB.Text = Convert.ToString(port);
             this.userTB.Text = Settings.Store.User;
             this.passwordTB.Text = Settings.Store.GetEncryptedSetting("Password");
-            this.tableTB.Text = Settings.Store.Table;
+            this.userTableTB.Text = Settings.Store.Table;
             this.dbTB.Text = Settings.Store.Database;
             bool useSsl = Settings.Store.UseSsl;
             this.useSslCB.Checked = useSsl;
@@ -105,7 +105,7 @@ namespace pGina.Plugin.MySQLAuth
             Settings.Store.Port = port;
             Settings.Store.User = this.userTB.Text.Trim();
             Settings.Store.SetEncryptedSetting("Password", this.passwordTB.Text);
-            Settings.Store.Table = this.tableTB.Text.Trim();
+            Settings.Store.Table = this.userTableTB.Text.Trim();
             Settings.Store.Database = this.dbTB.Text.Trim();
             Settings.Store.UseSsl = this.useSslCB.Checked;
             Settings.Store.UsernameColumn = this.unameColTB.Text.Trim();
@@ -129,7 +129,7 @@ namespace pGina.Plugin.MySQLAuth
         {
             m_logger.Debug("Testing connection to database...");
             MySqlConnection conn = null;
-            string tableName = this.tableTB.Text.Trim();
+            string tableName = this.userTableTB.Text.Trim();
             try
             {
                 string message = "";
@@ -248,7 +248,7 @@ namespace pGina.Plugin.MySQLAuth
         {
             string connStr = this.BuildConnectionString();
             if (connStr == null) return;
-            string tableName = this.tableTB.Text.Trim();
+            string tableName = this.userTableTB.Text.Trim();
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(connStr))
