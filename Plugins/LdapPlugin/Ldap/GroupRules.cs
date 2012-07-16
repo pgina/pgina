@@ -168,10 +168,10 @@ namespace pGina.Plugin.Ldap
                     str = "Always";
                     break;
                 case Condition.MEMBER_OF:
-                    str = "If member of LDAP group " + m_group;
+                    str = string.Format("If member of LDAP group \"{0}\"", m_group);
                     break;
                 case Condition.NOT_MEMBER_OF:
-                    str = "If not member of LDAP group " + m_group;
+                    str = string.Format("If not member of LDAP group \"{0}\"", m_group);
                     break;
             }
             if (m_allowOnMatch) str += " allow.";
@@ -222,13 +222,13 @@ namespace pGina.Plugin.Ldap
                     str = "Always";
                     break;
                 case Condition.MEMBER_OF:
-                    str = "If member of LDAP group " + m_group;
+                    str = string.Format("If member of LDAP group \"{0}\"", m_group);
                     break;
                 case Condition.NOT_MEMBER_OF:
-                    str = "If not member of LDAP group " + m_group;
+                    str = string.Format("If not member of LDAP group \"{0}\"", m_group);
                     break;
             }
-            str += " add to local group " + m_localGroup;
+            str += string.Format(" add to local group \"{0}\"", m_localGroup);
             return str;
         }
     }
