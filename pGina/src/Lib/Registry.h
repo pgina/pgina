@@ -37,5 +37,8 @@ namespace pGina
 		std::wstring GetString(const wchar_t * keyName, const wchar_t * defaultValue);
 		DWORD GetDword(const wchar_t * keyName, DWORD defaultValue);
 		bool GetBool(const wchar_t * keyName, bool defaultValue);
+
+		bool StringValueExistsAndIsNonZero( HKEY base, const wchar_t *subKeyName, const wchar_t *valueName );
+		std::wstring GetString( HKEY base, const wchar_t *subKeyName, const wchar_t *valueName );
 	}
 }

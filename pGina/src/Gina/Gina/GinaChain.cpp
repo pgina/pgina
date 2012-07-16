@@ -171,7 +171,9 @@ namespace pGina
 		int  GinaChain::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, 
 									 PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile)
 		{
-			if(m_passthru)
+			// If configured to pass through to MS GINA, or auto-logon is enabled, we 
+			// pass through, and let the MS GINA handle the logon.
+			if(m_passthru || IsAutoLogonEnabled())
 			{
 				return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);				
 			}
@@ -308,6 +310,20 @@ namespace pGina
 
 			// Everyone else falls through
    			return WinlogonProxy::WlxDialogBoxParam(hInst, lpszTemplate, hwndOwner, dlgprc, dwInitParam);
+		}
+
+		// Check to see if the auto-logon registry settings are there.
+		bool GinaChain::IsAutoLogonEnabled()
+		{
+			std::wstring subKeyName = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon";
+
+			// We look for the values "AutoAdminLogon" and "ForceAutoLogon".  If either of them exist
+			// and are non-zero, we return true.
+			if( pGina::Registry::StringValueExistsAndIsNonZero(HKEY_LOCAL_MACHINE, subKeyName.c_str(), L"AutoAdminLogon") ||
+				pGina::Registry::StringValueExistsAndIsNonZero(HKEY_LOCAL_MACHINE, subKeyName.c_str(), L"ForceAutoLogon") )
+				return true;
+
+			return false;
 		}
 	}
 }

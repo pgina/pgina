@@ -33,28 +33,10 @@ namespace pGina
 	{
 		std::wstring GetString(const wchar_t * keyName, const wchar_t * defaultValue)
 		{
-			std::wstring result = (defaultValue ? defaultValue : L"");	// Do not assign NULL!
-			HKEY hKey = NULL;
+			std::wstring result = GetString(HKEY_LOCAL_MACHINE, L"SOFTWARE\\pGina3", keyName);
+
+			if( result.length() == 0 ) result = defaultValue;
 			
-			if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"Software\\pGina3", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
-			{
-				DWORD dataLength = 0;				
-				if(RegQueryValueEx(hKey, keyName, 0, NULL, NULL, &dataLength) == ERROR_SUCCESS)
-				{
-					wchar_t * buffer = (wchar_t *) malloc(dataLength);
-					memset(buffer, 0, dataLength);
-					
-					if(RegQueryValueEx(hKey, keyName, 0, NULL, (LPBYTE) buffer, &dataLength) == ERROR_SUCCESS)
-					{
-						result = buffer;
-					}
-
-					free(buffer);
-				}				
-
-				RegCloseKey(hKey);
-			}
-
 			return result;
 		}	
 
@@ -87,6 +69,44 @@ namespace pGina
 				return false;
 
 			return defaultValue;
+		}
+
+		// Returns true if the value exists and is set to something other than L"0".
+		// Note that a zero length string is treated as a non-existent value (returns false)
+		// Assumes the type is REG_SZ
+		bool StringValueExistsAndIsNonZero( HKEY base, const wchar_t *subKeyName, const wchar_t *valueName )
+		{
+			std::wstring result = GetString(base, subKeyName, valueName);
+			if( result.length() == 0 ) return false;  // empty implies that the value does not exist
+			return wcscmp(L"0", result.c_str()) != 0;
+		}
+
+		// Returns empty (zero-length) string if the value does not exist (assumes REG_SZ)
+		std::wstring GetString( HKEY base, const wchar_t * subKeyName, const wchar_t *valueName )
+		{
+			std::wstring result = L"";	// Do not assign NULL!
+			HKEY hKey = NULL;
+			
+			if(RegOpenKeyEx(base, subKeyName, 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+			{
+				DWORD dataLength = 0;				
+				if(RegQueryValueEx(hKey, valueName, 0, NULL, NULL, &dataLength) == ERROR_SUCCESS)
+				{
+					wchar_t * buffer = (wchar_t *) malloc(dataLength);
+					memset(buffer, 0, dataLength);
+					
+					if(RegQueryValueEx(hKey, valueName, 0, NULL, (LPBYTE) buffer, &dataLength) == ERROR_SUCCESS)
+					{
+						result = buffer;
+					}
+
+					free(buffer);
+				}
+
+				RegCloseKey(hKey);
+			}
+
+			return result;
 		}
 	}
 }
