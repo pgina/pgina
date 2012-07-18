@@ -92,8 +92,9 @@ namespace pGina
 				DWORD dataLength = 0;				
 				if(RegQueryValueEx(hKey, valueName, 0, NULL, NULL, &dataLength) == ERROR_SUCCESS)
 				{
-					wchar_t * buffer = (wchar_t *) malloc(dataLength);
-					memset(buffer, 0, dataLength);
+					int bufferSize = dataLength + sizeof(wchar_t);
+					wchar_t * buffer = (wchar_t *) malloc(bufferSize);
+					memset(buffer, 0, bufferSize);
 					
 					if(RegQueryValueEx(hKey, valueName, 0, NULL, (LPBYTE) buffer, &dataLength) == ERROR_SUCCESS)
 					{
