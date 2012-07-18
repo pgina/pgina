@@ -137,6 +137,8 @@
             this.btnOkay = new System.Windows.Forms.Button();
             this.m_pginaVersionLbl = new System.Windows.Forms.Label();
             this.btnSaveAndClose = new System.Windows.Forms.Button();
+            this.label16 = new System.Windows.Forms.Label();
+            this.simResultLocalGroupsTB = new System.Windows.Forms.TextBox();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
             this.groupBox14.SuspendLayout();
@@ -786,6 +788,8 @@
             // 
             // groupBox13
             // 
+            this.groupBox13.Controls.Add(this.simResultLocalGroupsTB);
+            this.groupBox13.Controls.Add(this.label16);
             this.groupBox13.Controls.Add(this.simFinalResultPB);
             this.groupBox13.Controls.Add(this.label15);
             this.groupBox13.Controls.Add(this.simFinalResultMessageTB);
@@ -800,7 +804,7 @@
             // 
             // simFinalResultPB
             // 
-            this.simFinalResultPB.Location = new System.Drawing.Point(57, 242);
+            this.simFinalResultPB.Location = new System.Drawing.Point(57, 211);
             this.simFinalResultPB.Name = "simFinalResultPB";
             this.simFinalResultPB.Size = new System.Drawing.Size(20, 20);
             this.simFinalResultPB.TabIndex = 8;
@@ -809,7 +813,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(13, 245);
+            this.label15.Location = new System.Drawing.Point(13, 214);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(40, 13);
             this.label15.TabIndex = 7;
@@ -817,7 +821,7 @@
             // 
             // simFinalResultMessageTB
             // 
-            this.simFinalResultMessageTB.Location = new System.Drawing.Point(142, 242);
+            this.simFinalResultMessageTB.Location = new System.Drawing.Point(142, 211);
             this.simFinalResultMessageTB.Name = "simFinalResultMessageTB";
             this.simFinalResultMessageTB.ReadOnly = true;
             this.simFinalResultMessageTB.Size = new System.Drawing.Size(613, 20);
@@ -828,14 +832,14 @@
             this.simPluginResultsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.simPluginResultsListView.Location = new System.Drawing.Point(10, 20);
             this.simPluginResultsListView.Name = "simPluginResultsListView";
-            this.simPluginResultsListView.Size = new System.Drawing.Size(739, 216);
+            this.simPluginResultsListView.Size = new System.Drawing.Size(739, 180);
             this.simPluginResultsListView.TabIndex = 5;
             this.simPluginResultsListView.UseCompatibleStateImageBehavior = false;
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(83, 245);
+            this.label9.Location = new System.Drawing.Point(83, 214);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(53, 13);
             this.label9.TabIndex = 4;
@@ -1323,6 +1327,23 @@
             this.btnSaveAndClose.UseVisualStyleBackColor = true;
             this.btnSaveAndClose.Click += new System.EventHandler(this.btnSaveAndClose_Click);
             // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(63, 246);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(73, 13);
+            this.label16.TabIndex = 9;
+            this.label16.Text = "Local Groups:";
+            // 
+            // simResultLocalGroupsTB
+            // 
+            this.simResultLocalGroupsTB.Location = new System.Drawing.Point(142, 242);
+            this.simResultLocalGroupsTB.Name = "simResultLocalGroupsTB";
+            this.simResultLocalGroupsTB.ReadOnly = true;
+            this.simResultLocalGroupsTB.Size = new System.Drawing.Size(613, 20);
+            this.simResultLocalGroupsTB.TabIndex = 10;
+            // 
             // ConfigurationUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1496,5 +1517,7 @@
         private System.Windows.Forms.CheckBox enableMotdCB;
         private System.Windows.Forms.CheckBox logonUiShowServiceStatusCB;
         private System.Windows.Forms.Button btnSaveAndClose;
+        private System.Windows.Forms.TextBox simResultLocalGroupsTB;
+        private System.Windows.Forms.Label label16;
     }
 }

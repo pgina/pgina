@@ -1191,6 +1191,10 @@ namespace pGina.Configuration
 
             SetStageStatus(this.simFinalResultPB, finalResult.Success);
             this.simFinalResultMessageTB.Text = finalResult.Message;
+
+            // Display final list of groups
+            this.simResultLocalGroupsTB.Text =
+                string.Join(", ", sessionDriver.UserInformation.Groups.Select(groupInfo => groupInfo.Name) );
         }
 
         private void SetStageStatus(PictureBox pb, bool success)
