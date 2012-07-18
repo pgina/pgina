@@ -56,13 +56,16 @@ namespace pGina.Plugin.MySQLAuth
             this.portTB.Text = Convert.ToString(port);
             this.userTB.Text = Settings.Store.User;
             this.passwordTB.Text = Settings.Store.GetEncryptedSetting("Password");
-            this.userTableTB.Text = Settings.Store.Table;
             this.dbTB.Text = Settings.Store.Database;
             bool useSsl = Settings.Store.UseSsl;
             this.useSslCB.Checked = useSsl;
+
+            // User table schema settings
+            this.userTableTB.Text = Settings.Store.Table;
             this.unameColTB.Text = Settings.Store.UsernameColumn;
             this.hashMethodColTB.Text = Settings.Store.HashMethodColumn;
             this.passwdColTB.Text = Settings.Store.PasswordColumn;
+            this.userPrimaryKeyColTB.Text = Settings.Store.UserTablePrimaryKeyColumn;
 
             int encodingInt = Settings.Store.HashEncoding;
             Settings.HashEncoding encoding = (Settings.HashEncoding)encodingInt;
@@ -71,6 +74,22 @@ namespace pGina.Plugin.MySQLAuth
                 this.encHexRB.Checked = true;
             else
                 this.encBase64RB.Checked = true;
+
+            // Group table schema settings
+            this.groupTableNameTB.Text = Settings.Store.GroupTableName;
+            this.groupNameColTB.Text = Settings.Store.GroupNameColumn;
+            this.groupTablePrimaryKeyColTB.Text = Settings.Store.GroupTablePrimaryKeyColumn;
+
+            // User-Group table settings
+            this.userGroupTableNameTB.Text = Settings.Store.UserGroupTableName;
+            this.userGroupUserFKColTB.Text = Settings.Store.UserForeignKeyColumn;
+            this.userGroupGroupFKColTB.Text = Settings.Store.GroupForeignKeyColumn;
+
+            // Gateway rules
+            List<GroupGatewayRule> gwLst = GroupRuleLoader.GetGatewayRules();
+            foreach (GroupGatewayRule rule in gwLst)
+                this.gtwRulesListBox.Items.Add(rule);
+            this.gtwRuleConditionCB.SelectedIndex = 0;
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -105,17 +124,38 @@ namespace pGina.Plugin.MySQLAuth
             Settings.Store.Port = port;
             Settings.Store.User = this.userTB.Text.Trim();
             Settings.Store.SetEncryptedSetting("Password", this.passwordTB.Text);
-            Settings.Store.Table = this.userTableTB.Text.Trim();
             Settings.Store.Database = this.dbTB.Text.Trim();
             Settings.Store.UseSsl = this.useSslCB.Checked;
+
+            // User table settings
+            Settings.Store.Table = this.userTableTB.Text.Trim();
             Settings.Store.UsernameColumn = this.unameColTB.Text.Trim();
             Settings.Store.HashMethodColumn = this.hashMethodColTB.Text.Trim();
             Settings.Store.PasswordColumn = this.passwdColTB.Text.Trim();
+            Settings.Store.UserTablePrimaryKeyColumn = this.userPrimaryKeyColTB.Text.Trim();
 
             if (encHexRB.Checked)
                 Settings.Store.HashEncoding = (int)Settings.HashEncoding.HEX;
             else
                 Settings.Store.HashEncoding = (int)Settings.HashEncoding.BASE_64;
+
+            // Group table schema settings
+            Settings.Store.GroupTableName = this.groupTableNameTB.Text.Trim();
+            Settings.Store.GroupNameColumn = this.groupNameColTB.Text.Trim();
+            Settings.Store.GroupTablePrimaryKeyColumn = this.groupTablePrimaryKeyColTB.Text.Trim();
+
+            // User-Group table settings
+            Settings.Store.UserGroupTableName = this.userGroupTableNameTB.Text.Trim();
+            Settings.Store.UserForeignKeyColumn = this.userGroupUserFKColTB.Text.Trim();
+            Settings.Store.GroupForeignKeyColumn = this.userGroupGroupFKColTB.Text.Trim();
+
+            // Gateway rules
+            List<GroupGatewayRule> gwList = new List<GroupGatewayRule>();
+            foreach (Object item in this.gtwRulesListBox.Items)
+            {
+                gwList.Add(item as GroupGatewayRule);
+            }
+            GroupRuleLoader.SaveGatewayRules(gwList);
 
             return true;
         }
@@ -127,20 +167,24 @@ namespace pGina.Plugin.MySQLAuth
 
         private void testBtn_Click(object sender, EventArgs e)
         {
-            m_logger.Debug("Testing connection to database...");
+            TextBoxInfoDialog infoDlg = new TextBoxInfoDialog();
+            infoDlg.Show();
+
+            infoDlg.AppendLine("Beginning test of MySQL database..." + Environment.NewLine);
             MySqlConnection conn = null;
             string tableName = this.userTableTB.Text.Trim();
             try
             {
-                string message = "";
                 string connStr = this.BuildConnectionString();
                 if (connStr == null) return;
+                
+                infoDlg.AppendLine("Connection Status");
+                infoDlg.AppendLine("-------------------------------------");
+
                 conn = new MySqlConnection(connStr);
                 conn.Open();
 
-                message += "Connection Status";
-                message += "\n---------------------";
-                message += string.Format("\n  Connection to {0} successful.", this.hostTB.Text.Trim());
+                infoDlg.AppendLine(string.Format("Connection to {0} successful.", this.hostTB.Text.Trim()));
 
                 // Variables to be used repeatedly below
                 MySqlCommand cmd = null;
@@ -163,84 +207,102 @@ namespace pGina.Plugin.MySQLAuth
 
                     if (string.IsNullOrEmpty(cipher))
                     {
-                        message += "\n  Not using SSL.";
+                        infoDlg.AppendLine( "Not using SSL." );
                     }
                     else
                     {
-                        message += "\n  SSL enabled, using cipher: " + cipher;
+                        infoDlg.AppendLine("SSL enabled, using cipher: " + cipher);
                     }
                 }
                 else
                 {
-                    message += "\n  Not using SSL.";
+                    infoDlg.AppendLine( "Not using SSL." );
                 }
 
-                message += "\n\nUser Information Table";
-                message += "\n-------------------------------";
+                infoDlg.AppendLine( Environment.NewLine + "User Table" );
+                infoDlg.AppendLine( "-------------------------------");
+                CheckTable(tableName,
+                    new string[] { this.unameColTB.Text.Trim(), this.passwdColTB.Text.Trim(), this.hashMethodColTB.Text.Trim(), this.userPrimaryKeyColTB.Text.Trim() },
+                    infoDlg, conn);
 
-                // Check for existence of the table
-                bool tableExists = this.TableExists(tableName, conn);
-                if (tableExists)
-                {
-                    m_logger.DebugFormat("Table {0} found.", tableName);
-                    message += string.Format("\n  Table {0} found.", tableName);
-                }
-                else
-                {
-                    m_logger.DebugFormat("Table {0} not found.", tableName);
-                    message += string.Format("\n  WARNING: Table {0} not found.", tableName);
-                }
+                infoDlg.AppendLine(Environment.NewLine + "Group Table");
+                infoDlg.AppendLine("-------------------------------");
+                CheckTable(this.groupTableNameTB.Text.Trim(),
+                    new string[] { this.groupNameColTB.Text.Trim(), this.groupTablePrimaryKeyColTB.Text.Trim() },
+                    infoDlg, conn);
 
-                if (tableExists)
-                {
-                    // Check for appropriate columns.
-                    bool userCol = false;
-                    bool hashCol = false;
-                    bool passCol = false;
-                    string unameColName = this.unameColTB.Text.Trim();
-                    string hashMethodColName = this.hashMethodColTB.Text.Trim();
-                    string passwdColName = this.passwdColTB.Text.Trim();
-                    query = string.Format("DESCRIBE {0}", tableName);
-                    cmd = new MySqlCommand(query, conn);
-                    rdr = cmd.ExecuteReader();
-                    while (rdr.Read())
-                    {
-                        string colName = rdr[0].ToString();
-                        if (colName.Equals(unameColName, StringComparison.CurrentCultureIgnoreCase))
-                            userCol = true;
-                        else if (colName.Equals(hashMethodColName, StringComparison.CurrentCultureIgnoreCase))
-                            hashCol = true;
-                        else if (colName.Equals(passwdColName, StringComparison.CurrentCultureIgnoreCase))
-                            passCol = true;
-                    }
-                    rdr.Close();
-
-                    if (userCol && hashCol && passCol)
-                    {
-                        message += "\n  Table schema looks correct.";
-                    }
-                    else
-                    {
-                        message += "\n  WARNING: Table schema looks incorrect, authentication operations may fail.";
-                        if (!userCol)
-                            message += string.Format("\n      Column '{0}' not found.", unameColName);
-                        if (!hashCol)
-                            message += string.Format("\n      Column '{0}' not found.", hashMethodColName);
-                        if (!passCol)
-                            message += string.Format("\n      Column '{0}' not found.", passwdColName);
-                    }
-                }
-
-                MessageBox.Show(message);
+                infoDlg.AppendLine(Environment.NewLine + "User-Group Table");
+                infoDlg.AppendLine("-------------------------------");
+                CheckTable(this.userGroupTableNameTB.Text.Trim(),
+                    new string[] { this.userGroupUserFKColTB.Text.Trim(), this.userGroupGroupFKColTB.Text.Trim() },
+                    infoDlg, conn);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("A fatal error occured: \n" + ex.Message);
+                if (ex is MySqlException)
+                {
+                    MySqlException mysqlEx = ex as MySqlException;
+                    infoDlg.AppendLine("MySQL ERROR: " + mysqlEx.Message);
+                }
+                else
+                {
+                    infoDlg.AppendLine(string.Format("ERROR: A fatal error occured: {0}", ex));
+                }
             }
             finally
             {
+                infoDlg.AppendLine(Environment.NewLine + "Closing connection.");
                 if (conn != null)
                     conn.Close();
+                infoDlg.AppendLine("Test complete.");
+            }
+        }
+
+        private void CheckTable(string tableName, string[] columnNames, TextBoxInfoDialog infoDlg, MySqlConnection conn)
+        {
+            // Check for existence of the table
+            bool tableExists = this.TableExists(tableName, conn);
+            if (tableExists)
+            {
+                m_logger.DebugFormat("Table \"{0}\" found.", tableName);
+                infoDlg.AppendLine(string.Format("Table \"{0}\" found.", tableName));
+            }
+            else
+            {
+                m_logger.DebugFormat("Table {0} not found.", tableName);
+                infoDlg.AppendLine(string.Format("ERROR: Table \"{0}\" not found.", tableName));
+                return;
+            }
+
+            if (tableExists)
+            {
+                // Get column names from DB
+                List<string> columnNamesFromDB = new List<string>();
+                string query = string.Format("DESCRIBE {0}", tableName);
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    string colName = rdr[0].ToString();
+                    columnNamesFromDB.Add(colName);
+                }
+                rdr.Close();
+
+                // Check for appropriate columns.
+                bool ok = true;
+                foreach (string c in columnNames)
+                {
+                    if (columnNamesFromDB.Contains(c, StringComparer.CurrentCultureIgnoreCase))
+                        infoDlg.AppendLine(string.Format("Found column \"{0}\"", c));
+                    else
+                    {
+                        ok = false;
+                        infoDlg.AppendLine(string.Format("ERROR: Column \"{0}\" not found!", c));
+                    }
+                }
+
+                if (!ok)
+                    infoDlg.AppendLine(string.Format("ERROR: Table \"{0}\" schema looks incorrect.", tableName));
             }
         }
 
@@ -248,37 +310,136 @@ namespace pGina.Plugin.MySQLAuth
         {
             string connStr = this.BuildConnectionString();
             if (connStr == null) return;
-            string tableName = this.userTableTB.Text.Trim();
+
+            TextBoxInfoDialog infoDlg = new TextBoxInfoDialog();
+            infoDlg.ClearText();
+            infoDlg.Show();
+
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(connStr))
                 {
+                    infoDlg.AppendLine("Connecting...");
                     conn.Open();
+
+                    // User table
+                    string tableName = this.userTableTB.Text.Trim();
+                    infoDlg.AppendLine(Environment.NewLine +
+                        string.Format("Creating table \"{0}\"", tableName));
 
                     if (!this.TableExists(tableName, conn))
                     {
+                        // Column names
+                        string pk = this.userPrimaryKeyColTB.Text.Trim();
                         string unameCol = this.unameColTB.Text.Trim();
                         string hashMethodCol = this.hashMethodColTB.Text.Trim();
                         string passwdCol = this.passwdColTB.Text.Trim();
 
-                        string sql = string.Format(
-                            "CREATE TABLE {0} (" +
-                            "   {1} VARCHAR(128) PRIMARY KEY, " +
-                            "   {2} TEXT, " +
-                            "   {3} TEXT )", tableName, unameCol, hashMethodCol, passwdCol);
-                        MySqlCommand cmd = new MySqlCommand(sql, conn);
-                        cmd.ExecuteNonQuery();
-                        MessageBox.Show("Table created.");
+                        // Is the primary key the same as the username?
+                        bool pkIsUserName =
+                            unameCol.Equals(pk, StringComparison.CurrentCultureIgnoreCase);
+
+                        StringBuilder sql = new StringBuilder();
+                        sql.AppendFormat("CREATE TABLE {0} ( \r\n", tableName);
+                        if (!pkIsUserName)
+                            sql.AppendFormat(" {0} BIGINT auto_increment PRIMARY KEY, \r\n", pk);
+                        sql.AppendFormat(" {0} VARCHAR(128) {1}, \r\n", unameCol, pkIsUserName ? "PRIMARY KEY" : "NOT NULL UNIQUE");
+                        sql.AppendFormat(" {0} TEXT NOT NULL, \r\n", hashMethodCol);
+                        sql.AppendFormat(" {0} TEXT \r\n", passwdCol);
+                        sql.Append(")");  // End create table.
+
+                        infoDlg.AppendLine("Executing SQL:");
+                        infoDlg.AppendLine(sql.ToString());
+
+                        using (MySqlCommand cmd = new MySqlCommand(sql.ToString(), conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                            infoDlg.AppendLine(string.Format("Table \"{0}\" created.", tableName));
+                        }
                     }
                     else
                     {
-                        MessageBox.Show("Table already exists.");
+                        infoDlg.AppendLine(
+                            string.Format("WARNING: Table \"{0}\"already exists, skipping.", tableName));
                     }
+
+                    // Group table
+                    tableName = this.groupTableNameTB.Text.Trim();
+                    infoDlg.AppendLine(Environment.NewLine +
+                        string.Format("Creating table \"{0}\"", tableName));
+
+                    if (!this.TableExists(tableName, conn))
+                    {
+                        // Column names
+                        string pk = this.groupTablePrimaryKeyColTB.Text.Trim();
+                        string groupNameCol = this.groupNameColTB.Text.Trim();
+
+                        // Is the primary key the same as the group name?
+                        bool pkIsGroupName =
+                            groupNameCol.Equals(pk, StringComparison.CurrentCultureIgnoreCase);
+
+                        StringBuilder sql = new StringBuilder();
+                        sql.AppendFormat("CREATE TABLE {0} ( \r\n", tableName);
+                        if (!pkIsGroupName)
+                            sql.AppendFormat(" {0} BIGINT AUTO_INCREMENT PRIMARY KEY, \r\n", pk);
+                        sql.AppendFormat(" {0} VARCHAR(128) {1} \r\n", groupNameCol, pkIsGroupName ? "PRIMARY KEY" : "NOT NULL UNIQUE");
+                        sql.Append(")");  // End create table.
+
+                        infoDlg.AppendLine("Executing SQL:");
+                        infoDlg.AppendLine(sql.ToString());
+
+                        using (MySqlCommand cmd = new MySqlCommand(sql.ToString(), conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                            infoDlg.AppendLine(string.Format("Table \"{0}\" created.", tableName));
+                        }
+                    }
+                    else
+                    {
+                        infoDlg.AppendLine(
+                            string.Format("WARNING: Table \"{0}\"already exists, skipping.", tableName));
+                    }
+
+                    // user-Group table
+                    tableName = this.userGroupTableNameTB.Text.Trim();
+                    infoDlg.AppendLine(Environment.NewLine +
+                        string.Format("Creating table \"{0}\"", tableName));
+
+                    if (!this.TableExists(tableName, conn))
+                    {
+                        // Column names
+                        string userFK = this.userGroupUserFKColTB.Text.Trim();
+                        string groupFK = this.userGroupGroupFKColTB.Text.Trim();
+
+                        StringBuilder sql = new StringBuilder();
+                        sql.AppendFormat("CREATE TABLE {0} ( \r\n", tableName);
+                        sql.AppendFormat(" {0} VARCHAR(128), \r\n", groupFK);
+                        sql.AppendFormat(" {0} VARCHAR(128), \r\n", userFK);
+                        sql.AppendFormat(" PRIMARY KEY ({0}, {1}) \r\n", userFK, groupFK);
+                        sql.Append(")");  // End create table.
+
+                        infoDlg.AppendLine("Executing SQL:");
+                        infoDlg.AppendLine(sql.ToString());
+
+                        MySqlCommand cmd = new MySqlCommand(sql.ToString(), conn);
+                        cmd.ExecuteNonQuery();
+                        infoDlg.AppendLine(string.Format("Table \"{0}\" created.", tableName));
+                    }
+                    else
+                    {
+                        infoDlg.AppendLine(
+                            string.Format("WARNING: Table \"{0}\"already exists, skipping.", tableName));
+                    }
+
                 }
             }
             catch (MySqlException ex)
             {
-                MessageBox.Show(String.Format("Error: {0}", ex.Message));
+                infoDlg.AppendLine(String.Format("ERROR: {0}", ex.Message));
+            }
+            finally
+            {
+                infoDlg.AppendLine(Environment.NewLine + "Finished.");
             }
         }
 
@@ -329,6 +490,58 @@ namespace pGina.Plugin.MySQLAuth
         private void groupBox3_Enter(object sender, EventArgs e)
         {
 
+        }
+
+        private void gtwRuleAddBtn_Click(object sender, EventArgs e)
+        {
+            string localGrp = this.gtwRuleLocalGroupTB.Text.Trim();
+            if (string.IsNullOrEmpty(localGrp))
+            {
+                MessageBox.Show("Please enter a local group name");
+                return;
+            }
+            int idx = this.gtwRuleConditionCB.SelectedIndex;
+            GroupRule.Condition c;
+            if (idx == 0) c = GroupRule.Condition.MEMBER_OF;
+            else if (idx == 1) c = GroupRule.Condition.NOT_MEMBER_OF;
+            else if (idx == 2) c = GroupRule.Condition.ALWAYS;
+            else
+                throw new Exception("Unrecognized option in gtwRuleAddBtn_Click");
+
+            if (c == GroupRule.Condition.ALWAYS)
+            {
+                this.gtwRulesListBox.Items.Add(new GroupGatewayRule(localGrp));
+            }
+            else
+            {
+                string remoteGroup = this.gtwRuleMysqlGroupTB.Text.Trim();
+                if (string.IsNullOrEmpty(remoteGroup))
+                {
+                    MessageBox.Show("Please enter a remote group name");
+                    return;
+                }
+                this.gtwRulesListBox.Items.Add(new GroupGatewayRule(remoteGroup, c, localGrp));
+            }
+        }
+
+        private void gtwRuleConditionCB_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.gtwRuleConditionCB.SelectedIndex == 2)
+            {
+                this.gtwRuleMysqlGroupTB.Enabled = false;
+                this.gtwRuleMysqlGroupTB.Text = "";
+            }
+            else
+            {
+                this.gtwRuleMysqlGroupTB.Enabled = true;
+            }
+        }
+
+        private void gtwRuleDeleteBtn_Click(object sender, EventArgs e)
+        {
+            int idx = this.gtwRulesListBox.SelectedIndex;
+            if (idx >= 0 && idx < this.gtwRulesListBox.Items.Count)
+                this.gtwRulesListBox.Items.RemoveAt(idx);
         }
     }
 }

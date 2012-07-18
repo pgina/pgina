@@ -46,14 +46,30 @@ namespace pGina.Plugin.MySQLAuth
             m_settings.SetDefault("Host", "localhost");
             m_settings.SetDefault("Port", 3306);
             m_settings.SetDefault("UseSsl", false);
-            m_settings.SetDefault("User", "pgina");
+            m_settings.SetDefault("User", "pgina_user");
             m_settings.SetDefaultEncryptedSetting("Password", "secret");
             m_settings.SetDefault("Database", "account_db");
+
+            // User table
             m_settings.SetDefault("Table", "users");
             m_settings.SetDefault("HashEncoding", (int)HashEncoding.HEX);
-            m_settings.SetDefault("UsernameColumn", "user");
+            m_settings.SetDefault("UsernameColumn", "user_name");
             m_settings.SetDefault("HashMethodColumn", "hash_method");
             m_settings.SetDefault("PasswordColumn", "password");
+            m_settings.SetDefault("UserTablePrimaryKeyColumn", "user_id");
+
+            // Group table
+            m_settings.SetDefault("GroupTableName", "groups");
+            m_settings.SetDefault("GroupNameColumn", "group_name");
+            m_settings.SetDefault("GroupTablePrimaryKeyColumn", "group_id");
+
+            // User-Group table
+            m_settings.SetDefault("UserGroupTableName", "usergroup");
+            m_settings.SetDefault("UserForeignKeyColumn", "user_id");
+            m_settings.SetDefault("GroupForeignKeyColumn", "group_id");
+
+            // Gateway settings
+            m_settings.SetDefault("GroupGatewayRules", new string[] { });
         }
     }
 }
