@@ -31,12 +31,13 @@ using System.Text;
 using log4net;
 
 using pGina.Shared.Interfaces;
+using pGina.Shared.Types;
 
 using MySql.Data.MySqlClient;
 
 namespace pGina.Plugin.MySQLAuth
 {
-    public class PluginImpl : IPluginAuthentication, IPluginConfiguration
+    public class PluginImpl : IPluginAuthentication, IPluginAuthenticationGateway, IPluginConfiguration
     {
         public static readonly Guid PluginUuid = new Guid("{A89DF410-53CA-4FE1-A6CA-4479B841CA19}");
         private ILog m_logger = LogManager.GetLogger("MySQLAuth");
@@ -47,8 +48,30 @@ namespace pGina.Plugin.MySQLAuth
 
             m_logger.DebugFormat("Authenticate: {0}", userInfo.Username);
 
-            UserEntry entry = GetUserEntry(userInfo.Username);
-
+            UserEntry entry = null;
+            try
+            {
+                using (MySqlUserDataSource dataSource = new MySqlUserDataSource())
+                {
+                    entry = dataSource.GetUserEntry(userInfo.Username);
+                }
+            }
+            catch (MySqlException ex)
+            {
+                if (ex.Number == 1042)
+                    m_logger.ErrorFormat("Unable to connect to host: {0}", Settings.Store.Host);
+                else
+                {
+                    m_logger.ErrorFormat("{0}", ex);
+                    throw;
+                }
+            }
+            catch (Exception e)
+            {
+                m_logger.ErrorFormat("Unexpected error: {0}", e);
+                throw;
+            }
+            
             if (entry != null)
             {
                 m_logger.DebugFormat("Retrieved info for user {0} from MySQL.  Password uses {1}.",
@@ -112,102 +135,39 @@ namespace pGina.Plugin.MySQLAuth
             dialog.ShowDialog();
         }
 
-        private UserEntry GetUserEntry(string user)
+        public Shared.Types.BooleanResult AuthenticatedUserGateway(Shared.Types.SessionProperties properties)
         {
-            m_logger.Debug("GetUserEntry");
-
-            MySqlConnectionStringBuilder bldr = new MySqlConnectionStringBuilder();
-            bldr.Server = Settings.Store.Host;
-            int port = Settings.Store.Port;
-            bldr.Port = Convert.ToUInt32(port);
-            bldr.UserID = Settings.Store.User;
-            bldr.Database = Settings.Store.Database;
-            bldr.Password = Settings.Store.GetEncryptedSetting("Password");
-            bool useSsl = Settings.Store.UseSsl;
-            if (useSsl)
-                bldr.SslMode = MySqlSslMode.Required;
-            string tableName = Settings.Store.Table;
-
-            string unameCol = Settings.Store.UsernameColumn;
-            string hashMethodCol = Settings.Store.HashMethodColumn;
-            string passwdCol = Settings.Store.PasswordColumn;
+            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
 
             try
             {
-                using (MySqlConnection conn = new MySqlConnection(bldr.GetConnectionString(true)))
+                using (MySqlUserDataSource dataSource = new MySqlUserDataSource())
                 {
-                    conn.Open();
+                    List<GroupGatewayRule> rules = GroupRuleLoader.GetGatewayRules();
 
-                    string query = string.Format("SELECT {1}, {2}, {3} " +
-                        "FROM {0} WHERE {1}=@user", tableName, unameCol, hashMethodCol, passwdCol);
-                    MySqlCommand cmd = new MySqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@user", user);
-                    MySqlDataReader rdr = cmd.ExecuteReader();
-                    if (rdr.HasRows)
+                    foreach (GroupGatewayRule rule in rules)
                     {
-                        rdr.Read();
-                        PasswordHashAlgorithm hashAlg;
-                        string uname = rdr[0].ToString();
-                        string hash = rdr[2].ToString();
-                        switch (rdr[1].ToString())
+                        m_logger.DebugFormat("Checking rule: {0}", rule.ToString());
+                        if (rule.RuleMatch(dataSource.IsMemberOfGroup(userInfo.Username, rule.Group)))
                         {
-                            case "NONE":
-                                hashAlg = PasswordHashAlgorithm.NONE;
-                                break;
-                            case "MD5":
-                                hashAlg = PasswordHashAlgorithm.MD5;
-                                break;
-                            case "SMD5":
-                                hashAlg = PasswordHashAlgorithm.SMD5;
-                                break;
-                            case "SHA1":
-                                hashAlg = PasswordHashAlgorithm.SHA1;
-                                break;
-                            case "SSHA1":
-                                hashAlg = PasswordHashAlgorithm.SSHA1;
-                                break;
-                            case "SHA256":
-                                hashAlg = PasswordHashAlgorithm.SHA256;
-                                break;
-                            case "SSHA256":
-                                hashAlg = PasswordHashAlgorithm.SSHA256;
-                                break;
-                            case "SHA512":
-                                hashAlg = PasswordHashAlgorithm.SHA512;
-                                break;
-                            case "SSHA512":
-                                hashAlg = PasswordHashAlgorithm.SSHA512;
-                                break;
-                            case "SHA384":
-                                hashAlg = PasswordHashAlgorithm.SHA384;
-                                break;
-                            case "SSHA384":
-                                hashAlg = PasswordHashAlgorithm.SSHA384;
-                                break;
-                            default:
-                                m_logger.ErrorFormat("Unrecognized hash algorithm: {0}", rdr[1].ToString());
-                                return null;
+                            m_logger.DebugFormat("Rule is a match, adding to {0}", rule.LocalGroup);
+                            userInfo.Groups.Add(new GroupInformation { Name = rule.LocalGroup });
                         }
-                        rdr.Close();
-
-                        return new UserEntry(uname, hashAlg, hash);
-                    }
-                    else
-                    {
-                        return null;
+                        else
+                        {
+                            m_logger.DebugFormat("Rule is not a match");
+                        }
                     }
                 }
             }
-            catch (MySqlException ex)
+            catch (Exception e)
             {
-                if (ex.Number == 1042)
-                    m_logger.ErrorFormat("Unable to connect to host: {0}", Settings.Store.Host);
-                else
-                    m_logger.Error(ex.ToString());
-
-                // Return null causes failed auth.
-                return null;
+                m_logger.ErrorFormat("Unexpected error: {0}", e);
+                throw;
             }
+            
+            // Always return success
+            return new Shared.Types.BooleanResult { Success = true };
         }
     }
 }

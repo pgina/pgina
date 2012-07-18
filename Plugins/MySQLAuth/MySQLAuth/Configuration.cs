@@ -409,12 +409,23 @@ namespace pGina.Plugin.MySQLAuth
                     {
                         // Column names
                         string userFK = this.userGroupUserFKColTB.Text.Trim();
+                        string userPK = this.userPrimaryKeyColTB.Text.Trim();
                         string groupFK = this.userGroupGroupFKColTB.Text.Trim();
+                        string groupPK = this.groupTablePrimaryKeyColTB.Text.Trim();
+
+                        string groupNameCol = this.groupNameColTB.Text.Trim();
+                        string unameCol = this.unameColTB.Text.Trim();
+
+                        // Is the primary key the same as the group name?
+                        bool pkIsGroupName =
+                            groupNameCol.Equals(groupPK, StringComparison.CurrentCultureIgnoreCase);
+                        bool pkIsUserName =
+                            unameCol.Equals(userPK, StringComparison.CurrentCultureIgnoreCase);
 
                         StringBuilder sql = new StringBuilder();
                         sql.AppendFormat("CREATE TABLE {0} ( \r\n", tableName);
-                        sql.AppendFormat(" {0} VARCHAR(128), \r\n", groupFK);
-                        sql.AppendFormat(" {0} VARCHAR(128), \r\n", userFK);
+                        sql.AppendFormat(" {0} {1}, \r\n", groupFK, pkIsGroupName ? "VARCHAR(128)" : "BIGINT");
+                        sql.AppendFormat(" {0} {1}, \r\n", userFK, pkIsUserName ? "VARCHAR(128)" : "BIGINT");
                         sql.AppendFormat(" PRIMARY KEY ({0}, {1}) \r\n", userFK, groupFK);
                         sql.Append(")");  // End create table.
 
@@ -504,7 +515,6 @@ namespace pGina.Plugin.MySQLAuth
             GroupRule.Condition c;
             if (idx == 0) c = GroupRule.Condition.MEMBER_OF;
             else if (idx == 1) c = GroupRule.Condition.NOT_MEMBER_OF;
-            else if (idx == 2) c = GroupRule.Condition.ALWAYS;
             else
                 throw new Exception("Unrecognized option in gtwRuleAddBtn_Click");
 
@@ -526,15 +536,6 @@ namespace pGina.Plugin.MySQLAuth
 
         private void gtwRuleConditionCB_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (this.gtwRuleConditionCB.SelectedIndex == 2)
-            {
-                this.gtwRuleMysqlGroupTB.Enabled = false;
-                this.gtwRuleMysqlGroupTB.Text = "";
-            }
-            else
-            {
-                this.gtwRuleMysqlGroupTB.Enabled = true;
-            }
         }
 
         private void gtwRuleDeleteBtn_Click(object sender, EventArgs e)

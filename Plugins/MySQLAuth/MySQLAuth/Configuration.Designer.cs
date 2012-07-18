@@ -80,14 +80,14 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.tabPage5 = new System.Windows.Forms.TabPage();
-            this.gtwRuleConditionCB = new System.Windows.Forms.ComboBox();
-            this.gtwRuleMysqlGroupTB = new System.Windows.Forms.TextBox();
-            this.label17 = new System.Windows.Forms.Label();
-            this.gtwRuleLocalGroupTB = new System.Windows.Forms.TextBox();
-            this.gtwRuleAddBtn = new System.Windows.Forms.Button();
-            this.gtwRulesListBox = new System.Windows.Forms.ListBox();
-            this.label18 = new System.Windows.Forms.Label();
             this.gtwRuleDeleteBtn = new System.Windows.Forms.Button();
+            this.label18 = new System.Windows.Forms.Label();
+            this.gtwRulesListBox = new System.Windows.Forms.ListBox();
+            this.gtwRuleAddBtn = new System.Windows.Forms.Button();
+            this.gtwRuleLocalGroupTB = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.gtwRuleMysqlGroupTB = new System.Windows.Forms.TextBox();
+            this.gtwRuleConditionCB = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.tabControlDBSchema.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -607,42 +607,32 @@
             this.tabPage5.Text = "Gateway";
             this.tabPage5.UseVisualStyleBackColor = true;
             // 
-            // gtwRuleConditionCB
+            // gtwRuleDeleteBtn
             // 
-            this.gtwRuleConditionCB.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.gtwRuleConditionCB.FormattingEnabled = true;
-            this.gtwRuleConditionCB.Items.AddRange(new object[] {
-            "If a member of MySQL group:",
-            "If not a member of MySQL group:",
-            "Always:"});
-            this.gtwRuleConditionCB.Location = new System.Drawing.Point(6, 191);
-            this.gtwRuleConditionCB.Name = "gtwRuleConditionCB";
-            this.gtwRuleConditionCB.Size = new System.Drawing.Size(182, 21);
-            this.gtwRuleConditionCB.TabIndex = 0;
-            this.gtwRuleConditionCB.SelectedIndexChanged += new System.EventHandler(this.gtwRuleConditionCB_SelectedIndexChanged);
+            this.gtwRuleDeleteBtn.Image = global::pGina.Plugin.MySQLAuth.Properties.Resources.delete;
+            this.gtwRuleDeleteBtn.Location = new System.Drawing.Point(411, 90);
+            this.gtwRuleDeleteBtn.Name = "gtwRuleDeleteBtn";
+            this.gtwRuleDeleteBtn.Size = new System.Drawing.Size(31, 33);
+            this.gtwRuleDeleteBtn.TabIndex = 7;
+            this.gtwRuleDeleteBtn.UseVisualStyleBackColor = true;
+            this.gtwRuleDeleteBtn.Click += new System.EventHandler(this.gtwRuleDeleteBtn_Click);
             // 
-            // gtwRuleMysqlGroupTB
+            // label18
             // 
-            this.gtwRuleMysqlGroupTB.Location = new System.Drawing.Point(194, 191);
-            this.gtwRuleMysqlGroupTB.Name = "gtwRuleMysqlGroupTB";
-            this.gtwRuleMysqlGroupTB.Size = new System.Drawing.Size(172, 20);
-            this.gtwRuleMysqlGroupTB.TabIndex = 1;
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(6, 13);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(77, 13);
+            this.label18.TabIndex = 6;
+            this.label18.Text = "Gateway rules:";
             // 
-            // label17
+            // gtwRulesListBox
             // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(93, 221);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(95, 13);
-            this.label17.TabIndex = 2;
-            this.label17.Text = "add to local group:";
-            // 
-            // gtwRuleLocalGroupTB
-            // 
-            this.gtwRuleLocalGroupTB.Location = new System.Drawing.Point(194, 217);
-            this.gtwRuleLocalGroupTB.Name = "gtwRuleLocalGroupTB";
-            this.gtwRuleLocalGroupTB.Size = new System.Drawing.Size(171, 20);
-            this.gtwRuleLocalGroupTB.TabIndex = 3;
+            this.gtwRulesListBox.FormattingEnabled = true;
+            this.gtwRulesListBox.Location = new System.Drawing.Point(9, 29);
+            this.gtwRulesListBox.Name = "gtwRulesListBox";
+            this.gtwRulesListBox.Size = new System.Drawing.Size(396, 147);
+            this.gtwRulesListBox.TabIndex = 5;
             // 
             // gtwRuleAddBtn
             // 
@@ -654,32 +644,41 @@
             this.gtwRuleAddBtn.UseVisualStyleBackColor = true;
             this.gtwRuleAddBtn.Click += new System.EventHandler(this.gtwRuleAddBtn_Click);
             // 
-            // gtwRulesListBox
+            // gtwRuleLocalGroupTB
             // 
-            this.gtwRulesListBox.FormattingEnabled = true;
-            this.gtwRulesListBox.Location = new System.Drawing.Point(9, 29);
-            this.gtwRulesListBox.Name = "gtwRulesListBox";
-            this.gtwRulesListBox.Size = new System.Drawing.Size(396, 147);
-            this.gtwRulesListBox.TabIndex = 5;
+            this.gtwRuleLocalGroupTB.Location = new System.Drawing.Point(194, 217);
+            this.gtwRuleLocalGroupTB.Name = "gtwRuleLocalGroupTB";
+            this.gtwRuleLocalGroupTB.Size = new System.Drawing.Size(171, 20);
+            this.gtwRuleLocalGroupTB.TabIndex = 3;
             // 
-            // label18
+            // label17
             // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(6, 13);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(77, 13);
-            this.label18.TabIndex = 6;
-            this.label18.Text = "Gateway rules:";
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(93, 221);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(95, 13);
+            this.label17.TabIndex = 2;
+            this.label17.Text = "add to local group:";
             // 
-            // gtwRuleDeleteBtn
+            // gtwRuleMysqlGroupTB
             // 
-            this.gtwRuleDeleteBtn.Image = global::pGina.Plugin.MySQLAuth.Properties.Resources.delete;
-            this.gtwRuleDeleteBtn.Location = new System.Drawing.Point(411, 90);
-            this.gtwRuleDeleteBtn.Name = "gtwRuleDeleteBtn";
-            this.gtwRuleDeleteBtn.Size = new System.Drawing.Size(31, 33);
-            this.gtwRuleDeleteBtn.TabIndex = 7;
-            this.gtwRuleDeleteBtn.UseVisualStyleBackColor = true;
-            this.gtwRuleDeleteBtn.Click += new System.EventHandler(this.gtwRuleDeleteBtn_Click);
+            this.gtwRuleMysqlGroupTB.Location = new System.Drawing.Point(194, 191);
+            this.gtwRuleMysqlGroupTB.Name = "gtwRuleMysqlGroupTB";
+            this.gtwRuleMysqlGroupTB.Size = new System.Drawing.Size(172, 20);
+            this.gtwRuleMysqlGroupTB.TabIndex = 1;
+            // 
+            // gtwRuleConditionCB
+            // 
+            this.gtwRuleConditionCB.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.gtwRuleConditionCB.FormattingEnabled = true;
+            this.gtwRuleConditionCB.Items.AddRange(new object[] {
+            "If a member of MySQL group:",
+            "If not a member of MySQL group:"});
+            this.gtwRuleConditionCB.Location = new System.Drawing.Point(6, 191);
+            this.gtwRuleConditionCB.Name = "gtwRuleConditionCB";
+            this.gtwRuleConditionCB.Size = new System.Drawing.Size(182, 21);
+            this.gtwRuleConditionCB.TabIndex = 0;
+            this.gtwRuleConditionCB.SelectedIndexChanged += new System.EventHandler(this.gtwRuleConditionCB_SelectedIndexChanged);
             // 
             // Configuration
             // 
