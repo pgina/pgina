@@ -87,20 +87,27 @@ namespace pGina.Core
         {
             // Get the file name
             string fileName = args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll";
+            m_logger.DebugFormat("Resolving dependency {0}", fileName);
 
-            m_logger.DebugFormat("Resolving dependency {0} for {1}.", fileName, 
-                args.RequestingAssembly.FullName);
-
-            // Check sanity of the location
-            string requestorPath = args.RequestingAssembly.Location;
-            if (string.IsNullOrEmpty(requestorPath))
+            string requestorPath = null;
+            if (args.RequestingAssembly == null)
             {
-                requestorPath = args.RequestingAssembly.CodeBase;
+                requestorPath = Assembly.GetExecutingAssembly().Location;
+            }
+            else
+            {
+                requestorPath = args.RequestingAssembly.Location;
                 if (string.IsNullOrEmpty(requestorPath))
                 {
-                    m_logger.ErrorFormat("Unable to resolve dependency for {0}", args.Name);
-                    return null;
+                    requestorPath = args.RequestingAssembly.CodeBase;
                 }
+            }
+
+            // If unable to find a good path to search
+            if (string.IsNullOrEmpty(requestorPath))
+            {
+                m_logger.ErrorFormat("Unable to find a reasonable search path for {0}, giving up.", fileName);
+                return null;
             }
 
             // Look for the assembly in the same directory as the plugin that is loading the assembly
@@ -118,7 +125,7 @@ namespace pGina.Core
             }
 
             if( a == null )
-                m_logger.ErrorFormat("Unable to resolve dependency for {0}", args.Name);
+                m_logger.ErrorFormat("Unable to resolve dependency: {0}", args.Name);
             else
                 m_logger.InfoFormat("Successfully loaded assembly: {0}", a.FullName);
 
