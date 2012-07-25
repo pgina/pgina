@@ -100,6 +100,16 @@ namespace pGina.Core
                 if (string.IsNullOrEmpty(requestorPath))
                 {
                     requestorPath = args.RequestingAssembly.CodeBase;
+
+                    // In certain cases (using SOAP references) this may be a URI
+                    if (Uri.IsWellFormedUriString(requestorPath, UriKind.Absolute))
+                    {
+                        Uri requestorUri = new Uri(requestorPath);
+                        if (requestorUri.IsFile)
+                        {
+                            requestorPath = requestorUri.LocalPath;
+                        }
+                    }
                 }
             }
 
