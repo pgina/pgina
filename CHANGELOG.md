@@ -1,3 +1,10 @@
+3.1.4.0 BETA (2012/07/26)
+---------------------------
+ - MySQL Auth Plugin: support for groups in Gateway (#114)
+ - Show group list in simulator.
+ - Support AutoAdminLogon in GINA (#99)
+ - Fixes for dependency loading (#142,#143)
+
 3.1.3.0 BETA (2012/07/12)
 ---------------------------
  - RADIUS plugin: Improved logging and thread safety (Oooska)
