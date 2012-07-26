@@ -120,26 +120,34 @@ namespace pGina.Core
                 return null;
             }
 
-            // Look for the assembly in the same directory as the plugin that is loading the assembly
-            DirectoryInfo dir = Directory.GetParent(requestorPath);
-            string path = Path.Combine(dir.FullName, fileName);
-
-            m_logger.DebugFormat("Looking for: {0}", path);
-            Assembly a = null;
-            if( dir.Exists )
+            try
             {
-                if( File.Exists(path) )
-                    a = Assembly.LoadFile(path);
+                // Look for the assembly in the same directory as the plugin that is loading the assembly
+                DirectoryInfo dir = Directory.GetParent(requestorPath);
+                string path = Path.Combine(dir.FullName, fileName);
+
+                m_logger.DebugFormat("Looking for: {0}", path);
+                Assembly a = null;
+                if (dir.Exists)
+                {
+                    if (File.Exists(path))
+                        a = Assembly.LoadFile(path);
+                    else
+                        m_logger.DebugFormat("{0} not found", path);
+                }
+
+                if (a == null)
+                    m_logger.ErrorFormat("Unable to resolve dependency: {0}", args.Name);
                 else
-                    m_logger.DebugFormat("{0} not found", path);
+                    m_logger.InfoFormat("Successfully loaded assembly: {0}", a.FullName);
+
+                return a;
             }
-
-            if( a == null )
-                m_logger.ErrorFormat("Unable to resolve dependency: {0}", args.Name);
-            else
-                m_logger.InfoFormat("Successfully loaded assembly: {0}", a.FullName);
-
-            return a;
+            catch (Exception e)
+            {
+                m_logger.ErrorFormat("Error when loading dependency: {0}", e);
+                return null;
+            }
         }
         
         public static void LoadPlugins()
