@@ -86,6 +86,8 @@
             this.m_simTab = new System.Windows.Forms.TabPage();
             this.viewLogBtn = new System.Windows.Forms.Button();
             this.groupBox13 = new System.Windows.Forms.GroupBox();
+            this.simResultLocalGroupsTB = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
             this.simFinalResultPB = new System.Windows.Forms.PictureBox();
             this.label15 = new System.Windows.Forms.Label();
             this.simFinalResultMessageTB = new System.Windows.Forms.TextBox();
@@ -131,14 +133,15 @@
             this.chkSpecialButton = new System.Windows.Forms.CheckBox();
             this.cpOptions = new System.Windows.Forms.TabPage();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.chkDisableMSProviderChangePassword = new System.Windows.Forms.CheckBox();
+            this.chkDisableMSProviderUnlock = new System.Windows.Forms.CheckBox();
+            this.label17 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.chkMSProvider = new System.Windows.Forms.CheckBox();
+            this.chkDisableMSProviderLogon = new System.Windows.Forms.CheckBox();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnOkay = new System.Windows.Forms.Button();
             this.m_pginaVersionLbl = new System.Windows.Forms.Label();
             this.btnSaveAndClose = new System.Windows.Forms.Button();
-            this.label16 = new System.Windows.Forms.Label();
-            this.simResultLocalGroupsTB = new System.Windows.Forms.TextBox();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
             this.groupBox14.SuspendLayout();
@@ -802,6 +805,23 @@
             this.groupBox13.TabStop = false;
             this.groupBox13.Text = "Results";
             // 
+            // simResultLocalGroupsTB
+            // 
+            this.simResultLocalGroupsTB.Location = new System.Drawing.Point(142, 242);
+            this.simResultLocalGroupsTB.Name = "simResultLocalGroupsTB";
+            this.simResultLocalGroupsTB.ReadOnly = true;
+            this.simResultLocalGroupsTB.Size = new System.Drawing.Size(613, 20);
+            this.simResultLocalGroupsTB.TabIndex = 10;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(63, 246);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(73, 13);
+            this.label16.TabIndex = 9;
+            this.label16.Text = "Local Groups:";
+            // 
             // simFinalResultPB
             // 
             this.simFinalResultPB.Location = new System.Drawing.Point(57, 211);
@@ -1252,38 +1272,69 @@
             // 
             // groupBox9
             // 
+            this.groupBox9.Controls.Add(this.chkDisableMSProviderChangePassword);
+            this.groupBox9.Controls.Add(this.chkDisableMSProviderUnlock);
+            this.groupBox9.Controls.Add(this.label17);
             this.groupBox9.Controls.Add(this.textBox1);
-            this.groupBox9.Controls.Add(this.chkMSProvider);
+            this.groupBox9.Controls.Add(this.chkDisableMSProviderLogon);
             this.groupBox9.Location = new System.Drawing.Point(17, 15);
             this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(752, 108);
+            this.groupBox9.Size = new System.Drawing.Size(752, 185);
             this.groupBox9.TabIndex = 0;
             this.groupBox9.TabStop = false;
             this.groupBox9.Text = "System Provider Interaction";
             // 
+            // chkDisableMSProviderChangePassword
+            // 
+            this.chkDisableMSProviderChangePassword.AutoSize = true;
+            this.chkDisableMSProviderChangePassword.Location = new System.Drawing.Point(39, 91);
+            this.chkDisableMSProviderChangePassword.Name = "chkDisableMSProviderChangePassword";
+            this.chkDisableMSProviderChangePassword.Size = new System.Drawing.Size(146, 17);
+            this.chkDisableMSProviderChangePassword.TabIndex = 4;
+            this.chkDisableMSProviderChangePassword.Text = "Change password screen";
+            this.chkDisableMSProviderChangePassword.UseVisualStyleBackColor = true;
+            // 
+            // chkDisableMSProviderUnlock
+            // 
+            this.chkDisableMSProviderUnlock.AutoSize = true;
+            this.chkDisableMSProviderUnlock.Location = new System.Drawing.Point(38, 68);
+            this.chkDisableMSProviderUnlock.Name = "chkDisableMSProviderUnlock";
+            this.chkDisableMSProviderUnlock.Size = new System.Drawing.Size(95, 17);
+            this.chkDisableMSProviderUnlock.TabIndex = 3;
+            this.chkDisableMSProviderUnlock.Text = "Unlock screen";
+            this.chkDisableMSProviderUnlock.UseVisualStyleBackColor = true;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(10, 22);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(249, 13);
+            this.label17.TabIndex = 2;
+            this.label17.Text = "Disable the Microsoft Built-in Password Provider for:";
+            // 
             // textBox1
             // 
+            this.textBox1.BackColor = System.Drawing.Color.Yellow;
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(43, 53);
+            this.textBox1.Location = new System.Drawing.Point(13, 128);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(672, 45);
+            this.textBox1.Size = new System.Drawing.Size(703, 45);
             this.textBox1.TabIndex = 1;
-            this.textBox1.Text = "WARNING: Disabling the default password provider is not recommended.  If pGina ma" +
-    "lfunctions or otherwise prevents access to the machine, even safe mode may not s" +
-    "ave you.  You have been warned.";
+            this.textBox1.Text = resources.GetString("textBox1.Text");
             // 
-            // chkMSProvider
+            // chkDisableMSProviderLogon
             // 
-            this.chkMSProvider.AutoSize = true;
-            this.chkMSProvider.Location = new System.Drawing.Point(24, 29);
-            this.chkMSProvider.Name = "chkMSProvider";
-            this.chkMSProvider.Size = new System.Drawing.Size(236, 17);
-            this.chkMSProvider.TabIndex = 0;
-            this.chkMSProvider.Text = "Microsoft Built-in Password Provider Enabled";
-            this.chkMSProvider.UseVisualStyleBackColor = true;
+            this.chkDisableMSProviderLogon.AutoSize = true;
+            this.chkDisableMSProviderLogon.Location = new System.Drawing.Point(38, 45);
+            this.chkDisableMSProviderLogon.Name = "chkDisableMSProviderLogon";
+            this.chkDisableMSProviderLogon.Size = new System.Drawing.Size(91, 17);
+            this.chkDisableMSProviderLogon.TabIndex = 0;
+            this.chkDisableMSProviderLogon.Text = "Logon screen";
+            this.chkDisableMSProviderLogon.UseVisualStyleBackColor = true;
             // 
             // btnApply
             // 
@@ -1326,23 +1377,6 @@
             this.btnSaveAndClose.UseMnemonic = false;
             this.btnSaveAndClose.UseVisualStyleBackColor = true;
             this.btnSaveAndClose.Click += new System.EventHandler(this.btnSaveAndClose_Click);
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(63, 246);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(73, 13);
-            this.label16.TabIndex = 9;
-            this.label16.Text = "Local Groups:";
-            // 
-            // simResultLocalGroupsTB
-            // 
-            this.simResultLocalGroupsTB.Location = new System.Drawing.Point(142, 242);
-            this.simResultLocalGroupsTB.Name = "simResultLocalGroupsTB";
-            this.simResultLocalGroupsTB.ReadOnly = true;
-            this.simResultLocalGroupsTB.Size = new System.Drawing.Size(613, 20);
-            this.simResultLocalGroupsTB.TabIndex = 10;
             // 
             // ConfigurationUI
             // 
@@ -1500,7 +1534,7 @@
         private System.Windows.Forms.TextBox m_txtGinaChain;
         private System.Windows.Forms.Button btnGinaBrowse;
         private System.Windows.Forms.GroupBox groupBox9;
-        private System.Windows.Forms.CheckBox chkMSProvider;
+        private System.Windows.Forms.CheckBox chkDisableMSProviderLogon;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.CheckBox showTextResultPasswordCB;
         private System.Windows.Forms.Label m_pginaVersionLbl;
@@ -1519,5 +1553,8 @@
         private System.Windows.Forms.Button btnSaveAndClose;
         private System.Windows.Forms.TextBox simResultLocalGroupsTB;
         private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.CheckBox chkDisableMSProviderUnlock;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.CheckBox chkDisableMSProviderChangePassword;
     }
 }

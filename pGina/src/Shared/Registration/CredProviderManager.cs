@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -196,13 +196,13 @@ namespace pGina.CredentialProvider.Registration
     public class DefaultCredProviderManager : CredProviderManager
     {
         /*
-         [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers\{781A7B48-79A7-4fcf-92CC-A6977171F1A8}]
+         [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers\{**GUID**}]
          @="pGinaCredentialProvider"
 
-         [HKEY_CLASSES_ROOT\CLSID\{781A7B48-79A7-4fcf-92CC-A6977171F1A8}]
+         [HKEY_CLASSES_ROOT\CLSID\{**GUID**}]
          @="pGinaCredentialProvider"
 
-         [HKEY_CLASSES_ROOT\CLSID\{781A7B48-79A7-4fcf-92CC-A6977171F1A8}\InprocServer32]
+         [HKEY_CLASSES_ROOT\CLSID\{**GUID**}\InprocServer32]
          @="SampleCredUICredentialProvider.dll"
          "ThreadingModel"="Apartment"
         */
@@ -210,14 +210,20 @@ namespace pGina.CredentialProvider.Registration
         private ILog m_logger = LogManager.GetLogger("DefaultCredProviderManager");
 
         static readonly string PROVIDER_KEY_BASE = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers";
+        static readonly string CP_FILTER_KEY_BASE = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Provider Filters";
         static readonly string CLSID_BASE = @"CLSID";
         static readonly string PROVIDER_KEY_BASE_6432 = @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers";
+        static readonly string CP_FILTER_KEY_BASE_6432 = @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Authentication\Credential Provider Filters";
         static readonly string WINDIR = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
 
         // The registry keys
         string ProviderKey 
         { 
             get { return string.Format(@"{0}\{{{1}}}", PROVIDER_KEY_BASE, CpInfo.ProviderGuid.ToString()); }
+        }
+        string CredentialProviderFilterKey
+        {
+            get { return string.Format(@"{0}\{{{1}}}", CP_FILTER_KEY_BASE, CpInfo.ProviderGuid.ToString()); }
         }
         string ClsidRoot
         {
@@ -230,6 +236,10 @@ namespace pGina.CredentialProvider.Registration
         string ProviderKey6432
         {
             get { return string.Format(@"{0}\{{{1}}}", PROVIDER_KEY_BASE_6432, CpInfo.ProviderGuid.ToString()); }
+        }
+        string CredentialProviderFilterKey6432
+        {
+            get { return string.Format(@"{0}\{{{1}}}", CP_FILTER_KEY_BASE_6432, CpInfo.ProviderGuid.ToString()); }
         }
 
         public DefaultCredProviderManager()
@@ -286,8 +296,14 @@ namespace pGina.CredentialProvider.Registration
 
                     File.Copy(x32Dll.FullName, destination32, true);
 
-                    // Write registry key for 32 bit DLL
+                    // Write registry keys for 32 bit DLL
+                    // The provider
                     using (RegistryKey key = Registry.LocalMachine.CreateSubKey(this.ProviderKey6432))
+                    {
+                        key.SetValue("", CpInfo.ShortName);
+                    }
+                    // The provider filter
+                    using (RegistryKey key = Registry.LocalMachine.CreateSubKey(this.CredentialProviderFilterKey6432))
                     {
                         key.SetValue("", CpInfo.ShortName);
                     }
@@ -319,6 +335,11 @@ namespace pGina.CredentialProvider.Registration
 
             // Write registry values
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(this.ProviderKey))
+            {
+                m_logger.DebugFormat("{0} @=> {1}", key.ToString(), CpInfo.ShortName);
+                key.SetValue("", CpInfo.ShortName);
+            }
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(this.CredentialProviderFilterKey))
             {
                 m_logger.DebugFormat("{0} @=> {1}", key.ToString(), CpInfo.ShortName);
                 key.SetValue("", CpInfo.ShortName);
@@ -358,39 +379,22 @@ namespace pGina.CredentialProvider.Registration
             }
 
             string guid = "{" + CpInfo.ProviderGuid.ToString() + "}";
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(PROVIDER_KEY_BASE, true))
-            {
-                if (key != null)
-                {
-                    m_logger.DebugFormat("Deleting {0}\\{1}", key.ToString(), guid);
-                    key.DeleteSubKey(guid, false);
-                }
-            }
+            DeleteRegistryKey(Registry.LocalMachine, PROVIDER_KEY_BASE, guid);
+            DeleteRegistryKey(Registry.LocalMachine, CP_FILTER_KEY_BASE, guid);
+            DeleteRegistryKey(Registry.LocalMachine, PROVIDER_KEY_BASE_6432, guid);
+            DeleteRegistryKey(Registry.LocalMachine, CP_FILTER_KEY_BASE_6432, guid);
+            DeleteRegistryKey(Registry.ClassesRoot, CLSID_BASE, string.Format("{0}\\{1}", guid, "InprocServer32"));
+            DeleteRegistryKey(Registry.ClassesRoot, CLSID_BASE, guid);
+        }
 
-            using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(CLSID_BASE, true))
+        private void DeleteRegistryKey(RegistryKey baseKey, string parentSubKey, string childSubKey)
+        {
+            using (RegistryKey key = baseKey.OpenSubKey(parentSubKey, true))
             {
                 if (key != null)
                 {
-                    m_logger.DebugFormat("Deleting {0}\\{1}\\InprocServer32", key.ToString(), guid);
-                    key.DeleteSubKey(guid + "\\InprocServer32", false);
-                }
-            }
-
-            using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(CLSID_BASE, true))
-            {
-                if (key != null)
-                {
-                    m_logger.DebugFormat("Deleting {0}\\{1}", key.ToString(), guid);
-                    key.DeleteSubKey(guid, false);
-                }
-            }
-
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(PROVIDER_KEY_BASE_6432, true))
-            {
-                if (key != null)
-                {
-                    m_logger.DebugFormat("Deleting {0}\\{1}", key.ToString(), guid);
-                    key.DeleteSubKey(guid, false);
+                    m_logger.DebugFormat("Deleting {0}\\{1}", key.ToString(), childSubKey);
+                    key.DeleteSubKey(childSubKey);
                 }
             }
         }
