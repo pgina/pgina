@@ -24,6 +24,7 @@
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <initguid.h>
-#include "ProviderGuid.h"
-#include "CredentialProviderFilterGuid.h"
+
+// {90269638-B4E4-479C-B644-41F078FC0C82}
+DEFINE_GUID(CLSID_CpGinaCredentialProviderFilter, 
+0x90269638, 0xb4e4, 0x479c, 0xb6, 0x44, 0x41, 0xf0, 0x78, 0xfc, 0xc, 0x82);

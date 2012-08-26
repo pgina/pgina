@@ -28,6 +28,7 @@
 #include "Dll.h"
 
 #include "Provider.h"
+#include "CredentialProviderFilter.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -75,17 +76,35 @@ namespace pGina
 
 			if (!pUnkOuter)
 			{				
-				pGina::CredProv::Provider* pProvider = new pGina::CredProv::Provider();
+				if( IID_ICredentialProvider == riid )
+				{
+					pGina::CredProv::Provider* pProvider = new pGina::CredProv::Provider();
 
-				if (pProvider)
-				{
-					hr = pProvider->QueryInterface(riid, ppv);
-					pProvider->Release();
+					if (pProvider)
+					{
+						hr = pProvider->QueryInterface(riid, ppv);
+						pProvider->Release();
+					}
+					else
+					{
+						hr = E_OUTOFMEMORY;
+					}
 				}
-				else
+				else if( IID_ICredentialProviderFilter == riid )
 				{
-					hr = E_OUTOFMEMORY;
-				}				
+					pGina::CredProv::CredentialProviderFilter* pFilter = 
+						new pGina::CredProv::CredentialProviderFilter();
+
+					if (pFilter)
+					{
+						hr = pFilter->QueryInterface(riid, ppv);
+						pFilter->Release();
+					}
+					else
+					{
+						hr = E_OUTOFMEMORY;
+					}
+				}
 			}
 			
 			return hr;

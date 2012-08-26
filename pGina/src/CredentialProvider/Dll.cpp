@@ -28,6 +28,7 @@
 #include <Unknwn.h>
 
 #include "ProviderGuid.h"
+#include "CredentialProviderFilterGuid.h"
 #include "ClassFactory.h"
 
 // Handle to dll hinstance available for everyone globally via GetMy*()
@@ -88,8 +89,8 @@ HRESULT WINAPI DllGetClassObject(__in REFCLSID rclsid, __in REFIID riid, __deref
     HRESULT hr = CLASS_E_CLASSNOTAVAILABLE;
 	*ppv = NULL;
 
-	// We provide class factory support for our provider only
-    if (rclsid == CLSID_CpGinaProvider)
+	// We provide class factory support for our provider and filter only
+	if (rclsid == CLSID_CpGinaProvider || rclsid == CLSID_CpGinaCredentialProviderFilter)
     {
 		pGina::COM::CClassFactory * factory = new pGina::COM::CClassFactory();        
         if (factory)
