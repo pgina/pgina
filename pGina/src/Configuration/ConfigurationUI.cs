@@ -62,11 +62,6 @@ namespace pGina.Configuration
             }
         }
 
-        private class MissingBuiltInCredProvException : System.Exception 
-        {
-            public MissingBuiltInCredProvException(string message) : base(message) { }
-        }
-
         private static readonly string PGINA_SERVICE_NAME = "pGina";
 
         // Plugin information keyed by Guid
@@ -1364,9 +1359,9 @@ namespace pGina.Configuration
             bool currentStateUnlock = Settings.Get.DisableMSProviderUnlock;
             bool currentStateChangePassword = Settings.Get.DisableMSProviderChangePassword;
 
-            if ((chkDisableMSProviderLogon.Checked && chkDisableMSProviderLogon.Checked != currentStateLogon) ||
-                (chkDisableMSProviderUnlock.Checked && chkDisableMSProviderUnlock.Checked != currentStateUnlock) ||
-                (chkDisableMSProviderChangePassword.Checked && chkDisableMSProviderChangePassword.Checked != currentStateChangePassword))
+            if ((chkDisableMSProviderLogon.Checked && !currentStateLogon) ||
+                (chkDisableMSProviderUnlock.Checked && !currentStateUnlock) ||
+                (chkDisableMSProviderChangePassword.Checked && !currentStateChangePassword))
             {
                 if (MessageBox.Show(
                     "You have chosen to disable the built-in password provider for one or more interfaces, are you sure?", 
@@ -1375,6 +1370,8 @@ namespace pGina.Configuration
                     MessageBoxIcon.Warning, 
                     MessageBoxDefaultButton.Button2) != System.Windows.Forms.DialogResult.Yes)
                 {
+                    // Reset the checkboxes and return
+                    InitCpOptions();
                     return;
                 }
             }
