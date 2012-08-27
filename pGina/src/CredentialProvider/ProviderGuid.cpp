@@ -26,4 +26,3 @@
 */
 #include <initguid.h>
 #include "ProviderGuid.h"
-#include "CredentialProviderFilterGuid.h"

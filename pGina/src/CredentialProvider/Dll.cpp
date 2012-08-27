@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,6 @@
 #include <Unknwn.h>
 
 #include "ProviderGuid.h"
-#include "CredentialProviderFilterGuid.h"
 #include "ClassFactory.h"
 
 // Handle to dll hinstance available for everyone globally via GetMy*()
