@@ -109,5 +109,41 @@ namespace pGina
 
 			return result;
 		}
+
+		std::vector<std::wstring> GetStringArray( HKEY base, const wchar_t *subKeyName, const wchar_t *valueName )
+		{
+			std::vector<std::wstring> result;
+			HKEY hKey = NULL;
+
+			if( RegOpenKeyEx(base, subKeyName, 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+			{
+				DWORD dataLength = 0;				
+				if(RegQueryValueEx(hKey, valueName, 0, NULL, NULL, &dataLength) == ERROR_SUCCESS)
+				{
+					int bufferSize = dataLength + 2*sizeof(wchar_t);
+					int buffLength = bufferSize / sizeof(wchar_t);
+					wchar_t * buffer = (wchar_t *) malloc(bufferSize);
+					ZeroMemory(buffer, bufferSize);
+				
+					if(RegQueryValueEx(hKey, valueName, 0, NULL, (LPBYTE) buffer, &dataLength) == ERROR_SUCCESS)
+					{
+						std::wstring str;
+						size_t index = 0;
+						size_t len = wcsnlen(&buffer[index], buffLength);
+				
+						while(len > 0 && len < buffLength - index)
+						{
+							str = &buffer[index];
+							result.push_back(str);
+							index += len + 1;
+							len = wcsnlen(&buffer[index], buffLength - index);
+						}
+					}
+					free(buffer);
+				}
+				RegCloseKey(hKey);
+			}
+			return result;
+		}
 	}
 }

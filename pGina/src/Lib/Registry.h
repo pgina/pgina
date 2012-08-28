@@ -28,6 +28,7 @@
 
 #include <Windows.h>
 #include <string>
+#include <vector>
 
 namespace pGina
 {
@@ -40,5 +41,6 @@ namespace pGina
 
 		bool StringValueExistsAndIsNonZero( HKEY base, const wchar_t *subKeyName, const wchar_t *valueName );
 		std::wstring GetString( HKEY base, const wchar_t *subKeyName, const wchar_t *valueName );
+		std::vector<std::wstring> GetStringArray( HKEY base, const wchar_t *subKeyName, const wchar_t *valueName );
 	}
 }
