@@ -394,7 +394,7 @@ namespace pGina.CredentialProvider.Registration
                 if (key != null)
                 {
                     m_logger.DebugFormat("Deleting {0}\\{1}", key.ToString(), childSubKey);
-                    key.DeleteSubKey(childSubKey);
+                    key.DeleteSubKey(childSubKey,false);
                 }
             }
         }
