@@ -38,13 +38,13 @@
             this.m_chkAuthzLocalAdmin = new System.Windows.Forms.CheckBox();
             this.m_chkAuthzAll = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.m_chkRemoveProfile = new System.Windows.Forms.CheckBox();
+            this.m_chkScramble = new System.Windows.Forms.CheckBox();
             this.m_chkGroupFailIsFAIL = new System.Windows.Forms.CheckBox();
             this.m_groupsDgv = new System.Windows.Forms.DataGridView();
             this.Group = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_btnSave = new System.Windows.Forms.Button();
             this.m_btnClose = new System.Windows.Forms.Button();
-            this.m_chkScramble = new System.Windows.Forms.CheckBox();
-            this.m_chkRemoveProfile = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_localGroupDgv)).BeginInit();
@@ -156,6 +156,29 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Gateway";
             // 
+            // m_chkRemoveProfile
+            // 
+            this.m_chkRemoveProfile.AutoSize = true;
+            this.m_chkRemoveProfile.Location = new System.Drawing.Point(15, 77);
+            this.m_chkRemoveProfile.Name = "m_chkRemoveProfile";
+            this.m_chkRemoveProfile.Size = new System.Drawing.Size(316, 30);
+            this.m_chkRemoveProfile.TabIndex = 8;
+            this.m_chkRemoveProfile.Text = "Remove account and profile after logout when account does \r\nnot exist prior to lo" +
+    "gon.";
+            this.m_chkRemoveProfile.UseVisualStyleBackColor = true;
+            this.m_chkRemoveProfile.CheckedChanged += new System.EventHandler(this.m_chkRemoveProfile_CheckedChanged);
+            // 
+            // m_chkScramble
+            // 
+            this.m_chkScramble.AutoSize = true;
+            this.m_chkScramble.Location = new System.Drawing.Point(15, 42);
+            this.m_chkScramble.Name = "m_chkScramble";
+            this.m_chkScramble.Size = new System.Drawing.Size(292, 30);
+            this.m_chkScramble.TabIndex = 7;
+            this.m_chkScramble.Text = "Scramble password after logout when account does not \r\nexist prior to logon.";
+            this.m_chkScramble.UseVisualStyleBackColor = true;
+            this.m_chkScramble.CheckedChanged += new System.EventHandler(this.m_chkScramble_CheckedChanged);
+            // 
             // m_chkGroupFailIsFAIL
             // 
             this.m_chkGroupFailIsFAIL.AutoSize = true;
@@ -201,28 +224,6 @@
             this.m_btnClose.Text = "Close";
             this.m_btnClose.UseVisualStyleBackColor = true;
             this.m_btnClose.Click += new System.EventHandler(this.m_btnClose_Click);
-            // 
-            // m_chkScramble
-            // 
-            this.m_chkScramble.AutoSize = true;
-            this.m_chkScramble.Location = new System.Drawing.Point(15, 42);
-            this.m_chkScramble.Name = "m_chkScramble";
-            this.m_chkScramble.Size = new System.Drawing.Size(174, 17);
-            this.m_chkScramble.TabIndex = 7;
-            this.m_chkScramble.Text = "Scramble password after logout";
-            this.m_chkScramble.UseVisualStyleBackColor = true;
-            this.m_chkScramble.CheckedChanged += new System.EventHandler(this.m_chkScramble_CheckedChanged);
-            // 
-            // m_chkRemoveProfile
-            // 
-            this.m_chkRemoveProfile.AutoSize = true;
-            this.m_chkRemoveProfile.Location = new System.Drawing.Point(15, 65);
-            this.m_chkRemoveProfile.Name = "m_chkRemoveProfile";
-            this.m_chkRemoveProfile.Size = new System.Drawing.Size(216, 17);
-            this.m_chkRemoveProfile.TabIndex = 8;
-            this.m_chkRemoveProfile.Text = "Remove account and profile after logout";
-            this.m_chkRemoveProfile.UseVisualStyleBackColor = true;
-            this.m_chkRemoveProfile.CheckedChanged += new System.EventHandler(this.m_chkRemoveProfile_CheckedChanged);
             // 
             // Configuration
             // 
