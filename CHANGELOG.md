@@ -1,6 +1,6 @@
 3.0.13.0 (2012/09/01)
 ---------------------------
- - MySQLAuth: fix for hash algorithm NONE (#147)
+ - MySQLAuth: fix for hash algorithm NONE (#145)
  - LocalMachine: add more descriptive text in gateway UI.
 
 3.0.12.1 (2012/06/05)
