@@ -57,7 +57,10 @@ namespace pGina.Plugin.MySQLAuth
             m_name = uname;
             m_hashAlg = alg;
             m_hashedPass = hashedPass;
-            m_passBytes = this.Decode(m_hashedPass);
+            if (m_hashAlg != PasswordHashAlgorithm.NONE)
+                m_passBytes = this.Decode(m_hashedPass);
+            else
+                m_passBytes = null;
         }
 
         private byte[] Decode( string hash )
