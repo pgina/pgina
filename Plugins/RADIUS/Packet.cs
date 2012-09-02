@@ -24,7 +24,8 @@ namespace pGina.Plugin.RADIUS
         public byte[] authenticator { get; private set; }
 
 
-        private Dictionary<AttributeType, byte[]> avp = new Dictionary<AttributeType, byte[]>();
+        //private Dictionary<AttributeType, byte[]> avp = new Dictionary<AttributeType, byte[]>();
+        private List<KeyValuePair<AttributeType, byte[]>> avp = new List<KeyValuePair<AttributeType, byte[]>>();
         private byte[] _avpBytes = null; //Byte representation of dictionary; required to calculate length
         private byte[] avpBytes //Returns a current byte[] representation of AVP dictionary
         {
@@ -37,7 +38,7 @@ namespace pGina.Plugin.RADIUS
         }
 
         private static Random r = new Random();
-
+        private static KeyValuePair<AttributeType, byte[]> getKVP(AttributeType aType, byte[] val) { return new KeyValuePair<AttributeType, byte[]>(aType, val); }
 
         public Packet(Code code, string sharedKey) : this(code, (byte)r.Next((int)Byte.MaxValue + 1), sharedKey) { }
 
@@ -81,7 +82,7 @@ namespace pGina.Plugin.RADIUS
                 byte length = data[index++]; //length includes the type and length byte
                 byte[] value = new byte[length - 2];
                 System.Buffer.BlockCopy(data, index, value, 0, value.Length);
-                avp.Add(atype, value);
+                avp.Add(getKVP(atype, value));
                 index += value.Length;
             }
 
@@ -106,28 +107,35 @@ namespace pGina.Plugin.RADIUS
         {
             //If it's a User_Password, we need to encrypt it
             if (type == AttributeType.User_Password)
-                avp.Add(type, PAPPassword(value));
+                avp.Add(getKVP(type, PAPPassword(value)));
             else
-                avp.Add(type, value);
+                avp.Add(getKVP(type, value));
             _avpBytes = null; //avp has been modified
         }
 
         //Returns a list of Attribute Types this packet contains
-        public AttributeType[] getAttributeTypes()
-        {
-            return avp.Keys.ToArray();
-        }
+        //public AttributeType[] getAttributeTypes()
+        //{
+        //    return avp.Keys.ToArray();
+        //}
 
         //Returns the string value of the specified AttributeType
         public string getAttribute(AttributeType type)
         {
-            return Encoding.UTF8.GetString(avp[type]);
+            foreach (KeyValuePair<AttributeType, byte[]> kvp in avp)
+                if (kvp.Key == type)
+                    return Encoding.UTF8.GetString(kvp.Value);
+            throw new KeyNotFoundException("The specified attribute type does not exist.");
         }
 
         //Returns the byte[] value of the specified AttributeType
         public byte[] getRawAttribute(AttributeType type)
         {
-            return avp[type];
+
+            foreach (KeyValuePair<AttributeType, byte[]> kvp in avp)
+                if (kvp.Key == type)
+                    return kvp.Value;
+            throw new KeyNotFoundException("The specified attribute type does not exist.");
         }
 
         //Verifies the response authenticator comes from a legitimate source
@@ -202,9 +210,10 @@ namespace pGina.Plugin.RADIUS
         {
             //Figure out total length of data
             int avpLength = 0;
-            foreach (byte[] data in avp.Values)
+            //foreach (byte[] data in avp.Values)
+            foreach(KeyValuePair<AttributeType, byte[]> kvp in avp)
             {
-                avpLength += data.Length;
+                avpLength += kvp.Value.Length;
             }
 
             //Total size is 2 bytes per entry + the length of all the data
