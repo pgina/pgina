@@ -59,6 +59,8 @@ namespace pGina.Core
             s_settings.SetDefault("SpecialAction", "Shutdown");
             s_settings.SetDefault("ShowServiceStatusInLogonUi", true);
 
+            s_settings.SetDefault("CredentialProviderFilters", new string[] { });
+
             // Default setup is local machine plugin as enabled for auth and gateway
             s_settings.SetDefault("IPluginAuthentication_Order", new string[] { "12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D" });
             s_settings.SetDefault("IPluginAuthenticationGateway_Order", new string[] { "12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D" });

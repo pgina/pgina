@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,22 +26,40 @@
 */
 #pragma once
 
-#include <Windows.h>
-#include <string>
-#include <vector>
+#include "credentialprovider.h"
 
 namespace pGina
 {
-	namespace Registry 
+	namespace CredProv
 	{
-		// TBD: we should get settings from the service via named pipe, just use these for backup?
-		std::wstring GetString(const wchar_t * keyName, const wchar_t * defaultValue);
-		DWORD GetDword(const wchar_t * keyName, DWORD defaultValue);
-		bool GetBool(const wchar_t * keyName, bool defaultValue);
+		class CredentialProviderFilter : public ICredentialProviderFilter
+		{
+		public:
 
-		bool StringValueExistsAndIsNonZero( HKEY base, const wchar_t *subKeyName, const wchar_t *valueName );
-		std::wstring GetString( HKEY base, const wchar_t *subKeyName, const wchar_t *valueName );
-		std::vector<std::wstring> GetStringArray( const wchar_t *subKeyName );
-		std::vector<std::wstring> GetStringArray( HKEY base, const wchar_t *subKeyName, const wchar_t *valueName );
+			// IUnknown
+			IFACEMETHODIMP_(ULONG) AddRef();    
+			IFACEMETHODIMP_(ULONG) Release();    
+			IFACEMETHODIMP QueryInterface(__in REFIID riid, __deref_out void** ppv);
+			
+			// ICredentialProviderFilter
+			HRESULT STDMETHODCALLTYPE Filter( 
+            /* [in] */ CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus,
+            /* [in] */ DWORD dwFlags,
+            /* [size_is][in] */ GUID *rgclsidProviders,
+            /* [size_is][out][in] */ BOOL *rgbAllow,
+            /* [in] */ DWORD cProviders);
+
+			HRESULT STDMETHODCALLTYPE UpdateRemoteCredential( 
+            /* [in] */ const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION *pcpcsIn,
+            /* [out] */ CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION *pcpcsOut);
+        
+			// CredentialProviderFilter
+			CredentialProviderFilter(void);
+			~CredentialProviderFilter(void);
+
+		private:
+			long m_referenceCount;
+		
+		};
 	}
 }

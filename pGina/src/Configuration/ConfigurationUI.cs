@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -62,11 +62,6 @@ namespace pGina.Configuration
             }
         }
 
-        private class MissingBuiltInCredProvException : System.Exception 
-        {
-            public MissingBuiltInCredProvException(string message) : base(message) { }
-        }
-
         private static readonly string PGINA_SERVICE_NAME = "pGina";
 
         // Plugin information keyed by Guid
@@ -76,6 +71,7 @@ namespace pGina.Configuration
         private ServiceController m_pGinaServiceController = null;
         private System.Timers.Timer m_serviceTimer = new System.Timers.Timer();
         
+        // Plugin data grid view
         private const string PLUGIN_UUID_COLUMN = "Uuid";
         private const string PLUGIN_VERSION_COLUMN = "Version";
         private const string PLUGIN_DESC_COLUMN = "Description";
@@ -84,6 +80,13 @@ namespace pGina.Configuration
         private const string AUTHORIZATION_COLUMN = "Authorization";
         private const string GATEWAY_COLUMN = "Gateway";
         private const string NOTIFICATION_COLUMN = "Notification";
+
+        // Cred Prov Filter data grid view
+        private const string CPF_CP_NAME_COLUMN = "Name";
+        private const string CPF_CP_LOGON_COLUMN = "FilterLogon";
+        private const string CPF_CP_UNLOCK_COLUMN = "FilterUnlock";
+        private const string CPF_CP_CHANGE_PASS_COLUMN = "FilterChangePass";
+        private const string CPF_CP_UUID_COLUMN = "Uuid";
 
         private LogViewWindow logWindow = null;
         
@@ -149,28 +152,50 @@ namespace pGina.Configuration
 
         private void InitCpOptions()
         {
-            try
-            {
-                Guid builtInCredProvUuid = FindBuiltInCredProvGuid();
+            dgvCredProvFilter.RowHeadersVisible = false;
+            dgvCredProvFilter.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvCredProvFilter.MultiSelect = false;
+            dgvCredProvFilter.AllowUserToAddRows = false;
 
-                CredentialProvider.Registration.Settings msProviderSettings = new CredentialProvider.Registration.Settings()
-                {
-                    ProviderGuid = builtInCredProvUuid,
-                    ShortName = "PasswordProvider",
-                };
-
-                CredentialProvider.Registration.CredProviderManager manager = CredentialProvider.Registration.CredProviderManager.GetManager();
-                manager.CpInfo = msProviderSettings;
-                chkMSProvider.Checked = manager.Enabled();
-            }
-            catch (MissingBuiltInCredProvException)
+            dgvCredProvFilter.Columns.Add(new DataGridViewTextBoxColumn()
             {
-                MessageBox.Show(
-                    "Unable to find built-in Credential Provider!", 
-                    "Built-in Credential Provider Not Found",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                chkMSProvider.Enabled = false;
-            }
+                Name = CPF_CP_NAME_COLUMN,
+                DataPropertyName = CPF_CP_NAME_COLUMN,
+                HeaderText = "Credential Provider",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+                ReadOnly = true
+            });
+            dgvCredProvFilter.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = CPF_CP_LOGON_COLUMN,
+                DataPropertyName = CPF_CP_LOGON_COLUMN,
+                HeaderText = "Logon",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            dgvCredProvFilter.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = CPF_CP_UNLOCK_COLUMN,
+                DataPropertyName = CPF_CP_UNLOCK_COLUMN,
+                HeaderText = "Unlock",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            dgvCredProvFilter.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = CPF_CP_CHANGE_PASS_COLUMN,
+                DataPropertyName = CPF_CP_CHANGE_PASS_COLUMN,
+                HeaderText = "Change Password",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            dgvCredProvFilter.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                Name = CPF_CP_UUID_COLUMN,
+                DataPropertyName = CPF_CP_UUID_COLUMN,
+                HeaderText = "UUID",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            });
+
+            dgvCredProvFilter.AutoGenerateColumns = false;
+            dgvCredProvFilter.DataSource = CredProvFilterConfig.LoadCredProvsAndFilterSettings();
         }
 
         private void InitGinaOptions()
@@ -1379,38 +1404,8 @@ namespace pGina.Configuration
 
         private void SaveCpSettings()
         {
-            try
-            {
-                Guid builtInCredProvUuid = FindBuiltInCredProvGuid();
-
-                CredentialProvider.Registration.Settings msProviderSettings = new CredentialProvider.Registration.Settings()
-                {
-                    ProviderGuid = builtInCredProvUuid,
-                    ShortName = "PasswordProvider",
-                };
-
-                CredentialProvider.Registration.CredProviderManager manager = CredentialProvider.Registration.CredProviderManager.GetManager();
-                manager.CpInfo = msProviderSettings;
-                bool currentState = manager.Enabled();
-
-                if (chkMSProvider.Checked != currentState)
-                {
-                    if (chkMSProvider.Checked)
-                        manager.Enable();
-                    else
-                    {
-                        if (MessageBox.Show("You have chosen to disable the built-in password provider, are you sure?", "Really?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == System.Windows.Forms.DialogResult.Yes)
-                        {
-                            manager.Disable();
-                        }
-                    }
-                }
-            }
-            catch (MissingBuiltInCredProvException)
-            {
-                // Do nothing, because the built-in CP was not found.  User should have been
-                // warned about this already (see InitCpOptions)
-            }
+            List<CredProv> credProvs = (List<CredProv>)dgvCredProvFilter.DataSource;
+            CredProvFilterConfig.SaveFilterSettings(credProvs);
         }
 
         private void chkSpecialButton_CheckedChanged(object sender, EventArgs e)
@@ -1434,50 +1429,6 @@ namespace pGina.Configuration
         private void enableMotdCB_CheckedChanged(object sender, EventArgs e)
         {
             this.motdTB.Enabled = this.enableMotdCB.Checked;
-        }
-
-        private Guid FindBuiltInCredProvGuid()
-        {
-            // Windows 8 {60b78e88-ead8-445c-9cfd-0b87f74ea6cd}
-            Guid win8uuid = new Guid("{60b78e88-ead8-445c-9cfd-0b87f74ea6cd}");
-            // Windows 7 {6f45dc1e-5384-457a-bc13-2cd81b0d28ed}
-            Guid win7uuid = new Guid("{6f45dc1e-5384-457a-bc13-2cd81b0d28ed}");
-
-            // We could do this by determining the OS and returning the known
-            // CP GUID, but instead, we check the registry to see which key
-            // exists.  Either way would probably work, but I prefer to look for
-            // an existing registry key.  :)
-
-            // Check for Windows 7 built-in credential provider
-            if (IsRegisteredBuiltInCredProv(win7uuid)) return win7uuid;
-
-            // Check for Windows 8 built-in credential provider
-            if (IsRegisteredBuiltInCredProv(win8uuid)) return win8uuid;
-            
-            throw new MissingBuiltInCredProvException("Unable to find built-in Credential Provider");
-        }
-
-        private bool IsRegisteredBuiltInCredProv(Guid uuid)
-        {
-            string keyBase = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers";
-            string key = string.Format(@"{0}\{{{1}}}", keyBase, uuid.ToString());
-            m_logger.DebugFormat("Looking for: {0}", key);
-            using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(key))
-            {
-                if (rk != null)
-                {
-                    string defValue = (string)rk.GetValue("");
-                    m_logger.DebugFormat("Default value: {0}", defValue);
-                    if (defValue != null && defValue.Equals("PasswordProvider", StringComparison.CurrentCultureIgnoreCase))
-                        return true;
-                }
-                else
-                {
-                    m_logger.Debug("Not found!");
-                }
-            }
-            m_logger.Debug("Key not found, or is not a password provider.");
-            return false;
         }
     }
 }

@@ -104,6 +104,7 @@
     <Compile Include="ConfigurationUI.Designer.cs">
       <DependentUpon>ConfigurationUI.cs</DependentUpon>
     </Compile>
+    <Compile Include="CredProvFilterConfig.cs" />
     <Compile Include="LogViewWindow.cs">
       <SubType>Form</SubType>
     </Compile>

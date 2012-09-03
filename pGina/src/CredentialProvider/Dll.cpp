@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -89,7 +89,7 @@ HRESULT WINAPI DllGetClassObject(__in REFCLSID rclsid, __in REFIID riid, __deref
 	*ppv = NULL;
 
 	// We provide class factory support for our provider only
-    if (rclsid == CLSID_CpGinaProvider)
+	if (rclsid == CLSID_CpGinaProvider)
     {
 		pGina::COM::CClassFactory * factory = new pGina::COM::CClassFactory();        
         if (factory)
