@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -71,6 +71,7 @@ namespace pGina.Configuration
         private ServiceController m_pGinaServiceController = null;
         private System.Timers.Timer m_serviceTimer = new System.Timers.Timer();
         
+        // Plugin data grid view
         private const string PLUGIN_UUID_COLUMN = "Uuid";
         private const string PLUGIN_VERSION_COLUMN = "Version";
         private const string PLUGIN_DESC_COLUMN = "Description";
@@ -79,6 +80,13 @@ namespace pGina.Configuration
         private const string AUTHORIZATION_COLUMN = "Authorization";
         private const string GATEWAY_COLUMN = "Gateway";
         private const string NOTIFICATION_COLUMN = "Notification";
+
+        // Cred Prov Filter data grid view
+        private const string CPF_CP_NAME_COLUMN = "Name";
+        private const string CPF_CP_LOGON_COLUMN = "FilterLogon";
+        private const string CPF_CP_UNLOCK_COLUMN = "FilterUnlock";
+        private const string CPF_CP_CHANGE_PASS_COLUMN = "FilterChangePass";
+        private const string CPF_CP_UUID_COLUMN = "Uuid";
 
         private LogViewWindow logWindow = null;
         
@@ -144,9 +152,50 @@ namespace pGina.Configuration
 
         private void InitCpOptions()
         {
-            chkDisableMSProviderLogon.Checked = Settings.Get.DisableMSProviderLogon;
-            chkDisableMSProviderUnlock.Checked = Settings.Get.DisableMSProviderUnlock;
-            chkDisableMSProviderChangePassword.Checked = Settings.Get.DisableMSProviderChangePassword;
+            dgvCredProvFilter.RowHeadersVisible = false;
+            dgvCredProvFilter.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvCredProvFilter.MultiSelect = false;
+            dgvCredProvFilter.AllowUserToAddRows = false;
+
+            dgvCredProvFilter.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                Name = CPF_CP_NAME_COLUMN,
+                DataPropertyName = CPF_CP_NAME_COLUMN,
+                HeaderText = "Credential Provider",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+                ReadOnly = true
+            });
+            dgvCredProvFilter.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = CPF_CP_LOGON_COLUMN,
+                DataPropertyName = CPF_CP_LOGON_COLUMN,
+                HeaderText = "Logon",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            dgvCredProvFilter.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = CPF_CP_UNLOCK_COLUMN,
+                DataPropertyName = CPF_CP_UNLOCK_COLUMN,
+                HeaderText = "Unlock",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            dgvCredProvFilter.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = CPF_CP_CHANGE_PASS_COLUMN,
+                DataPropertyName = CPF_CP_CHANGE_PASS_COLUMN,
+                HeaderText = "Change Password",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            dgvCredProvFilter.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                Name = CPF_CP_UUID_COLUMN,
+                DataPropertyName = CPF_CP_UUID_COLUMN,
+                HeaderText = "UUID",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            });
+
+            dgvCredProvFilter.AutoGenerateColumns = false;
+            dgvCredProvFilter.DataSource = CredProvFilterConfig.LoadCredProvsAndFilterSettings();
         }
 
         private void InitGinaOptions()
@@ -1355,30 +1404,8 @@ namespace pGina.Configuration
 
         private void SaveCpSettings()
         {
-            bool currentStateLogon = Settings.Get.DisableMSProviderLogon;
-            bool currentStateUnlock = Settings.Get.DisableMSProviderUnlock;
-            bool currentStateChangePassword = Settings.Get.DisableMSProviderChangePassword;
-
-            if ((chkDisableMSProviderLogon.Checked && !currentStateLogon) ||
-                (chkDisableMSProviderUnlock.Checked && !currentStateUnlock) ||
-                (chkDisableMSProviderChangePassword.Checked && !currentStateChangePassword))
-            {
-                if (MessageBox.Show(
-                    "You have chosen to disable the built-in password provider for one or more interfaces, are you sure?", 
-                    "Really?", 
-                    MessageBoxButtons.YesNo, 
-                    MessageBoxIcon.Warning, 
-                    MessageBoxDefaultButton.Button2) != System.Windows.Forms.DialogResult.Yes)
-                {
-                    // Reset the checkboxes and return
-                    InitCpOptions();
-                    return;
-                }
-            }
-
-            Settings.Get.DisableMSProviderLogon = chkDisableMSProviderLogon.Checked;
-            Settings.Get.DisableMSProviderUnlock = chkDisableMSProviderUnlock.Checked;
-            Settings.Get.DisableMSProviderChangePassword = chkDisableMSProviderChangePassword.Checked;
+            List<CredProv> credProvs = (List<CredProv>)dgvCredProvFilter.DataSource;
+            CredProvFilterConfig.SaveFilterSettings(credProvs);
         }
 
         private void chkSpecialButton_CheckedChanged(object sender, EventArgs e)

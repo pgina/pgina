@@ -71,29 +71,63 @@ namespace pGina {
             /* [in] */ DWORD cProviders)
 		{
 			pDEBUG(L"CredentialProviderFilter::Filter");
-			
-			bool doDisable = false;
-			switch(cpus)
+
+			// Retrieve the registry settings
+			std::vector<std::wstring> rawFilterSettings = 
+				pGina::Registry::GetStringArray(L"CredentialProviderFilters");
+
+			// If there's nothing there, there's nothing to do.
+			if( rawFilterSettings.size() == 0 ) return S_OK;
+
+			// Unpack the settings
+			struct FilterSetting { GUID uuid; int filter; std::wstring uuidStr; };
+			std::vector<struct FilterSetting> filterSettings;
+			for( DWORD i = 0; i < rawFilterSettings.size(); i++ )
 			{
-			case CPUS_LOGON:
-				doDisable = pGina::Registry::GetBool(L"DisableMSProviderLogon", false);
-				break;
-			case CPUS_UNLOCK_WORKSTATION:
-				doDisable = pGina::Registry::GetBool(L"DisableMSProviderUnlock", false);
-				break;
-			case CPUS_CHANGE_PASSWORD:
-				doDisable = pGina::Registry::GetBool(L"DisableMSProviderChangePassword", false);
-				break;
+				std::wstring s = rawFilterSettings[i];
+				size_t idx = s.find_first_of(L"\t");
+				if( idx != std::wstring::npos )
+				{
+					std::wstring guidStr = s.substr(0, idx);
+					std::wstring filterStr = s.substr(idx+1);
+					
+					struct FilterSetting setting;
+					HRESULT hr = CLSIDFromString(guidStr.c_str(), &(setting.uuid));
+					if( SUCCEEDED(hr) )
+					{
+						setting.uuidStr = guidStr;
+						setting.filter = _wtoi(filterStr.c_str());
+						filterSettings.push_back(setting);
+						//pDEBUG(L"Loaded filter setting: %s %d", setting.uuidStr.c_str(), setting.filter);
+					}
+				}
 			}
 
-			if(doDisable)
+			// Loop over each cred prov and see if we need to filter it
+			for( DWORD i = 0; i < cProviders; i++ )
 			{
-				for( DWORD i = 0; i < cProviders; i++ )
+				bool doFilter = false;
+				struct FilterSetting setting;
+				for( DWORD j = 0; j < filterSettings.size(); j++ )
 				{
-					// Disable MS password provider
-					if( CLSID_PasswordCredentialProvider == rgclsidProviders[i] )
+					if( IsEqualGUID( filterSettings[j].uuid, rgclsidProviders[i] ) )
 					{
-						pDEBUG(L"CredentialProviderFilter::Filter: Disabling MS password provider");
+						doFilter = true;
+						setting = filterSettings[j];
+					}
+				}
+				
+				// If we are filtering this CP
+				if( doFilter )
+				{
+					// If we are configured to filter in this scenario
+					if(
+						(cpus == CPUS_LOGON && ((setting.filter & 0x1) != 0)) ||
+						(cpus == CPUS_UNLOCK_WORKSTATION && ((setting.filter & 0x2) != 0)) ||
+						(cpus == CPUS_CHANGE_PASSWORD && ((setting.filter & 0x4) != 0))
+						)
+					{
+						pDEBUG(L"Filtering %s", setting.uuidStr.c_str() );
 						rgbAllow[i] = FALSE;
 					}
 				}

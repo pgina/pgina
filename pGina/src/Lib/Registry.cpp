@@ -110,6 +110,11 @@ namespace pGina
 			return result;
 		}
 
+		std::vector<std::wstring> GetStringArray( const wchar_t *subKeyName )
+		{
+			return GetStringArray(HKEY_LOCAL_MACHINE, L"SOFTWARE\\pGina3", subKeyName);
+		}
+
 		std::vector<std::wstring> GetStringArray( HKEY base, const wchar_t *subKeyName, const wchar_t *valueName )
 		{
 			std::vector<std::wstring> result;
