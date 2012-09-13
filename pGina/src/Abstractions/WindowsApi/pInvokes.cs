@@ -531,7 +531,10 @@ namespace Abstractions.WindowsApi
                     bool sResult = SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionInfo.SessionID, SafeNativeMethods.WTS_INFO_CLASS.WTSUserName, out userInfo, out bytes);
                     if (!sResult)
                     {
-                        throw new Win32Exception(Marshal.GetLastWin32Error(), "WTSQuerySessionInformation");
+                        //Save Error Code For We Should Call WTSFreeMemory , Which May Cover it.
+                        int Win32ErrorResult = Marshal.GetLastWin32Error();
+                        SafeNativeMethods.WTSFreeMemory(sessionInfoList);
+                        throw new Win32Exception(Win32ErrorResult, "WTSQuerySessionInformation");
                     }
                     string user = Marshal.PtrToStringAnsi(userInfo);
                     SafeNativeMethods.WTSFreeMemory(userInfo);
@@ -539,7 +542,9 @@ namespace Abstractions.WindowsApi
                     sResult = SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionInfo.SessionID, SafeNativeMethods.WTS_INFO_CLASS.WTSDomainName, out domainInfo, out bytes);
                     if (!sResult)
                     {
-                        throw new Win32Exception(Marshal.GetLastWin32Error(), "WTSQuerySessionInformation");
+                        int Win32ErrorResult = Marshal.GetLastWin32Error();
+                        SafeNativeMethods.WTSFreeMemory(sessionInfoList);
+                        throw new Win32Exception(Win32ErrorResult, "WTSQuerySessionInformation");
                     }
 
                     string domain = Marshal.PtrToStringAnsi(domainInfo);
