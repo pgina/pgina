@@ -574,7 +574,11 @@ namespace Abstractions.WindowsApi
                 sessionId, SafeNativeMethods.WTS_INFO_CLASS.WTSUserName, out userInfo, out bytes);
 
             if (!result)
-                throw new Win32Exception(Marshal.GetLastWin32Error(), "WTSQuerySessionInformation");
+            {
+                int Win32ErrorResult = Marshal.GetLastWin32Error();
+                SafeNativeMethods.WTSFreeMemory(userInfo);
+                throw new Win32Exception(Win32ErrorResult, "WTSQuerySessionInformation");
+            }
             
             string userName = Marshal.PtrToStringAnsi(userInfo);
             SafeNativeMethods.WTSFreeMemory(userInfo);
