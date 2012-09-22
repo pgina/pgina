@@ -259,8 +259,18 @@ namespace pGina.Plugin.Email
 
                 String resp = getResponse(reader);
 
+                //Change To Fix Issues #150
+                //use "{{" to get a '{' in string.Format, the same to '}'
+                writer.WriteLine("li01 LOGIN {0} {{{1}}}", creds.UserName, creds.Password.Length);
+                writer.Flush();
 
-                writer.WriteLine("li01 LOGIN {0} {1}", creds.UserName, creds.Password);
+                do //wait for + Ready ..... which ask for password
+                {
+                    resp = getResponse(reader);
+                    m_logger.DebugFormat("[WaitForPasswordPrompt] Server response: {0}", resp);
+                } while (!resp.Trim().ToLower().StartsWith("+ ready"));
+
+                writer.WriteLine("{0}", creds.Password);
                 writer.Flush();
 
                 do //Read input until we get a response to li01 request
