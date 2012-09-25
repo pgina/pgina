@@ -57,6 +57,16 @@ namespace pGina.Plugin.Email
         private string m_defaultDescription = "A plugin that authenticates against a POP or IMAP server.";
         private dynamic m_settings = null;
 
+        /// <summary>
+        /// Timeout Limit In Read, in milliseconds
+        /// </summary>
+        private const int CONST_NetworkStreamTimeoutRead = 10 * 1000;
+
+        /// <summary>
+        /// Timeout Limit In Write, in milliseconds
+        /// </summary>
+        private const int CONST_NetworkStreamTimeoutWrite = 10 * 1000;
+
         public EmailAuthPlugin()
         {
             using(Process me = Process.GetCurrentProcess())
@@ -119,7 +129,7 @@ namespace pGina.Plugin.Email
                 Stream stream = getNetworkStream(server, port, useSsl);
                 bool authenticated;
 
-                m_logger.DebugFormat("Have network stream...");
+                m_logger.DebugFormat("Have network stream...Try Auth now");
 
                 //Authenticate based on protocol
                 if (protocol == "POP3")
@@ -147,7 +157,7 @@ namespace pGina.Plugin.Email
 
             catch (Exception e)
             {
-                m_logger.ErrorFormat("Error: {0}", e.Message);
+                m_logger.ErrorFormat("Error: {0}", e.ToString());
                 return new BooleanResult { Success = false, Message = "Unspecified Error occurred. " + e.Message };
             }
 
@@ -174,10 +184,16 @@ namespace pGina.Plugin.Email
             m_logger.DebugFormat("Connecting to {0}:{1}, {2} SSL", server, port, ssl ? "using" : "not using");
             TcpClient socket = new TcpClient(server, port);
             NetworkStream ns = socket.GetStream();
+
+            ns.ReadTimeout = CONST_NetworkStreamTimeoutRead;
+            ns.WriteTimeout = CONST_NetworkStreamTimeoutWrite;
+
             if (ssl)
             {
                 SslStream sns = new SslStream(ns, true);
+                m_logger.DebugFormat("SSL Stream Created");
                 sns.AuthenticateAsClient(server);
+                m_logger.DebugFormat("SSL Client Authenticated");
                 return sns;
             }
             return ns;
@@ -334,25 +350,20 @@ namespace pGina.Plugin.Email
         private string getResponse(System.IO.StreamReader reader)
         {   //Keeps trying to grab input. Will throw exception if connection error occurs, 
 
-            Timer timer = new Timer(10000);
-            timer.AutoReset = false;
-            timer.Elapsed += new ElapsedEventHandler(delegate(object o, ElapsedEventArgs args)
-            {
-                throw new EMailAuthException("Server response timed out.");
-            });
-
-            timer.Start();
             try
             {
                 string output = null;
                 do { output = reader.ReadLine(); }
                 while (output == null);
-                timer.Stop();
+
                 return output;
+            }
+            catch (IOException e)
+            {
+                throw new EMailAuthException("Error reading from server. Are We Timeout?", e);
             }
             catch (Exception e)
             {
-                timer.Stop();
                 throw new EMailAuthException("Error reading from server.", e);
             }
 
