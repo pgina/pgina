@@ -60,6 +60,7 @@ namespace pGina.Plugin.LocalMachine
             // Cleanup thread settings (not user configurable)
             m_settings.SetDefault("CleanupUsers", new string[] { });     // List of principal names we must cleanup!
             m_settings.SetDefault("BackgroundTimerSeconds", 60);         // How often we look to cleanup
+            m_settings.SetDefault("AllowForEmptyPassword", false);         // Allow Empty Password Login (no matter in which group)
         }
 
         public static dynamic Store

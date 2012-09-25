@@ -212,7 +212,25 @@ namespace pGina.Plugin.LocalMachine
                     {
                         // We use a pInvoke here instead of using PrincipalContext.ValidateCredentials
                         // due to the fact that the latter will throw an exception when the network is disconnected.
-                        if (Abstractions.WindowsApi.pInvokes.ValidateCredentials(userInfo.Username, userInfo.Password))
+                        bool isLoginSuccess = Abstractions.WindowsApi.pInvokes.ValidateCredentials(userInfo.Username, userInfo.Password);
+                        int loginErrorCode = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
+
+                        //check for login result, if it's ERROR_ACCOUNT_RESTRICTION(1327 or 0x52F), it's empty password not allowed error.
+                        //view http://msdn.microsoft.com/en-us/library/windows/desktop/ms681385%28v=vs.85%29.aspx for details.
+
+                        //find empty-password user here and try to workaround restrictions here. Is there any other way to verify that? I'm glad to hear you. -----By slayercat
+                        const int LOGIN_ERROR_ACCOUNT_PASSWORD_CANNOT_BE_EMPTY = 0x52F;
+                        if (!isLoginSuccess && (bool)Settings.Store.AllowForEmptyPassword && loginErrorCode == LOGIN_ERROR_ACCOUNT_PASSWORD_CANNOT_BE_EMPTY)
+                        {
+                            m_logger.DebugFormat("Empty Password User {0} Login Now", userInfo.Username);
+                            isLoginSuccess = true;
+                        }
+                        else if(loginErrorCode == LOGIN_ERROR_ACCOUNT_PASSWORD_CANNOT_BE_EMPTY)
+                        {
+                            m_logger.InfoFormat("Empty Password User {0} Try To Login, But Currect Setting Disallow That.", userInfo.Username);
+                        }
+
+                        if (isLoginSuccess)
                         {
                             m_logger.InfoFormat("Authenticated user: {0}", userInfo.Username);
                             userInfo.Domain = Environment.MachineName;
