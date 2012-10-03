@@ -27,6 +27,7 @@ namespace pGina.Plugin.Email
             m_settings.SetDefault("Port", "");
             m_settings.SetDefault("AppendDomain", false);
             m_settings.SetDefault("Domain", "");
+            m_settings.SetDefault("NetworkTimeout", 10000);  // timeout in ms
         }
     }
 }

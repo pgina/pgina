@@ -37,6 +37,8 @@ namespace pGina.Plugin.Email
             portTextBox.Text = Settings.Store.Port;
             domainAppendCheckBox.Checked = Settings.Store.AppendDomain;
             domainTextBox.Text = Settings.Store.Domain;
+            int timeout = Settings.Store.NetworkTimeout;
+            tbTimeout.Text = timeout.ToString();
             updateSettings();
         }
 
@@ -48,6 +50,12 @@ namespace pGina.Plugin.Email
             Settings.Store.Port = portTextBox.Text.Trim();
             Settings.Store.AppendDomain = domainAppendCheckBox.Checked;
             Settings.Store.Domain = domainTextBox.Text.Replace('@', ' ').Trim();
+            try
+            {
+                int timeout = Convert.ToInt32(tbTimeout.Text);
+                Settings.Store.NetworkTimeout = timeout;
+            }
+            catch (FormatException) { }
         }
 
         private bool ValidateInput()

@@ -147,7 +147,7 @@ namespace pGina.Plugin.Email
 
             catch (Exception e)
             {
-                m_logger.ErrorFormat("Error: {0}", e.Message);
+                m_logger.ErrorFormat("Error: {0}", e);
                 return new BooleanResult { Success = false, Message = "Unspecified Error occurred. " + e.Message };
             }
 
@@ -174,6 +174,10 @@ namespace pGina.Plugin.Email
             m_logger.DebugFormat("Connecting to {0}:{1}, {2} SSL", server, port, ssl ? "using" : "not using");
             TcpClient socket = new TcpClient(server, port);
             NetworkStream ns = socket.GetStream();
+
+            ns.ReadTimeout = Settings.Store.NetworkTimeout;
+            ns.WriteTimeout = Settings.Store.NetworkTimeout;
+
             if (ssl)
             {
                 SslStream sns = new SslStream(ns, true);
@@ -258,15 +262,28 @@ namespace pGina.Plugin.Email
                 System.IO.StreamWriter writer = new System.IO.StreamWriter(stream);
 
                 String resp = getResponse(reader);
+                m_logger.DebugFormat("IMAP server: {0}", resp);
 
-
-                writer.WriteLine("li01 LOGIN {0} {1}", creds.UserName, creds.Password);
+                writer.WriteLine("li01 LOGIN {{{0}}}", creds.UserName.Length);
                 writer.Flush();
+                resp = getResponse(reader);
+                m_logger.DebugFormat("IMAP Server: {0}", resp);
+                if (!resp.StartsWith("+")) 
+                    throw new EMailAuthException(string.Format("Unexpected response from server: {0}", resp));
 
-                do //Read input until we get a response to li01 request
+                writer.WriteLine("{0} {{{1}}}", creds.UserName, creds.Password.Length);
+                writer.Flush();
+                resp = getResponse(reader);
+                m_logger.DebugFormat("IMAP Server: {0}", resp);
+                if (!resp.StartsWith("+"))
+                    throw new EMailAuthException(string.Format("Unexpected response from server: {0}", resp));
+
+                writer.WriteLine(creds.Password);
+                writer.Flush();
+                do
                 {
                     resp = getResponse(reader);
-                    m_logger.DebugFormat("Server response: {0}", resp);
+                    m_logger.DebugFormat("IMAP Server: {0}", resp);
                 } while (!resp.StartsWith("li01"));
 
                 //Tell server we're disconnecting
@@ -314,38 +331,26 @@ namespace pGina.Plugin.Email
         }
 
         /// <summary>
-        /// Attempts to grab a response from the server. 
-        /// 
-        /// An EmailAuthException will be thrown if there is no response within 5 seconds
-        /// or if an IO error occurs. 
+        /// Attempts to grab a response from the server.
         /// </summary>
         /// <param name="reader"></param>
         /// <returns>Response from the server</returns>
         private string getResponse(System.IO.StreamReader reader)
-        {   //Keeps trying to grab input. Will throw exception if connection error occurs, 
-
-            Timer timer = new Timer(10000);
-            timer.AutoReset = false;
-            timer.Elapsed += new ElapsedEventHandler(delegate(object o, ElapsedEventArgs args)
-            {
-                throw new EMailAuthException("Server response timed out.");
-            });
-
-            timer.Start();
+        {   
             try
             {
                 string output = null;
-                do { output = reader.ReadLine(); }
-                while (output == null);
-                timer.Stop();
+                output = reader.ReadLine();
                 return output;
+            }
+            catch (IOException)
+            {
+                throw new EMailAuthException("IOException when reading response from server, possible timeout");
             }
             catch (Exception e)
             {
-                timer.Stop();
                 throw new EMailAuthException("Error reading from server.", e);
             }
-
         }
 
     }

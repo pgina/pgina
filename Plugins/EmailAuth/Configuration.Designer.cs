@@ -43,6 +43,8 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.domainTextBox = new System.Windows.Forms.TextBox();
             this.domainAppendCheckBox = new System.Windows.Forms.CheckBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.tbTimeout = new System.Windows.Forms.TextBox();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -64,7 +66,7 @@
             // 
             label2.AutoSize = true;
             label2.CausesValidation = false;
-            label2.Location = new System.Drawing.Point(12, 37);
+            label2.Location = new System.Drawing.Point(9, 40);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(82, 13);
             label2.TabIndex = 7;
@@ -74,7 +76,7 @@
             // 
             label3.AutoSize = true;
             label3.CausesValidation = false;
-            label3.Location = new System.Drawing.Point(221, 37);
+            label3.Location = new System.Drawing.Point(214, 40);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(29, 13);
             label3.TabIndex = 8;
@@ -92,7 +94,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(217, 132);
+            this.btnOk.Location = new System.Drawing.Point(219, 164);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 3;
@@ -102,7 +104,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(136, 132);
+            this.btnCancel.Location = new System.Drawing.Point(138, 164);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 4;
@@ -157,14 +159,14 @@
             // 
             // serverTextBox
             // 
-            this.serverTextBox.Location = new System.Drawing.Point(93, 33);
+            this.serverTextBox.Location = new System.Drawing.Point(92, 38);
             this.serverTextBox.Name = "serverTextBox";
             this.serverTextBox.Size = new System.Drawing.Size(110, 20);
             this.serverTextBox.TabIndex = 11;
             // 
             // portTextBox
             // 
-            this.portTextBox.Location = new System.Drawing.Point(249, 33);
+            this.portTextBox.Location = new System.Drawing.Point(249, 38);
             this.portTextBox.Name = "portTextBox";
             this.portTextBox.Size = new System.Drawing.Size(36, 20);
             this.portTextBox.TabIndex = 12;
@@ -174,9 +176,9 @@
             this.groupBox2.Controls.Add(this.domainTextBox);
             this.groupBox2.Controls.Add(this.domainLabel);
             this.groupBox2.Controls.Add(this.domainAppendCheckBox);
-            this.groupBox2.Location = new System.Drawing.Point(13, 58);
+            this.groupBox2.Location = new System.Drawing.Point(12, 90);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(279, 68);
+            this.groupBox2.Size = new System.Drawing.Size(282, 68);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Optional Settings";
@@ -200,12 +202,30 @@
             this.domainAppendCheckBox.UseVisualStyleBackColor = true;
             this.domainAppendCheckBox.Click += new System.EventHandler(this.settingsChanged);
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(16, 67);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(70, 13);
+            this.label4.TabIndex = 14;
+            this.label4.Text = "Timeout (ms):";
+            // 
+            // tbTimeout
+            // 
+            this.tbTimeout.Location = new System.Drawing.Point(92, 64);
+            this.tbTimeout.Name = "tbTimeout";
+            this.tbTimeout.Size = new System.Drawing.Size(91, 20);
+            this.tbTimeout.TabIndex = 15;
+            // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(296, 160);
+            this.ClientSize = new System.Drawing.Size(306, 202);
             this.ControlBox = false;
+            this.Controls.Add(this.tbTimeout);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.portTextBox);
             this.Controls.Add(this.serverTextBox);
@@ -246,5 +266,7 @@
         private System.Windows.Forms.CheckBox domainAppendCheckBox;
         private System.Windows.Forms.TextBox domainTextBox;
         private System.Windows.Forms.Label domainLabel;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox tbTimeout;
     }
 }
