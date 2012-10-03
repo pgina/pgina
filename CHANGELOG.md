@@ -1,3 +1,9 @@
+3.1.5.0 BETA (2012/10/03)
+---------------------------
+ - Filtering of any credential provider (#144, #132)
+ - MySQL:  Fix for problem when no hash alg is used (#145)
+ - Email Auth:  IMAP fixes (#150. #151)
+
 3.1.4.0 BETA (2012/07/26)
 ---------------------------
  - MySQL Auth Plugin: support for groups in Gateway (#114)
