@@ -1041,6 +1041,23 @@ namespace pGina.Configuration
             this.logWindow.LogTextBox.AppendText(message);
         }
 
+        private List<string> GetPluginList()
+        {
+            List<string> result = new List<string>();
+
+            List<IPluginAuthentication> authPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthentication>();
+            List<IPluginAuthorization> authzPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthorization>();
+            List<IPluginAuthenticationGateway> gatewayPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthenticationGateway>();
+            List<IPluginEventNotifications> notePlugins = PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>();
+
+            result.Add("Authentication: " + (string.Join(", ", authPlugins.Select(p => p.Name))));
+            result.Add("Authorization: " + (string.Join(", ", authzPlugins.Select(p => p.Name))));
+            result.Add("Gateway: " + (string.Join(", ", gatewayPlugins.Select(p => p.Name))));
+            result.Add("Notification: " + (string.Join(", ", notePlugins.Select(p => p.Name))));
+            
+            return result;
+        }
+
         private void ResetSimUI()
         {
             this.simFinalResultMessageTB.Text = null;
@@ -1050,15 +1067,37 @@ namespace pGina.Configuration
             m_domainResult.Text = null;
             m_passwordResult.Text = null;
             this.logWindow.LogTextBox.Text = "";
+            if (m_radioUseService.Checked || m_radioCredUI.Checked)
+            {
+                this.logWindow.LogTextBox.AppendText("*****" + Environment.NewLine);
+                this.logWindow.LogTextBox.AppendText("***** Log output unavailable when using pGina service or CredUI prompt." + 
+                    Environment.NewLine);
+                this.logWindow.LogTextBox.AppendText("*****" + Environment.NewLine);
+            }
+            else
+            {
+                this.logWindow.LogTextBox.AppendText("****" + Environment.NewLine);
+                this.logWindow.LogTextBox.AppendText("**** Simulated login starting: " + DateTime.Now.ToString("F") + Environment.NewLine);
+                this.logWindow.LogTextBox.AppendText("**** pGina Version:  " +
+                    System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + Environment.NewLine);
+                this.logWindow.LogTextBox.AppendText("**** Enabled plugins: " + Environment.NewLine);
+                foreach (string s in GetPluginList())
+                {
+                    this.logWindow.LogTextBox.AppendText("****     " + s + Environment.NewLine);
+                }
+                this.logWindow.LogTextBox.AppendText("****" + Environment.NewLine);
+            }
         }
 
         private void btnSimGo_Click(object sender, EventArgs e)
         {            
-            ResetSimUI();
-            pGina.Shared.Logging.InProcAppender.AddListener(SimLogHandler);
-
             if (m_radioUseService.Checked)
             {
+                if (MessageBox.Show("Individual plugin results and results for each stage are unavailable when using the pGina service.  Continue?",
+                                "Warning", MessageBoxButtons.YesNo) != System.Windows.Forms.DialogResult.Yes)
+                    return;
+
+                ResetSimUI();
                 DoServiceClientSimulation();
             }
             else
@@ -1069,12 +1108,12 @@ namespace pGina.Configuration
                     return;
                 }
 
+                pGina.Shared.Logging.InProcAppender.AddListener(SimLogHandler);
                 SaveSettings();
-
+                ResetSimUI();
                 DoInternalSimulation();
+                pGina.Shared.Logging.InProcAppender.RemoveListener(SimLogHandler);
             }
-
-            pGina.Shared.Logging.InProcAppender.RemoveListener(SimLogHandler);
         }
 
         private void DoServiceClientSimulation()
