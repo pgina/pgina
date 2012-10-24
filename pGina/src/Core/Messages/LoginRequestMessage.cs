@@ -39,6 +39,7 @@ namespace pGina.Core.Messages
         {
             Login = 0,
             Unlock,
+            CredUI
         }
 
         public string Username { get; set; }

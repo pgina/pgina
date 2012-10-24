@@ -253,6 +253,9 @@ namespace pGina
 			case CPUS_UNLOCK_WORKSTATION:
 				reason = pGina::Protocol::LoginRequestMessage::Unlock;
 				break;
+			case CPUS_CREDUI:
+				reason = pGina::Protocol::LoginRequestMessage::CredUI;
+				break;
 			}
 
 			pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);

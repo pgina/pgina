@@ -167,7 +167,8 @@ namespace pGina
 			enum LoginReason
 			{
 				Login = 0,
-				Unlock
+				Unlock,
+				CredUI,
 			};
 
 			LoginRequestMessage()
