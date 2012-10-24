@@ -424,20 +424,42 @@ namespace pGina
 			}
 			else if(m_usageScenario == CPUS_UNLOCK_WORKSTATION)
 			{
-				// See if we can get a username from WTS
 				DWORD mySession = pGina::Helpers::GetCurrentSessionId();
-				std::wstring wtsDomain = pGina::Helpers::GetSessionDomainName(mySession);
-				std::wstring wtsUser = pGina::Helpers::GetSessionUsername(mySession);
+				std::wstring username, domain;    // Username and domain to be determined
+				std::wstring usernameFieldValue;  // The value for the username field
 				std::wstring machineName = pGina::Helpers::GetMachineName();
-				std::wstring usernameFieldValue;
 
-				if(!wtsDomain.empty() && _wcsicmp(wtsDomain.c_str(), machineName.c_str()) != 0)
+				// Get user information from service (if available)
+				pDEBUG(L"Retrieving user information from service.");
+				pGina::Transactions::LoginInfo::UserInformation userInfo = 
+					pGina::Transactions::LoginInfo::GetUserInformation(mySession);
+				pDEBUG(L"Received: original uname: '%s' uname: '%s' domain: '%s'", 
+					userInfo.OriginalUsername().c_str(), userInfo.Username().c_str(), userInfo.Domain().c_str());
+
+				// Grab the domain if available
+				if( ! userInfo.Domain().empty() )
+					domain = userInfo.Domain();
+
+				// Are we configured to use the original username?
+				if( pGina::Registry::GetBool(L"UseOriginalUsernameInUnlockScenario", false) )
+					username = userInfo.OriginalUsername();
+				else
+					username = userInfo.Username();
+
+				// If we didn't get a username/domain from the service, try to get it from WTS
+				if( username.empty() )
+					username = pGina::Helpers::GetSessionUsername(mySession);
+				if( domain.empty() )
+					domain = pGina::Helpers::GetSessionDomainName(mySession);
+					
+
+				if(!domain.empty() && _wcsicmp(domain.c_str(), machineName.c_str()) != 0)
 				{
-					usernameFieldValue += wtsDomain;
+					usernameFieldValue += domain;
 					usernameFieldValue += L"\\";
 				}
 
-				usernameFieldValue += wtsUser;
+				usernameFieldValue += username;
 				
 				SHStrDupW(usernameFieldValue.c_str(), &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
 			}

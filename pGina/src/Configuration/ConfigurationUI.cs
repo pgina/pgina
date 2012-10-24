@@ -275,6 +275,9 @@ namespace pGina.Configuration
             }
 
             UpdateCpStatus();
+
+            // Load the unlock setting
+            chk_originalUsernameUnlock.Checked = Settings.Get.UseOriginalUsernameInUnlockScenario;
         }
 
         private void UpdateCpStatus()
@@ -845,6 +848,9 @@ namespace pGina.Configuration
 
             // Service status checkbox
             Settings.Get.ShowServiceStatusInLogonUi = this.logonUiShowServiceStatusCB.Checked;
+
+            // Save unlock setting
+            Settings.Get.UseOriginalUsernameInUnlockScenario = chk_originalUsernameUnlock.Checked;
 
             if (Abstractions.Windows.OsInfo.IsVistaOrLater())
                 this.SaveCpSettings();

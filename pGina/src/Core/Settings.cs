@@ -66,6 +66,8 @@ namespace pGina.Core
             s_settings.SetDefault("IPluginAuthenticationGateway_Order", new string[] { "12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D" });
             s_settings.SetDefault("12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D", 
                 (int) (Core.PluginLoader.State.AuthenticateEnabled | Core.PluginLoader.State.GatewayEnabled));
+
+            s_settings.SetDefault("UseOriginalUsernameInUnlockScenario", false);
         }
     }
 }

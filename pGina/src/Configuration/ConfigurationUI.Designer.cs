@@ -141,6 +141,8 @@
             this.btnOkay = new System.Windows.Forms.Button();
             this.m_pginaVersionLbl = new System.Windows.Forms.Label();
             this.btnSaveAndClose = new System.Windows.Forms.Button();
+            this.chk_originalUsernameUnlock = new System.Windows.Forms.CheckBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
             this.groupBox14.SuspendLayout();
@@ -178,6 +180,7 @@
             this.cpOptions.SuspendLayout();
             this.groupBox9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCredProvFilter)).BeginInit();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // m_tabs
@@ -200,6 +203,7 @@
             // 
             // m_generalConfigTab
             // 
+            this.m_generalConfigTab.Controls.Add(this.groupBox4);
             this.m_generalConfigTab.Controls.Add(this.groupBox14);
             this.m_generalConfigTab.Controls.Add(this.servGB);
             this.m_generalConfigTab.Controls.Add(this.motdGB);
@@ -1365,6 +1369,26 @@
             this.btnSaveAndClose.UseVisualStyleBackColor = true;
             this.btnSaveAndClose.Click += new System.EventHandler(this.btnSaveAndClose_Click);
             // 
+            // chk_originalUsernameUnlock
+            // 
+            this.chk_originalUsernameUnlock.AutoSize = true;
+            this.chk_originalUsernameUnlock.Location = new System.Drawing.Point(9, 19);
+            this.chk_originalUsernameUnlock.Name = "chk_originalUsernameUnlock";
+            this.chk_originalUsernameUnlock.Size = new System.Drawing.Size(227, 17);
+            this.chk_originalUsernameUnlock.TabIndex = 4;
+            this.chk_originalUsernameUnlock.Text = "Use original username to unlock computer.";
+            this.chk_originalUsernameUnlock.UseVisualStyleBackColor = true;
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.chk_originalUsernameUnlock);
+            this.groupBox4.Location = new System.Drawing.Point(17, 411);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(543, 47);
+            this.groupBox4.TabIndex = 5;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Unlock";
+            // 
             // ConfigurationUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1427,6 +1451,8 @@
             this.groupBox9.ResumeLayout(false);
             this.groupBox9.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCredProvFilter)).EndInit();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1543,5 +1569,7 @@
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.DataGridView dgvCredProvFilter;
         private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.CheckBox chk_originalUsernameUnlock;
     }
 }
