@@ -48,6 +48,8 @@ namespace pGina
 			DynLabelRequest = 0x07,
 			DynLabelResponse= 0x08,
 			LoginInfoChange = 0x09,
+			UserInfoRequest = 0x0a,
+			UserInfoResponse = 0x0b
 		};
 				
 		class MessageBase 
@@ -361,6 +363,91 @@ namespace pGina
 		private:
 			std::wstring m_text;
 		};
+
+
+		/* Request for user information based on session ID. */
+		class UserInformationRequestMessage : public MessageBase
+		{
+		public:
+			UserInformationRequestMessage() 
+			{
+				Type(UserInfoRequest);
+				SessionID(-1);
+			}
+
+			UserInformationRequestMessage( int sess_id )
+			{
+				Type(UserInfoRequest);
+				m_sessid = sess_id;
+			}
+
+			int const& SessionID() { return m_sessid; }
+			void SessionID(int v) { m_sessid = v; }
+
+			virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
+			{
+				MessageBase::FromDynamicMessage(msg);
+
+				if(msg->Exists<int>(L"SessionID"))
+					SessionID(msg->Property<int>(L"SessionID"));
+			}
+
+			virtual pGina::Messaging::Message * ToDynamicMessage()
+			{				
+				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();				
+				msg->Property<int>(L"SessionID", SessionID(), pGina::Messaging::Integer);
+				return msg;
+			}
+
+		private:
+			int m_sessid;
+		};
+
+		/* Response containing user information. */
+		class UserInformationResponseMessage : public UserInformationRequestMessage
+		{
+		public:
+			UserInformationResponseMessage()
+			{
+				Type(UserInfoResponse);
+			}
+
+			std::wstring const& OriginalUsername() { return m_orig_uname; }
+			void	OriginalUsername(std::wstring const& v) { m_orig_uname = v; }
+
+			std::wstring const& Username() { return m_uname; }
+			void	Username(std::wstring const& v) { m_uname = v; }
+
+			std::wstring const& Domain() { return m_domain; }
+			void	Domain(std::wstring const& v) { m_domain = v; }
+
+			virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
+			{
+				UserInformationRequestMessage::FromDynamicMessage(msg);
+
+				if(msg->Exists<std::wstring>(L"OriginalUsername"))
+					OriginalUsername(msg->Property<std::wstring>(L"OriginalUsername"));
+				if(msg->Exists<std::wstring>(L"Username"))
+					Username(msg->Property<std::wstring>(L"Username"));
+				if(msg->Exists<std::wstring>(L"Domain"))
+					Domain(msg->Property<std::wstring>(L"Domain"));
+			}
+
+			virtual pGina::Messaging::Message * ToDynamicMessage()
+			{				
+				pGina::Messaging::Message * msg = UserInformationRequestMessage::ToDynamicMessage();				
+				msg->Property<std::wstring>(L"OriginalUsername", OriginalUsername(), pGina::Messaging::String);
+				msg->Property<std::wstring>(L"Username", Username(), pGina::Messaging::String);
+				msg->Property<std::wstring>(L"Domain", Domain(), pGina::Messaging::String);
+				return msg;
+			}
+
+		private:
+			std::wstring m_orig_uname;
+			std::wstring m_uname;
+			std::wstring m_domain;
+		};
+
 
 		class LoginInfoChangeMessage : public LoginRequestMessage
 		{

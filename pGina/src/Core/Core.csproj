@@ -53,6 +53,8 @@
     <Compile Include="Messages\LogMessage.cs" />
     <Compile Include="Messages\MessageBase.cs" />
     <Compile Include="Messages\MessageTypes.cs" />
+    <Compile Include="Messages\UserInformationRequestMessage.cs" />
+    <Compile Include="Messages\UserInformationResponseMessage.cs" />
     <Compile Include="PluginDriver.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Init.cs" />

@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -218,6 +218,8 @@ namespace pGina.Service.Impl
                     return HandleDynamicLabelRequest(new DynamicLabelRequestMessage(msg)).ToExpando();
                 case MessageType.LoginInfoChange:
                     return HandleLoginInfoChange(new LoginInfoChangeMessage(msg)).ToExpando();
+                case MessageType.UserInfoRequest:
+                    return HandleUserInfoRequest(new UserInformationRequestMessage(msg)).ToExpando();
                 default:
                     return null;                // Unknowns get disconnected
             }
@@ -293,7 +295,28 @@ namespace pGina.Service.Impl
                     return new DynamicLabelResponseMessage() { Name = msg.Name, Text = motd };
                 // Others can be added here.
             }
-            return null;
+            return new DynamicLabelResponseMessage();
+        }
+
+        private UserInformationResponseMessage HandleUserInfoRequest(UserInformationRequestMessage msg)
+        {
+            lock (m_sessionPropertyCache)
+            {
+                if (m_sessionPropertyCache.Exists(msg.SessionID))
+                {
+                    SessionProperties props = m_sessionPropertyCache.Get(msg.SessionID);
+                    UserInformation userInfo = props.GetTrackedSingle<UserInformation>();
+
+                    return new UserInformationResponseMessage
+                    {
+                        OriginalUsername = userInfo.OriginalUsername,
+                        Username = userInfo.Username,
+                        Domain = userInfo.Domain
+                    };
+                }
+            }
+
+            return new UserInformationResponseMessage();
         }
 
         private EmptyMessage HandleLoginInfoChange(LoginInfoChangeMessage msg)

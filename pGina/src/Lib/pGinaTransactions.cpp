@@ -322,6 +322,59 @@ namespace pGina
 		}
 
 		/* static */
+		LoginInfo::UserInformation LoginInfo::GetUserInformation(int session_id)
+		{
+			// Write a log message to the service
+			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
+			std::wstring pipePath = L"\\\\.\\pipe\\";
+			pipePath += pipeName;
+
+			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);	
+			
+			if( pipeClient.Connect() )
+			{
+				// Start a cleanup pool for messages we collect along the way
+				pGina::Memory::ObjectCleanupPool cleanup;
+
+				// Always send hello first, expect hello in return
+				pGina::Protocol::HelloMessage hello;
+				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);		
+				cleanup.Add(reply);
+
+				if(reply && reply->Type() != pGina::Protocol::Hello)
+					return UserInformation();
+
+				// Then send a request message, expect a response message
+				pGina::Protocol::UserInformationRequestMessage request(session_id);
+				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, request);
+				cleanup.Add(reply);
+
+				if(reply && reply->Type() != pGina::Protocol::UserInfoResponse)
+					return UserInformation();
+
+				// Get the reply
+				pGina::Protocol::UserInformationResponseMessage * responseMsg = 
+					static_cast<pGina::Protocol::UserInformationResponseMessage *>(reply);
+
+				// Send disconnect, expect ack, then close
+				pGina::Protocol::DisconnectMessage disconnect;
+				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, disconnect);
+				cleanup.Add(reply);		
+
+				// We close regardless, no need to check reply type..
+				pipeClient.Close();
+
+				return UserInformation(responseMsg->OriginalUsername(), responseMsg->Username(), responseMsg->Domain());
+			}
+			else
+			{
+				Log::Warn(L"Unable to connect to pGina service pipe - LastError: 0x%08x, giving up.", GetLastError());
+			}
+
+			return UserInformation();
+		}
+
+		/* static */
 		void LoginInfo::Move(const wchar_t *username, const wchar_t *domain, const wchar_t *password, int old_session, int new_session)
 		{
 			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");

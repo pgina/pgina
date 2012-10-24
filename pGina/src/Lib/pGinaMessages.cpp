@@ -77,6 +77,12 @@ namespace pGina
 						case DynLabelResponse:
 							reply = (MessageBase *) (new DynamicLabelResponseMessage());
 							break;
+						case UserInfoRequest:
+							reply = (MessageBase *) (new UserInformationRequestMessage());
+							break;
+						case UserInfoResponse:
+							reply = (MessageBase *) (new UserInformationResponseMessage());
+							break;
 						}
 					}
 

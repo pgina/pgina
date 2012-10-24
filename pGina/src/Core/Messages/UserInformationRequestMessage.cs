@@ -24,26 +24,40 @@
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Dynamic;
 
 namespace pGina.Core.Messages
 {
-    public enum MessageType
+    public class UserInformationRequestMessage : MessageBase
     {
-        Unknown         = 0x00,
-        Hello           = 0x01,
-        Disconnect      = 0x02,
-        Ack             = 0x03,
-        Log             = 0x04,
-        LoginRequest    = 0x05,
-        LoginResponse   = 0x06,
-        DynLabelRequest = 0x07,
-        DynLabelResponse = 0x08,
-        LoginInfoChange = 0x09,
-        UserInfoRequest = 0x0a,
-        UserInfoResponse = 0x0b
+        public int SessionID { get; set; }
+
+        public UserInformationRequestMessage(dynamic expandoVersion)
+        {
+            FromExpando(expandoVersion);
+        }
+
+        public UserInformationRequestMessage()
+        {
+            SessionID = -1;
+        }
+
+        public override void FromExpando(dynamic expandoVersion)
+        {
+            SessionID = expandoVersion.SessionID;
+        }
+
+        public override dynamic ToExpando()
+        {
+            dynamic exp = new ExpandoObject();
+            exp.SessionID = this.SessionID;
+            exp.MessageType = (byte) MessageType.UserInfoRequest;
+            return exp;
+        }
     }
 }

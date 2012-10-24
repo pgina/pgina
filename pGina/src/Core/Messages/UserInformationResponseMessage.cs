@@ -24,26 +24,49 @@
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Dynamic;
 
 namespace pGina.Core.Messages
 {
-    public enum MessageType
+    public class UserInformationResponseMessage : UserInformationRequestMessage
     {
-        Unknown         = 0x00,
-        Hello           = 0x01,
-        Disconnect      = 0x02,
-        Ack             = 0x03,
-        Log             = 0x04,
-        LoginRequest    = 0x05,
-        LoginResponse   = 0x06,
-        DynLabelRequest = 0x07,
-        DynLabelResponse = 0x08,
-        LoginInfoChange = 0x09,
-        UserInfoRequest = 0x0a,
-        UserInfoResponse = 0x0b
+        public string OriginalUsername { get; set; }
+        public string Username { get; set; }
+        public string Domain { get; set; }
+
+        public UserInformationResponseMessage(dynamic expandoVersion)
+        {
+            FromExpando(expandoVersion);
+        }
+
+        public UserInformationResponseMessage()
+        {
+            OriginalUsername = "";
+            Username = "";
+            Domain = "";
+        }
+
+        public override void FromExpando(dynamic expandoVersion)
+        {
+            base.FromExpando((ExpandoObject)expandoVersion);
+            OriginalUsername = expandoVersion.OriginalUsername;
+            Username = expandoVersion.Username;
+            Domain = expandoVersion.Domain;
+        }
+
+        public override dynamic ToExpando()
+        {
+            dynamic exp = base.ToExpando();
+            exp.OriginalUsername = this.OriginalUsername;
+            exp.Username = this.Username;
+            exp.Domain = this.Domain;
+            exp.MessageType = (byte)MessageType.UserInfoResponse;
+            return exp;
+        }
     }
 }

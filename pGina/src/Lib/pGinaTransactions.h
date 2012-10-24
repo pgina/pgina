@@ -101,7 +101,31 @@ namespace pGina
 		class LoginInfo
 		{
 		public:
-			static void Move(const wchar_t *username, const wchar_t *domain, const wchar_t *password, int old_session, int new_session);			
+
+			class UserInformation 
+			{
+			public:
+				std::wstring OriginalUsername() { return m_orig_uname; }
+				void OriginalUsername(std::wstring const &v) { m_orig_uname = v; }
+
+				std::wstring Username() { return m_username; }
+				void Username(std::wstring const& v) { m_username = v; }
+
+				std::wstring Domain() { return m_domain; }
+				void Domain(std::wstring const& v) { m_domain = v; }
+
+				UserInformation() {}
+				UserInformation(const std::wstring & orig_uname, const std::wstring & uname, const std::wstring& dom): 
+					m_orig_uname(orig_uname), m_username(uname), m_domain(dom) {}
+
+			private:
+				std::wstring m_username;
+				std::wstring m_domain;
+				std::wstring m_orig_uname;
+			};
+
+			static UserInformation GetUserInformation( int session_id );
+			static void Move(const wchar_t *username, const wchar_t *domain, const wchar_t *password, int old_session, int new_session);
 		};
 		
 		class ServiceStateThread : public pGina::Threading::Thread
