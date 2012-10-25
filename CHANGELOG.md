@@ -1,3 +1,10 @@
+3.1.6.0 BETA (2012/10/24)
+---------------------------
+ - Support for filtering in CredUI scenario.
+ - Simulator explains lack of logging when using pGina service.
+ - Support for using original username in the unlock scenario (CP only, #154).
+ - Fix session cache bug related to CredUI login (#153).
+
 3.1.5.0 BETA (2012/10/03)
 ---------------------------
  - Filtering of any credential provider (#144, #132)
