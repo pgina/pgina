@@ -86,6 +86,7 @@ namespace pGina.Configuration
         private const string CPF_CP_LOGON_COLUMN = "FilterLogon";
         private const string CPF_CP_UNLOCK_COLUMN = "FilterUnlock";
         private const string CPF_CP_CHANGE_PASS_COLUMN = "FilterChangePass";
+        private const string CPF_CP_CREDUI_COLUMN = "FilterCredUI";
         private const string CPF_CP_UUID_COLUMN = "Uuid";
 
         private LogViewWindow logWindow = null;
@@ -184,6 +185,13 @@ namespace pGina.Configuration
                 Name = CPF_CP_CHANGE_PASS_COLUMN,
                 DataPropertyName = CPF_CP_CHANGE_PASS_COLUMN,
                 HeaderText = "Change Password",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+            dgvCredProvFilter.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = CPF_CP_CREDUI_COLUMN,
+                DataPropertyName = CPF_CP_CREDUI_COLUMN,
+                HeaderText = "Cred UI",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
             dgvCredProvFilter.Columns.Add(new DataGridViewTextBoxColumn()

@@ -122,10 +122,11 @@ namespace pGina.Configuration
         public bool FilterLogon { get; set; }
         public bool FilterUnlock { get; set; }
         public bool FilterChangePass { get; set; }
+        public bool FilterCredUI { get; set; }
 
         public bool FilterEnabled()
         {
-            return FilterLogon || FilterUnlock || FilterChangePass;
+            return FilterLogon || FilterUnlock || FilterChangePass || FilterCredUI;
         }
 
         public string ToRegString()
@@ -135,6 +136,7 @@ namespace pGina.Configuration
             if (FilterLogon) filter |= 0x1;
             if (FilterUnlock) filter |= 0x2;
             if (FilterChangePass) filter |= 0x4;
+            if (FilterCredUI) filter |= 0x8;
 
             return string.Format("{{{0}}}\t{1}", Uuid.ToString(), filter);
         }
@@ -150,6 +152,7 @@ namespace pGina.Configuration
             if ((filter & 0x1) != 0) result.FilterLogon = true;
             if ((filter & 0x2) != 0) result.FilterUnlock = true;
             if ((filter & 0x4) != 0) result.FilterChangePass = true;
+            if ((filter & 0x8) != 0) result.FilterCredUI = true;
             return result;
         }
     }

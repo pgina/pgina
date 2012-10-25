@@ -124,7 +124,8 @@ namespace pGina {
 					if(
 						(cpus == CPUS_LOGON && ((setting.filter & 0x1) != 0)) ||
 						(cpus == CPUS_UNLOCK_WORKSTATION && ((setting.filter & 0x2) != 0)) ||
-						(cpus == CPUS_CHANGE_PASSWORD && ((setting.filter & 0x4) != 0))
+						(cpus == CPUS_CHANGE_PASSWORD && ((setting.filter & 0x4) != 0)) ||
+						(cpus == CPUS_CREDUI && ((setting.filter & 0x8) != 0))
 						)
 					{
 						pDEBUG(L"Filtering %s", setting.uuidStr.c_str() );
