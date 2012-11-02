@@ -7,6 +7,7 @@
   <ItemGroup>
     <CoreSolution Include="pGina\src\pGina-3.x-vs2010.sln" />
     <PluginSolutions Include="Plugins\**\*.sln" />
+    <OutputDirectories Include="Plugins\bin;pGina\src\bin;pGina\src\build" />
   </ItemGroup>
   
   <!-- Build everything -->
@@ -36,6 +37,7 @@
     <MSBuild Projects="@(CoreSolution)" Targets="Clean" Properties="Configuration=$(Configuration);Platform=x64" />
     <MSBuild Projects="@(CoreSolution)" Targets="Clean" Properties="Configuration=$(Configuration);Platform=Win32" />
     <MSBuild Projects="@(PluginSolutions)" Targets="Clean" Properties="Configuration=$(Configuration);Platform=Any CPU" />
+    <RemoveDir Directories="@(OutputDirectories)" />
   </Target>
 
 </Project>
