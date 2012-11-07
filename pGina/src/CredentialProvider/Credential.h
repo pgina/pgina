@@ -95,6 +95,7 @@ namespace pGina
 			UI_FIELDS *m_fields;			
 			DWORD	m_usageFlags;
 			pGina::Transactions::User::LoginResult m_loginResult;
+			bool m_logonCancelled;
 		};
 	}
 }

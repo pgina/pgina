@@ -243,6 +243,16 @@ namespace pGina
 			// Credential::Connect will have executed prior to this method, which contacts the
 			// service, so m_loginResult should have the result from the plugins.
 
+			if( m_logonCancelled )
+			{
+				// User clicked cancel during logon
+				pDEBUG(L"Credential::GetSerialization - Logon was cancelled, returning S_FALSE");
+				SHStrDupW(L"Logon cancelled", ppwszOptionalStatusText);
+				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
+				*pcpsiOptionalStatusIcon = CPSI_ERROR;
+				return S_FALSE;
+			}
+
 			if(!m_loginResult.Result())
 			{
 				pERROR(L"Credential::GetSerialization: Failed login");
@@ -354,7 +364,8 @@ namespace pGina
 			m_usageScenario(CPUS_INVALID),
 			m_logonUiCallback(NULL),
 			m_fields(NULL),			
-			m_usageFlags(0)
+			m_usageFlags(0),
+			m_logonCancelled(false)
 		{
 			AddDllReference();
 
@@ -571,6 +582,7 @@ namespace pGina
 			m_loginResult.Domain(L"");
 			m_loginResult.Message(L"");
 			m_loginResult.Result(false);
+			m_logonCancelled = false;
 
 			// Workout what our username, and password are.  Plugins are responsible for
 			// parsing out domain\machine name if needed
@@ -605,7 +617,7 @@ namespace pGina
 			{
 				if( m_loginResult.Result() )
 				{
-					pDEBUG(L"Plugins registered logon success.");
+					pDEBUG(L"Plugins registered logon success");
 					pqcws->SetStatusMessage(L"Logon successful");
 				}
 				else
@@ -613,14 +625,21 @@ namespace pGina
 					pDEBUG(L"Plugins registered logon failure");
 					pqcws->SetStatusMessage(L"Logon failed");
 				}
+
+				// Did the user click the "Cancel" button?
+				if( pqcws->QueryContinue() != S_OK )
+				{
+					pDEBUG(L"User clicked cancel button during plugin processing");
+					m_logonCancelled = true;
+				}
 			}
+
 			return S_OK;
 		}
 
 		IFACEMETHODIMP Credential::Disconnect()
 		{
-			pDEBUG(L"Credential::Disconnect");
-			return S_OK;
+			return E_NOTIMPL;
 		}
 	}
 }
