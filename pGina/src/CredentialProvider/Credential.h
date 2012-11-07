@@ -29,6 +29,8 @@
 #include <windows.h>
 #include <credentialprovider.h>
 
+#include <pGinaNativeLib.h>
+
 #include "ClassFactory.h"
 #include "TileUiTypes.h"
 
@@ -36,7 +38,7 @@ namespace pGina
 {
 	namespace CredProv
 	{
-		class Credential : public ICredentialProviderCredential
+		class Credential : public IConnectableCredentialProviderCredential
 		{
 		public:
 			// IUnknown
@@ -64,6 +66,8 @@ namespace pGina
 											__deref_out_opt PWSTR* ppwszOptionalStatusText, __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon);
 			IFACEMETHODIMP ReportResult(__in NTSTATUS ntsStatus, __in NTSTATUS ntsSubstatus, __deref_out_opt PWSTR* ppwszOptionalStatusText, 
 										__out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon);
+			IFACEMETHODIMP Connect( __in IQueryContinueWithStatus *pqcws );
+			IFACEMETHODIMP Disconnect();
 
 			Credential();
 			virtual ~Credential();
@@ -90,6 +94,7 @@ namespace pGina
 			ICredentialProviderCredentialEvents * m_logonUiCallback;
 			UI_FIELDS *m_fields;			
 			DWORD	m_usageFlags;
+			pGina::Transactions::User::LoginResult m_loginResult;
 		};
 	}
 }

@@ -34,7 +34,6 @@
 #include <shlwapi.h>
 #pragma warning(pop)
 
-#include <pGinaNativeLib.h>
 #include <Macros.h>
 
 #include "ClassFactory.h"
@@ -57,7 +56,8 @@ namespace pGina
 			// And more crazy ass v-table madness, yay COM again!
 			static const QITAB qit[] =
 			{
-				QITABENT(Credential, ICredentialProviderCredential), 
+				QITABENT(Credential, ICredentialProviderCredential),
+				QITABENT(Credential, IConnectableCredentialProviderCredential), 
 				{0},
 			};
 			return QISearch(this, qit, riid, ppv);
@@ -240,32 +240,15 @@ namespace pGina
 		IFACEMETHODIMP Credential::GetSerialization(__out CREDENTIAL_PROVIDER_GET_SERIALIZATION_RESPONSE* pcpgsr, __out CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs,
 													__deref_out_opt PWSTR* ppwszOptionalStatusText, __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
 		{
-			// Workout what our username, and password are.  Plugins are responsible for parsing out domain\machine name if needed
-			PWSTR username = FindUsernameValue();			
-			PWSTR password = FindPasswordValue();
-			PWSTR domain = NULL;
-			
-			pGina::Protocol::LoginRequestMessage::LoginReason reason = pGina::Protocol::LoginRequestMessage::Login;
-			switch(m_usageScenario)
-			{
-			case CPUS_LOGON:
-				break;
-			case CPUS_UNLOCK_WORKSTATION:
-				reason = pGina::Protocol::LoginRequestMessage::Unlock;
-				break;
-			case CPUS_CREDUI:
-				reason = pGina::Protocol::LoginRequestMessage::CredUI;
-				break;
-			}
+			// Credential::Connect will have executed prior to this method, which contacts the
+			// service, so m_loginResult should have the result from the plugins.
 
-			pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);
-			pGina::Transactions::User::LoginResult loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password, reason);
-			if(!loginResult.Result())
+			if(!m_loginResult.Result())
 			{
 				pERROR(L"Credential::GetSerialization: Failed login");
-				if(loginResult.Message().length() > 0)
+				if(m_loginResult.Message().length() > 0)
 				{
-					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);					
+					SHStrDupW(m_loginResult.Message().c_str(), ppwszOptionalStatusText);					
 				}
 				else
 				{
@@ -282,9 +265,9 @@ namespace pGina
 
 			pGina::Memory::ObjectCleanupPool cleanup;
 
-			username = loginResult.Username().length() > 0 ? _wcsdup(loginResult.Username().c_str()) : NULL;
-			password = loginResult.Password().length() > 0 ? _wcsdup(loginResult.Password().c_str()) : NULL;
-			domain = loginResult.Domain().length() > 0 ? _wcsdup(loginResult.Domain().c_str()) : NULL;			
+			PWSTR username = m_loginResult.Username().length() > 0 ? _wcsdup(m_loginResult.Username().c_str()) : NULL;
+			PWSTR password = m_loginResult.Password().length() > 0 ? _wcsdup(m_loginResult.Password().c_str()) : NULL;
+			PWSTR domain = m_loginResult.Domain().length() > 0 ? _wcsdup(m_loginResult.Domain().c_str()) : NULL;			
 
 			cleanup.AddFree(username);
 			cleanup.AddFree(password);
@@ -575,6 +558,69 @@ namespace pGina
 				std::wstring text = pGina::Service::StateHelper::GetStateText();
 				m_logonUiCallback->SetFieldString(this, FindStatusId(), text.c_str());
 			}
+		}
+
+		// Called just after the "submit" button is clicked and just before GetSerialization
+		IFACEMETHODIMP Credential::Connect( IQueryContinueWithStatus *pqcws )
+		{
+			pDEBUG(L"Credential::Connect()");
+
+			// Reset m_loginResult
+			m_loginResult.Username(L"");
+			m_loginResult.Password(L"");
+			m_loginResult.Domain(L"");
+			m_loginResult.Message(L"");
+			m_loginResult.Result(false);
+
+			// Workout what our username, and password are.  Plugins are responsible for
+			// parsing out domain\machine name if needed
+			PWSTR username = FindUsernameValue();			
+			PWSTR password = FindPasswordValue();
+			PWSTR domain = NULL;
+			
+			pGina::Protocol::LoginRequestMessage::LoginReason reason = pGina::Protocol::LoginRequestMessage::Login;
+			switch(m_usageScenario)
+			{
+			case CPUS_LOGON:
+				break;
+			case CPUS_UNLOCK_WORKSTATION:
+				reason = pGina::Protocol::LoginRequestMessage::Unlock;
+				break;
+			case CPUS_CREDUI:
+				reason = pGina::Protocol::LoginRequestMessage::CredUI;
+				break;
+			}
+
+			pDEBUG(L"Credential::Connect: Processing login for %s", username);
+			
+			if( pqcws )
+			{
+				pqcws->SetStatusMessage(L"Processing logon...");
+			}
+
+			// Execute plugins
+			m_loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password, reason);
+			
+			if( pqcws )
+			{
+				if( m_loginResult.Result() )
+				{
+					pDEBUG(L"Plugins registered logon success.");
+					pqcws->SetStatusMessage(L"Logon successful");
+				}
+				else
+				{
+					pDEBUG(L"Plugins registered logon failure");
+					pqcws->SetStatusMessage(L"Logon failed");
+				}
+			}
+			return S_OK;
+		}
+
+		IFACEMETHODIMP Credential::Disconnect()
+		{
+			pDEBUG(L"Credential::Disconnect");
+			return S_OK;
 		}
 	}
 }

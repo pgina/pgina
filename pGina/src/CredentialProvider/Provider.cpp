@@ -350,8 +350,8 @@ namespace pGina
 			if(dwIndex != 0 || !ppcpc)
 				return E_INVALIDARG;
 
-			// Alright... QueryIface for ICredentialProviderCredential
-			return m_credential->QueryInterface(IID_ICredentialProviderCredential, reinterpret_cast<void **>(ppcpc));			 
+			// Alright... QueryIface for IConnectableCredentialProviderCredential
+			return m_credential->QueryInterface(IID_IConnectableCredentialProviderCredential, reinterpret_cast<void **>(ppcpc));			 
     	}
 
 		IFACEMETHODIMP Provider::GetFieldDescriptorForUi(UI_FIELDS const& fields, DWORD index, CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR **ppcpfd)
