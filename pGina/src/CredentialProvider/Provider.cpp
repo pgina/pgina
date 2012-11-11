@@ -125,11 +125,17 @@ namespace pGina
 			{
 			case CPUS_LOGON:
 			case CPUS_UNLOCK_WORKSTATION:
-			case CPUS_CREDUI:
 				m_usageScenario = cpus;
 				m_usageFlags = dwFlags;
 				return S_OK;
-			
+			case CPUS_CREDUI:
+				// Dropped support for the CredUI scenario when we moved to the
+				// IConnectableCredentialProviderCredential interface.
+				// This is due to the fact that Windows doesn't seem to support 
+				// IConnectableCrendentialProviderCredential
+				// in this scenario.  We could provide support at some later time by 
+				// providing a separate credential implementation for the CredUI scenario.
+				return E_NOTIMPL;
 			case CPUS_CHANGE_PASSWORD:			
 				return E_NOTIMPL;	// Todo: Support this
 
