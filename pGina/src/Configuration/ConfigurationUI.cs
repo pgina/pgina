@@ -1317,7 +1317,7 @@ namespace pGina.Configuration
                 {
                     if (String.IsNullOrEmpty(m_tileImageTxt.Text.Trim()))
                     {
-                        m_tileImage.Image = pGina.Configuration.Properties.Resources.pginalogo;
+                        m_tileImage.Image = pGina.Configuration.Properties.Resources.pginalogo_monochrome_126x126;
                     }
                     else
                     {
@@ -1326,7 +1326,7 @@ namespace pGina.Configuration
                 }
                 catch (Exception)
                 {
-                    m_tileImage.Image = pGina.Configuration.Properties.Resources.pginalogo;
+                    m_tileImage.Image = pGina.Configuration.Properties.Resources.pginalogo_monochrome_126x126;
                 }
 
                 ResetStageStatus();

@@ -159,7 +159,7 @@ namespace pGina
 			if(tileImage.empty() || tileImage.length() == 1)
 			{
 				// Use builtin
-				bitmap = LoadBitmap(GetMyInstance(), MAKEINTRESOURCE(IDB_PGINA_LOGO));
+				bitmap = LoadBitmap(GetMyInstance(), MAKEINTRESOURCE(IDB_LOGO_MONOCHROME_200));
 			}
 			else
 			{

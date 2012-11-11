@@ -188,6 +188,8 @@
     <None Include="Resources\redx.png" />
     <None Include="Resources\grayBar.png" />
     <None Include="Resources\greenCheckMark.png" />
+    <None Include="Resources\pginalogo_monochrome_126x126.png" />
+    <None Include="Resources\pginalogo_monochrome_200x200.png" />
     <Content Include="Resources\pgina_icons.ico" />
     <None Include="Resources\pginalogo.bmp" />
   </ItemGroup>
