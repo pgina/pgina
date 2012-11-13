@@ -33,6 +33,8 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 using pGina.Service.Impl;
 
@@ -40,14 +42,88 @@ using log4net;
 
 namespace Service
 {
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SERVICE_STATUS
+    {
+        public int serviceType;
+        public int currentState;
+        public int controlsAccepted;
+        public int win32ExitCode;
+        public int serviceSpecificExitCode;
+        public int checkPoint;
+        public int waitHint;
+    }
+    public enum State
+    {
+        SERVICE_STOPPED = 0x00000001,
+        SERVICE_START_PENDING = 0x00000002,
+        SERVICE_STOP_PENDING = 0x00000003,
+        SERVICE_RUNNING = 0x00000004,
+        SERVICE_CONTINUE_PENDING = 0x00000005,
+        SERVICE_PAUSE_PENDING = 0x00000006,
+        SERVICE_PAUSED = 0x00000007,
+    }
+    public enum ServiceAccept
+    {
+        SERVICE_ACCEPT_NETBINDCHANGE = 0x00000010,
+        SERVICE_ACCEPT_PARAMCHANGE = 0x00000008,
+        SERVICE_ACCEPT_PAUSE_CONTINUE = 0x00000002,
+        SERVICE_ACCEPT_PRESHUTDOWN = 0x00000100,
+        SERVICE_ACCEPT_SHUTDOWN = 0x00000004,
+        SERVICE_ACCEPT_STOP = 0x00000001,
+        SERVICE_ACCEPT_HARDWAREPROFILECHANGE = 0x00000020,
+        SERVICE_ACCEPT_POWEREVENT = 0x00000040,
+        SERVICE_ACCEPT_SESSIONCHANGE = 0x00000080,
+        SERVICE_ACCEPT_TIMECHANGE = 0x00000200,
+        SERVICE_ACCEPT_TRIGGEREVENT = 0x00000400,
+        SERVICE_ACCEPT_USERMODEREBOOT = 0x00000800, //windows 8
+    }
+    public enum ServiceControl
+    {
+        SERVICE_CONTROL_DEVICEEVENT = 0x0000000B,
+        SERVICE_CONTROL_HARDWAREPROFILECHANGE = 0x0000000C,
+        SERVICE_CONTROL_POWEREVENT = 0x0000000D,
+        SERVICE_CONTROL_SESSIONCHANGE = 0x0000000E,
+        SERVICE_CONTROL_TIMECHANGE = 0x00000010,
+        SERVICE_CONTROL_TRIGGEREVENT = 0x00000020,
+        SERVICE_CONTROL_USERMODEREBOOT = 0x00000040,
+        SERVICE_CONTROL_CONTINUE = 0x00000003,
+        SERVICE_CONTROL_INTERROGATE = 0x00000004,
+        SERVICE_CONTROL_NETBINDADD = 0x00000007,
+        SERVICE_CONTROL_NETBINDDISABLE = 0x0000000A,
+        SERVICE_CONTROL_NETBINDENABLE = 0x00000009,
+        SERVICE_CONTROL_NETBINDREMOVE = 0x00000008,
+        SERVICE_CONTROL_PARAMCHANGE = 0x00000006,
+        SERVICE_CONTROL_PAUSE = 0x00000002,
+        SERVICE_CONTROL_PRESHUTDOWN = 0x0000000F,
+        SERVICE_CONTROL_SHUTDOWN = 0x00000005,
+        SERVICE_CONTROL_STOP = 0x00000001,
+    }
     public partial class pGinaServiceHost : ServiceBase
     {
         private Thread m_serviceThread = null;
         private pGina.Service.Impl.ServiceThread m_serviceThreadObj = null;
 
+        [DllImport("advapi32.dll", SetLastError = true)]
+        internal static extern bool SetServiceStatus(IntPtr hServiceStatus, ref SERVICE_STATUS lpServiceStatus);
+
+        private SERVICE_STATUS myServiceStatus;
+
         public pGinaServiceHost()
         {
-            InitializeComponent();           
+            InitializeComponent();
+
+            FieldInfo fi = typeof(ServiceBase).GetField("acceptedCommands", BindingFlags.Instance | BindingFlags.NonPublic);
+            int val = (int)fi.GetValue(this) | (int)ServiceAccept.SERVICE_ACCEPT_PRESHUTDOWN;
+            fi.SetValue(this, val);
+
+            //prepare myServiceStatus for further use
+            ServiceController sc = new ServiceController(this.ServiceName);
+            myServiceStatus.serviceType = (int)sc.ServiceType;
+            myServiceStatus.controlsAccepted = val;
+            myServiceStatus.serviceSpecificExitCode = 0;
+            myServiceStatus.win32ExitCode = 0;
+            sc.Close();
         }
 
         protected override void OnStart(string[] args)
@@ -69,6 +145,34 @@ namespace Service
         {
             WaitForServiceInit();
             m_serviceThreadObj.Stop();
+        }
+
+        protected override void OnCustomCommand(int command)
+        {
+            WaitForServiceInit();
+            switch (command)
+            {
+                case (int)ServiceControl.SERVICE_CONTROL_PRESHUTDOWN:
+                    Timer p_timer = new Timer(SignalShutdownPending, 5, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
+                    break;
+                default:
+                    base.OnCustomCommand(command);
+                    break;
+            }
+        }
+        private void SignalShutdownPending(object state)
+        {
+            while (m_serviceThreadObj.OnCustomCommand())
+            {
+                myServiceStatus.checkPoint++;
+                myServiceStatus.currentState = (int)State.SERVICE_STOP_PENDING;
+                myServiceStatus.waitHint = 1500;
+                if (!SetServiceStatus(this.ServiceHandle, ref myServiceStatus))
+                {
+                    int lastError = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
+                }
+                Thread.Sleep(500);
+            }
         }
 
         protected override void OnSessionChange(SessionChangeDescription changeDescription)
