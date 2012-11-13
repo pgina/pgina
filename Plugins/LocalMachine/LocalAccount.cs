@@ -36,6 +36,8 @@ using System.DirectoryServices.AccountManagement;
 using System.Security.Principal;
 using System.Security.AccessControl;
 using System.IO;
+using Microsoft.Win32;
+using System.Threading;
 
 using pGina.Shared.Types;
 
@@ -136,7 +138,7 @@ namespace pGina.Plugin.LocalMachine
                     if (p is GroupPrincipal)
                     {
                         GroupPrincipal group = (GroupPrincipal)p;
-                        if (group.Name.Equals(groupname, StringComparison.CurrentCultureIgnoreCase))
+                        if (group.Name.Equals(groupname, StringComparison.CurrentCultureIgnoreCase) || group.Sid.ToString().Equals(groupname, StringComparison.CurrentCultureIgnoreCase))
                             return group;
                     }
                 }
@@ -297,6 +299,8 @@ namespace pGina.Plugin.LocalMachine
                 {
                     user.Name = userInfo.Username;
                     user.SetPassword(userInfo.Password);
+                    user.Description = "pGina created";
+                    userInfo.Description = user.Description;
                     user.Save();
 
                     // Sync via DE
@@ -436,7 +440,7 @@ namespace pGina.Plugin.LocalMachine
             }
         }
 
-        public static void RemoveUserAndProfile(string user)
+        public static void RemoveUserAndProfile(string user, int sessionID)
         {
             using (UserPrincipal userPrincipal = GetUserPrincipal(user))
             {
@@ -446,17 +450,72 @@ namespace pGina.Plugin.LocalMachine
                     string usersProfileDir = Abstractions.Windows.User.GetProfileDir(userPrincipal.Sid);
                     if (!string.IsNullOrEmpty(usersProfileDir))
                     {
+                        // instead of while (true)
+                        for (int x = 0; x < 60; x++ )
+                        {
+                            try
+                            {
+                                // logoff detection is quite a problem under NT6
+                                // a disconnectEvent is only triggered during a logoff
+                                // but not during a shutdown/reboot
+                                // and the SessionLogoffEvent is only saying that the user is logging of
+                                // So, there is no event that is fired during a user-logoff/reboot/shutdown
+                                // that indicates that the user has logged of
+                                int ses = Abstractions.WindowsApi.pInvokes.GetSessionId();
+                                m_logger.DebugFormat("GetSessionId:{0}", ses);
+                                if (ses != Convert.ToInt32(sessionID) || PluginImpl.IsShuttingDown)
+                                {
+                                    using (FileStream isunloaded = File.Open(usersProfileDir + "\\NTUSER.DAT", FileMode.Open, FileAccess.Read))
+                                    {
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    Thread.Sleep(1000);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                m_logger.DebugFormat("Ex loop{1}:{0}",ex.Message,x);
+                                Thread.Sleep(1000);
+                            }
+                        }
                         m_logger.DebugFormat("User {0} has profile in {1}, giving myself delete permission", user, usersProfileDir);
+                        try {Directory.Delete(usersProfileDir, true); }catch {}
                         RecurseDelete(usersProfileDir);
                         // Now remove it from the registry as well
                         Abstractions.WindowsApi.pInvokes.DeleteProfile(userPrincipal.Sid);
                     }
                 }
-                catch (KeyNotFoundException) 
+                catch (KeyNotFoundException)
                 {
                     m_logger.DebugFormat("User {0} has no disk profile, just removing principal", user);
                 }
-                userPrincipal.Delete();                
+
+                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\SessionData\" + sessionID.ToString() + "'");
+                Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\SessionData\" + sessionID.ToString(), false);
+                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\NetCache\PurgeAtNextLogoff\" + userPrincipal.Sid + "'");
+                Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\NetCache\PurgeAtNextLogoff\", true).DeleteValue(userPrincipal.Sid.ToString(), false);
+                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\Status\" + userPrincipal.Sid + "'");
+                Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\Status\" + userPrincipal.Sid, false);
+                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\" + userPrincipal.Sid + "'");
+                Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\" + userPrincipal.Sid, false);
+                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\" + userPrincipal.Sid + "'");
+                Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\" + userPrincipal.Sid, false);
+                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\" + userPrincipal.Sid + "'");
+                Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\" + userPrincipal.Sid, false);
+                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\IdentityStore\Cache\" + userPrincipal.Sid + "'");
+                Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\IdentityStore\Cache\" + userPrincipal.Sid, false);
+
+                try
+                {
+                    userPrincipal.Delete();
+                }
+                catch (Exception ex)
+                {
+                    m_logger.ErrorFormat("userPrincipal.Delete error:{0}", ex.Message);
+                }
             }
         }
 
@@ -482,21 +541,41 @@ namespace pGina.Plugin.LocalMachine
             // Files
             foreach (string file in files)
             {
-                // m_logger.DebugFormat("File: {0}", file);
-                FileSecurity fileSecurity = File.GetAccessControl(file);
-                fileSecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().Name, FileSystemRights.FullControl, AccessControlType.Allow));
-                File.SetAccessControl(file, fileSecurity); // Set the new access settings.
-                File.SetAttributes(file, FileAttributes.Normal);
-                File.Delete(file);
+                try
+                {
+                    // m_logger.DebugFormat("File: {0}", file);
+                    FileSecurity fileSecurity = File.GetAccessControl(file);
+                    fileSecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().Name, FileSystemRights.FullControl, AccessControlType.Allow));
+                    File.SetAccessControl(file, fileSecurity); // Set the new access settings.
+                    File.SetAttributes(file, FileAttributes.Normal);
+                    File.Delete(file);
+                }
+                catch (Exception ex)
+                {
+                    m_logger.Debug(ex.Message);
+                }
             }
 
             // Recurse each dir
             foreach (string dir in dirs)
             {
-                RecurseDelete(dir);
+                try
+                {
+                    RecurseDelete(dir);
+                }
+                catch (Exception ex)
+                {
+                    m_logger.Debug(ex.Message);
+                }
             }
-            
-            Directory.Delete(directory, false);
+            try
+            {
+                Directory.Delete(directory, false);
+            }
+            catch (Exception ex)
+            {
+                m_logger.Debug(ex.Message);
+            }
         }
 
         /// <summary>
