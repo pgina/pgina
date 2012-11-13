@@ -23,6 +23,11 @@ namespace pGina.Service.Impl
             m_service.Stop();
         }
 
+        public Boolean OnCustomCommand()
+        {
+            return m_service.OnCustomCommand();
+        }
+
         public void SessionChange(SessionChangeDescription desc)
         {
             m_service.SessionChange(desc);
