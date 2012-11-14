@@ -280,15 +280,9 @@ namespace pGina.Plugin.MySqlLogger
         private string ConsoleConnectEvent(int sessionId, SessionProperties properties)
         {
             bool okToLog = Settings.Store.EvtConsoleConnect;
-            string userName = "";
-
-            userName = getUsername(properties);
-            if (userName == null)
-                userName = UNKNOWN_USERNAME;
-
 
             if (okToLog)
-                return string.Format("[{0}] Console connect user: {1}", sessionId, userName);
+                return string.Format("[{0}] Console connect", sessionId);
 
             return "";
         }
@@ -296,15 +290,9 @@ namespace pGina.Plugin.MySqlLogger
         private string ConsoleDisconnectEvent(int sessionId, SessionProperties properties)
         {
             bool okToLog = Settings.Store.EvtConsoleDisconnect;
-            string userName = "";
-
-            userName = getUsername(properties);
-            if (userName == null)
-                userName = UNKNOWN_USERNAME;
-
 
             if (okToLog)
-                return string.Format("[{0}] Console disconnect user: {1}", sessionId, userName);
+                return string.Format("[{0}] Console disconnect", sessionId);
 
             return "";
         }
@@ -391,14 +379,15 @@ namespace pGina.Plugin.MySqlLogger
 
         private string getUsername(SessionProperties properties)
         {
+            if (properties == null)
+                return UNKNOWN_USERNAME;
+
             bool useModifiedName = Settings.Store.UseModifiedName;
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-
             if (useModifiedName)
                 return userInfo.Username;
             else
                 return userInfo.OriginalUsername;
-            //return null;
         }
     }
 }
