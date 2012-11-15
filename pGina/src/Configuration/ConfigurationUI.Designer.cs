@@ -57,6 +57,7 @@
             this.groupBox12 = new System.Windows.Forms.GroupBox();
             this.btnImageBrowse = new System.Windows.Forms.Button();
             this.label11 = new System.Windows.Forms.Label();
+            this.m_tileImagePreview = new System.Windows.Forms.PictureBox();
             this.m_tileImageTxt = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.m_pluginConfigTab = new System.Windows.Forms.TabPage();
@@ -69,23 +70,35 @@
             this.lstPluginDirs = new System.Windows.Forms.ListView();
             this.m_pluginOrderTab = new System.Windows.Forms.TabPage();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
+            this.gatewayBtnDown = new System.Windows.Forms.Button();
+            this.gatewayBtnUp = new System.Windows.Forms.Button();
             this.gatewayDGV = new System.Windows.Forms.DataGridView();
             this.groupBox11 = new System.Windows.Forms.GroupBox();
+            this.eventBtnDown = new System.Windows.Forms.Button();
+            this.eventBtnUp = new System.Windows.Forms.Button();
             this.eventDGV = new System.Windows.Forms.DataGridView();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.authorizeBtnDown = new System.Windows.Forms.Button();
+            this.authorizeBtnUp = new System.Windows.Forms.Button();
             this.authorizeDGV = new System.Windows.Forms.DataGridView();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.authenticateBtnDown = new System.Windows.Forms.Button();
+            this.authenticateBtnUp = new System.Windows.Forms.Button();
             this.authenticateDGV = new System.Windows.Forms.DataGridView();
             this.m_simTab = new System.Windows.Forms.TabPage();
             this.viewLogBtn = new System.Windows.Forms.Button();
             this.groupBox13 = new System.Windows.Forms.GroupBox();
             this.simResultLocalGroupsTB = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
+            this.simFinalResultPB = new System.Windows.Forms.PictureBox();
             this.label15 = new System.Windows.Forms.Label();
             this.simFinalResultMessageTB = new System.Windows.Forms.TextBox();
             this.simPluginResultsListView = new System.Windows.Forms.ListView();
             this.label9 = new System.Windows.Forms.Label();
             this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.simGatewayResultPB = new System.Windows.Forms.PictureBox();
+            this.simAuthzResultPB = new System.Windows.Forms.PictureBox();
+            this.simAuthResultPB = new System.Windows.Forms.PictureBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
@@ -98,10 +111,12 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.btnSimGo = new System.Windows.Forms.Button();
             this.m_password = new System.Windows.Forms.TextBox();
             this.m_username = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.m_tileImage = new System.Windows.Forms.PictureBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.m_radioEmulate = new System.Windows.Forms.RadioButton();
             this.m_radioUseService = new System.Windows.Forms.RadioButton();
@@ -126,21 +141,6 @@
             this.btnOkay = new System.Windows.Forms.Button();
             this.m_pginaVersionLbl = new System.Windows.Forms.Label();
             this.btnSaveAndClose = new System.Windows.Forms.Button();
-            this.m_tileImagePreview = new System.Windows.Forms.PictureBox();
-            this.gatewayBtnDown = new System.Windows.Forms.Button();
-            this.gatewayBtnUp = new System.Windows.Forms.Button();
-            this.eventBtnDown = new System.Windows.Forms.Button();
-            this.eventBtnUp = new System.Windows.Forms.Button();
-            this.authorizeBtnDown = new System.Windows.Forms.Button();
-            this.authorizeBtnUp = new System.Windows.Forms.Button();
-            this.authenticateBtnDown = new System.Windows.Forms.Button();
-            this.authenticateBtnUp = new System.Windows.Forms.Button();
-            this.simFinalResultPB = new System.Windows.Forms.PictureBox();
-            this.simGatewayResultPB = new System.Windows.Forms.PictureBox();
-            this.simAuthzResultPB = new System.Windows.Forms.PictureBox();
-            this.simAuthResultPB = new System.Windows.Forms.PictureBox();
-            this.btnSimGo = new System.Windows.Forms.Button();
-            this.m_tileImage = new System.Windows.Forms.PictureBox();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -148,6 +148,7 @@
             this.servGB.SuspendLayout();
             this.motdGB.SuspendLayout();
             this.groupBox12.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.m_tileImagePreview)).BeginInit();
             this.m_pluginConfigTab.SuspendLayout();
             this.pluginsGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).BeginInit();
@@ -163,9 +164,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).BeginInit();
             this.m_simTab.SuspendLayout();
             this.groupBox13.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.simFinalResultPB)).BeginInit();
             this.groupBox10.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.simGatewayResultPB)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.simAuthzResultPB)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.simAuthResultPB)).BeginInit();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.m_tileImage)).BeginInit();
             this.groupBox3.SuspendLayout();
             this.ginaOptions.SuspendLayout();
             this.groupBox16.SuspendLayout();
@@ -173,12 +179,6 @@
             this.cpOptions.SuspendLayout();
             this.groupBox9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCredProvFilter)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.m_tileImagePreview)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.simFinalResultPB)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.simGatewayResultPB)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.simAuthzResultPB)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.simAuthResultPB)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.m_tileImage)).BeginInit();
             this.SuspendLayout();
             // 
             // m_tabs
@@ -447,6 +447,16 @@
             this.label11.TabIndex = 3;
             this.label11.Text = "Preview:";
             // 
+            // m_tileImagePreview
+            // 
+            this.m_tileImagePreview.Image = global::pGina.Configuration.Properties.Resources.pginalogo_monochrome_126x126;
+            this.m_tileImagePreview.Location = new System.Drawing.Point(591, 17);
+            this.m_tileImagePreview.Name = "m_tileImagePreview";
+            this.m_tileImagePreview.Size = new System.Drawing.Size(130, 130);
+            this.m_tileImagePreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.m_tileImagePreview.TabIndex = 2;
+            this.m_tileImagePreview.TabStop = false;
+            // 
             // m_tileImageTxt
             // 
             this.m_tileImageTxt.Location = new System.Drawing.Point(94, 30);
@@ -611,6 +621,28 @@
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "Gateway";
             // 
+            // gatewayBtnDown
+            // 
+            this.gatewayBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.gatewayBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.gatewayBtnDown.Location = new System.Drawing.Point(330, 89);
+            this.gatewayBtnDown.Name = "gatewayBtnDown";
+            this.gatewayBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.gatewayBtnDown.TabIndex = 16;
+            this.gatewayBtnDown.UseVisualStyleBackColor = true;
+            this.gatewayBtnDown.Click += new System.EventHandler(this.gatewayBtnDown_Click);
+            // 
+            // gatewayBtnUp
+            // 
+            this.gatewayBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.gatewayBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.gatewayBtnUp.Location = new System.Drawing.Point(330, 56);
+            this.gatewayBtnUp.Name = "gatewayBtnUp";
+            this.gatewayBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.gatewayBtnUp.TabIndex = 15;
+            this.gatewayBtnUp.UseVisualStyleBackColor = true;
+            this.gatewayBtnUp.Click += new System.EventHandler(this.gatewayBtnUp_Click);
+            // 
             // gatewayDGV
             // 
             this.gatewayDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -632,6 +664,28 @@
             this.groupBox11.TabIndex = 21;
             this.groupBox11.TabStop = false;
             this.groupBox11.Text = "Event Notification";
+            // 
+            // eventBtnDown
+            // 
+            this.eventBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.eventBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.eventBtnDown.Location = new System.Drawing.Point(339, 89);
+            this.eventBtnDown.Name = "eventBtnDown";
+            this.eventBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.eventBtnDown.TabIndex = 16;
+            this.eventBtnDown.UseVisualStyleBackColor = true;
+            this.eventBtnDown.Click += new System.EventHandler(this.eventBtnDown_Click);
+            // 
+            // eventBtnUp
+            // 
+            this.eventBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.eventBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.eventBtnUp.Location = new System.Drawing.Point(339, 56);
+            this.eventBtnUp.Name = "eventBtnUp";
+            this.eventBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.eventBtnUp.TabIndex = 15;
+            this.eventBtnUp.UseVisualStyleBackColor = true;
+            this.eventBtnUp.Click += new System.EventHandler(this.eventBtnUp_Click);
             // 
             // eventDGV
             // 
@@ -655,6 +709,28 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Authorization";
             // 
+            // authorizeBtnDown
+            // 
+            this.authorizeBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.authorizeBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.authorizeBtnDown.Location = new System.Drawing.Point(339, 89);
+            this.authorizeBtnDown.Name = "authorizeBtnDown";
+            this.authorizeBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.authorizeBtnDown.TabIndex = 16;
+            this.authorizeBtnDown.UseVisualStyleBackColor = true;
+            this.authorizeBtnDown.Click += new System.EventHandler(this.authorizeBtnDown_Click);
+            // 
+            // authorizeBtnUp
+            // 
+            this.authorizeBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.authorizeBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.authorizeBtnUp.Location = new System.Drawing.Point(339, 56);
+            this.authorizeBtnUp.Name = "authorizeBtnUp";
+            this.authorizeBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.authorizeBtnUp.TabIndex = 15;
+            this.authorizeBtnUp.UseVisualStyleBackColor = true;
+            this.authorizeBtnUp.Click += new System.EventHandler(this.authorizeBtnUp_Click);
+            // 
             // authorizeDGV
             // 
             this.authorizeDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -676,6 +752,28 @@
             this.groupBox7.TabIndex = 12;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Authentication";
+            // 
+            // authenticateBtnDown
+            // 
+            this.authenticateBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.authenticateBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.authenticateBtnDown.Location = new System.Drawing.Point(330, 89);
+            this.authenticateBtnDown.Name = "authenticateBtnDown";
+            this.authenticateBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.authenticateBtnDown.TabIndex = 16;
+            this.authenticateBtnDown.UseVisualStyleBackColor = true;
+            this.authenticateBtnDown.Click += new System.EventHandler(this.authenticateBtnDown_Click);
+            // 
+            // authenticateBtnUp
+            // 
+            this.authenticateBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.authenticateBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.authenticateBtnUp.Location = new System.Drawing.Point(330, 56);
+            this.authenticateBtnUp.Name = "authenticateBtnUp";
+            this.authenticateBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.authenticateBtnUp.TabIndex = 15;
+            this.authenticateBtnUp.UseVisualStyleBackColor = true;
+            this.authenticateBtnUp.Click += new System.EventHandler(this.authenticateBtnUp_Click);
             // 
             // authenticateDGV
             // 
@@ -746,6 +844,14 @@
             this.label16.TabIndex = 9;
             this.label16.Text = "Local Groups:";
             // 
+            // simFinalResultPB
+            // 
+            this.simFinalResultPB.Location = new System.Drawing.Point(57, 211);
+            this.simFinalResultPB.Name = "simFinalResultPB";
+            this.simFinalResultPB.Size = new System.Drawing.Size(20, 20);
+            this.simFinalResultPB.TabIndex = 8;
+            this.simFinalResultPB.TabStop = false;
+            // 
             // label15
             // 
             this.label15.AutoSize = true;
@@ -795,6 +901,33 @@
             this.groupBox10.TabIndex = 3;
             this.groupBox10.TabStop = false;
             this.groupBox10.Text = "pGina Stages";
+            // 
+            // simGatewayResultPB
+            // 
+            this.simGatewayResultPB.Image = global::pGina.Configuration.Properties.Resources.grayBar;
+            this.simGatewayResultPB.Location = new System.Drawing.Point(84, 74);
+            this.simGatewayResultPB.Name = "simGatewayResultPB";
+            this.simGatewayResultPB.Size = new System.Drawing.Size(20, 20);
+            this.simGatewayResultPB.TabIndex = 5;
+            this.simGatewayResultPB.TabStop = false;
+            // 
+            // simAuthzResultPB
+            // 
+            this.simAuthzResultPB.Image = global::pGina.Configuration.Properties.Resources.grayBar;
+            this.simAuthzResultPB.Location = new System.Drawing.Point(84, 49);
+            this.simAuthzResultPB.Name = "simAuthzResultPB";
+            this.simAuthzResultPB.Size = new System.Drawing.Size(20, 20);
+            this.simAuthzResultPB.TabIndex = 4;
+            this.simAuthzResultPB.TabStop = false;
+            // 
+            // simAuthResultPB
+            // 
+            this.simAuthResultPB.Image = global::pGina.Configuration.Properties.Resources.grayBar;
+            this.simAuthResultPB.Location = new System.Drawing.Point(84, 23);
+            this.simAuthResultPB.Name = "simAuthResultPB";
+            this.simAuthResultPB.Size = new System.Drawing.Size(20, 20);
+            this.simAuthResultPB.TabIndex = 3;
+            this.simAuthResultPB.TabStop = false;
             // 
             // label6
             // 
@@ -917,6 +1050,16 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Simulated LogonUI";
             // 
+            // btnSimGo
+            // 
+            this.btnSimGo.Image = global::pGina.Configuration.Properties.Resources.arrow_right_3;
+            this.btnSimGo.Location = new System.Drawing.Point(307, 184);
+            this.btnSimGo.Name = "btnSimGo";
+            this.btnSimGo.Size = new System.Drawing.Size(30, 27);
+            this.btnSimGo.TabIndex = 5;
+            this.btnSimGo.UseVisualStyleBackColor = true;
+            this.btnSimGo.Click += new System.EventHandler(this.btnSimGo_Click);
+            // 
             // m_password
             // 
             this.m_password.Location = new System.Drawing.Point(79, 188);
@@ -949,6 +1092,16 @@
             this.label4.Size = new System.Drawing.Size(58, 13);
             this.label4.TabIndex = 1;
             this.label4.Text = "Username:";
+            // 
+            // m_tileImage
+            // 
+            this.m_tileImage.Image = global::pGina.Configuration.Properties.Resources.pginalogo_monochrome_126x126;
+            this.m_tileImage.Location = new System.Drawing.Point(121, 21);
+            this.m_tileImage.Name = "m_tileImage";
+            this.m_tileImage.Size = new System.Drawing.Size(130, 130);
+            this.m_tileImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.m_tileImage.TabIndex = 0;
+            this.m_tileImage.TabStop = false;
             // 
             // groupBox3
             // 
@@ -1210,159 +1363,6 @@
             this.btnSaveAndClose.UseVisualStyleBackColor = true;
             this.btnSaveAndClose.Click += new System.EventHandler(this.btnSaveAndClose_Click);
             // 
-            // m_tileImagePreview
-            // 
-            this.m_tileImagePreview.Image = global::pGina.Configuration.Properties.Resources.pginalogo_monochrome_126x126;
-            this.m_tileImagePreview.Location = new System.Drawing.Point(591, 17);
-            this.m_tileImagePreview.Name = "m_tileImagePreview";
-            this.m_tileImagePreview.Size = new System.Drawing.Size(130, 130);
-            this.m_tileImagePreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.m_tileImagePreview.TabIndex = 2;
-            this.m_tileImagePreview.TabStop = false;
-            // 
-            // gatewayBtnDown
-            // 
-            this.gatewayBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.gatewayBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.gatewayBtnDown.Location = new System.Drawing.Point(330, 89);
-            this.gatewayBtnDown.Name = "gatewayBtnDown";
-            this.gatewayBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.gatewayBtnDown.TabIndex = 16;
-            this.gatewayBtnDown.UseVisualStyleBackColor = true;
-            this.gatewayBtnDown.Click += new System.EventHandler(this.gatewayBtnDown_Click);
-            // 
-            // gatewayBtnUp
-            // 
-            this.gatewayBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.gatewayBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.gatewayBtnUp.Location = new System.Drawing.Point(330, 56);
-            this.gatewayBtnUp.Name = "gatewayBtnUp";
-            this.gatewayBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.gatewayBtnUp.TabIndex = 15;
-            this.gatewayBtnUp.UseVisualStyleBackColor = true;
-            this.gatewayBtnUp.Click += new System.EventHandler(this.gatewayBtnUp_Click);
-            // 
-            // eventBtnDown
-            // 
-            this.eventBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.eventBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.eventBtnDown.Location = new System.Drawing.Point(339, 89);
-            this.eventBtnDown.Name = "eventBtnDown";
-            this.eventBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.eventBtnDown.TabIndex = 16;
-            this.eventBtnDown.UseVisualStyleBackColor = true;
-            this.eventBtnDown.Click += new System.EventHandler(this.eventBtnDown_Click);
-            // 
-            // eventBtnUp
-            // 
-            this.eventBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.eventBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.eventBtnUp.Location = new System.Drawing.Point(339, 56);
-            this.eventBtnUp.Name = "eventBtnUp";
-            this.eventBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.eventBtnUp.TabIndex = 15;
-            this.eventBtnUp.UseVisualStyleBackColor = true;
-            this.eventBtnUp.Click += new System.EventHandler(this.eventBtnUp_Click);
-            // 
-            // authorizeBtnDown
-            // 
-            this.authorizeBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.authorizeBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.authorizeBtnDown.Location = new System.Drawing.Point(339, 89);
-            this.authorizeBtnDown.Name = "authorizeBtnDown";
-            this.authorizeBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.authorizeBtnDown.TabIndex = 16;
-            this.authorizeBtnDown.UseVisualStyleBackColor = true;
-            this.authorizeBtnDown.Click += new System.EventHandler(this.authorizeBtnDown_Click);
-            // 
-            // authorizeBtnUp
-            // 
-            this.authorizeBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.authorizeBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.authorizeBtnUp.Location = new System.Drawing.Point(339, 56);
-            this.authorizeBtnUp.Name = "authorizeBtnUp";
-            this.authorizeBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.authorizeBtnUp.TabIndex = 15;
-            this.authorizeBtnUp.UseVisualStyleBackColor = true;
-            this.authorizeBtnUp.Click += new System.EventHandler(this.authorizeBtnUp_Click);
-            // 
-            // authenticateBtnDown
-            // 
-            this.authenticateBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.authenticateBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.authenticateBtnDown.Location = new System.Drawing.Point(330, 89);
-            this.authenticateBtnDown.Name = "authenticateBtnDown";
-            this.authenticateBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.authenticateBtnDown.TabIndex = 16;
-            this.authenticateBtnDown.UseVisualStyleBackColor = true;
-            this.authenticateBtnDown.Click += new System.EventHandler(this.authenticateBtnDown_Click);
-            // 
-            // authenticateBtnUp
-            // 
-            this.authenticateBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.authenticateBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.authenticateBtnUp.Location = new System.Drawing.Point(330, 56);
-            this.authenticateBtnUp.Name = "authenticateBtnUp";
-            this.authenticateBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.authenticateBtnUp.TabIndex = 15;
-            this.authenticateBtnUp.UseVisualStyleBackColor = true;
-            this.authenticateBtnUp.Click += new System.EventHandler(this.authenticateBtnUp_Click);
-            // 
-            // simFinalResultPB
-            // 
-            this.simFinalResultPB.Location = new System.Drawing.Point(57, 211);
-            this.simFinalResultPB.Name = "simFinalResultPB";
-            this.simFinalResultPB.Size = new System.Drawing.Size(20, 20);
-            this.simFinalResultPB.TabIndex = 8;
-            this.simFinalResultPB.TabStop = false;
-            // 
-            // simGatewayResultPB
-            // 
-            this.simGatewayResultPB.Image = global::pGina.Configuration.Properties.Resources.grayBar;
-            this.simGatewayResultPB.Location = new System.Drawing.Point(84, 74);
-            this.simGatewayResultPB.Name = "simGatewayResultPB";
-            this.simGatewayResultPB.Size = new System.Drawing.Size(20, 20);
-            this.simGatewayResultPB.TabIndex = 5;
-            this.simGatewayResultPB.TabStop = false;
-            // 
-            // simAuthzResultPB
-            // 
-            this.simAuthzResultPB.Image = global::pGina.Configuration.Properties.Resources.grayBar;
-            this.simAuthzResultPB.Location = new System.Drawing.Point(84, 49);
-            this.simAuthzResultPB.Name = "simAuthzResultPB";
-            this.simAuthzResultPB.Size = new System.Drawing.Size(20, 20);
-            this.simAuthzResultPB.TabIndex = 4;
-            this.simAuthzResultPB.TabStop = false;
-            // 
-            // simAuthResultPB
-            // 
-            this.simAuthResultPB.Image = global::pGina.Configuration.Properties.Resources.grayBar;
-            this.simAuthResultPB.Location = new System.Drawing.Point(84, 23);
-            this.simAuthResultPB.Name = "simAuthResultPB";
-            this.simAuthResultPB.Size = new System.Drawing.Size(20, 20);
-            this.simAuthResultPB.TabIndex = 3;
-            this.simAuthResultPB.TabStop = false;
-            // 
-            // btnSimGo
-            // 
-            this.btnSimGo.Image = global::pGina.Configuration.Properties.Resources.arrow_right_3;
-            this.btnSimGo.Location = new System.Drawing.Point(307, 184);
-            this.btnSimGo.Name = "btnSimGo";
-            this.btnSimGo.Size = new System.Drawing.Size(30, 27);
-            this.btnSimGo.TabIndex = 5;
-            this.btnSimGo.UseVisualStyleBackColor = true;
-            this.btnSimGo.Click += new System.EventHandler(this.btnSimGo_Click);
-            // 
-            // m_tileImage
-            // 
-            this.m_tileImage.Image = global::pGina.Configuration.Properties.Resources.pginalogo_monochrome_126x126;
-            this.m_tileImage.Location = new System.Drawing.Point(121, 21);
-            this.m_tileImage.Name = "m_tileImage";
-            this.m_tileImage.Size = new System.Drawing.Size(130, 130);
-            this.m_tileImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.m_tileImage.TabIndex = 0;
-            this.m_tileImage.TabStop = false;
-            // 
             // ConfigurationUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1388,6 +1388,7 @@
             this.motdGB.PerformLayout();
             this.groupBox12.ResumeLayout(false);
             this.groupBox12.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.m_tileImagePreview)).EndInit();
             this.m_pluginConfigTab.ResumeLayout(false);
             this.pluginsGroupBox.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).EndInit();
@@ -1404,12 +1405,17 @@
             this.m_simTab.ResumeLayout(false);
             this.groupBox13.ResumeLayout(false);
             this.groupBox13.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.simFinalResultPB)).EndInit();
             this.groupBox10.ResumeLayout(false);
             this.groupBox10.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.simGatewayResultPB)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.simAuthzResultPB)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.simAuthResultPB)).EndInit();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.m_tileImage)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.ginaOptions.ResumeLayout(false);
@@ -1421,12 +1427,6 @@
             this.groupBox9.ResumeLayout(false);
             this.groupBox9.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCredProvFilter)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.m_tileImagePreview)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.simFinalResultPB)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.simGatewayResultPB)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.simAuthzResultPB)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.simAuthResultPB)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.m_tileImage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

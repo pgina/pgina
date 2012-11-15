@@ -75,7 +75,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\pgina_icons.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\pginaicon_redcircle.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
@@ -184,12 +184,14 @@
     <None Include="Resources\DownArrowSolid.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="pginaicon_redcircle.ico" />
     <Content Include="Resources\arrow-right-3.png" />
     <None Include="Resources\redx.png" />
     <None Include="Resources\grayBar.png" />
     <None Include="Resources\greenCheckMark.png" />
     <None Include="Resources\pginalogo_monochrome_126x126.png" />
     <None Include="Resources\pginalogo_monochrome_200x200.png" />
+    <Content Include="Resources\pginaicon_redcircle.ico" />
     <Content Include="Resources\pgina_icons.ico" />
     <None Include="Resources\pginalogo.bmp" />
   </ItemGroup>
