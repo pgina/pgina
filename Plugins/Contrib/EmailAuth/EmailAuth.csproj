@@ -8,8 +8,8 @@
     <ProjectGuid>{40AA44E3-9A7F-4166-AEDF-D817C2A0854B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>pGina.Plugin.Sample</RootNamespace>
-    <AssemblyName>pGina.Plugin.Sample</AssemblyName>
+    <RootNamespace>pGina.Plugin.Email</RootNamespace>
+    <AssemblyName>pGina.Plugin.Email</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -33,13 +33,13 @@
   <ItemGroup>
     <Reference Include="Abstractions, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SDK\Abstractions.dll</HintPath>
+      <HintPath>..\..\SDK\Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
-      <HintPath>..\SDK\log4net.dll</HintPath>
+      <HintPath>..\..\SDK\log4net.dll</HintPath>
     </Reference>
     <Reference Include="pGina.Shared">
-      <HintPath>..\SDK\pGina.Shared.dll</HintPath>
+      <HintPath>..\..\SDK\pGina.Shared.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Settings.cs" />
     <Compile Include="Configuration.cs">
       <SubType>Form</SubType>
     </Compile>
