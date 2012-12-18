@@ -45,7 +45,6 @@ namespace pGina.InstallUtil
     {
         static readonly string PGINA_SERVICE_NAME = "pGina";
         static readonly string PGINA_SERVICE_EXE = "pGina.Service.ServiceHost.exe";
-        static readonly string PGINA_CONFIG_EXE = "pGina.Configuration.exe";
         
         // Initalized in the static constructor
         static readonly SecurityIdentifier ADMIN_GROUP;
@@ -113,9 +112,31 @@ namespace pGina.InstallUtil
             SetRegistryAcls();
             InstallAndStartService();
             RegisterAndEnableCredentialProvider();
+            UpdatePluginPath();
+        }
 
-            // Probably not necessary or useful...
-            //SetFileSystemAcls();
+        /// <summary>
+        /// If the current plugin path is the default for pGina 3.1.6 and earlier, 
+        /// update it for later versions.
+        /// </summary>
+        private static void UpdatePluginPath()
+        {
+            m_logger.Debug("Checking plugin path to see if it needs to be updated.");
+            string pluginsBaseDir = 
+                string.Format( @"{0}\Plugins",
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+
+            dynamic settings = new pGina.Shared.Settings.pGinaDynamicSettings();
+            string[] pluginDirs = settings.PluginDirectories;
+            if (pluginDirs.Length == 1 &&
+                pluginDirs[0].Equals(pluginsBaseDir, StringComparison.CurrentCultureIgnoreCase))
+            {
+                m_logger.Info("Updating plugin path for core/contrib subdirectories.");
+                settings.PluginDirectories = new string[] { 
+                    string.Format(@"{0}\Core", pluginsBaseDir),
+                    string.Format(@"{0}\Contrib", pluginsBaseDir)
+                };
+            }
         }
 
         private static void DoPostUninstall()
@@ -133,34 +154,6 @@ namespace pGina.InstallUtil
 
             // Uninstall CP
             UninstallCredentialProvider();
-        }
-
-        private static void SetFileSystemAcls()
-        {
-            if (!File.Exists(PGINA_CONFIG_EXE))
-            {
-                throw new Exception(string.Format("Unable to find configuration executable: {0}", PGINA_CONFIG_EXE));
-            }
-
-            m_logger.InfoFormat("Setting ACLs on {0}", PGINA_CONFIG_EXE);
-
-            FileSystemAccessRule userReadAndExecute = new FileSystemAccessRule(USERS_GROUP, FileSystemRights.ReadAndExecute, AccessControlType.Allow);
-            FileSystemAccessRule userRead = new FileSystemAccessRule(USERS_GROUP, FileSystemRights.Read, AccessControlType.Allow);
-            FileSystemAccessRule adminFull = new FileSystemAccessRule(ADMIN_GROUP, FileSystemRights.FullControl, AccessControlType.Allow);
-            FileSystemAccessRule systemFull = new FileSystemAccessRule(SYSTEM_ACCT, FileSystemRights.FullControl, AccessControlType.Allow);
-            FileSystemAccessRule authedUsersMod = new FileSystemAccessRule(AUTHED_USERS, FileSystemRights.Modify, AccessControlType.Allow);
-            FileSystemAccessRule usersMod = new FileSystemAccessRule(USERS_GROUP, FileSystemRights.Modify, AccessControlType.Allow);
-            FileSecurity fs = File.GetAccessControl(PGINA_CONFIG_EXE);
-
-            fs.SetAccessRuleProtection(true, false);
-
-            fs.RemoveAccessRuleAll(authedUsersMod);
-            fs.RemoveAccessRuleAll(usersMod);
-            fs.AddAccessRule(userReadAndExecute);
-            fs.AddAccessRule(adminFull);
-            fs.AddAccessRule(systemFull);
-
-            File.SetAccessControl(PGINA_CONFIG_EXE, fs);
         }
 
         private static void SetRegistryAcls()
