@@ -149,7 +149,7 @@ namespace pGina.Service.Impl
         public Boolean OnCustomCommand()
         {
             Boolean result = false;
-            foreach (IPluginLogoffRequestAddTime plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
+            foreach (IPluginLogoffRequestAddTime plugin in PluginLoader.GetOrderedPluginsOfType<IPluginLogoffRequestAddTime>())
             {
                 try
                 {
@@ -281,7 +281,7 @@ namespace pGina.Service.Impl
 
                 // check if a plugin still does some logoff work for this user
                 Boolean thisUserLogoff = false;
-                foreach (IPluginLogoffRequestAddTime plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
+                foreach (IPluginLogoffRequestAddTime plugin in PluginLoader.GetOrderedPluginsOfType<IPluginLogoffRequestAddTime>())
                 {
                     if (plugin.LoginUserRequest(sessionDriver.UserInformation.Username))
                         thisUserLogoff = true;

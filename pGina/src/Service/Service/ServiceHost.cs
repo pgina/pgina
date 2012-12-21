@@ -153,14 +153,15 @@ namespace Service
             switch (command)
             {
                 case (int)ServiceControl.SERVICE_CONTROL_PRESHUTDOWN:
-                    Timer p_timer = new Timer(SignalShutdownPending, 5, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
+                    Thread postpone = new Thread(SignalShutdownPending);
+                    postpone.Start();
                     break;
                 default:
                     base.OnCustomCommand(command);
                     break;
             }
         }
-        private void SignalShutdownPending(object state)
+        private void SignalShutdownPending()
         {
             while (m_serviceThreadObj.OnCustomCommand())
             {
