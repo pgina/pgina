@@ -278,6 +278,78 @@ namespace pGina.Plugin.pgSMB
             return true;
         }
 
+        public static Boolean RegRunOnce(RegistryLocation where, string name, string script)
+        {
+            m_logger.InfoFormat("set RunOnce for {0}", script);
+            string[] server;
+
+            if (String.IsNullOrEmpty(script))
+            {
+                m_logger.DebugFormat("string script is empty");
+                return false;
+            }
+            server = script.Trim('\\').Split('\\');
+            if (String.IsNullOrEmpty(server[0]))
+            {
+                m_logger.DebugFormat("cant extract server address from {0}", script);
+                return false;
+            }
+
+            try
+            {
+                using (RegistryKey key = GetRegistryLocation(where).CreateSubKey(name + @"\Software\Microsoft\Windows\CurrentVersion\RunOnce"))
+                {
+                    key.SetValue("pGina_logonscript", script, RegistryValueKind.String);
+                }
+                if (!server[0].Contains(":"))
+                {
+                    using (RegistryKey key = GetRegistryLocation(where).CreateSubKey(name + @"\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges"))
+                    {
+                        bool found = false;
+                        List<string> subkeys = new List<string>();
+
+                        foreach (string subkey in key.GetSubKeyNames())
+                        {
+                            using (RegistryKey range = key.OpenSubKey(subkey))
+                            {
+                                if ((range.GetValue(":Range").ToString().Equals(server[0], StringComparison.CurrentCultureIgnoreCase)) && ((range.GetValue("*")) != null))
+                                {
+                                    m_logger.InfoFormat("subkey {0} contains {1}", subkey, server[0]);
+                                    found = true;
+                                    break;
+                                }
+                                subkeys.Add(subkey);
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            for (uint x = 1; x < 1000; x++)
+                            {
+                                if (!subkeys.Contains("Range" + x.ToString()))
+                                {
+                                    m_logger.InfoFormat("add trustworthy server {0}", server[0]);
+                                    using (RegistryKey addrule = key.CreateSubKey("Range" + x.ToString(), RegistryKeyPermissionCheck.ReadWriteSubTree))
+                                    {
+                                        addrule.SetValue(":Range", server[0], RegistryValueKind.String);
+                                        addrule.SetValue("*", 1, RegistryValueKind.DWord);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.ErrorFormat("Can't set RunOnce for {0} Error:{1}", name, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
         public static Boolean RegSec(RegistryLocation where, string name)
         {
             try

@@ -94,14 +94,14 @@ namespace pGina.Plugin.pgSMB
             toolTip1.SetToolTip(this.SMBshare, "The UNC name of the share to connect");
             toolTip1.SetToolTip(this.RoamingSource, "Where to store the compressed profile");
             toolTip1.SetToolTip(this.Filename, "The name of the compressed profile");
-            toolTip1.SetToolTip(this.RoamingDest, "Where to store the compressed profile");
+            toolTip1.SetToolTip(this.RoamingDest, "The local path for the extracted Roaming Profile");
             toolTip1.SetToolTip(this.ConnectRetry, "How often to retry to connect to the share\n(un)compress the profile");
             toolTip1.SetToolTip(this.Compressor, "The Program to (un)compress the user profile");
             toolTip1.SetToolTip(this.UncompressCLI, "The command to uncompress the profile");
             toolTip1.SetToolTip(this.CompressCLI, "The Commandline to compress the user profile");
             toolTip1.SetToolTip(this.HomeDir, "The user home directory");
             toolTip1.SetToolTip(this.HomeDirDrive, "The user home drive");
-            toolTip1.SetToolTip(this.ScriptPath, "The user script path");
+            toolTip1.SetToolTip(this.ScriptPath, "The full path to your login script (Runonce regkey!)");
             toolTip1.SetToolTip(this.MaxStore, "Maximum profile size in kbytes\n0 == all space");
             toolTip1.SetToolTip(this.ntp, "space seperated FQDN list of your ntp servers");
             toolTip1.SetToolTip(this.email, "space seperated FQDN list of email addresses");
@@ -212,7 +212,9 @@ namespace pGina.Plugin.pgSMB
                         "   The user HomeDirDrive: (otional)",
                         "      The drive name of the home directory",
                         "   Script Path: (otional)",
-                        "      The path to the script folder for users",
+                        "      The full path to the login script",
+                        @"      Its stored at HKCU\Software\Microsoft\Windows\CurrentVersion\RunOnce",
+                        "      and the server is added to the Local Intranet Zone (Internet Explorer/Security)",
                         "   The user max storage space in kbytes:",
                         "      The max storage for users",
                         "      A user GPO setting to limit the profile size",

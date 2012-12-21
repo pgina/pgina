@@ -235,9 +235,22 @@ namespace pGina.Plugin.pgSMB
             if (properties == null || changeDescription == null)
                 return;
 
+            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+            try
+            {
+                String.IsNullOrEmpty(userInfo.Username);
+                String.IsNullOrEmpty(userInfo.Password);
+                String.IsNullOrEmpty(userInfo.Description);
+                String.IsNullOrEmpty(userInfo.SID.ToString());
+            }
+            catch
+            {
+                m_logger.InfoFormat("SessionChange Event denied for ID:{0}", changeDescription.SessionId);
+                return;
+            }
+
             if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
             {
-                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
                 m_logger.DebugFormat("SessionChange SessionLogoff for ID:{0} as user:{1}", changeDescription.SessionId, userInfo.Username);
 
                 if (userInfo.Description.Contains("pGina created pgSMB"))
@@ -258,7 +271,6 @@ namespace pGina.Plugin.pgSMB
             }
             if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
             {
-                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
                 m_logger.DebugFormat("SessionChange SessionLogon for ID:{0} as user:{1}", changeDescription.SessionId, userInfo.Username);
 
                 if (userInfo.Description.Contains("pGina created pgSMB"))

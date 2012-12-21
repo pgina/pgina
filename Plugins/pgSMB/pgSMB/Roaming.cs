@@ -406,7 +406,8 @@ namespace pGina.Plugin.pgSMB
             if (!String.IsNullOrEmpty(settings["HomeDirDrive"]))
                 userinfo4.home_dir_drive = settings["HomeDirDrive"];
             if (!String.IsNullOrEmpty(settings["ScriptPath"]))
-                userinfo4.script_path = settings["ScriptPath"];
+                userinfo4.script_path = null;
+                //userinfo4.script_path = settings["ScriptPath"];
             if (Convert.ToInt32(settings["MaxStore"]) > 0)
                 userinfo4.max_storage = Convert.ToInt32(settings["MaxStore"]);
             else
@@ -491,6 +492,10 @@ namespace pGina.Plugin.pgSMB
             {
                 m_logger.WarnFormat("Can't set quota. Thats not terrible");
             }
+            if (!registry.RegRunOnce(registry.RegistryLocation.HKEY_LOCAL_MACHINE, username, settings["ScriptPath"] ))
+            {
+                m_logger.WarnFormat("Can't set RunOnce. Thats not terrible");
+            }
             if (!registry.RegistryUnLoad("HKEY_LOCAL_MACHINE", username))
             {
                 m_logger.WarnFormat("Can't unload regkey {0}\\{1}", settings["RoamingDest_real"], "NTUSER.DAT");
@@ -547,6 +552,7 @@ namespace pGina.Plugin.pgSMB
             dSecurity.AddAccessRule(new FileSystemAccessRule(Account, Rights, Inherit, Propagation, ControlType));
             try
             {
+                dSecurity.SetOwner(new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null));
                 dInfo.SetAccessControl(dSecurity);
             }
             catch (Exception ex)

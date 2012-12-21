@@ -50,7 +50,7 @@ namespace pGina.Plugin.pgSMB
 
             m_settings.SetDefault("HomeDir", @"\\server.my.domain.com\%u" );
             m_settings.SetDefault("HomeDirDrive", @"O:" );
-            m_settings.SetDefault("ScriptPath", @"\\server.my.domain.com\%u\scripts" );
+            m_settings.SetDefault("ScriptPath", @"\\server.my.domain.com\%u\script\login.cmd" );
             m_settings.SetDefault("MaxStore", 0);
 
             m_settings.SetDefault("ntp", @"ts1.my.domain.com ts2.my.domain.com");
