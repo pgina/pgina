@@ -440,10 +440,23 @@ namespace pGina.Plugin.LocalMachine
             if (properties == null || changeDescription == null)
                 return;
 
+            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+            try
+            {
+                String.IsNullOrEmpty(userInfo.Username);
+                String.IsNullOrEmpty(userInfo.Password);
+                String.IsNullOrEmpty(userInfo.Description);
+                String.IsNullOrEmpty(userInfo.SID.ToString());
+            }
+            catch
+            {
+                m_logger.InfoFormat("SessionChange Event denied for ID:{0}", changeDescription.SessionId);
+                return;
+            }
+
             if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
             {
-                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-                m_logger.DebugFormat("SessionChange SessionLogoff for ID:{0} as user:{1}", changeDescription.SessionId, userInfo.Username);
+                m_logger.DebugFormat("SessionChange SessionLogoff", changeDescription.SessionId);
 
                 if (userInfo.Description.Contains("pGina created"))
                 {
