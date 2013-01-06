@@ -71,6 +71,7 @@ namespace pGina.Core
                 (int) (Core.PluginLoader.State.AuthenticateEnabled | Core.PluginLoader.State.GatewayEnabled));
 
             s_settings.SetDefault("UseOriginalUsernameInUnlockScenario", false);
+            s_settings.SetDefault("LogonProgressMessage", "Logging on %u...");
         }
     }
 }

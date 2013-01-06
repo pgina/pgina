@@ -141,6 +141,10 @@
             this.btnOkay = new System.Windows.Forms.Button();
             this.m_pginaVersionLbl = new System.Windows.Forms.Label();
             this.btnSaveAndClose = new System.Windows.Forms.Button();
+            this.groupBox17 = new System.Windows.Forms.GroupBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.tbLogonProgressMessage = new System.Windows.Forms.TextBox();
+            this.label20 = new System.Windows.Forms.Label();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -179,6 +183,7 @@
             this.cpOptions.SuspendLayout();
             this.groupBox9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCredProvFilter)).BeginInit();
+            this.groupBox17.SuspendLayout();
             this.SuspendLayout();
             // 
             // m_tabs
@@ -201,6 +206,7 @@
             // 
             // m_generalConfigTab
             // 
+            this.m_generalConfigTab.Controls.Add(this.groupBox17);
             this.m_generalConfigTab.Controls.Add(this.groupBox4);
             this.m_generalConfigTab.Controls.Add(this.groupBox14);
             this.m_generalConfigTab.Controls.Add(this.servGB);
@@ -1363,6 +1369,44 @@
             this.btnSaveAndClose.UseVisualStyleBackColor = true;
             this.btnSaveAndClose.Click += new System.EventHandler(this.btnSaveAndClose_Click);
             // 
+            // groupBox17
+            // 
+            this.groupBox17.Controls.Add(this.label20);
+            this.groupBox17.Controls.Add(this.tbLogonProgressMessage);
+            this.groupBox17.Controls.Add(this.label19);
+            this.groupBox17.Location = new System.Drawing.Point(17, 464);
+            this.groupBox17.Name = "groupBox17";
+            this.groupBox17.Size = new System.Drawing.Size(645, 68);
+            this.groupBox17.TabIndex = 6;
+            this.groupBox17.TabStop = false;
+            this.groupBox17.Text = "Logon Progress";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(6, 22);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(130, 13);
+            this.label19.TabIndex = 0;
+            this.label19.Text = "Logon Progress Message:";
+            // 
+            // tbLogonProgressMessage
+            // 
+            this.tbLogonProgressMessage.Location = new System.Drawing.Point(142, 19);
+            this.tbLogonProgressMessage.Name = "tbLogonProgressMessage";
+            this.tbLogonProgressMessage.Size = new System.Drawing.Size(487, 20);
+            this.tbLogonProgressMessage.TabIndex = 1;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label20.Location = new System.Drawing.Point(139, 42);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(164, 13);
+            this.label20.TabIndex = 2;
+            this.label20.Text = "Valid substitution: %u - user name";
+            // 
             // ConfigurationUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1427,6 +1471,8 @@
             this.groupBox9.ResumeLayout(false);
             this.groupBox9.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCredProvFilter)).EndInit();
+            this.groupBox17.ResumeLayout(false);
+            this.groupBox17.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1543,5 +1589,9 @@
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.CheckBox chk_originalUsernameUnlock;
+        private System.Windows.Forms.GroupBox groupBox17;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.TextBox tbLogonProgressMessage;
+        private System.Windows.Forms.Label label19;
     }
 }

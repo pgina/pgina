@@ -605,9 +605,23 @@ namespace pGina
 
 			pDEBUG(L"Credential::Connect: Processing login for %s", username);
 			
+			// Set the status message
 			if( pqcws )
 			{
-				pqcws->SetStatusMessage(L"Processing logon...");
+				std::wstring message = pGina::Registry::GetString(L"LogonProgressMessage", L"Logging on...");
+
+				// Replace occurences of %u with the username
+				std::wstring::size_type pos = 0;
+				std::wstring unameCopy = username;
+				int unameSize = unameCopy.size();
+				for( std::wstring::size_type pos = 0; 
+					(pos = message.find(L"%u", pos)) != std::wstring::npos;
+					pos += unameSize )
+				{
+					message.replace(pos, unameSize, unameCopy);
+				}
+
+				pqcws->SetStatusMessage(message.c_str());
 			}
 
 			// Execute plugins

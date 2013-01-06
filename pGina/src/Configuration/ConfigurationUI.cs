@@ -286,6 +286,9 @@ namespace pGina.Configuration
 
             // Load the unlock setting
             chk_originalUsernameUnlock.Checked = Settings.Get.UseOriginalUsernameInUnlockScenario;
+
+            // The logon progress message
+            tbLogonProgressMessage.Text = Settings.Get.LogonProgressMessage;
         }
 
         private void UpdateCpStatus()
@@ -859,6 +862,9 @@ namespace pGina.Configuration
 
             // Save unlock setting
             Settings.Get.UseOriginalUsernameInUnlockScenario = chk_originalUsernameUnlock.Checked;
+
+            // Save logon progress setting
+            Settings.Get.LogonProgressMessage = tbLogonProgressMessage.Text;
 
             if (Abstractions.Windows.OsInfo.IsVistaOrLater())
                 this.SaveCpSettings();
