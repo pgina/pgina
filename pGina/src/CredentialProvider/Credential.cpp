@@ -611,9 +611,8 @@ namespace pGina
 				std::wstring message = pGina::Registry::GetString(L"LogonProgressMessage", L"Logging on...");
 
 				// Replace occurences of %u with the username
-				std::wstring::size_type pos = 0;
 				std::wstring unameCopy = username;
-				int unameSize = unameCopy.size();
+				std::wstring::size_type unameSize = unameCopy.size();
 				for( std::wstring::size_type pos = 0; 
 					(pos = message.find(L"%u", pos)) != std::wstring::npos;
 					pos += unameSize )

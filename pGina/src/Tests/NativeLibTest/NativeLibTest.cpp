@@ -42,7 +42,7 @@ class ThreadTest : public pGina::Threading::Thread
 	}
 };
 
-int _tmain(int argc, _TCHAR* argv[])
+int __cdecl _tmain(int argc, _TCHAR* argv[])
 {			
 	// And auth, all in one...
 	pGina::Transactions::User::LoginResult result = pGina::Transactions::User::ProcessLoginForUser(L"Administrator", L"", L"password", pGina::Protocol::LoginRequestMessage::Login);
