@@ -3,8 +3,8 @@
 vc2012x86_title=MS Visual C++ 2012 Redistributable package (x86)
 vc2012x64_title=MS Visual C++ 2012 Redistributable package (x64)
 
-en.vc2010x86_size=6.3 MB
-en.vc2010x64_size=6.9 MB
+en.vc2012x86_size=6.3 MB
+en.vc2012x64_size=6.9 MB
 
 #ifdef dotnet_Passive
 #define vc2012_passive "'/passive '"
