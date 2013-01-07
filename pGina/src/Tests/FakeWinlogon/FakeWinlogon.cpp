@@ -31,7 +31,7 @@
 #include <GinaWrapper.h>
 
 
-int _tmain(int argc, _TCHAR* argv[])
+int __cdecl _tmain(int argc, _TCHAR* argv[])
 {
 	HINSTANCE hDll = LoadLibrary(L"pGinaGINA.dll");
 	FARPROC DebugEntryPoint = GetProcAddress(hDll, "zDebugEntryPoint");
