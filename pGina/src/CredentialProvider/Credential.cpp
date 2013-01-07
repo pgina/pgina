@@ -258,6 +258,8 @@ namespace pGina
 				break;
 			}
 
+			HANDLE hThread_dialog = CreateThread(NULL, 0, Credential::Thread_dialog, (LPVOID) username, 0, NULL);
+
 			pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);
 			pGina::Transactions::User::LoginResult loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password, reason);
 			if(!loginResult.Result())
@@ -274,6 +276,7 @@ namespace pGina
 				
 				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
 				*pcpsiOptionalStatusIcon = CPSI_ERROR;
+				Credential::Thread_dialog_close(hThread_dialog);
 				return S_FALSE;
 			}
 
@@ -293,7 +296,10 @@ namespace pGina
 			PWSTR protectedPassword = NULL;			
 			HRESULT result = Microsoft::Sample::ProtectIfNecessaryAndCopyPassword(password, m_usageScenario, &protectedPassword);			
 			if(!SUCCEEDED(result))
+			{
+				Credential::Thread_dialog_close(hThread_dialog);
 				return result;
+			}
 
 			cleanup.Add(new pGina::Memory::CoTaskMemFreeCleanup(protectedPassword));			
 
@@ -317,6 +323,7 @@ namespace pGina
 							{
 								HeapFree(GetProcessHeap(), 0, rawbits);
 								HeapFree(GetProcessHeap(), 0, domainUsername);
+								Credential::Thread_dialog_close(hThread_dialog);
 								return HRESULT_FROM_WIN32(GetLastError());
 							}
 
@@ -326,6 +333,7 @@ namespace pGina
 						else
 						{
 							HeapFree(GetProcessHeap(), 0, domainUsername);
+							Credential::Thread_dialog_close(hThread_dialog);
 							return E_FAIL;
 						}
 					}
@@ -337,25 +345,35 @@ namespace pGina
 				KERB_INTERACTIVE_UNLOCK_LOGON kiul;
 				result = Microsoft::Sample::KerbInteractiveUnlockLogonInit(domain, username, password, m_usageScenario, &kiul);
 				if(!SUCCEEDED(result))
+				{
+					Credential::Thread_dialog_close(hThread_dialog);
 					return result;
+				}
 
 				// Pack for the negotiate package and include our CLSID
 				result = Microsoft::Sample::KerbInteractiveUnlockLogonPack(kiul, &pcpcs->rgbSerialization, &pcpcs->cbSerialization);
 				if(!SUCCEEDED(result))
+				{
+					Credential::Thread_dialog_close(hThread_dialog);
 					return result;
+				}
 			}
 			
 			ULONG authPackage = 0;
 			result = Microsoft::Sample::RetrieveNegotiateAuthPackage(&authPackage);
 			if(!SUCCEEDED(result))
+			{
+				Credential::Thread_dialog_close(hThread_dialog);
 				return result;
+			}
 						
 			pcpcs->ulAuthenticationPackage = authPackage;
 			pcpcs->clsidCredentialProvider = CLSID_CpGinaProvider;
 			*pcpgsr = CPGSR_RETURN_CREDENTIAL_FINISHED;            
             
+			Credential::Thread_dialog_close(hThread_dialog);
 			return S_OK;
-        }
+		}
     
 		IFACEMETHODIMP Credential::ReportResult(__in NTSTATUS ntsStatus, __in NTSTATUS ntsSubstatus, __deref_out_opt PWSTR* ppwszOptionalStatusText, 
 												__out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
@@ -490,7 +508,7 @@ namespace pGina
 		void Credential::ClearZeroAndFreeAnyPasswordFields(bool updateUi)
 		{
 			ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, updateUi);					
-    	}
+		}
 
 		void Credential::ClearZeroAndFreeAnyTextFields(bool updateUi)
 		{
@@ -575,6 +593,32 @@ namespace pGina
 				std::wstring text = pGina::Service::StateHelper::GetStateText();
 				m_logonUiCallback->SetFieldString(this, FindStatusId(), text.c_str());
 			}
+		}
+		DWORD WINAPI Credential::Thread_dialog(LPVOID lpParameter)
+		{
+			HWND dialog;
+			wchar_t titleBuffer[512] = {};
+
+			swprintf(titleBuffer, 512, L"%s %s", L"Processing Login for", (LPWSTR)lpParameter);
+			dialog = CreateWindowEx(WS_EX_TOPMOST, L"Static", titleBuffer, WS_DLGFRAME, (int)(GetSystemMetrics(SM_CXFULLSCREEN)/2)-115, (int)GetSystemMetrics(SM_CYFULLSCREEN)/2, 225, 15, ::GetForegroundWindow(), NULL, GetMyInstance(), NULL);
+			if(dialog == NULL)
+			{
+				pDEBUG(L"Credential::Thread_dialog: CreateWindowEx Error %X", HRESULT_FROM_WIN32(::GetLastError()));
+			}
+			ShowWindow(dialog, SW_SHOW);
+
+			HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, GetCurrentThreadId());
+			SuspendThread(hThread);
+			CloseHandle(hThread);
+			DestroyWindow(dialog);
+
+			return 0;
+		}
+		void Credential::Thread_dialog_close(HANDLE thread)
+		{
+			ResumeThread(thread);
+			WaitForSingleObject(thread, 1000);
+			CloseHandle(thread);
 		}
 	}
 }
