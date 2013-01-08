@@ -7,7 +7,7 @@
   <ItemGroup>
     <CoreSolution Include="pGina\src\pGina-3.x-vs2010.sln" />
     <PluginSolutions Include="Plugins\**\*.sln" />
-    <OutputDirectories Include="Plugins\bin;pGina\src\bin;pGina\src\build" />
+    <OutputDirectories Include="Plugins\bin;Plugins\Core\bin;Plugins\Contrib\bin;pGina\src\bin;pGina\src\build" />
   </ItemGroup>
   
   <!-- Build everything -->
