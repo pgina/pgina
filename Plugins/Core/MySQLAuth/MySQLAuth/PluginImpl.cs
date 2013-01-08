@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@ using MySql.Data.MySqlClient;
 
 namespace pGina.Plugin.MySQLAuth
 {
-    public class PluginImpl : IPluginAuthentication, IPluginAuthenticationGateway, IPluginConfiguration
+    public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration
     {
         public static readonly Guid PluginUuid = new Guid("{A89DF410-53CA-4FE1-A6CA-4479B841CA19}");
         private ILog m_logger = LogManager.GetLogger("MySQLAuth");
@@ -98,12 +98,12 @@ namespace pGina.Plugin.MySQLAuth
 
         public string Description
         {
-            get { return "Authenticates users using a MySQL server as the account database."; }
+            get { return "Uses a MySQL server as the account database."; }
         }
 
         public string Name
         {
-            get { return "MySQL Authentication"; }
+            get { return "MySQL"; }
         }
 
         public void Starting()
@@ -168,6 +168,97 @@ namespace pGina.Plugin.MySQLAuth
             
             // Always return success
             return new Shared.Types.BooleanResult { Success = true };
+        }
+
+        public BooleanResult AuthorizeUser(SessionProperties properties)
+        {
+            m_logger.Debug("MySql Plugin Authorization");
+
+            bool requireAuth = Settings.Store.AuthzRequireMySqlAuth;
+            
+            // If we require authentication, and we failed to auth this user, then we
+            // fail authorization.
+            if (requireAuth)
+            {
+                PluginActivityInformation actInfo = properties.GetTrackedSingle<PluginActivityInformation>();
+                try
+                {
+                    BooleanResult mySqlResult = actInfo.GetAuthenticationResult(this.Uuid);
+                    if (!mySqlResult.Success)
+                    {
+                        m_logger.InfoFormat("Deny because MySQL auth failed, and configured to require MySQL auth.");
+                        return new BooleanResult()
+                        {
+                            Success = false,
+                            Message = "Deny because MySQL authentication failed."
+                        };
+                    }
+                }
+                catch (KeyNotFoundException)
+                {
+                    // The plugin is not enabled for authentication
+                    m_logger.ErrorFormat("MySQL is not enabled for authentication, and authz is configured to require auth.");
+                    return new BooleanResult
+                    {
+                        Success = false,
+                        Message = "Deny because MySQL auth did not execute, and configured to require MySQL auth."
+                    };
+                }
+            }
+            
+            // Get the authz rules from registry
+            List<GroupAuthzRule> rules = GroupRuleLoader.GetAuthzRules();
+            if (rules.Count == 0)
+            {
+                throw new Exception("No authorization rules found.");
+            }
+
+            try
+            {
+                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+                string user = userInfo.Username;
+
+                using (MySqlUserDataSource dataSource = new MySqlUserDataSource())
+                {
+                    foreach (GroupAuthzRule rule in rules)
+                    {
+                        m_logger.DebugFormat("Checking rule: {0}", rule.ToString());
+                        bool inGroup = false;
+
+                        if (rule.RuleCondition != GroupRule.Condition.ALWAYS)
+                        {
+                            inGroup = dataSource.IsMemberOfGroup(user, rule.Group);
+                            m_logger.DebugFormat("User '{0}' {1} a member of '{2}'", user,
+                                inGroup ? "is" : "is not", rule.Group);
+                        }
+
+                        if (rule.RuleMatch(inGroup))
+                        {
+                            if (rule.AllowOnMatch)
+                                return new BooleanResult
+                                {
+                                    Success = true,
+                                    Message = string.Format("Allow via rule '{0}'", rule.ToString() )
+                                };
+                            else
+                                return new BooleanResult
+                                {
+                                    Success = false,
+                                    Message = string.Format("Deny via rule '{0}'", rule.ToString())
+                                };
+                        }
+                    }
+                }
+
+                // If we get this far, no rules matched.  This should never happen since
+                // the last rule should always match (the default).  Throw.
+                throw new Exception("Missing default authorization rule.");
+            }
+            catch (Exception e)
+            {
+                m_logger.ErrorFormat("Exception during authorization: {0}", e);
+                throw;
+            }
         }
     }
 }
