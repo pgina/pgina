@@ -1,3 +1,12 @@
+3.1.7.0 BETA (2013/01/07)
+---------------------------
+ - Configurable login progress message while plugins are executing.
+ - Plugins split into "Core" and "Contrib" directories. 
+ - New icon
+ - New tile image (Win 8 style)
+ - Remove support for the CredUI scenario.
+ - Installer now installs the VS2012 redistributable package.
+
 3.1.6.0 BETA (2012/10/24)
 ---------------------------
  - Support for filtering in CredUI scenario.
