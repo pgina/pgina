@@ -33,6 +33,7 @@ using System.Security.Principal;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Threading;
+using System.IO;
 
 using log4net;
 
@@ -42,13 +43,16 @@ using pGina.Shared.Types;
 namespace pGina.Plugin.LocalMachine
 {
 
-    public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration
+    public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration, IPluginEventNotifications, IPluginLogoffRequestAddTime
     {
         // Per-instance logger
         private ILog m_logger = LogManager.GetLogger("LocalMachine");
 
-        private Timer m_backgroundTimer = null;
+        private Dictionary<string, Boolean> RunningTasks = new Dictionary<string, Boolean>();
+        private ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+        public static Boolean IsShuttingDown = false;
 
+        #region Init-plugin
         public static Guid PluginUuid
         {
             get { return new Guid("{12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D}"); }
@@ -84,6 +88,59 @@ namespace pGina.Plugin.LocalMachine
         {
             get { return PluginUuid; }
         }
+        #endregion
+
+        public void Starting() { }
+        public void Stopping() { }
+
+        public Boolean LogoffRequestAddTime()
+        {
+            IsShuttingDown = true;
+            try
+            {
+                Locker.TryEnterReadLock(-1);
+                if (RunningTasks.Values.Contains(true))
+                    return true;
+            }
+            catch (Exception ex)
+            {
+                m_logger.InfoFormat("LogoffRequestAddTime() error {0}", ex.Message);
+            }
+            finally
+            {
+                Locker.ExitReadLock();
+            }
+
+            return false;
+        }
+
+        public Boolean LoginUserRequest(string username)
+        {
+            try
+            {
+                Locker.TryEnterReadLock(-1);
+                if (RunningTasks.Keys.Contains(username))
+                {
+                    m_logger.InfoFormat("LoginUserRequest() logoff in process for {0}", username);
+                    return true;
+                }
+                else
+                {
+                    m_logger.InfoFormat("LoginUserRequest() {0} free to login", username);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.InfoFormat("LoginUserRequest() {0} error {1}", username, ex.Message);
+            }
+            finally
+            {
+                Locker.ExitReadLock();
+            }
+
+            return false;
+        }
 
         private int FindString(string[] array, string filter)
         {
@@ -95,7 +152,7 @@ namespace pGina.Plugin.LocalMachine
 
             return -1;
         }
-        
+
         public BooleanResult AuthenticatedUserGateway(SessionProperties properties)
         {
             // Our job, if we've been elected to do gateway, is to ensure that an
@@ -118,55 +175,51 @@ namespace pGina.Plugin.LocalMachine
             if (MandatoryGroups.Length > 0)
             {
                 foreach (string group in MandatoryGroups)
-                    userInfo.AddGroup(new GroupInformation() { Name = group });
+                {
+                    string group_string=group;
+
+                    m_logger.DebugFormat("Is there a Group with SID/Name:{0}", group);
+                    using (GroupPrincipal groupconf = LocalAccount.GetGroupPrincipal(group))
+                    {
+                        if (groupconf != null)
+                        {
+                            m_logger.DebugFormat("Groupname: \"{0}\"", groupconf.Name);
+                            group_string = groupconf.Name;
+                        }
+                        else
+                        {
+                            m_logger.ErrorFormat("Group: \"{0}\" not found", group);
+                            m_logger.Error("Failsave add user to group Users");
+                            using (GroupPrincipal groupfail = LocalAccount.GetGroupPrincipal(new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null).ToString()))
+                            {
+                                if (groupfail != null)
+                                {
+                                    group_string = groupfail.Name;
+                                }
+                                else
+                                {
+                                    m_logger.Debug("no BuiltinUsers. I'm out of options");
+                                    group_string = null;
+                                }
+                            }
+                        }
+                    }
+
+                    if (group_string != null)
+                        userInfo.AddGroup(new GroupInformation() { Name = group_string });
+                }
             }
 
             try
             {
-                bool scramble = Settings.Store.ScramblePasswords;
-                bool remove = Settings.Store.RemoveProfiles;
-
-                if (remove)
-                {
-                    // If this user doesn't already exist, and we are supposed to clean up after ourselves,
-                    //  make note of the username!
-                    if (!LocalAccount.UserExists(userInfo.Username))
-                    {
-                        m_logger.DebugFormat("Marking for deletion: {0}", userInfo.Username);
-                        CleanupTasks.AddTask(new CleanupTask(userInfo.Username, CleanupAction.DELETE_PROFILE));
-                    }
-                }
-
-                // If we are configured to scramble passwords
-                if (scramble)
-                {
-                    // Scramble the password only if the user is not in the list
-                    // of exceptions.
-                    string[] exceptions = Settings.Store.ScramblePasswordsExceptions;
-                    if (!exceptions.Contains(userInfo.Username, StringComparer.CurrentCultureIgnoreCase))
-                    {
-                        // If configured to do so, we check to see if this plugin failed
-                        // to auth this user, and only scramble in that case
-                        bool scrambleWhenLMFail = Settings.Store.ScramblePasswordsWhenLMAuthFails;
-                        if (scrambleWhenLMFail)
-                        {
-                            // Scramble the password only if we did not authenticate this user
-                            if (!DidWeAuthThisUser(properties, false))
-                            {
-                                m_logger.DebugFormat("LM did not authenticate this user, marking user for scramble: {0}", userInfo.Username);
-                                CleanupTasks.AddTask(new CleanupTask(userInfo.Username, CleanupAction.SCRAMBLE_PASSWORD));
-                            }
-                        }
-                        else
-                        {
-                            m_logger.DebugFormat("Marking user for scramble: {0}", userInfo.Username);
-                            CleanupTasks.AddTask(new CleanupTask(userInfo.Username, CleanupAction.SCRAMBLE_PASSWORD));
-                        }
-                    }
-                }
-                
                 m_logger.DebugFormat("AuthenticatedUserGateway({0}) for user: {1}", properties.Id.ToString(), userInfo.Username);
                 LocalAccount.SyncUserInfoToLocalUser(userInfo);
+                using (UserPrincipal user = LocalAccount.GetUserPrincipal(userInfo.Username))
+                {
+                    userInfo.SID = user.Sid;
+                    userInfo.Description = user.Description;
+                }
+                properties.AddTrackedSingle<UserInformation>(userInfo);
             }
             catch (LocalAccount.GroupSyncException e)
             {
@@ -381,146 +434,91 @@ namespace pGina.Plugin.LocalMachine
 
             return false;
         }
-        
-        public void Starting()
-        {         
-            // Start background timer          
-            m_logger.DebugFormat("Starting background timer");  
-            m_backgroundTimer = new Timer(new TimerCallback(BackgroundTaskCallback), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(-1));            
-        }
 
-        public void Stopping()
-        {            
-            // Dispose of our background timer            
-            lock (this)
-            {
-                m_logger.DebugFormat("Stopping background timer");
-                m_backgroundTimer.Change(TimeSpan.FromMilliseconds(-1), TimeSpan.FromMilliseconds(-1));
-                m_backgroundTimer.Dispose();
-                m_backgroundTimer = null;
-            }
-        }
-
-        private TimeSpan BackgroundTimeSpan
+        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, SessionProperties properties)
         {
-            get
+            if (properties == null || changeDescription == null)
+                return;
+
+            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+            try
             {
-                int seconds = Settings.Store.BackgroundTimerSeconds;
-                return TimeSpan.FromSeconds(seconds);
+                String.IsNullOrEmpty(userInfo.Username);
+                String.IsNullOrEmpty(userInfo.Password);
+                String.IsNullOrEmpty(userInfo.Description);
+                String.IsNullOrEmpty(userInfo.SID.ToString());
             }
-        }
-
-        private void BackgroundTaskCallback(object state)
-        {
-            // Do background stuff
-            lock(this)
+            catch
             {
-                try
-                {
-                    IterateCleanupUsers();
-                }
-                catch (Exception e)
-                {
-                    // Log the exception and continue
-                    m_logger.ErrorFormat("Exception in IterateCleanupUsers {0}", e);
-                }
-
-                if (m_backgroundTimer != null)
-                    m_backgroundTimer.Change(BackgroundTimeSpan, TimeSpan.FromMilliseconds(-1));
+                m_logger.InfoFormat("SessionChange Event denied for ID:{0}", changeDescription.SessionId);
+                return;
             }
-        }
 
-        private List<string> LoggedOnLocalUsers()
-        {
-            List<string> loggedOnUsers = Abstractions.WindowsApi.pInvokes.GetInteractiveUserList();
-
-            // Transform the logged on list, strip it to just local users, then drop the machine name
-            List<string> xformed = new List<string>();
-            foreach (string user in loggedOnUsers)
+            if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
             {
-                if (user.Contains("\\"))
-                {
-                    if (user.StartsWith(Environment.MachineName,StringComparison.CurrentCultureIgnoreCase))
-                        xformed.Add(user.Substring(user.IndexOf("\\") + 1).ToUpper());
-                }
-                else
-                    xformed.Add(user.ToUpper());
-            }
-            return xformed;
-        }
+                m_logger.DebugFormat("SessionChange SessionLogoff", changeDescription.SessionId);
 
-        private void IterateCleanupUsers()
-        {
-            lock(this)
-            {
-                List<CleanupTask> tasks = CleanupTasks.GetEligibleTasks();
-                List<string> loggedOnUsers = null;
-                try
-                {
-                    loggedOnUsers = LoggedOnLocalUsers();
-                }
-                catch (System.ComponentModel.Win32Exception e)
-                {
-                    m_logger.ErrorFormat("Error (ignored) LoggedOnLocalUsers {0}", e);
-                    return;
-                }
-
-                m_logger.DebugFormat("IterateCleanupUsers Eligible users: {0}", string.Join(",",tasks));
-                m_logger.DebugFormat("IterateCleanupUsers loggedOnUsers: {0}", string.Join(",",loggedOnUsers));
-
-                foreach (CleanupTask task in tasks)
+                if (userInfo.Description.Contains("pGina created"))
                 {
                     try
                     {
-                        using (UserPrincipal userPrincipal = LocalAccount.GetUserPrincipal(task.UserName))
-                        {
-                            // Make sure the user exists
-                            if (userPrincipal == null)
-                            {
-                                // This dude doesn't exist!
-                                m_logger.DebugFormat("User {0} doesn't exist, not cleaning up.", task.UserName);
-                                CleanupTasks.RemoveTaskForUser(task.UserName);
-                                continue;
-                            }
-
-                            // Is she logged in still?
-                            if (loggedOnUsers.Contains(task.UserName, StringComparer.CurrentCultureIgnoreCase))
-                                continue;
-
-                            m_logger.InfoFormat("Cleaning up: {0} -> {1}", task.UserName, task.Action);
-
-                            try
-                            {
-                                switch (task.Action)
-                                {
-                                    case CleanupAction.SCRAMBLE_PASSWORD:
-                                        LocalAccount.ScrambleUsersPassword(task.UserName);
-                                        break;
-                                    case CleanupAction.DELETE_PROFILE:
-                                        LocalAccount.RemoveUserAndProfile(task.UserName);
-                                        break;
-                                    default:
-                                        m_logger.ErrorFormat("Unrecognized action: {0}, skipping user {1}", task.Action, task.UserName);
-                                        throw new Exception();
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                m_logger.WarnFormat("Cleanup for {0} failed, will retry next time around. Error: {1}", task.UserName, e);
-                                continue;
-                            }
-
-                            // All done! No more cleanup for this user needed
-                            CleanupTasks.RemoveTaskForUser(task.UserName);
-                        }
+                        Locker.TryEnterWriteLock(-1);
+                        RunningTasks.Add(userInfo.Username, true);
                     }
-                    catch (Exception e)
+                    finally
                     {
-                        // If something goes wrong, we log the exception and ignore.
-                        m_logger.ErrorFormat("Caught (ignoring) Exception {0}", e);
+                        Locker.ExitWriteLock();
                     }
+
+                    Thread rem_local = new Thread(() => cleanup(userInfo, changeDescription.SessionId));
+                    rem_local.Start();
                 }
             }
-        }                
+        }
+
+        private void cleanup(UserInformation userInfo, int sessionID)
+        {
+            bool scramble = Settings.Store.ScramblePasswords;
+            bool remove = Settings.Store.RemoveProfiles;
+
+            m_logger.DebugFormat("start cleanup for user {0} with Description \"{1}\"", userInfo.Username, userInfo.Description);
+
+            if (LocalAccount.UserExists(userInfo.Username))
+            {
+                if (remove)
+                {
+                    m_logger.DebugFormat("remove profile {0}", userInfo.Username);
+                    LocalAccount.RemoveUserAndProfile(userInfo.Username, sessionID);
+                }
+                else
+                {
+                    m_logger.DebugFormat("not removing profile {0}", userInfo.Username);
+                }
+                if (scramble && !remove)
+                {
+                    m_logger.DebugFormat("scramble password {0}", userInfo.Username);
+                    LocalAccount.ScrambleUsersPassword(userInfo.Username);
+                }
+                else
+                {
+                    m_logger.DebugFormat("not scramble password {0}", userInfo.Username);
+                }
+                m_logger.DebugFormat("cleanup done for user {0}", userInfo.Username);
+            }
+            else
+            {
+                m_logger.Debug(userInfo.Username + " doesnt exist");
+            }
+
+            try
+            {
+                Locker.TryEnterWriteLock(-1);
+                RunningTasks.Remove(userInfo.Username);
+            }
+            finally
+            {
+                Locker.ExitWriteLock();
+            }
+        }
     }
 }

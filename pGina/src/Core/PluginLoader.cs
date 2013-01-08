@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -36,7 +36,7 @@ using log4net;
 using pGina.Shared.Interfaces;
 
 namespace pGina.Core
-{    
+{
     public static class PluginLoader
     {
         private static string[] m_pluginDirectories = null;
@@ -49,7 +49,7 @@ namespace pGina.Core
             AuthenticateEnabled  = 1 << 1,
             AuthorizeEnabled     = 1 << 2,
             GatewayEnabled       = 1 << 3,
-            NotificationEnabled  = 1 << 4,            
+            NotificationEnabled  = 1 << 4,
         }
 
         public static string[] PluginDirectories
@@ -62,7 +62,7 @@ namespace pGina.Core
         {
             m_logger.DebugFormat("Initializing");
             PluginDirectories = Core.Settings.Get.PluginDirectories;
-            
+
             // Set up an event handler to load plugin dependencies
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.AssemblyResolve += new ResolveEventHandler(ResolvePluginDependencies);
@@ -74,12 +74,12 @@ namespace pGina.Core
             foreach (IPluginBase plugin in PluginLoader.AllPlugins)
             {
                 m_logger.DebugFormat("  {0} -> {1}", plugin.Name, plugin.Uuid.ToString());
-            }            
+            }
         }
 
         /// <summary>
-        /// This method is intended to help plugins load their dependencies.  It is an event handler 
-        /// that is triggered when an assembly is not found (resolved).  It tries to load the 
+        /// This method is intended to help plugins load their dependencies.  It is an event handler
+        /// that is triggered when an assembly is not found (resolved).  It tries to load the
         /// assembly from the same directory as the assembly that is requesting the dependency.
         /// </summary>
         /// <returns>The assembly or null if not found.</returns>
@@ -149,21 +149,21 @@ namespace pGina.Core
                 return null;
             }
         }
-        
+
         public static void LoadPlugins()
         {
             m_plugins.Clear();
-            
+
             foreach (string dir in m_pluginDirectories)
             {
                 LoadPluginsFromDir(dir);
-            }       
-     
+            }
+
             // All plugins default to completely disabled
             foreach (IPluginBase plugin in m_plugins)
-            {                
+            {
                 Settings.Get.SetDefault(plugin.Uuid.ToString(), 0);
-            }            
+            }
         }
 
         private static void LoadPluginsFromDir(string dir)
@@ -176,18 +176,18 @@ namespace pGina.Core
 
             m_logger.DebugFormat("Loading plugins from {0}", dir);
 
-            string[] files = Directory.GetFiles(dir, "*.dll");                        
+            string[] files = Directory.GetFiles(dir, "*.dll");
             foreach (string file in files)
             {
                 try
                 {
                     // Load the assembly up
                     Assembly assembly = Assembly.LoadFile(file);
-                    
+
                     foreach (Type type in assembly.GetTypes())
                     {
                         // Make sure its a public class
-                        if (!type.IsClass || type.IsNotPublic) 
+                        if (!type.IsClass || type.IsNotPublic)
                             continue;
 
                         Type[] interfaces = type.GetInterfaces();
@@ -195,12 +195,12 @@ namespace pGina.Core
                         {
                             // TBD: We could do inverted control here.. logger, settings, etc?
                             //  We could also consider loading plugins in their own app domain,
-                            //  making them unloadable...                            
+                            //  making them unloadable...
                             object pluginObject = Activator.CreateInstance(type);
                             IPluginBase pluginBase = pluginObject as IPluginBase;
                             m_logger.DebugFormat("Created plugin object type: {0} from plugin: {1} uuid: {2}", type.ToString(), file, pluginBase.Uuid);
                             m_plugins.Add(pluginObject as IPluginBase);
-                        }                        
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -227,7 +227,7 @@ namespace pGina.Core
             foreach (IPluginBase plugin in m_plugins)
             {
                 int pluginMask = Settings.Get.GetSetting(plugin.Uuid.ToString());
-                if ( plugin is IStatefulPlugin && 
+                if ( plugin is IStatefulPlugin &&
                         (
                         IsEnabledFor<IPluginAuthentication>(pluginMask) ||
                         IsEnabledFor<IPluginAuthorization>(pluginMask) ||
@@ -273,7 +273,7 @@ namespace pGina.Core
         {
             if (typeof(T) == typeof(IPluginAuthentication) && TestMask(mask, State.AuthenticateEnabled))
                 return true;
-            
+
             if (typeof(T) == typeof(IPluginAuthorization) && TestMask(mask, State.AuthorizeEnabled))
                 return true;
 
@@ -282,7 +282,10 @@ namespace pGina.Core
 
             if (typeof(T) == typeof(IPluginEventNotifications) && TestMask(mask, State.NotificationEnabled))
                 return true;
-                                    
+
+            if (typeof(T) == typeof(IPluginLogoffRequestAddTime))
+                return true;
+
             return false;
         }
 
@@ -314,7 +317,7 @@ namespace pGina.Core
                 }
             }
 
-            // We now have all plugins listed from our order list, what about any remaining? lets pair down 
+            // We now have all plugins listed from our order list, what about any remaining? lets pair down
             // and look.
             foreach (T p in orderedPlugins)
             {
@@ -337,6 +340,6 @@ namespace pGina.Core
             }
 
             return orderedPlugins;
-        }          
+        }
     }
 }
