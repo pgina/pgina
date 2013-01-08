@@ -33,11 +33,11 @@
   <ItemGroup>
     <Reference Include="Abstractions, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SDK\Abstractions.dll</HintPath>
+      <HintPath>..\..\..\pGina\src\bin\Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SDK\log4net.dll</HintPath>
+      <HintPath>..\..\..\pGina\src\bin\log4net.dll</HintPath>
     </Reference>
     <Reference Include="MySql.Data, Version=6.4.3.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -45,7 +45,7 @@
     </Reference>
     <Reference Include="pGina.Shared, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SDK\pGina.Shared.dll</HintPath>
+      <HintPath>..\..\..\pGina\src\bin\pGina.Shared.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

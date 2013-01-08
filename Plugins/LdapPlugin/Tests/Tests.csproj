@@ -35,10 +35,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Abstractions">
-      <HintPath>..\..\SDK\Abstractions.dll</HintPath>
+      <HintPath>..\..\..\pGina\src\bin\Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="pGina.Shared">
-      <HintPath>..\..\SDK\pGina.Shared.dll</HintPath>
+      <HintPath>..\..\..\pGina\src\bin\pGina.Shared.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

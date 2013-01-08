@@ -33,13 +33,13 @@
   <ItemGroup>
     <Reference Include="Abstractions, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SDK\Abstractions.dll</HintPath>
+      <HintPath>..\..\..\pGina\src\bin\Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
-      <HintPath>..\..\SDK\log4net.dll</HintPath>
+      <HintPath>..\..\..\pGina\src\bin\log4net.dll</HintPath>
     </Reference>
     <Reference Include="pGina.Shared">
-      <HintPath>..\..\SDK\pGina.Shared.dll</HintPath>
+      <HintPath>..\..\..\pGina\src\bin\pGina.Shared.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
