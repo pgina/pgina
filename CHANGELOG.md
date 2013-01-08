@@ -6,6 +6,7 @@
  - New tile image (Win 8 style)
  - Remove support for the CredUI scenario.
  - Installer now installs the VS2012 redistributable package.
+ - MySQL plugin support for group-based authorization.
 
 3.1.6.0 BETA (2012/10/24)
 ---------------------------
