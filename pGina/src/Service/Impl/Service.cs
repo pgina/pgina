@@ -263,9 +263,12 @@ namespace pGina.Service.Impl
 
                 if (msg.Reason == LoginRequestMessage.LoginReason.Login)
                 {
-                    lock (m_sessionPropertyCache)
+                    if (!m_sessionPropertyCache.Exists(msg.Session))
                     {
-                        m_sessionPropertyCache.Add(msg.Session, sessionDriver.SessionProperties);
+                        lock (m_sessionPropertyCache)
+                        {
+                            m_sessionPropertyCache.Add(msg.Session, sessionDriver.SessionProperties);
+                        }
                     }
                 }
 
