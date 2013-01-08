@@ -84,6 +84,9 @@ namespace pGina
 			bool	IsFieldDynamic(DWORD dwFieldID);
 			std::wstring GetTextForField(DWORD dwFieldID);
 
+			static DWORD WINAPI Thread_dialog(LPVOID lpParameter);
+			static void Thread_dialog_close(HANDLE thread);
+
 		private:
 			long m_referenceCount;
 			CREDENTIAL_PROVIDER_USAGE_SCENARIO	m_usageScenario;
