@@ -273,6 +273,8 @@ namespace pGina
 				{
 					SHStrDupW(L"ProcessLoginForUser failed, but a specific error message was not provided", ppwszOptionalStatusText);
 				}
+				ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, false);
+				ClearZeroAndFreeFields(CPFT_EDIT_TEXT, false);
 				
 				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
 				*pcpsiOptionalStatusIcon = CPSI_ERROR;
