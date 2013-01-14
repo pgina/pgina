@@ -249,6 +249,17 @@ namespace pGina
 			switch(m_usageScenario)
 			{
 			case CPUS_LOGON:
+				if ( !pGina::Helpers::IsUserLocalAdmin(username) && !pGina::Service::StateHelper::GetState() )
+				{
+					pDEBUG(L"Credential::GetSerialization: pGina service is unavailable");
+					SHStrDupW(L"Your login request failed, because the pGina service is not running!\nOnly useres from the local administrator group are able to login.\n\nPlease contact your system administrator.\nReboot the machine to fix this issue.", ppwszOptionalStatusText);
+					ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, false);
+					ClearZeroAndFreeFields(CPFT_EDIT_TEXT, false);
+				
+					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
+					*pcpsiOptionalStatusIcon = CPSI_ERROR;
+					return S_FALSE;
+				}
 				break;
 			case CPUS_UNLOCK_WORKSTATION:
 				reason = pGina::Protocol::LoginRequestMessage::Unlock;

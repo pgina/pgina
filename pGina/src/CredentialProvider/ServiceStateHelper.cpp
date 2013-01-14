@@ -63,6 +63,19 @@ namespace pGina
 		}			
 
 		/* static */
+		bool StateHelper::GetState()
+		{
+			if(s_serviceStateThread.IsServiceRunning())
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		/* static */
 		void StateHelper::AddTarget(pGina::CredProv::Provider *ptr)
 		{
 			pGina::Threading::ScopedLock lock(s_mutex);

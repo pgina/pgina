@@ -48,6 +48,7 @@ namespace pGina
 			static void Stop();
 			
 			static std::wstring GetStateText();
+			static bool GetState();
 
 			static void AddTarget(pGina::CredProv::Credential *ptr);
 			static void RemoveTarget(pGina::CredProv::Credential *ptr);
