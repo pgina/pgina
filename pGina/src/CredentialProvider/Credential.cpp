@@ -424,6 +424,17 @@ namespace pGina
 			m_usageScenario = cpus;
 			m_usageFlags = usageFlags;
 
+			if (m_usageScenario == CPUS_LOGON && pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true))
+			{
+				HANDLE hThread_dialog = CreateThread(NULL, 0, Credential::Thread_dialog, (LPVOID) L"waiting for the pGina service ...", 0, NULL);
+				for (int x = 0; x < 60; x++)
+				{
+					if (pGina::Service::StateHelper::GetState()) break;
+					Sleep(1000);
+				}
+				Credential::Thread_dialog_close(hThread_dialog);
+			}
+
 			// Allocate and copy our UI_FIELDS struct, we need our own copy to set/track the state of
 			//  our fields over time
 			m_fields = (UI_FIELDS *) (malloc(sizeof(UI_FIELDS) + (sizeof(UI_FIELD) * fields.fieldCount)));
