@@ -166,6 +166,8 @@ namespace pGina
 				pDEBUG(L"Credential::GetBitmapValue: Loading image from: %s", tileImage.c_str());
 				bitmap = (HBITMAP) LoadImageW((HINSTANCE) NULL, tileImage.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);			
 			}
+			if (pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) && !pGina::Service::StateHelper::GetState())
+				bitmap = LoadBitmap(GetMyInstance(), MAKEINTRESOURCE(IDB_PGINA_ERROR));
 			
 			if(!bitmap)
 				return HRESULT_FROM_WIN32(GetLastError());
