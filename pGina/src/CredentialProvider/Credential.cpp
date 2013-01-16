@@ -614,6 +614,9 @@ namespace pGina
 
 		void Credential::ServiceStateChanged(bool newState)
 		{
+			ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, false);
+			ClearZeroAndFreeFields(CPFT_EDIT_TEXT, true);
+
 			if(m_logonUiCallback)
 			{
 				std::wstring text = pGina::Service::StateHelper::GetStateText();
