@@ -297,7 +297,7 @@ namespace pGina.Plugin.pgSMB
 
             try
             {
-                using (RegistryKey key = GetRegistryLocation(where).CreateSubKey(name + @"\Software\Microsoft\Windows\CurrentVersion\RunOnce"))
+                using (RegistryKey key = GetRegistryLocation(where).CreateSubKey(name + @"\Software\Microsoft\Windows\CurrentVersion\Run"))
                 {
                     key.SetValue("pGina_logonscript", script, RegistryValueKind.String);
                 }
