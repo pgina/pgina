@@ -40,6 +40,15 @@ using log4net;
 //based on http://stackoverflow.com/questions/7894909/load-registry-hive-from-c-sharp-fails
 namespace pGina.Plugin.pgSMB
 {
+    public enum RegistryLocation
+    {
+        HKEY_CLASSES_ROOT,
+        HKEY_CURRENT_USER,
+        HKEY_LOCAL_MACHINE,
+        HKEY_USERS,
+        HKEY_CURRENT_CONFIG
+    }
+
     class registry
     {
         private static ILog m_logger = LogManager.GetLogger("pgSMB[registry]");
@@ -90,14 +99,6 @@ namespace pGina.Plugin.pgSMB
             HKEY_CURRENT_CONFIG = 0x80000005
         }
 
-        public enum RegistryLocation
-        {
-            HKEY_CLASSES_ROOT,
-            HKEY_CURRENT_USER,
-            HKEY_LOCAL_MACHINE,
-            HKEY_USERS,
-            HKEY_CURRENT_CONFIG
-        }
         public static RegistryKey GetRegistryLocation(RegistryLocation location)
         {
             switch (location)

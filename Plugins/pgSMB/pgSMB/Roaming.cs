@@ -129,6 +129,10 @@ namespace pGina.Plugin.pgSMB
                 {
                     m_logger.Debug("there is no " + settings["RoamingSource"] + "\\" + settings["Filename"] + " or " + settings["RoamingSource"] + "\\" + settings["Filename"] + ".bak");
 
+                    if (!SetGPO(RegistryLocation.HKEY_USERS, Convert.ToUInt32(settings["MaxStore"]), ".DEFAULT"))
+                    {
+                        m_logger.WarnFormat("Can't set quota. Thats not terrible");
+                    }
 
                     if (!userAdd(settings, username, password, "pGina created pgSMB"))
                     {
@@ -471,6 +475,15 @@ namespace pGina.Plugin.pgSMB
             return false;
         }
 
+        public static Boolean SetGPO(RegistryLocation regkey, UInt32 maxStore, string username)
+        {
+            if (!registry.RegQuota(regkey, username, maxStore))
+            {
+                return false;
+            }
+            return true;
+        }
+
         private static Boolean SetACL(Dictionary<string, string> settings, string username, string password)
         {
             if (!AddDirectorySecurity(settings["RoamingDest_real"], username, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None))
@@ -483,18 +496,14 @@ namespace pGina.Plugin.pgSMB
                 m_logger.WarnFormat("Can't load regfile {0}", settings["RoamingDest_real"] + "\\NTUSER.DAT");
                 return false;
             }
-            if (!registry.RegSec(registry.RegistryLocation.HKEY_LOCAL_MACHINE, username))
+            if (!registry.RegSec(RegistryLocation.HKEY_LOCAL_MACHINE, username))
             {
-                m_logger.WarnFormat("Can't set ACL for regkey {0}\\{1}", registry.RegistryLocation.HKEY_LOCAL_MACHINE.ToString(), username);
+                m_logger.WarnFormat("Can't set ACL for regkey {0}\\{1}", RegistryLocation.HKEY_LOCAL_MACHINE.ToString(), username);
                 return false;
             }
-            if (!registry.RegQuota(registry.RegistryLocation.HKEY_LOCAL_MACHINE, username, Convert.ToUInt32(settings["MaxStore"])))
+            if (!SetGPO(RegistryLocation.HKEY_LOCAL_MACHINE, Convert.ToUInt32(settings["MaxStore"]), username))
             {
                 m_logger.WarnFormat("Can't set quota. Thats not terrible");
-            }
-            if (!registry.RegRunOnce(registry.RegistryLocation.HKEY_LOCAL_MACHINE, username, settings["ScriptPath"] ))
-            {
-                m_logger.WarnFormat("Can't set RunOnce. Thats not terrible");
             }
             if (!registry.RegistryUnLoad("HKEY_LOCAL_MACHINE", username))
             {
