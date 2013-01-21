@@ -166,6 +166,8 @@ namespace pGina
 				pDEBUG(L"Credential::GetBitmapValue: Loading image from: %s", tileImage.c_str());
 				bitmap = (HBITMAP) LoadImageW((HINSTANCE) NULL, tileImage.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);			
 			}
+			if (pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) && !pGina::Service::StateHelper::GetState())
+				bitmap = LoadBitmap(GetMyInstance(), MAKEINTRESOURCE(IDB_PGINA_ERROR));
 			
 			if(!bitmap)
 				return HRESULT_FROM_WIN32(GetLastError());
@@ -249,6 +251,17 @@ namespace pGina
 			switch(m_usageScenario)
 			{
 			case CPUS_LOGON:
+				if ( !pGina::Helpers::IsUserLocalAdmin(username) && !pGina::Service::StateHelper::GetState() )
+				{
+					pDEBUG(L"Credential::GetSerialization: pGina service is unavailable");
+					SHStrDupW(L"Your login request failed, because the pGina service is not running!\nOnly useres from the local administrator group are able to login.\n\nPlease contact your system administrator.\nReboot the machine to fix this issue.", ppwszOptionalStatusText);
+					ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, false);
+					ClearZeroAndFreeFields(CPFT_EDIT_TEXT, false);
+				
+					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
+					*pcpsiOptionalStatusIcon = CPSI_ERROR;
+					return S_FALSE;
+				}
 				break;
 			case CPUS_UNLOCK_WORKSTATION:
 				reason = pGina::Protocol::LoginRequestMessage::Unlock;
@@ -258,7 +271,9 @@ namespace pGina
 				break;
 			}
 
-			HANDLE hThread_dialog = CreateThread(NULL, 0, Credential::Thread_dialog, (LPVOID) username, 0, NULL);
+			wchar_t title[128] = {};
+			swprintf(title, 128, L"%s %s", L"Processing Login for", (LPWSTR)username);
+			HANDLE hThread_dialog = CreateThread(NULL, 0, Credential::Thread_dialog, (LPVOID) title, 0, NULL);
 
 			pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);
 			pGina::Transactions::User::LoginResult loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password, reason);
@@ -410,6 +425,17 @@ namespace pGina
 		{
 			m_usageScenario = cpus;
 			m_usageFlags = usageFlags;
+
+			if (m_usageScenario == CPUS_LOGON && pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) && !pGina::Service::StateHelper::GetState())
+			{
+				HANDLE hThread_dialog = CreateThread(NULL, 0, Credential::Thread_dialog, (LPVOID) L"waiting for the pGina service ...", 0, NULL);
+				for (int x = 0; x < 60; x++)
+				{
+					if (pGina::Service::StateHelper::GetState()) break;
+					Sleep(1000);
+				}
+				Credential::Thread_dialog_close(hThread_dialog);
+			}
 
 			// Allocate and copy our UI_FIELDS struct, we need our own copy to set/track the state of
 			//  our fields over time
@@ -590,6 +616,9 @@ namespace pGina
 
 		void Credential::ServiceStateChanged(bool newState)
 		{
+			ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, false);
+			ClearZeroAndFreeFields(CPFT_EDIT_TEXT, true);
+
 			if(m_logonUiCallback)
 			{
 				std::wstring text = pGina::Service::StateHelper::GetStateText();
@@ -599,10 +628,8 @@ namespace pGina
 		DWORD WINAPI Credential::Thread_dialog(LPVOID lpParameter)
 		{
 			HWND dialog;
-			wchar_t titleBuffer[512] = {};
-
-			swprintf(titleBuffer, 512, L"%s %s", L"Processing Login for", (LPWSTR)lpParameter);
-			dialog = CreateWindowEx(WS_EX_TOPMOST, L"Static", titleBuffer, WS_DLGFRAME, (int)(GetSystemMetrics(SM_CXFULLSCREEN)/2)-115, (int)GetSystemMetrics(SM_CYFULLSCREEN)/2, 225, 15, ::GetForegroundWindow(), NULL, GetMyInstance(), NULL);
+			
+			dialog = CreateWindowEx(WS_EX_TOPMOST, L"Static", (LPWSTR)lpParameter, WS_DLGFRAME, (int)(GetSystemMetrics(SM_CXFULLSCREEN)/2)-115, (int)GetSystemMetrics(SM_CYFULLSCREEN)/2, 225, 15, ::GetForegroundWindow(), NULL, GetMyInstance(), NULL);
 			if(dialog == NULL)
 			{
 				pDEBUG(L"Credential::Thread_dialog: CreateWindowEx Error %X", HRESULT_FROM_WIN32(::GetLastError()));
@@ -618,7 +645,8 @@ namespace pGina
 		}
 		void Credential::Thread_dialog_close(HANDLE thread)
 		{
-			ResumeThread(thread);
+			while (ResumeThread(thread) == 0)
+				Sleep(1050);
 			WaitForSingleObject(thread, 1000);
 			CloseHandle(thread);
 		}
