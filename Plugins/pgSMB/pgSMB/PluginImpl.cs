@@ -277,6 +277,16 @@ namespace pGina.Plugin.pgSMB
                 {
                     Dictionary<string, string> settings = GetSettings(userInfo.Username);
 
+                    if (!String.IsNullOrEmpty(settings["ScriptPath"]))
+                    {
+                        Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(changeDescription.SessionId, settings["ScriptPath"]);
+                    }
+
+                    if (!Roaming.SetGPO(RegistryLocation.HKEY_USERS, 0, ".DEFAULT"))
+                    {
+                        m_logger.InfoFormat("can't reset GPO settings for user DEFAULT");
+                    }
+
                     m_logger.DebugFormat("removing Roaming Profile {0}", settings["RoamingDest_real"]);
                     if (!Roaming.DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"])))
                         m_logger.WarnFormat("Can't delete {0}", settings["RoamingDest_real"]);
