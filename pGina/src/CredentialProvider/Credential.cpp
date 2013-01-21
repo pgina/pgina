@@ -426,7 +426,7 @@ namespace pGina
 			m_usageScenario = cpus;
 			m_usageFlags = usageFlags;
 
-			if (m_usageScenario == CPUS_LOGON && pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true))
+			if (m_usageScenario == CPUS_LOGON && pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) && !pGina::Service::StateHelper::GetState())
 			{
 				HANDLE hThread_dialog = CreateThread(NULL, 0, Credential::Thread_dialog, (LPVOID) L"waiting for the pGina service ...", 0, NULL);
 				for (int x = 0; x < 60; x++)
