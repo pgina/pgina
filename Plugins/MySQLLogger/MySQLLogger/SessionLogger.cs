@@ -27,12 +27,15 @@ namespace pGina.Plugin.MySqlLogger
             if (m_conn == null)
                 throw new InvalidOperationException("No MySQL Connection present.");
 
-            UserInformation ui = properties.GetTrackedSingle<UserInformation>();
             string username = "--UNKNOWN--";
-            if((bool)Settings.Store.UseModifiedName)
-                username = ui.Username;
-            else
-                username = ui.OriginalUsername;
+            if (properties != null)
+            {
+                UserInformation ui = properties.GetTrackedSingle<UserInformation>();
+                if ((bool)Settings.Store.UseModifiedName)
+                    username = ui.Username;
+                else
+                    username = ui.OriginalUsername;
+            }
 
             //Logon Event
             if (changeDescription.Reason == SessionChangeReason.SessionLogon)
@@ -164,13 +167,13 @@ namespace pGina.Plugin.MySqlLogger
                 string table = Settings.Store.SessionTable;
                 string sql = string.Format(
                     "CREATE TABLE {0} (" +
-                    "`dbid` BIGINT NOT NULL AUTO_INCREMENT ," +
-                    "`loginstamp` DATETIME NOT NULL, " +
-                    "`logoutstamp` DATETIME NOT NULL, " +
-                    "`username` TEXT NOT NULL, " +
-                    "`machine` TEXT NOT NULL, " +
-                    "`ipaddress` TEXT NOT NULL, " +
-                    "INDEX (`dbid`))", table);
+                    " dbid BIGINT NOT NULL AUTO_INCREMENT ," +
+                    " loginstamp DATETIME NOT NULL, " +
+                    " logoutstamp DATETIME NOT NULL, " +
+                    " username TEXT NOT NULL, " +
+                    " machine TEXT NOT NULL, " +
+                    " ipaddress TEXT NOT NULL, " +
+                    " INDEX (dbid))", table);
 
                 MySqlCommand cmd = new MySqlCommand(sql, m_conn);
                 cmd.ExecuteNonQuery();
