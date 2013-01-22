@@ -1,3 +1,13 @@
+3.1.6.1 BETA (2013/01/08)
+---------------------------
+ - bugfix free memory (#146)
+ - finally Fix session cache bug related to CredUI login (#153).
+ - added plugin pgSMB
+   changed LocaleMachine plugin cleanup be triggered by Events
+   preventing a system shutdown while cleanupjobs are running
+   Make userprofile cleanup depended on the comment of the userprofile field
+ - A Message will be displayed during logon
+
 3.1.6.0 BETA (2012/10/24)
 ---------------------------
  - Support for filtering in CredUI scenario.
