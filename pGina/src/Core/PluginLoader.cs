@@ -86,7 +86,16 @@ namespace pGina.Core
         public static Assembly ResolvePluginDependencies(Object sender, ResolveEventArgs args)
         {
             // Get the file name
-            string fileName = args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll";
+            string[] fields = args.Name.Split(',');
+            string name = fields[0].Trim();
+            string culture = fields[2].Trim();
+
+            // Ignore requests for resources.  These are "satellite assemblies" for
+            // localization, and this loader will not load them.
+            if (name.EndsWith(".resources") && !culture.EndsWith("neutral"))
+                return null;
+
+            string fileName = name + ".dll";
             m_logger.DebugFormat("Resolving dependency {0}", fileName);
 
             string requestorPath = null;

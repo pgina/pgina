@@ -122,9 +122,9 @@ namespace pGina.Plugin.SessionLimit
         }
 
         public void Starting() 
-        { 
-            StartTimer();
+        {
             m_cache = new SessionCache();
+            StartTimer();
         }
 
         public void Stopping() 
