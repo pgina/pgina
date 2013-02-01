@@ -40,13 +40,18 @@ using Abstractions.WindowsApi;
 
 namespace pGina.Plugin.SessionLimit
 {
-    public class PluginImpl : IPluginConfiguration, IPluginEventNotifications
+    public class PluginImpl : IPluginConfiguration, IPluginEventNotifications, IPluginLogoffRequestAddTime
     {
         private ILog m_logger = LogManager.GetLogger("SessionLimitPlugin");
-        public static Guid PluginUuid = new Guid("{D73131D7-7AF2-47BB-BBF4-4F8583B44962}");
 
         private Timer m_timer;
         private SessionCache m_cache;
+
+        #region Init-plugin
+        public static Guid PluginUuid
+        {
+            get { return new Guid("{D73131D7-7AF2-47BB-BBF4-4F8583B44962}"); }
+        }
 
         public PluginImpl()
         {
@@ -55,6 +60,41 @@ namespace pGina.Plugin.SessionLimit
                 Settings.Init();
                 m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
             }
+        }
+
+        public string Name
+        {
+            get { return "Session Limit"; }
+        }
+
+        public string Description
+        {
+            get { return "Enforces limits to user's sessions"; }
+        }
+
+        public string Version
+        {
+            get
+            {
+                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            }
+        }
+
+        public Guid Uuid
+        {
+            get { return PluginUuid; }
+        }
+        #endregion
+
+        public Boolean LogoffRequestAddTime()
+        {
+            Stopping();
+            return false;
+        }
+
+        public Boolean LoginUserRequest(string username)
+        {
+            return true;
         }
 
         private void StartTimer()
@@ -92,36 +132,13 @@ namespace pGina.Plugin.SessionLimit
             }
         }
 
-        public string Name
-        {
-            get { return "Session Limit"; }
-        }
-
-        public string Description
-        {
-            get { return "Enforces limits to user's sessions"; }
-        }
-
-        public string Version
-        {
-            get
-            {
-                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            }
-        }
-
-        public Guid Uuid
-        {
-            get { return PluginUuid; }
-        }
-
         public void Configure()
         {
             Configuration conf = new Configuration();
             conf.ShowDialog();
         }
 
-        public void Starting() 
+        public void Starting()
         {
             m_cache = new SessionCache();
             StartTimer();
