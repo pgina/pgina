@@ -41,12 +41,16 @@ namespace pGina.Shared.Interfaces
         Guid Uuid { get; }
 
         /// <summary>
-        /// Called when plugin is initially loaded after startup, for 'startup' time processing
+        /// Called when pGina service starts.  Intended for 'startup' time processing.  This is 
+        /// not called during simulation so plugins should not do anything here that would
+        /// be necessary for logon processing.
         /// </summary>
         void Starting();
 
         /// <summary>
-        /// Called when shutting down, for 'stopping' time processing
+        /// Called when the pGina service is shutting down, for 'stopping' time processing.  This 
+        /// is not called during simulation.  Plugins should not depend on this to clean up
+        /// post logon.
         /// </summary>
         void Stopping();
     }
