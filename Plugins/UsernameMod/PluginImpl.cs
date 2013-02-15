@@ -45,7 +45,7 @@ namespace pGina.Plugin.UsernameMod
         public static Guid SimpleUuid = new Guid("{98477B3A-830D-4BEE-B270-2D7435275F9C}");
         private string m_defaultDescription = "Modify the username at various stages of the login process";
         private dynamic m_settings = null;
-        private ListOfRules rules;
+        //private ListOfRules rules;
 
 
         public UsernameModPlugin()
@@ -95,6 +95,9 @@ namespace pGina.Plugin.UsernameMod
             try
             {
                 m_logger.DebugFormat("AuthenticateUser({0})", properties.Id.ToString());
+
+                ListOfRules rules = new ListOfRules();
+                rules.Load();
 
                 // Get user info
                 UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
@@ -146,6 +149,9 @@ namespace pGina.Plugin.UsernameMod
             try
             {
                 m_logger.DebugFormat("AuthorizeUser({0})", properties.Id.ToString());
+
+                ListOfRules rules = new ListOfRules();
+                rules.Load();
 
                 // Get user info
                 UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
@@ -201,6 +207,9 @@ namespace pGina.Plugin.UsernameMod
             {
                 m_logger.DebugFormat("GatewayUser({0})", properties.Id.ToString());
 
+                ListOfRules rules = new ListOfRules();
+                rules.Load();
+
                 // Get user info
                 UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
 
@@ -248,10 +257,7 @@ namespace pGina.Plugin.UsernameMod
             conf.ShowDialog();
         }
 
-        public void Starting() {
-            rules = new ListOfRules();
-            rules.Load();
-        }
+        public void Starting() { }
         public void Stopping() { }
     }
 
