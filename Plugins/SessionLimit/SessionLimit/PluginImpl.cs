@@ -94,7 +94,7 @@ namespace pGina.Plugin.SessionLimit
 
         public Boolean LoginUserRequest(string username)
         {
-            return true;
+            return false;
         }
 
         private void StartTimer()
