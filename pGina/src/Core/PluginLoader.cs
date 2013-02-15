@@ -292,7 +292,7 @@ namespace pGina.Core
             if (typeof(T) == typeof(IPluginEventNotifications) && TestMask(mask, State.NotificationEnabled))
                 return true;
 
-            if (typeof(T) == typeof(IPluginLogoffRequestAddTime))
+            if (typeof(T) == typeof(IPluginLogoffRequestAddTime) && TestMask(mask, State.NotificationEnabled))
                 return true;
 
             return false;
