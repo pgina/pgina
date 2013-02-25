@@ -195,6 +195,12 @@ namespace pGina.Plugin.pgSMB
                 return false;
             }
 
+            if (!File.Exists(settings["RoamingDest_real"]+"\\NTUSER.DAT"))
+            {
+                m_logger.ErrorFormat("Unable to find \"{0}\" quota exceeded?", settings["RoamingDest_real"] + "\\NTUSER.DAT");
+                return false;
+            }
+
             ProcessStartInfo startInfo = new ProcessStartInfo();
             for (uint x = 0; x < Convert.ToUInt32(settings["ConnectRetry"]); x++)
             {
@@ -694,6 +700,27 @@ namespace pGina.Plugin.pgSMB
             if (String.IsNullOrEmpty(smtpAddress))
                 return false;
 
+            try
+            {
+                using (EventLog systemLog = new EventLog("System"))
+                {
+                    body += "\n\n====================Eventlog System====================\n";
+                    for (int x = systemLog.Entries.Count - 30; x < systemLog.Entries.Count; x++)
+                    {
+                        body += String.Format("{0} {1} {2} {3}\n", systemLog.Entries[x].TimeGenerated, systemLog.Entries[x].EntryType, (UInt16)systemLog.Entries[x].InstanceId, systemLog.Entries[x].Message);
+                    }
+                }
+                using (EventLog application = new EventLog("Application"))
+                {
+                    body += "\n\n====================Eventlog Application===============\n";
+                    for (int x = application.Entries.Count - 30; x < application.Entries.Count; x++)
+                    {
+                        body += String.Format("{0} {1} {2} {3}\n", application.Entries[x].TimeGenerated, application.Entries[x].EntryType, (UInt16)application.Entries[x].InstanceId, application.Entries[x].Message);
+                    }
+                }
+            }
+            catch { }
+
             string[] mails = mailAddress.Split(' ');
             string[] smtps = smtpAddress.Split(' ');
 
@@ -725,7 +752,7 @@ namespace pGina.Plugin.pgSMB
                                     int line_count = 0;
                                     if (lastlines.Length > 50)
                                         line_count = lastlines.Length - 51;
-                                    body += "\n\n";
+                                    body += "\n\n====================Pgina log==========================\n";
                                     for (; line_count < lastlines.Length; line_count++)
                                     {
                                         body += lastlines[line_count] + '\n';

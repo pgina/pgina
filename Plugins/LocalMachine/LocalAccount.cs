@@ -451,34 +451,22 @@ namespace pGina.Plugin.LocalMachine
                     if (!string.IsNullOrEmpty(usersProfileDir))
                     {
                         // instead of while (true)
-                        for (int x = 0; x < 60; x++ )
+                        if (File.Exists(usersProfileDir + "\\NTUSER.DAT"))
                         {
-                            try
+                            for (int x = 0; x < 60; x++)
                             {
-                                // logoff detection is quite a problem under NT6
-                                // a disconnectEvent is only triggered during a logoff
-                                // but not during a shutdown/reboot
-                                // and the SessionLogoffEvent is only saying that the user is logging of
-                                // So, there is no event that is fired during a user-logoff/reboot/shutdown
-                                // that indicates that the user has logged of
-                                int ses = Abstractions.WindowsApi.pInvokes.GetSessionId();
-                                m_logger.DebugFormat("GetSessionId:{0}", ses);
-                                if (ses != Convert.ToInt32(sessionID) || PluginImpl.IsShuttingDown)
+                                try
                                 {
                                     using (FileStream isunloaded = File.Open(usersProfileDir + "\\NTUSER.DAT", FileMode.Open, FileAccess.Read))
                                     {
                                         break;
                                     }
                                 }
-                                else
+                                catch (Exception ex)
                                 {
+                                    m_logger.DebugFormat("Ex loop{1}:{0}", ex.Message, x);
                                     Thread.Sleep(1000);
                                 }
-                            }
-                            catch (Exception ex)
-                            {
-                                m_logger.DebugFormat("Ex loop{1}:{0}",ex.Message,x);
-                                Thread.Sleep(1000);
                             }
                         }
                         m_logger.DebugFormat("User {0} has profile in {1}, giving myself delete permission", user, usersProfileDir);
