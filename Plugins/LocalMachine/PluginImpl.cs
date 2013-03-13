@@ -481,6 +481,26 @@ namespace pGina.Plugin.LocalMachine
             bool scramble = Settings.Store.ScramblePasswords;
             bool remove = Settings.Store.RemoveProfiles;
 
+            for (int x = 0; x < 60; x++)
+            {
+                // logoff detection is quite a problem under NT6
+                // a disconnectEvent is only triggered during a logoff
+                // but not during a shutdown/reboot
+                // and the SessionLogoffEvent is only saying that the user is logging of
+                // So, there is no event that is fired during a user-logoff/reboot/shutdown
+                // that indicates that the user has logged of
+                int ses = Abstractions.WindowsApi.pInvokes.GetSessionId();
+                m_logger.DebugFormat("GetSessionId:{0}", ses);
+                if (ses != sessionID || IsShuttingDown)
+                {
+                    break;
+                }
+                else
+                {
+                    Thread.Sleep(1000);
+                }
+            }
+
             m_logger.DebugFormat("start cleanup for user {0} with Description \"{1}\"", userInfo.Username, userInfo.Description);
 
             if (LocalAccount.UserExists(userInfo.Username))
