@@ -57,8 +57,8 @@ IDB_PGINA_LOGO          BITMAP                  "pginalogo.bmp"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,1,6,1
- PRODUCTVERSION 3,1,6,1
+ FILEVERSION 3,1,6,2
+ PRODUCTVERSION 3,1,6,2
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -75,10 +75,10 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "pGina Team"
             VALUE "FileDescription", "pGina GINA"
-            VALUE "FileVersion", "3.1.6.1"
+            VALUE "FileVersion", "3.1.6.2"
             VALUE "LegalCopyright", "Copyright (C) pGina Team 2012"
             VALUE "ProductName", "pGina"
-            VALUE "ProductVersion", "3.1.6.1"
+            VALUE "ProductVersion", "3.1.6.2"
         END
     END
     BLOCK "VarFileInfo"
