@@ -169,6 +169,11 @@ namespace pGina.Plugin.Ldap
                     m_logger.ErrorFormat("Server certificate validation failed: {0}", e.Message);
                     return false;
                 }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("Server certificate validation failed: {0}", e.Message);
+                    return false;
+                }
             }
             else
             {
@@ -209,6 +214,12 @@ namespace pGina.Plugin.Ldap
             {
                 // This shouldn't happen, but log it and re-throw
                 m_logger.ErrorFormat("InvalidOperationException: {0}", e.Message);
+                throw e;
+            }
+            catch (Exception e)
+            {
+                // This shouldn't happen, but log it and re-throw
+                m_logger.ErrorFormat("Bind Exception: {0}", e.Message);
                 throw e;
             }
         }
@@ -254,6 +265,12 @@ namespace pGina.Plugin.Ldap
             {
                 // This shouldn't happen, but log it and re-throw
                 m_logger.ErrorFormat("InvalidOperationException: {0}", e.Message);
+                throw e;
+            }
+            catch (Exception e)
+            {
+                // This shouldn't happen, but log it and re-throw
+                m_logger.ErrorFormat("Bind Exception: {0}", e.Message);
                 throw e;
             }
         }
@@ -328,7 +345,7 @@ namespace pGina.Plugin.Ldap
                 SearchResponse resp = (SearchResponse)m_conn.SendRequest(req);
                 return resp.Entries.Count > 0;
             }
-            catch (DirectoryOperationException e)
+            catch (Exception e)
             {
                 m_logger.ErrorFormat("Error when checking for group membership: {0}", e.Message);
                 return false;
@@ -380,6 +397,11 @@ namespace pGina.Plugin.Ldap
 
                     // Let caller handle other kinds of exceptions
                     throw;
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("LDAP plugin failed {0}",e.Message);
+                    return new BooleanResult { Success = false, Message = String.Format("LDAP plugin failed\n{0}",e.Message) };
                 }
 
                 // If we get here, the authentication was successful, we're done!
@@ -433,6 +455,11 @@ namespace pGina.Plugin.Ldap
                 catch (DirectoryOperationException e)
                 {
                     m_logger.ErrorFormat("DirectoryOperationException: {0}", e.Message);
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("FindUserDN failed: {0}", e.Message);
+                    return null;
                 }
                 if (dn != null)
                 {

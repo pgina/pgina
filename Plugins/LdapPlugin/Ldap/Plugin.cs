@@ -207,6 +207,15 @@ namespace pGina.Plugin.Ldap
                         Message = "Deny because LDAP auth did not execute, and configured to require LDAP auth."
                     };
                 }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("LDAP auth failed {0}", e.Message);
+                    return new BooleanResult
+                    {
+                        Success = false,
+                        Message = String.Format("Deny because LDAP auth failed\n{0}",e.Message)
+                    };
+                }
             }
 
             // Apply the authorization rules
