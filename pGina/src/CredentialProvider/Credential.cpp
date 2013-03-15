@@ -255,8 +255,8 @@ namespace pGina
 				{
 					pDEBUG(L"Credential::GetSerialization: pGina service is unavailable");
 					SHStrDupW(L"Your login request failed, because the pGina service is not running!\nOnly useres from the local administrator group are able to login.\n\nPlease contact your system administrator.\nReboot the machine to fix this issue.", ppwszOptionalStatusText);
-					ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, true);
-					ClearZeroAndFreeFields(CPFT_EDIT_TEXT, true);
+					SetStringValue(m_fields->usernameFieldIdx, (PCWSTR)L"");
+					SetStringValue(m_fields->passwordFieldIdx, (PCWSTR)L"");
 				
 					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 					*pcpsiOptionalStatusIcon = CPSI_ERROR;
@@ -288,8 +288,8 @@ namespace pGina
 				{
 					SHStrDupW(L"ProcessLoginForUser failed, but a specific error message was not provided", ppwszOptionalStatusText);
 				}
-				ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, false);
-				ClearZeroAndFreeFields(CPFT_EDIT_TEXT, false);
+				SetStringValue(m_fields->usernameFieldIdx, (PCWSTR)L"");
+				SetStringValue(m_fields->passwordFieldIdx, (PCWSTR)L"");
 				
 				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
 				*pcpsiOptionalStatusIcon = CPSI_ERROR;
