@@ -279,7 +279,14 @@ namespace pGina.Plugin.pgSMB
 
                     if (!String.IsNullOrEmpty(settings["ScriptPath"]))
                     {
-                        Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(changeDescription.SessionId, settings["ScriptPath"]);
+                        try
+                        {
+                            Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(changeDescription.SessionId, settings["ScriptPath"]);
+                        }
+                        catch (Exception ex)
+                        {
+                            m_logger.ErrorFormat("Can't run application {0} because {1}", settings["ScriptPath"], ex.ToString());
+                        }
                     }
 
                     if (!Roaming.SetGPO(RegistryLocation.HKEY_USERS, 0, ".DEFAULT"))
