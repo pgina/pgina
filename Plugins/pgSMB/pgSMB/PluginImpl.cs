@@ -307,7 +307,7 @@ namespace pGina.Plugin.pgSMB
 
             try
             {
-                for (int x = 0; x < 60 * Convert.ToUInt32(settings["ConnectRetry"]); x++)
+                while (true)
                 {
                     // logoff detection is quite a problem under NT6
                     // a disconnectEvent is only triggered during a logoff

@@ -481,7 +481,7 @@ namespace pGina.Plugin.LocalMachine
             bool scramble = Settings.Store.ScramblePasswords;
             bool remove = Settings.Store.RemoveProfiles;
 
-            for (int x = 0; x < 60; x++)
+            while (true)
             {
                 // logoff detection is quite a problem under NT6
                 // a disconnectEvent is only triggered during a logoff
