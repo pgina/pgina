@@ -584,6 +584,60 @@ namespace Abstractions.WindowsApi
             return result;            
         }
 
+        public static bool IsSessionLoggedOFF(int session)
+        {
+            SafeNativeMethods.WTS_SESSION_INFO sessionInfo = new SafeNativeMethods.WTS_SESSION_INFO();
+            // if WTSQuerySessionInformation returns false than the session is already closed
+            // WTSQuerySessionInformation returns zero if the session is logged off.
+            sessionInfo.State = SafeNativeMethods.WTS_CONNECTSTATE_CLASS.WTSReset;
+            uint bytes = 0;
+            IntPtr userInfo = IntPtr.Zero;
+
+            bool sResult = SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, session, SafeNativeMethods.WTS_INFO_CLASS.WTSConnectState, out userInfo, out bytes);
+            if (sResult)
+            {
+                int lData = Marshal.ReadInt32(userInfo);
+                sessionInfo.State = (SafeNativeMethods.WTS_CONNECTSTATE_CLASS)Enum.ToObject(typeof(SafeNativeMethods.WTS_CONNECTSTATE_CLASS), lData);
+                /*
+                switch (sessionInfo.State)
+                {
+                    case SafeNativeMethods.WTS_CONNECTSTATE_CLASS.WTSActive:
+                        ret = "WTSActive";
+                        break;
+                    case SafeNativeMethods.WTS_CONNECTSTATE_CLASS.WTSConnected:
+                        ret = "WTSConnected";
+                        break;
+                    case SafeNativeMethods.WTS_CONNECTSTATE_CLASS.WTSConnectQuery:
+                        ret = "WTSConnectQuery";
+                        break;
+                    case SafeNativeMethods.WTS_CONNECTSTATE_CLASS.WTSDisconnected:
+                        ret = "WTSDisconnected";
+                        break;
+                    case SafeNativeMethods.WTS_CONNECTSTATE_CLASS.WTSDown:
+                        ret = "WTSDown";
+                        break;
+                    case SafeNativeMethods.WTS_CONNECTSTATE_CLASS.WTSIdle:
+                        ret = "WTSIdle";
+                        break;
+                    case SafeNativeMethods.WTS_CONNECTSTATE_CLASS.WTSInit:
+                        ret = "WTSInit";
+                        break;
+                    case SafeNativeMethods.WTS_CONNECTSTATE_CLASS.WTSListen:
+                        ret = "WTSListen";
+                        break;
+                    case SafeNativeMethods.WTS_CONNECTSTATE_CLASS.WTSReset:
+                        ret = "WTSReset";
+                        break;
+                    case SafeNativeMethods.WTS_CONNECTSTATE_CLASS.WTSShadow:
+                        ret = "WTSShadow";
+                        break;
+                }
+                */
+            }
+            SafeNativeMethods.WTSFreeMemory(userInfo);
+            return (sessionInfo.State == SafeNativeMethods.WTS_CONNECTSTATE_CLASS.WTSReset) ? true : false;
+        }
+
         public static string GetUserName(int sessionId)
         {
             uint bytes = 0;
