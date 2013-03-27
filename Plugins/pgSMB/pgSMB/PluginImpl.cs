@@ -315,9 +315,7 @@ namespace pGina.Plugin.pgSMB
                     // and the SessionLogoffEvent is only saying that the user is logging of
                     // So, there is no event that is fired during a user-logoff/reboot/shutdown
                     // that indicates that the user has logged of
-                    int ses = Abstractions.WindowsApi.pInvokes.GetSessionId();
-                    m_logger.DebugFormat("GetSessionId:{0}", ses);
-                    if (ses != sessionID || IsShuttingDown)
+                    if (Abstractions.WindowsApi.pInvokes.IsSessionLoggedOFF(sessionID) || IsShuttingDown)
                     {
                         break;
                     }
