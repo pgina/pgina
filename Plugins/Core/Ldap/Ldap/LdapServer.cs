@@ -324,7 +324,7 @@ namespace pGina.Plugin.Ldap
             m_logger.DebugFormat("Searching for group membership, DN: {0}  Filter: {1}", groupDn, filter);
             try
             {
-                SearchRequest req = new SearchRequest(groupDn, filter, SearchScope.Base, null);
+                SearchRequest req = new SearchRequest(groupDn, filter, SearchScope.Base, new string[] {"dn"});
                 SearchResponse resp = (SearchResponse)m_conn.SendRequest(req);
                 return resp.Entries.Count > 0;
             }
