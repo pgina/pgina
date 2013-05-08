@@ -276,9 +276,6 @@ namespace pGina.Service.Impl
                 sessionDriver.UserInformation.Username = msg.Username.Trim();
                 sessionDriver.UserInformation.Password = msg.Password;
 
-                m_logger.DebugFormat("Processing LoginRequest for: {0} in session: {1} reason: {2}", 
-                    sessionDriver.UserInformation.Username, msg.Session, msg.Reason);
-
                 // check if a plugin still does some logoff work for this user
                 Boolean thisUserLogoff = false;
                 foreach (IPluginLogoffRequestAddTime plugin in PluginLoader.GetOrderedPluginsOfType<IPluginLogoffRequestAddTime>())
@@ -289,14 +286,35 @@ namespace pGina.Service.Impl
                 if (thisUserLogoff)
                     return new LoginResponseMessage() { Result = false, Message = String.Format("Still logoff work to do for user {0}\nWait a view seconds and retry", sessionDriver.UserInformation.Username) };
 
-                BooleanResult result = sessionDriver.PerformLoginProcess();
+                BooleanResult result = new BooleanResult() { Success = true, Message = "" };
 
                 if (msg.Reason == LoginRequestMessage.LoginReason.Login)
                 {
+                    m_logger.DebugFormat("Processing LoginRequest for: {0} in session: {1} reason: {2}", sessionDriver.UserInformation.Username, msg.Session, msg.Reason);
+
+                    Boolean isLoggedIN = false;
+                    List<string> Users = Abstractions.WindowsApi.pInvokes.GetInteractiveUserList();
+                    foreach (string user in Users)
+                    {
+                        m_logger.DebugFormat("Interactive user:{0}", user);
+                        if (user.EndsWith(sessionDriver.UserInformation.Username, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            //the user is still logged in
+                            isLoggedIN = true;
+                            m_logger.DebugFormat("User:{0} is Locked", sessionDriver.UserInformation.Username);
+                        }
+                    }
+                    if (!isLoggedIN)
+                        result = sessionDriver.PerformLoginProcess();
+
                     lock (m_sessionPropertyCache)
                     {
                         m_sessionPropertyCache.Add(msg.Session, sessionDriver.SessionProperties);
                     }
+                }
+                else
+                {
+                    m_logger.DebugFormat("Parse Request for: {0} in session: {1} reason: {2}", sessionDriver.UserInformation.Username, msg.Session, msg.Reason);
                 }
 
                 return new LoginResponseMessage()
