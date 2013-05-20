@@ -305,7 +305,13 @@ namespace pGina
 		{
 			// We currently always support only a single tile
 			*pdwCount = 1;
-			*pdwDefault = 0;
+
+			bool defaultTile = pGina::Registry::GetBool(L"CredentialProviderDefaultTile", true);
+			if(defaultTile)
+				*pdwDefault = 0;
+			else
+				*pdwDefault = CREDENTIAL_PROVIDER_NO_DEFAULT;
+
 			*pbAutoLogonWithDefault = FALSE;
 			
 			// If we were given creds via SetSerialization, and they appear complete, then we can 

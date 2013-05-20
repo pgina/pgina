@@ -73,22 +73,23 @@
             this.btnAdd = new System.Windows.Forms.Button();
             this.lstPluginDirs = new System.Windows.Forms.ListView();
             this.m_pluginOrderTab = new System.Windows.Forms.TabPage();
-            this.groupBox8 = new System.Windows.Forms.GroupBox();
-            this.gatewayBtnDown = new System.Windows.Forms.Button();
-            this.gatewayBtnUp = new System.Windows.Forms.Button();
-            this.gatewayDGV = new System.Windows.Forms.DataGridView();
-            this.groupBox11 = new System.Windows.Forms.GroupBox();
-            this.eventBtnDown = new System.Windows.Forms.Button();
-            this.eventBtnUp = new System.Windows.Forms.Button();
-            this.eventDGV = new System.Windows.Forms.DataGridView();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.authorizeBtnDown = new System.Windows.Forms.Button();
-            this.authorizeBtnUp = new System.Windows.Forms.Button();
-            this.authorizeDGV = new System.Windows.Forms.DataGridView();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.authenticateBtnDown = new System.Windows.Forms.Button();
             this.authenticateBtnUp = new System.Windows.Forms.Button();
             this.authenticateDGV = new System.Windows.Forms.DataGridView();
+            this.groupBox11 = new System.Windows.Forms.GroupBox();
+            this.eventBtnDown = new System.Windows.Forms.Button();
+            this.eventBtnUp = new System.Windows.Forms.Button();
+            this.eventDGV = new System.Windows.Forms.DataGridView();
+            this.groupBox8 = new System.Windows.Forms.GroupBox();
+            this.gatewayBtnDown = new System.Windows.Forms.Button();
+            this.gatewayBtnUp = new System.Windows.Forms.Button();
+            this.gatewayDGV = new System.Windows.Forms.DataGridView();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.authorizeBtnDown = new System.Windows.Forms.Button();
+            this.authorizeBtnUp = new System.Windows.Forms.Button();
+            this.authorizeDGV = new System.Windows.Forms.DataGridView();
             this.m_simTab = new System.Windows.Forms.TabPage();
             this.viewLogBtn = new System.Windows.Forms.Button();
             this.groupBox13 = new System.Windows.Forms.GroupBox();
@@ -136,6 +137,8 @@
             this.radioShutdown = new System.Windows.Forms.RadioButton();
             this.chkSpecialButton = new System.Windows.Forms.CheckBox();
             this.cpOptions = new System.Windows.Forms.TabPage();
+            this.groupBox18 = new System.Windows.Forms.GroupBox();
+            this.defaultCPTileCB = new System.Windows.Forms.CheckBox();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
             this.label18 = new System.Windows.Forms.Label();
             this.dgvCredProvFilter = new System.Windows.Forms.DataGridView();
@@ -145,7 +148,6 @@
             this.btnOkay = new System.Windows.Forms.Button();
             this.m_pginaVersionLbl = new System.Windows.Forms.Label();
             this.btnSaveAndClose = new System.Windows.Forms.Button();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
             this.groupBox17.SuspendLayout();
@@ -160,14 +162,15 @@
             ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.m_pluginOrderTab.SuspendLayout();
-            this.groupBox8.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).BeginInit();
-            this.groupBox11.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.eventDGV)).BeginInit();
-            this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).BeginInit();
+            this.tableLayoutPanel1.SuspendLayout();
             this.groupBox7.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).BeginInit();
+            this.groupBox11.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.eventDGV)).BeginInit();
+            this.groupBox8.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).BeginInit();
+            this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).BeginInit();
             this.m_simTab.SuspendLayout();
             this.groupBox13.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.simFinalResultPB)).BeginInit();
@@ -183,9 +186,9 @@
             this.groupBox16.SuspendLayout();
             this.groupBox15.SuspendLayout();
             this.cpOptions.SuspendLayout();
+            this.groupBox18.SuspendLayout();
             this.groupBox9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCredProvFilter)).BeginInit();
-            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // m_tabs
@@ -667,53 +670,73 @@
             this.m_pluginOrderTab.Text = "Plugin Order";
             this.m_pluginOrderTab.UseVisualStyleBackColor = true;
             // 
-            // groupBox8
+            // tableLayoutPanel1
             // 
-            this.groupBox8.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox8.Controls.Add(this.gatewayBtnDown);
-            this.groupBox8.Controls.Add(this.gatewayBtnUp);
-            this.groupBox8.Controls.Add(this.gatewayDGV);
-            this.groupBox8.Location = new System.Drawing.Point(3, 273);
-            this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(386, 265);
-            this.groupBox8.TabIndex = 18;
-            this.groupBox8.TabStop = false;
-            this.groupBox8.Text = "Gateway";
+            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Controls.Add(this.groupBox7, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.groupBox11, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.groupBox8, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.groupBox2, 1, 0);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(784, 541);
+            this.tableLayoutPanel1.TabIndex = 22;
             // 
-            // gatewayBtnDown
+            // groupBox7
             // 
-            this.gatewayBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.gatewayBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.gatewayBtnDown.Location = new System.Drawing.Point(349, 137);
-            this.gatewayBtnDown.Name = "gatewayBtnDown";
-            this.gatewayBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.gatewayBtnDown.TabIndex = 16;
-            this.gatewayBtnDown.UseVisualStyleBackColor = true;
-            this.gatewayBtnDown.Click += new System.EventHandler(this.gatewayBtnDown_Click);
-            // 
-            // gatewayBtnUp
-            // 
-            this.gatewayBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.gatewayBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.gatewayBtnUp.Location = new System.Drawing.Point(349, 104);
-            this.gatewayBtnUp.Name = "gatewayBtnUp";
-            this.gatewayBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.gatewayBtnUp.TabIndex = 15;
-            this.gatewayBtnUp.UseVisualStyleBackColor = true;
-            this.gatewayBtnUp.Click += new System.EventHandler(this.gatewayBtnUp_Click);
-            // 
-            // gatewayDGV
-            // 
-            this.gatewayDGV.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.groupBox7.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.gatewayDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gatewayDGV.Location = new System.Drawing.Point(15, 20);
-            this.gatewayDGV.Name = "gatewayDGV";
-            this.gatewayDGV.Size = new System.Drawing.Size(328, 239);
-            this.gatewayDGV.TabIndex = 0;
+            this.groupBox7.Controls.Add(this.authenticateBtnDown);
+            this.groupBox7.Controls.Add(this.authenticateBtnUp);
+            this.groupBox7.Controls.Add(this.authenticateDGV);
+            this.groupBox7.Location = new System.Drawing.Point(3, 3);
+            this.groupBox7.Name = "groupBox7";
+            this.groupBox7.Size = new System.Drawing.Size(386, 264);
+            this.groupBox7.TabIndex = 12;
+            this.groupBox7.TabStop = false;
+            this.groupBox7.Text = "Authentication";
+            // 
+            // authenticateBtnDown
+            // 
+            this.authenticateBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.authenticateBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.authenticateBtnDown.Location = new System.Drawing.Point(349, 136);
+            this.authenticateBtnDown.Name = "authenticateBtnDown";
+            this.authenticateBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.authenticateBtnDown.TabIndex = 16;
+            this.authenticateBtnDown.UseVisualStyleBackColor = true;
+            this.authenticateBtnDown.Click += new System.EventHandler(this.authenticateBtnDown_Click);
+            // 
+            // authenticateBtnUp
+            // 
+            this.authenticateBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.authenticateBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.authenticateBtnUp.Location = new System.Drawing.Point(349, 103);
+            this.authenticateBtnUp.Name = "authenticateBtnUp";
+            this.authenticateBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.authenticateBtnUp.TabIndex = 15;
+            this.authenticateBtnUp.UseVisualStyleBackColor = true;
+            this.authenticateBtnUp.Click += new System.EventHandler(this.authenticateBtnUp_Click);
+            // 
+            // authenticateDGV
+            // 
+            this.authenticateDGV.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.authenticateDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.authenticateDGV.Location = new System.Drawing.Point(15, 20);
+            this.authenticateDGV.Name = "authenticateDGV";
+            this.authenticateDGV.Size = new System.Drawing.Size(328, 238);
+            this.authenticateDGV.TabIndex = 0;
             // 
             // groupBox11
             // 
@@ -763,6 +786,54 @@
             this.eventDGV.Size = new System.Drawing.Size(328, 239);
             this.eventDGV.TabIndex = 0;
             // 
+            // groupBox8
+            // 
+            this.groupBox8.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox8.Controls.Add(this.gatewayBtnDown);
+            this.groupBox8.Controls.Add(this.gatewayBtnUp);
+            this.groupBox8.Controls.Add(this.gatewayDGV);
+            this.groupBox8.Location = new System.Drawing.Point(3, 273);
+            this.groupBox8.Name = "groupBox8";
+            this.groupBox8.Size = new System.Drawing.Size(386, 265);
+            this.groupBox8.TabIndex = 18;
+            this.groupBox8.TabStop = false;
+            this.groupBox8.Text = "Gateway";
+            // 
+            // gatewayBtnDown
+            // 
+            this.gatewayBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.gatewayBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.gatewayBtnDown.Location = new System.Drawing.Point(349, 137);
+            this.gatewayBtnDown.Name = "gatewayBtnDown";
+            this.gatewayBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.gatewayBtnDown.TabIndex = 16;
+            this.gatewayBtnDown.UseVisualStyleBackColor = true;
+            this.gatewayBtnDown.Click += new System.EventHandler(this.gatewayBtnDown_Click);
+            // 
+            // gatewayBtnUp
+            // 
+            this.gatewayBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.gatewayBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.gatewayBtnUp.Location = new System.Drawing.Point(349, 104);
+            this.gatewayBtnUp.Name = "gatewayBtnUp";
+            this.gatewayBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.gatewayBtnUp.TabIndex = 15;
+            this.gatewayBtnUp.UseVisualStyleBackColor = true;
+            this.gatewayBtnUp.Click += new System.EventHandler(this.gatewayBtnUp_Click);
+            // 
+            // gatewayDGV
+            // 
+            this.gatewayDGV.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gatewayDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gatewayDGV.Location = new System.Drawing.Point(15, 20);
+            this.gatewayDGV.Name = "gatewayDGV";
+            this.gatewayDGV.Size = new System.Drawing.Size(328, 239);
+            this.gatewayDGV.TabIndex = 0;
+            // 
             // groupBox2
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -810,54 +881,6 @@
             this.authorizeDGV.Name = "authorizeDGV";
             this.authorizeDGV.Size = new System.Drawing.Size(328, 238);
             this.authorizeDGV.TabIndex = 0;
-            // 
-            // groupBox7
-            // 
-            this.groupBox7.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox7.Controls.Add(this.authenticateBtnDown);
-            this.groupBox7.Controls.Add(this.authenticateBtnUp);
-            this.groupBox7.Controls.Add(this.authenticateDGV);
-            this.groupBox7.Location = new System.Drawing.Point(3, 3);
-            this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(386, 264);
-            this.groupBox7.TabIndex = 12;
-            this.groupBox7.TabStop = false;
-            this.groupBox7.Text = "Authentication";
-            // 
-            // authenticateBtnDown
-            // 
-            this.authenticateBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.authenticateBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.authenticateBtnDown.Location = new System.Drawing.Point(349, 136);
-            this.authenticateBtnDown.Name = "authenticateBtnDown";
-            this.authenticateBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.authenticateBtnDown.TabIndex = 16;
-            this.authenticateBtnDown.UseVisualStyleBackColor = true;
-            this.authenticateBtnDown.Click += new System.EventHandler(this.authenticateBtnDown_Click);
-            // 
-            // authenticateBtnUp
-            // 
-            this.authenticateBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.authenticateBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.authenticateBtnUp.Location = new System.Drawing.Point(349, 103);
-            this.authenticateBtnUp.Name = "authenticateBtnUp";
-            this.authenticateBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.authenticateBtnUp.TabIndex = 15;
-            this.authenticateBtnUp.UseVisualStyleBackColor = true;
-            this.authenticateBtnUp.Click += new System.EventHandler(this.authenticateBtnUp_Click);
-            // 
-            // authenticateDGV
-            // 
-            this.authenticateDGV.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.authenticateDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.authenticateDGV.Location = new System.Drawing.Point(15, 20);
-            this.authenticateDGV.Name = "authenticateDGV";
-            this.authenticateDGV.Size = new System.Drawing.Size(328, 238);
-            this.authenticateDGV.TabIndex = 0;
             // 
             // m_simTab
             // 
@@ -1348,6 +1371,7 @@
             // 
             // cpOptions
             // 
+            this.cpOptions.Controls.Add(this.groupBox18);
             this.cpOptions.Controls.Add(this.groupBox9);
             this.cpOptions.Location = new System.Drawing.Point(4, 22);
             this.cpOptions.Name = "cpOptions";
@@ -1356,6 +1380,28 @@
             this.cpOptions.TabIndex = 5;
             this.cpOptions.Text = "Credential Provider Options";
             this.cpOptions.UseVisualStyleBackColor = true;
+            // 
+            // groupBox18
+            // 
+            this.groupBox18.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox18.Controls.Add(this.defaultCPTileCB);
+            this.groupBox18.Location = new System.Drawing.Point(17, 6);
+            this.groupBox18.Name = "groupBox18";
+            this.groupBox18.Size = new System.Drawing.Size(752, 46);
+            this.groupBox18.TabIndex = 1;
+            this.groupBox18.TabStop = false;
+            this.groupBox18.Text = "Default Tile";
+            // 
+            // defaultCPTileCB
+            // 
+            this.defaultCPTileCB.AutoSize = true;
+            this.defaultCPTileCB.Location = new System.Drawing.Point(13, 19);
+            this.defaultCPTileCB.Name = "defaultCPTileCB";
+            this.defaultCPTileCB.Size = new System.Drawing.Size(196, 17);
+            this.defaultCPTileCB.TabIndex = 0;
+            this.defaultCPTileCB.Text = "Request pGina tile to be the default.";
+            this.defaultCPTileCB.UseVisualStyleBackColor = true;
             // 
             // groupBox9
             // 
@@ -1366,9 +1412,9 @@
             this.groupBox9.Controls.Add(this.dgvCredProvFilter);
             this.groupBox9.Controls.Add(this.label17);
             this.groupBox9.Controls.Add(this.textBox1);
-            this.groupBox9.Location = new System.Drawing.Point(17, 15);
+            this.groupBox9.Location = new System.Drawing.Point(17, 58);
             this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(752, 516);
+            this.groupBox9.Size = new System.Drawing.Size(752, 473);
             this.groupBox9.TabIndex = 0;
             this.groupBox9.TabStop = false;
             this.groupBox9.Text = "Disable Credential Providers";
@@ -1377,7 +1423,7 @@
             // 
             this.label18.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(10, 449);
+            this.label18.Location = new System.Drawing.Point(10, 406);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(411, 13);
             this.label18.TabIndex = 6;
@@ -1392,7 +1438,7 @@
             this.dgvCredProvFilter.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvCredProvFilter.Location = new System.Drawing.Point(13, 38);
             this.dgvCredProvFilter.Name = "dgvCredProvFilter";
-            this.dgvCredProvFilter.Size = new System.Drawing.Size(721, 408);
+            this.dgvCredProvFilter.Size = new System.Drawing.Size(721, 365);
             this.dgvCredProvFilter.TabIndex = 5;
             // 
             // label17
@@ -1410,7 +1456,7 @@
             this.textBox1.BackColor = System.Drawing.Color.Yellow;
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(13, 465);
+            this.textBox1.Location = new System.Drawing.Point(13, 422);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
@@ -1462,26 +1508,6 @@
             this.btnSaveAndClose.UseVisualStyleBackColor = true;
             this.btnSaveAndClose.Click += new System.EventHandler(this.btnSaveAndClose_Click);
             // 
-            // tableLayoutPanel1
-            // 
-            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Controls.Add(this.groupBox7, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.groupBox11, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.groupBox8, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.groupBox2, 1, 0);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(784, 541);
-            this.tableLayoutPanel1.TabIndex = 22;
-            // 
             // ConfigurationUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1515,14 +1541,15 @@
             ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.m_pluginOrderTab.ResumeLayout(false);
-            this.groupBox8.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).EndInit();
-            this.groupBox11.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.eventDGV)).EndInit();
-            this.groupBox2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).EndInit();
+            this.tableLayoutPanel1.ResumeLayout(false);
             this.groupBox7.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).EndInit();
+            this.groupBox11.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.eventDGV)).EndInit();
+            this.groupBox8.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).EndInit();
+            this.groupBox2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).EndInit();
             this.m_simTab.ResumeLayout(false);
             this.groupBox13.ResumeLayout(false);
             this.groupBox13.PerformLayout();
@@ -1545,10 +1572,11 @@
             this.groupBox15.ResumeLayout(false);
             this.groupBox15.PerformLayout();
             this.cpOptions.ResumeLayout(false);
+            this.groupBox18.ResumeLayout(false);
+            this.groupBox18.PerformLayout();
             this.groupBox9.ResumeLayout(false);
             this.groupBox9.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCredProvFilter)).EndInit();
-            this.tableLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1670,5 +1698,7 @@
         private System.Windows.Forms.TextBox tbLogonProgressMessage;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.GroupBox groupBox18;
+        private System.Windows.Forms.CheckBox defaultCPTileCB;
     }
 }

@@ -153,6 +153,9 @@ namespace pGina.Configuration
 
         private void InitCpOptions()
         {
+            bool defaultTile = Settings.Get.CredentialProviderDefaultTile;
+            this.defaultCPTileCB.Checked = defaultTile;
+
             dgvCredProvFilter.RowHeadersVisible = false;
             dgvCredProvFilter.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvCredProvFilter.MultiSelect = false;
@@ -1466,6 +1469,8 @@ namespace pGina.Configuration
 
         private void SaveCpSettings()
         {
+            Settings.Get.CredentialProviderDefaultTile = this.defaultCPTileCB.Checked;
+
             List<CredProv> credProvs = (List<CredProv>)dgvCredProvFilter.DataSource;
             CredProvFilterConfig.SaveFilterSettings(credProvs);
         }
