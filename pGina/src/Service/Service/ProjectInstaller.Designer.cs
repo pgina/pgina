@@ -39,9 +39,11 @@
             // 
             // pGinaServiceProjectInstaller
             // 
-            this.pGinaServiceProjectInstaller.Description = "pGina Management Service";
+            this.pGinaServiceProjectInstaller.Description = "The pGina Management Service.";
             this.pGinaServiceProjectInstaller.DisplayName = "pGina Service";
             this.pGinaServiceProjectInstaller.ServiceName = "pGina";
+            this.pGinaServiceProjectInstaller.ServicesDependedOn = new string[] {
+        "RpcSs"};
             this.pGinaServiceProjectInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // ProjectInstaller
