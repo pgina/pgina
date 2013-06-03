@@ -66,6 +66,8 @@ namespace pGina
 											__deref_out_opt PWSTR* ppwszOptionalStatusText, __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon);
 			IFACEMETHODIMP ReportResult(__in NTSTATUS ntsStatus, __in NTSTATUS ntsSubstatus, __deref_out_opt PWSTR* ppwszOptionalStatusText, 
 										__out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon);
+			
+			// IConnectableCredentialProviderCredential
 			IFACEMETHODIMP Connect( __in IQueryContinueWithStatus *pqcws );
 			IFACEMETHODIMP Disconnect();
 
@@ -84,6 +86,7 @@ namespace pGina
 			PWSTR   FindUsernameValue();
 			PWSTR   FindPasswordValue();
 			DWORD   FindStatusId();
+			void	ProcessLoginAttempt(IQueryContinueWithStatus *pqcws);
 
 			bool	IsFieldDynamic(DWORD dwFieldID);
 			std::wstring GetTextForField(DWORD dwFieldID);

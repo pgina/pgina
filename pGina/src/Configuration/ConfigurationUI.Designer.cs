@@ -123,6 +123,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.m_tileImage = new System.Windows.Forms.PictureBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.btnLaunchCredUI = new System.Windows.Forms.Button();
+            this.m_radioCredUI = new System.Windows.Forms.RadioButton();
             this.m_radioEmulate = new System.Windows.Forms.RadioButton();
             this.m_radioUseService = new System.Windows.Forms.RadioButton();
             this.ginaOptions = new System.Windows.Forms.TabPage();
@@ -1217,6 +1219,8 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.btnLaunchCredUI);
+            this.groupBox3.Controls.Add(this.m_radioCredUI);
             this.groupBox3.Controls.Add(this.m_radioEmulate);
             this.groupBox3.Controls.Add(this.m_radioUseService);
             this.groupBox3.Location = new System.Drawing.Point(367, 6);
@@ -1225,12 +1229,34 @@
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Simulation Method";
+            //
+            // btnLaunchCredUI
+            // 
+            this.btnLaunchCredUI.Enabled = false;
+            this.btnLaunchCredUI.Image = global::pGina.Configuration.Properties.Resources.arrow_right_3;
+            this.btnLaunchCredUI.Location = new System.Drawing.Point(169, 69);
+            this.btnLaunchCredUI.Name = "btnLaunchCredUI";
+            this.btnLaunchCredUI.Size = new System.Drawing.Size(30, 27);
+            this.btnLaunchCredUI.TabIndex = 6;
+            this.btnLaunchCredUI.UseVisualStyleBackColor = true;
+            this.btnLaunchCredUI.Click += new System.EventHandler(this.btnLaunchCredUI_Click);
+            // 
+            // m_radioCredUI
+            // 
+            this.m_radioCredUI.AutoSize = true;
+            this.m_radioCredUI.Location = new System.Drawing.Point(21, 74);
+            this.m_radioCredUI.Name = "m_radioCredUI";
+            this.m_radioCredUI.Size = new System.Drawing.Size(142, 17);
+            this.m_radioCredUI.TabIndex = 2;
+            this.m_radioCredUI.Text = "Launch a CredUI Prompt";
+            this.m_radioCredUI.UseVisualStyleBackColor = true;
+            this.m_radioCredUI.CheckedChanged += new System.EventHandler(this.simMethodChanged);            
             // 
             // m_radioEmulate
             // 
             this.m_radioEmulate.AutoSize = true;
             this.m_radioEmulate.Checked = true;
-            this.m_radioEmulate.Location = new System.Drawing.Point(21, 35);
+            this.m_radioEmulate.Location = new System.Drawing.Point(21, 28);
             this.m_radioEmulate.Name = "m_radioEmulate";
             this.m_radioEmulate.Size = new System.Drawing.Size(133, 17);
             this.m_radioEmulate.TabIndex = 1;
@@ -1242,7 +1268,7 @@
             // m_radioUseService
             // 
             this.m_radioUseService.AutoSize = true;
-            this.m_radioUseService.Location = new System.Drawing.Point(21, 69);
+            this.m_radioUseService.Location = new System.Drawing.Point(21, 51);
             this.m_radioUseService.Name = "m_radioUseService";
             this.m_radioUseService.Size = new System.Drawing.Size(114, 17);
             this.m_radioUseService.TabIndex = 0;
@@ -1599,6 +1625,7 @@
         private System.Windows.Forms.TabPage m_simTab;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.RadioButton m_radioCredUI;
         private System.Windows.Forms.RadioButton m_radioEmulate;
         private System.Windows.Forms.RadioButton m_radioUseService;
         private System.Windows.Forms.GroupBox groupBox6;
@@ -1629,6 +1656,7 @@
         private System.Windows.Forms.Button eventBtnDown;
         private System.Windows.Forms.Button eventBtnUp;
         private System.Windows.Forms.DataGridView eventDGV;
+        private System.Windows.Forms.Button btnLaunchCredUI;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label3;

@@ -202,7 +202,7 @@ namespace pGina
 		}
 
 		IFACEMETHODIMP Credential::SetStringValue(__in DWORD dwFieldID, __in PCWSTR pwz)
-		{
+		{			
 			if(!m_fields || dwFieldID >= m_fields->fieldCount)
 				return E_INVALIDARG;
 
@@ -212,14 +212,18 @@ namespace pGina
 			   m_fields->fields[dwFieldID].fieldDescriptor.cpft != CPFT_LARGE_TEXT)
 				return E_INVALIDARG;
 
-			PWSTR *currentValue = &m_fields->fields[dwFieldID].wstr;
+			PWSTR *currentValue = &(m_fields->fields[dwFieldID].wstr);
 			if(*currentValue)
 			{
-				CoTaskMemFree(*currentValue);
+				CoTaskMemFree(*currentValue);									
 				*currentValue = NULL;
 			}
-
-			return SHStrDupW(pwz, currentValue);			
+			
+			if(pwz)
+			{			
+				return SHStrDupW(pwz, currentValue);						
+			}
+			return S_OK;
 		}
 
 		IFACEMETHODIMP Credential::SetCheckboxValue(__in DWORD dwFieldID, __in BOOL bChecked)
@@ -240,8 +244,15 @@ namespace pGina
 		IFACEMETHODIMP Credential::GetSerialization(__out CREDENTIAL_PROVIDER_GET_SERIALIZATION_RESPONSE* pcpgsr, __out CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs,
 													__deref_out_opt PWSTR* ppwszOptionalStatusText, __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
 		{
+			pDEBUG(L"Credential::GetSerialization, enter");
+			// If we are operating in a non CredUI scenario, then 
 			// Credential::Connect will have executed prior to this method, which contacts the
-			// service, so m_loginResult should have the result from the plugins.
+			// service, so m_loginResult should have the result from the plugins. Otherwise,
+			// consider this the attempt to login!
+			if(m_usageScenario == CPUS_CREDUI)
+			{
+				ProcessLoginAttempt(NULL);
+			}
 
 			if( m_logonCancelled )
 			{
@@ -575,7 +586,17 @@ namespace pGina
 		IFACEMETHODIMP Credential::Connect( IQueryContinueWithStatus *pqcws )
 		{
 			pDEBUG(L"Credential::Connect()");
+			ProcessLoginAttempt(pqcws);
+			return S_OK;
+		}
 
+		IFACEMETHODIMP Credential::Disconnect()
+		{
+			return E_NOTIMPL;
+		}
+
+		void Credential::ProcessLoginAttempt(IQueryContinueWithStatus *pqcws)
+		{
 			// Reset m_loginResult
 			m_loginResult.Username(L"");
 			m_loginResult.Password(L"");
@@ -603,7 +624,7 @@ namespace pGina
 				break;
 			}
 
-			pDEBUG(L"Credential::Connect: Processing login for %s", username);
+			pDEBUG(L"ProcessLoginAttempt: Processing login for %s", username);
 			
 			// Set the status message
 			if( pqcws )
@@ -645,14 +666,7 @@ namespace pGina
 					pDEBUG(L"User clicked cancel button during plugin processing");
 					m_logonCancelled = true;
 				}
-			}
-
-			return S_OK;
-		}
-
-		IFACEMETHODIMP Credential::Disconnect()
-		{
-			return E_NOTIMPL;
+			}			
 		}
 	}
 }

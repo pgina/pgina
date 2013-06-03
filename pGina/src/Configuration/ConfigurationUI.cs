@@ -978,8 +978,8 @@ namespace pGina.Configuration
         }        
 
         private void simMethodChanged(object sender, EventArgs e)
-        {            
-            // No need to do anything when the simulation method is changed.
+        {
+            btnLaunchCredUI.Enabled = (sender == m_radioCredUI);
         }
 
         private void authenticateBtnUp_Click(object sender, EventArgs e)
@@ -1030,8 +1030,6 @@ namespace pGina.Configuration
                 MoveDown(this.eventDGV, this.eventDGV.SelectedRows[0].Index);
         }
 
-        /* 
-         * No longer used, due to dropped support for CredUI
         private void btnLaunchCredUI_Click(object sender, EventArgs e)
         {
             ResetSimUI();
@@ -1045,8 +1043,7 @@ namespace pGina.Configuration
                 m_passwordResult.Text = credential.Password;
             }
         }
-        */
-
+        
         private void HandleLabelTextChange(Label lbl)
         {
             if (lbl.Text == "Success")
@@ -1093,10 +1090,10 @@ namespace pGina.Configuration
             m_domainResult.Text = null;
             m_passwordResult.Text = null;
             this.logWindow.LogTextBox.Text = "";
-            if (m_radioUseService.Checked )
+            if (m_radioUseService.Checked || m_radioCredUI.Checked)            
             {
                 this.logWindow.LogTextBox.AppendText("*****" + Environment.NewLine);
-                this.logWindow.LogTextBox.AppendText("***** Log output unavailable when using pGina service." + 
+                this.logWindow.LogTextBox.AppendText("***** Log output unavailable when using pGina service or CredUI prompt." +
                     Environment.NewLine);
                 this.logWindow.LogTextBox.AppendText("*****" + Environment.NewLine);
             }
