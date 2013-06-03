@@ -125,17 +125,10 @@ namespace pGina
 			{
 			case CPUS_LOGON:
 			case CPUS_UNLOCK_WORKSTATION:
+			case CPUS_CREDUI:
 				m_usageScenario = cpus;
 				m_usageFlags = dwFlags;
 				return S_OK;
-			case CPUS_CREDUI:
-				// Dropped support for the CredUI scenario when we moved to the
-				// IConnectableCredentialProviderCredential interface.
-				// This is due to the fact that Windows doesn't seem to support 
-				// IConnectableCrendentialProviderCredential
-				// in this scenario.  We could provide support at some later time by 
-				// providing a separate credential implementation for the CredUI scenario.
-				return E_NOTIMPL;
 			case CPUS_CHANGE_PASSWORD:			
 				return E_NOTIMPL;	// Todo: Support this
 
@@ -361,9 +354,15 @@ namespace pGina
 			// Better be index 0 (we only have 1 currently)
 			if(dwIndex != 0 || !ppcpc)
 				return E_INVALIDARG;
-
-			// Alright... QueryIface for IConnectableCredentialProviderCredential
-			return m_credential->QueryInterface(IID_IConnectableCredentialProviderCredential, reinterpret_cast<void **>(ppcpc));			 
+			
+			if(m_usageScenario == CPUS_CREDUI)
+			{
+				return m_credential->QueryInterface(IID_ICredentialProviderCredential, reinterpret_cast<void **>(ppcpc));			 		
+			}
+			else
+			{
+				return m_credential->QueryInterface(IID_IConnectableCredentialProviderCredential, reinterpret_cast<void **>(ppcpc));			 		
+			}			
     	}
 
 		IFACEMETHODIMP Provider::GetFieldDescriptorForUi(UI_FIELDS const& fields, DWORD index, CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR **ppcpfd)
