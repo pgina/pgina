@@ -48,8 +48,8 @@ namespace Abstractions.Pipes
             String          = 0x03,
             EmptyString     = 0x04,
         }
-        
-        public static dynamic Demarshal(byte[] data)
+
+        public static IDictionary<string, object> Demarshal(byte[] data)
         {
             // Cannot be empty
             if (data.Length == 0)
@@ -62,9 +62,8 @@ namespace Abstractions.Pipes
                 if (messageFormatVersion != CurrentMessageFormatVersion)
                     throw new InvalidDataException(string.Format("Message format: {0} is not support (library version: {1})", messageFormatVersion, CurrentMessageFormatVersion));
 
-                // Create an expando object to represent this message
-                dynamic message = new ExpandoObject();
-                IDictionary<String, Object> messageDict = ((IDictionary<String, Object>)message);
+                // Create a dict for the message contents                
+                Dictionary<string, object> messageDict = new Dictionary<string, object>();
 
                 while (br.BaseStream.Position < br.BaseStream.Length)
                 {
@@ -93,11 +92,11 @@ namespace Abstractions.Pipes
                     }
                 }
 
-                return message;
+                return messageDict;
             }
         }
 
-        public static byte[] Marshal(dynamic message)
+        public static byte[] Marshal(IDictionary<string, object> message)
         {
             using (MemoryStream memory = new MemoryStream())
             {
@@ -107,7 +106,7 @@ namespace Abstractions.Pipes
                 writer.Write(CurrentMessageFormatVersion);
     
                 // Now we just iterate properties and write them out
-                foreach (KeyValuePair<String, Object> property in (IDictionary<String, Object>) message)
+                foreach (KeyValuePair<string, object> property in message)
                 {
                     writer.Write(property.Key);
 

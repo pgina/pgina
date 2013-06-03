@@ -37,29 +37,29 @@ namespace pGina.Core.Messages
         public bool Result { get; set; }
         public string Message { get; set; }
 
-        public LoginResponseMessage(dynamic expandoVersion)            
+        public LoginResponseMessage(IDictionary<string, object> expandoVersion)            
         {
-            FromExpando(expandoVersion);
+            FromDict(expandoVersion);
         }
 
         public LoginResponseMessage()
         {
         }
 
-        public override void FromExpando(dynamic expandoVersion)
+        public override void FromDict(IDictionary<string, object> expandoVersion)
         {
-            base.FromExpando((ExpandoObject) expandoVersion);
-            Result = expandoVersion.Result;
-            Message = expandoVersion.Message;
+            base.FromDict(expandoVersion);
+            Result = (bool) expandoVersion["Result"];
+            Message = (string) expandoVersion["Message"];
         }
 
-        public override dynamic ToExpando()
+        public override IDictionary<string, object> ToDict()
         {
-            dynamic exp = base.ToExpando();
-            exp.Result = this.Result;
-            exp.Message = this.Message;
-            exp.MessageType = (byte) MessageType.LoginResponse;
-            return exp;
+            Dictionary<string, object> dict = base.ToDict() as Dictionary<string, object>;
+            dict.Add("Result", Result);
+            dict["Message"] = Message;
+            dict["MessageType"] = (byte) MessageType.LoginResponse;            
+            return dict;
         }
     }
 }

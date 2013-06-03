@@ -117,7 +117,7 @@ namespace pGina.Service.Impl
                 int maxClients = Core.Settings.Get.MaxClients;
                 m_logger.DebugFormat("Service created - PipeName: {0} MaxClients: {1}", pipeName, maxClients);
                 m_logger.DebugFormat("System Info: {0}", Abstractions.Windows.OsInfo.OsDescription());
-                m_server = new PipeServer(pipeName, maxClients, (Func<dynamic, dynamic>)HandleMessage);
+                m_server = new PipeServer(pipeName, maxClients, (Func<IDictionary<string, object>, IDictionary<string, object>>)HandleMessage);
                 m_logger.DebugFormat("Using plugin directories: ");
                 foreach (string dir in PluginDirectories)
                     m_logger.DebugFormat("  {0}", dir); 
@@ -185,12 +185,12 @@ namespace pGina.Service.Impl
         //  the connection remains open and operations on behalf of this client
         //  should occur in this thread etc.  The current managed thread id 
         //  can be used to differentiate between instances if scope requires.
-        private dynamic HandleMessage(dynamic msg)
+        private IDictionary<string, object> HandleMessage(IDictionary<string, object> msg)
         {
             int instance = Thread.CurrentThread.ManagedThreadId;
             ILog logger = LogManager.GetLogger(string.Format("HandleMessage[{0}]", instance));
-
-            MessageType type = (MessageType)msg.MessageType;
+            
+            MessageType type = (MessageType) Enum.ToObject(typeof (MessageType), msg["MessageType"]);            
 
             // Very noisy, not usually worth having on, configurable via "TraceMsgTraffic" boolean
             bool traceMsgTraffic = pGina.Core.Settings.Get.GetSetting("TraceMsgTraffic", false);
@@ -204,22 +204,22 @@ namespace pGina.Service.Impl
                 case MessageType.Disconnect:
                     // We ack, and mark this as LastMessage, which tells the pipe framework
                     //  not to expect further messages
-                    dynamic disconnectAck = new EmptyMessage(MessageType.Ack).ToExpando();  // Ack
-                    disconnectAck.LastMessage = true;
+                    IDictionary<string, object> disconnectAck = new EmptyMessage(MessageType.Ack).ToDict();  // Ack
+                    disconnectAck["LastMessage"] = true;
                     return disconnectAck;
                 case MessageType.Hello:
-                    return new EmptyMessage(MessageType.Hello).ToExpando();  // Ack with our own hello
+                    return new EmptyMessage(MessageType.Hello).ToDict();  // Ack with our own hello
                 case MessageType.Log:
                     HandleLogMessage(new LogMessage(msg));
-                    return new EmptyMessage(MessageType.Ack).ToExpando();  // Ack
+                    return new EmptyMessage(MessageType.Ack).ToDict();  // Ack
                 case MessageType.LoginRequest:
-                    return HandleLoginRequest(new LoginRequestMessage(msg)).ToExpando();                
+                    return HandleLoginRequest(new LoginRequestMessage(msg)).ToDict();                
                 case MessageType.DynLabelRequest:
-                    return HandleDynamicLabelRequest(new DynamicLabelRequestMessage(msg)).ToExpando();
+                    return HandleDynamicLabelRequest(new DynamicLabelRequestMessage(msg)).ToDict();
                 case MessageType.LoginInfoChange:
-                    return HandleLoginInfoChange(new LoginInfoChangeMessage(msg)).ToExpando();
+                    return HandleLoginInfoChange(new LoginInfoChangeMessage(msg)).ToDict();
                 case MessageType.UserInfoRequest:
-                    return HandleUserInfoRequest(new UserInformationRequestMessage(msg)).ToExpando();
+                    return HandleUserInfoRequest(new UserInformationRequestMessage(msg)).ToDict();
                 default:
                     return null;                // Unknowns get disconnected
             }

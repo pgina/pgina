@@ -48,34 +48,34 @@ namespace pGina.Core.Messages
         public int Session { get; set; }
         public LoginReason Reason { get; set; }
 
-        public LoginRequestMessage(dynamic expandoVersion)
+        public LoginRequestMessage(IDictionary<string, object> expandoVersion)
         {
-            FromExpando(expandoVersion);
+            FromDict(expandoVersion);
         }
 
         public LoginRequestMessage()
         {
         }
 
-        public override void FromExpando(dynamic expandoVersion)
+        public override void FromDict(IDictionary<string, object> expandoVersion)
         {
-            Username = expandoVersion.Username;
-            Password = expandoVersion.Password;
-            Domain = expandoVersion.Domain;
-            Session = expandoVersion.Session;
-            Reason = (LoginReason)((byte)expandoVersion.Reason);
+            Username = (string) expandoVersion["Username"];
+            Password = (string) expandoVersion["Password"];
+            Domain = (string) expandoVersion["Domain"];
+            Session = (int) expandoVersion["Session"];
+            Reason = (LoginReason)((byte)expandoVersion["Reason"]);
         }
 
-        public override dynamic ToExpando()
+        public override IDictionary<string, object> ToDict()
         {
-            dynamic exp = new ExpandoObject();
-            exp.Username = this.Username;
-            exp.Password = this.Password;
-            exp.Domain = this.Domain;
-            exp.Session = this.Session;
-            exp.Reason = (byte)this.Reason;
-            exp.MessageType = (byte) MessageType.LoginRequest;
-            return exp;
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            dict.Add("Username", Username);
+            dict.Add("Password", Password);
+            dict.Add("Domain", Domain);
+            dict.Add("Session", Session);
+            dict.Add("Reason", (byte) this.Reason);
+            dict.Add("MessageType", (byte) MessageType.LoginRequest);
+            return dict;
         }
     }
 }

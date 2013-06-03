@@ -57,7 +57,7 @@ namespace Abstractions.Pipes
             MaxClients = maxClients;
         }
 
-        public PipeServer(string name, int maxClients, Func<dynamic, dynamic> action)
+        public PipeServer(string name, int maxClients, Func<IDictionary<string, object>, IDictionary<string, object>> action)
             : base(name, action) 
         {
             MaxClients = maxClients;
