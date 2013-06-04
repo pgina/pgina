@@ -1,5 +1,5 @@
 #define MyAppName "pGina"
-#define MyAppVersion "3.1.7.1"
+#define MyAppVersion "3.1.8.0"
 #define MyAppPublisher "pGina Team"
 #define MyAppURL "http://www.pgina.org/"
 #define MyAppExeName "pGina.Configuration.exe"

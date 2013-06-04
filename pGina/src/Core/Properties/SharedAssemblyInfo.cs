@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyCompany("pGina Team")]
 [assembly: AssemblyProduct("pGina")]
-[assembly: AssemblyCopyright("Copyright © pGina Team 2012")]
+[assembly: AssemblyCopyright("Copyright © pGina Team 2013")]
 [assembly: AssemblyTrademark("")]
 
 // Version information for an assembly consists of the following four values:
@@ -17,5 +17,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("3.1.7.1")]
-[assembly: AssemblyFileVersion("3.1.7.1")]
+[assembly: AssemblyVersion("3.1.8.0")]
+[assembly: AssemblyFileVersion("3.1.8.0")]

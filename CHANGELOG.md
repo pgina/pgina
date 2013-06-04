@@ -1,3 +1,12 @@
+3.1.8.0 (2013/06/03)
+---------------------------
+ - First stable release for 3.1
+ - Re-add support for the CredUI scenario.  (#195)
+ - Option to make pGina the default tile. (#182)
+ - Service is now dependent on RPC, improves startup time.
+ - Improve resize behavior of configuration. (#188)
+ - Various bug fixes (#146, #187, #177)
+
 3.1.7.0 BETA (2013/01/07)
 ---------------------------
  - Configurable login progress message while plugins are executing.
