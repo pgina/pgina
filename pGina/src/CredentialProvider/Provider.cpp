@@ -357,10 +357,12 @@ namespace pGina
 			
 			if(m_usageScenario == CPUS_CREDUI)
 			{
+				pDEBUG(L"GetCredentialAt: CredUI - returning an IID_ICredentialProviderCredential");
 				return m_credential->QueryInterface(IID_ICredentialProviderCredential, reinterpret_cast<void **>(ppcpc));			 		
 			}
 			else
 			{
+				pDEBUG(L"GetCredentialAt: Non CredUI - returning an IID_IConnectableCredentialProviderCredential");
 				return m_credential->QueryInterface(IID_IConnectableCredentialProviderCredential, reinterpret_cast<void **>(ppcpc));			 		
 			}			
     	}
