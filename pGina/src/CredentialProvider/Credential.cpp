@@ -53,14 +53,27 @@ namespace pGina
 	{
 		IFACEMETHODIMP Credential::QueryInterface(__in REFIID riid, __deref_out void **ppv)
 		{
-			// And more crazy ass v-table madness, yay COM again!
-			static const QITAB qit[] =
+			static const QITAB qitBaseOnly[] =
+			{
+				QITABENT(Credential, ICredentialProviderCredential),				
+				{0},
+			};
+
+			static const QITAB qitFull[] =
 			{
 				QITABENT(Credential, ICredentialProviderCredential),
 				QITABENT(Credential, IConnectableCredentialProviderCredential), 
 				{0},
 			};
-			return QISearch(this, qit, riid, ppv);
+
+			if(m_usageScenario == CPUS_CREDUI)
+			{			
+				return QISearch(this, qitBaseOnly, riid, ppv);
+			}
+			else
+			{
+				return QISearch(this, qitFull, riid, ppv);
+			}			
 		}
 
 		IFACEMETHODIMP_(ULONG) Credential::AddRef()
