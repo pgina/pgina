@@ -1,6 +1,6 @@
 # pGina
 
-[http://pgina.org]()
+http://pgina.org
 
 pGina is a pluggable Open Source GINA and CredentialProvider replacement.
 Plugins are written in managed code and allow for user authentication, session
