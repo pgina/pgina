@@ -225,16 +225,15 @@ namespace pGina
 			   m_fields->fields[dwFieldID].fieldDescriptor.cpft != CPFT_LARGE_TEXT)
 				return E_INVALIDARG;
 
-			PWSTR *currentValue = &(m_fields->fields[dwFieldID].wstr);
-			if(*currentValue)
+			if(m_fields->fields[dwFieldID].wstr)
 			{
-				CoTaskMemFree(*currentValue);									
-				*currentValue = NULL;
+				CoTaskMemFree(m_fields->fields[dwFieldID].wstr);
+				m_fields->fields[dwFieldID].wstr = NULL;
 			}
 			
 			if(pwz)
-			{			
-				return SHStrDupW(pwz, currentValue);						
+			{
+				return SHStrDupW(pwz, &m_fields->fields[dwFieldID].wstr);
 			}
 			return S_OK;
 		}
