@@ -526,9 +526,10 @@ namespace pGina
 				{
 					if(m_fields->fields[x].wstr)
 					{
-						size_t len = lstrlen(m_fields->fields[x].wstr);
+						size_t len = wcslen(m_fields->fields[x].wstr);
 						SecureZeroMemory(m_fields->fields[x].wstr, len * sizeof(wchar_t));
 						CoTaskMemFree(m_fields->fields[x].wstr);						
+						m_fields->fields[x].wstr = NULL;
 
 						// If we've been advised, we can tell the UI so the UI correctly reflects that this
 						//	field is not set any longer (set it to empty string)
