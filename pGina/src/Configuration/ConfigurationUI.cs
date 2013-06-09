@@ -1152,10 +1152,10 @@ namespace pGina.Configuration
                 string pipeName = Core.Settings.Get.ServicePipeName;
                 PipeClient client = new PipeClient(pipeName);
                 client.Start(
-                    (Func<dynamic, dynamic>)
+                    (Func<IDictionary<string, object>, IDictionary<string, object>>)
                     ((m) =>
-                    {
-                        MessageType type = (MessageType) m.MessageType;
+                        {
+                        MessageType type = (MessageType)Enum.ToObject(typeof(MessageType), m["MessageType"]);            
                         
                         // Acceptable server responses are Hello, and LoginResponse                        
                         switch (type)
@@ -1167,7 +1167,7 @@ namespace pGina.Configuration
                                     Username = m_username.Text,
                                     Password = m_password.Text,
                                 };
-                                return requestMsg.ToExpando();                                
+                                return requestMsg.ToDict();                                
                             case MessageType.LoginResponse:
                                 LoginResponseMessage responseMsg = new LoginResponseMessage(m);
                                 m_usernameResult.Text = responseMsg.Username;
@@ -1179,7 +1179,7 @@ namespace pGina.Configuration
                                     this.simFinalResultMessageTB.Text = responseMsg.Message;
                                 }
                                 // Respond with a disconnect, we're done
-                                return (new EmptyMessage(MessageType.Disconnect).ToExpando());
+                                return (new EmptyMessage(MessageType.Disconnect).ToDict());
                             case MessageType.Ack:   // Ack to our disconnect
                                 return null;    
                             default:
@@ -1187,7 +1187,7 @@ namespace pGina.Configuration
                                 return null;                                
                         }                                                
                     }),
-                (new EmptyMessage(MessageType.Hello)).ToExpando(), 1000);
+                (new EmptyMessage(MessageType.Hello)).ToDict(), 1000);
             }
             catch (Exception e)
             {

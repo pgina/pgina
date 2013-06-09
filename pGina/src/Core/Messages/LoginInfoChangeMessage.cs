@@ -38,29 +38,29 @@ namespace pGina.Core.Messages
         public int FromSession { get; set; }
         public int ToSession { get; set; }
 
-        public LoginInfoChangeMessage(dynamic expandoVersion)
+        public LoginInfoChangeMessage(IDictionary<string, object> expandoVersion)
         {
-            FromExpando(expandoVersion);
+            FromDict(expandoVersion);
         }
 
         public LoginInfoChangeMessage()
         {
         }
 
-        public override void FromExpando(dynamic expandoVersion)
+        public override void FromDict(IDictionary<string, object> expandoVersion)
         {
-            base.FromExpando((ExpandoObject)expandoVersion);
-            FromSession = expandoVersion.FromSession;
-            ToSession = expandoVersion.ToSession;            
+            base.FromDict(expandoVersion);
+            FromSession = (int) expandoVersion["FromSession"];
+            ToSession = (int) expandoVersion["ToSession"];
         }
 
-        public override dynamic ToExpando()
+        public override IDictionary<string, object> ToDict()
         {
-            dynamic exp = base.ToExpando();
-            exp.FromSession = FromSession;
-            exp.ToSession = ToSession;
-            exp.MessageType = (byte)MessageType.LoginInfoChange;
-            return exp;
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            dict.Add("FromSession", FromSession);
+            dict.Add("ToSession", ToSession);
+            dict.Add("MessageType", (byte)MessageType.LoginInfoChange);
+            return dict;
         }
     }
 }

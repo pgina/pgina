@@ -45,16 +45,16 @@ namespace pGina.Core.Messages
             this.MessageType = type;
         }
 
-        public override void FromExpando(dynamic expandoVersion)
+        public override void FromDict(IDictionary<string, object> expandoVersion)
         {
-            this.MessageType = (MessageType) expandoVersion.MessageType;
+            this.MessageType = (MessageType)Enum.ToObject(typeof(MessageType), expandoVersion["MessageType"]);                        
         }
 
-        public override dynamic ToExpando()
+        public override IDictionary<string, object> ToDict()
         {
-            dynamic exp = new ExpandoObject();
-            exp.MessageType = (byte)this.MessageType;
-            return exp;
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            dict.Add("MessageType", (byte)this.MessageType);
+            return dict;
         }
     }
 }

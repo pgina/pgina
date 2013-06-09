@@ -37,9 +37,9 @@ namespace pGina.Core.Messages
     {
         public int SessionID { get; set; }
 
-        public UserInformationRequestMessage(dynamic expandoVersion)
+        public UserInformationRequestMessage(IDictionary<string, object> expandoVersion)
         {
-            FromExpando(expandoVersion);
+            FromDict(expandoVersion);
         }
 
         public UserInformationRequestMessage()
@@ -47,17 +47,17 @@ namespace pGina.Core.Messages
             SessionID = -1;
         }
 
-        public override void FromExpando(dynamic expandoVersion)
+        public override void FromDict(IDictionary<string, object> expandoVersion)
         {
-            SessionID = expandoVersion.SessionID;
+            SessionID = (int) expandoVersion["SessionID"];
         }
 
-        public override dynamic ToExpando()
+        public override IDictionary<string, object> ToDict()
         {
-            dynamic exp = new ExpandoObject();
-            exp.SessionID = this.SessionID;
-            exp.MessageType = (byte) MessageType.UserInfoRequest;
-            return exp;
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            dict["SessionID"] = this.SessionID;
+            dict["MessageType"] = (byte) MessageType.UserInfoRequest;
+            return dict;
         }
     }
 }

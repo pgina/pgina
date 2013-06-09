@@ -46,7 +46,7 @@ namespace Abstractions.Pipes
         {            
         }
 
-        public PipeClient(string name, Func<dynamic, dynamic> action)
+        public PipeClient(string name, Func<IDictionary<string, object>, IDictionary<string, object>> action)
             : base(name, action)
         {            
         }
@@ -70,7 +70,7 @@ namespace Abstractions.Pipes
             Start(StreamAction, initialMessage, timeout);
         }
 
-        public void Start(Func<dynamic, dynamic> action, dynamic initialMessage, int timeout)
+        public void Start(Func<IDictionary<string, object>, IDictionary<string, object>> action, IDictionary<string, object> initialMessage, int timeout)
         {                
             Start(
                 (Func<BinaryReader, BinaryWriter, bool>)((r, w) =>
@@ -80,7 +80,7 @@ namespace Abstractions.Pipes
             initialMessage, timeout);
         }
 
-        public void Start(Func<BinaryReader, BinaryWriter, bool> action, dynamic initialMessage, int timeout)
+        public void Start(Func<BinaryReader, BinaryWriter, bool> action, IDictionary<string, object> initialMessage, int timeout)
         {
             StreamAction = action;
 
