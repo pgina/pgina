@@ -423,7 +423,8 @@ namespace pGina
 				m_fields->fields[x].fieldStatePair = fields.fields[x].fieldStatePair;
 				m_fields->fields[x].fieldDataSource = fields.fields[x].fieldDataSource;
 				m_fields->fields[x].wstr = NULL;
-				if(fields.fields[x].wstr)
+
+				if(fields.fields[x].wstr && !IsFieldDynamic(x))
 				{
 					SHStrDup(fields.fields[x].wstr, &m_fields->fields[x].wstr);
 				}
