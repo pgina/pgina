@@ -225,16 +225,15 @@ namespace pGina
 			   m_fields->fields[dwFieldID].fieldDescriptor.cpft != CPFT_LARGE_TEXT)
 				return E_INVALIDARG;
 
-			PWSTR *currentValue = &(m_fields->fields[dwFieldID].wstr);
-			if(*currentValue)
+			if(m_fields->fields[dwFieldID].wstr)
 			{
-				CoTaskMemFree(*currentValue);									
-				*currentValue = NULL;
+				CoTaskMemFree(m_fields->fields[dwFieldID].wstr);
+				m_fields->fields[dwFieldID].wstr = NULL;
 			}
 			
 			if(pwz)
-			{			
-				return SHStrDupW(pwz, currentValue);						
+			{
+				return SHStrDupW(pwz, &m_fields->fields[dwFieldID].wstr);
 			}
 			return S_OK;
 		}
@@ -423,7 +422,8 @@ namespace pGina
 				m_fields->fields[x].fieldStatePair = fields.fields[x].fieldStatePair;
 				m_fields->fields[x].fieldDataSource = fields.fields[x].fieldDataSource;
 				m_fields->fields[x].wstr = NULL;
-				if(fields.fields[x].wstr)
+
+				if(fields.fields[x].wstr && !IsFieldDynamic(x))
 				{
 					SHStrDup(fields.fields[x].wstr, &m_fields->fields[x].wstr);
 				}
@@ -526,9 +526,10 @@ namespace pGina
 				{
 					if(m_fields->fields[x].wstr)
 					{
-						size_t len = lstrlen(m_fields->fields[x].wstr);
+						size_t len = wcslen(m_fields->fields[x].wstr);
 						SecureZeroMemory(m_fields->fields[x].wstr, len * sizeof(wchar_t));
 						CoTaskMemFree(m_fields->fields[x].wstr);						
+						m_fields->fields[x].wstr = NULL;
 
 						// If we've been advised, we can tell the UI so the UI correctly reflects that this
 						//	field is not set any longer (set it to empty string)
