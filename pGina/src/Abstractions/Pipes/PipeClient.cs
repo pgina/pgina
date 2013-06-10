@@ -57,12 +57,12 @@ namespace Abstractions.Pipes
             // user must use Start(action) flavor...
         }
 
-        public void Start(dynamic initialMessage)
+        public void Start(IDictionary<string, object> initialMessage)
         {
             Start(initialMessage, Timeout.Infinite);
         }
 
-        public void Start(dynamic initialMessage, int timeout)
+        public void Start(IDictionary<string, object> initialMessage, int timeout)
         {
             if (StreamAction == null)
                 throw new ArgumentException(string.Format("You cannot use Start() having constructed the client without an action, use Start(<action>) instead."));
