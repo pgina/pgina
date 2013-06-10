@@ -36,26 +36,26 @@ namespace pGina.Core.Messages
     {
         public string Name { get; set; }
 
-        public DynamicLabelRequestMessage(dynamic expandoVersion)
+        public DynamicLabelRequestMessage(IDictionary<string, object> expandoVersion)
         {
-            FromExpando(expandoVersion);
+            FromDict(expandoVersion);
         }
 
         public DynamicLabelRequestMessage()
         {
         }
 
-        public override void FromExpando(dynamic expandoVersion)
+        public override void FromDict(IDictionary<string, object> expandoVersion)
         {
-            Name = expandoVersion.Name;
+            Name = (string) expandoVersion["Name"];
         }
 
-        public override dynamic ToExpando()
+        public override IDictionary<string, object> ToDict()
         {
-            dynamic exp = new ExpandoObject();
-            exp.Name = this.Name;
-            exp.MessageType = (byte) MessageType.DynLabelRequest;
-            return exp;
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            dict.Add("Name", this.Name);
+            dict.Add("MessageType", (byte)MessageType.DynLabelRequest);
+            return dict;
         }
     }
 }

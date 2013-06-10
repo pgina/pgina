@@ -39,9 +39,9 @@ namespace pGina.Core.Messages
         public string Username { get; set; }
         public string Domain { get; set; }
 
-        public UserInformationResponseMessage(dynamic expandoVersion)
+        public UserInformationResponseMessage(IDictionary<string, object> expandoVersion)
         {
-            FromExpando(expandoVersion);
+            FromDict(expandoVersion);
         }
 
         public UserInformationResponseMessage()
@@ -51,22 +51,22 @@ namespace pGina.Core.Messages
             Domain = "";
         }
 
-        public override void FromExpando(dynamic expandoVersion)
+        public override void FromDict(IDictionary<string, object> expandoVersion)
         {
-            base.FromExpando((ExpandoObject)expandoVersion);
-            OriginalUsername = expandoVersion.OriginalUsername;
-            Username = expandoVersion.Username;
-            Domain = expandoVersion.Domain;
+            base.FromDict(expandoVersion);
+            OriginalUsername = (string) expandoVersion["OriginalUsername"];
+            Username = (string) expandoVersion["Username"];
+            Domain = (string) expandoVersion["Domain"];
         }
 
-        public override dynamic ToExpando()
+        public override IDictionary<string, object> ToDict()
         {
-            dynamic exp = base.ToExpando();
-            exp.OriginalUsername = this.OriginalUsername;
-            exp.Username = this.Username;
-            exp.Domain = this.Domain;
-            exp.MessageType = (byte)MessageType.UserInfoResponse;
-            return exp;
+            Dictionary<string, object> dict = base.ToDict() as Dictionary<string, object>;            
+            dict["OriginalUsername"] = this.OriginalUsername;
+            dict["Username"] = this.Username;
+            dict["Domain"] = this.Domain;
+            dict["MessageType"] = (byte)MessageType.UserInfoResponse;
+            return dict;
         }
     }
 }

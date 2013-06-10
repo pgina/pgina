@@ -33,7 +33,7 @@ namespace pGina.Core.Messages
 {
     public abstract class MessageBase
     {
-        public abstract void FromExpando(dynamic expandoVersion);
-        public abstract dynamic ToExpando();
+        public abstract void FromDict(IDictionary<string, object> expandoVersion);
+        public abstract IDictionary<string, object> ToDict();
     }
 }

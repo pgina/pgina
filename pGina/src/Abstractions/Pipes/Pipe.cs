@@ -55,7 +55,7 @@ namespace Abstractions.Pipes
             StreamAction = action;            
         }
 
-        protected Pipe(string name, Func<dynamic, dynamic> action)
+        protected Pipe(string name, Func<IDictionary<string, object>, IDictionary<string, object>> action)
             : this(name)
         {
             if (action == null)
@@ -67,12 +67,12 @@ namespace Abstractions.Pipes
             });
         }
 
-        protected bool DefaultMessageHandler(BinaryReader reader, BinaryWriter writer, Func<dynamic, dynamic> callback)
+        protected bool DefaultMessageHandler(BinaryReader reader, BinaryWriter writer, Func<IDictionary<string, object>, IDictionary<string, object>> callback)
         {
             int len = reader.ReadInt32();
             byte[] bytes = reader.ReadBytes(len);
-            dynamic msg = PipeMessage.Demarshal(bytes);
-            dynamic reply = callback(msg);
+            IDictionary<string, object> msg = PipeMessage.Demarshal(bytes);
+            IDictionary<string, object> reply = callback(msg);
             if (reply != null)
             {                            
                 WriteMessage(writer, reply);
@@ -87,7 +87,7 @@ namespace Abstractions.Pipes
             return (reply != null);
         }
 
-        protected void WriteMessage(BinaryWriter writer, dynamic msg)
+        protected void WriteMessage(BinaryWriter writer, IDictionary<string, object> msg)
         {
             byte[] encoded = PipeMessage.Marshal(msg);
             writer.Write((int)encoded.Length);
@@ -95,7 +95,7 @@ namespace Abstractions.Pipes
             writer.Flush();
         }
 
-        protected void HandlePipeConnection(PipeStream pipeStream, dynamic initialMessage)
+        protected void HandlePipeConnection(PipeStream pipeStream, IDictionary<string, object> initialMessage)
         {
             // You think we'd scope these with using() right? They are IDisposable
             //  after all... but nope, the implementation of these is such that 

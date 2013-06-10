@@ -39,30 +39,30 @@ namespace pGina.Core.Messages
         public string LoggedMessage { get; set; }
         public string Level { get; set; }
 
-        public LogMessage(dynamic expandoVersion)
+        public LogMessage(IDictionary<string, object> expandoVersion)
         {
-            FromExpando(expandoVersion);
+            FromDict(expandoVersion);
         }        
 
         public LogMessage()
         {
         }
 
-        public override void FromExpando(dynamic expandoVersion)
+        public override void FromDict(IDictionary<string, object> expandoVersion)
         {
-            LoggerName = expandoVersion.LoggerName;
-            Level = expandoVersion.Level;
-            LoggedMessage = expandoVersion.LoggedMessage;
+            LoggerName = (string) expandoVersion["LoggerName"];
+            Level = (string) expandoVersion["Level"];
+            LoggedMessage = (string) expandoVersion["LoggedMessage"];
         }
 
-        public override dynamic ToExpando()
+        public override IDictionary<string, object> ToDict()
         {
-            dynamic exp = new ExpandoObject();
-            exp.LoggerName = this.LoggerName;
-            exp.Level = this.Level;
-            exp.LoggedMessage = this.LoggedMessage;
-            exp.MessageType = (byte) MessageType.Log;
-            return exp;
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            dict["LoggerName"] = LoggerName;
+            dict["Level"] = Level;
+            dict["LoggedMessage"] = LoggedMessage;
+            dict["MessageType"] = (byte) MessageType.Log;
+            return dict;            
         }
     }
 }

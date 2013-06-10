@@ -36,27 +36,27 @@ namespace pGina.Core.Messages
     {
         public string Text { get; set; }
 
-        public DynamicLabelResponseMessage(dynamic expandoVersion)            
+        public DynamicLabelResponseMessage(IDictionary<string, object> expandoVersion)            
         {
-            FromExpando(expandoVersion);
+            FromDict(expandoVersion);
         }
 
         public DynamicLabelResponseMessage()
         {
         }
 
-        public override void FromExpando(dynamic expandoVersion)
+        public override void FromDict(IDictionary<string, object> expandoVersion)
         {
-            base.FromExpando((ExpandoObject) expandoVersion);
-            Text = expandoVersion.Text;
+            base.FromDict(expandoVersion);
+            Text = (string) expandoVersion["Text"];
         }
 
-        public override dynamic ToExpando()
+        public override IDictionary<string, object> ToDict()
         {
-            dynamic exp = base.ToExpando();
-            exp.Text = this.Text;
-            exp.MessageType = (byte) MessageType.DynLabelResponse;
-            return exp;
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            dict.Add("Text", this.Text);
+            dict.Add("MessageType", (byte)MessageType.DynLabelResponse);
+            return dict;
         }
     }
 }
