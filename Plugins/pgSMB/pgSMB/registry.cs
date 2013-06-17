@@ -279,6 +279,25 @@ namespace pGina.Plugin.pgSMB
             return true;
         }
 
+        public static Boolean RegQueryQuota(RegistryLocation where, string name)
+        {
+            m_logger.InfoFormat("query Quota for {0}", name);
+            try
+            {
+                using (RegistryKey key = GetRegistryLocation(where).OpenSubKey(name + @"\Software\Microsoft\Windows\CurrentVersion\Policies\System"))
+                {
+                    key.GetValue("EnableProfileQuota");
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.ErrorFormat("Can't get profile quota for {0} Error:{1}", name, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
         public static Boolean RegRunOnce(RegistryLocation where, string name, string script)
         {
             m_logger.InfoFormat("set RunOnce for {0}", script);

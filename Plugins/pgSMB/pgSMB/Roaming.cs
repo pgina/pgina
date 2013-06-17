@@ -129,11 +129,6 @@ namespace pGina.Plugin.pgSMB
                 {
                     m_logger.Debug("there is no " + settings["RoamingSource"] + "\\" + settings["Filename"] + " or " + settings["RoamingSource"] + "\\" + settings["Filename"] + ".bak");
 
-                    if (!SetGPO(RegistryLocation.HKEY_USERS, Convert.ToUInt32(settings["MaxStore"]), ".DEFAULT"))
-                    {
-                        m_logger.WarnFormat("Can't set quota. Thats not terrible");
-                    }
-
                     if (!userAdd(settings, username, password, "pGina created pgSMB"))
                     {
                         userDel(settings, username, password);

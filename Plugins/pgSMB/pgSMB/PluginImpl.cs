@@ -289,9 +289,25 @@ namespace pGina.Plugin.pgSMB
                         }
                     }
 
-                    if (!Roaming.SetGPO(RegistryLocation.HKEY_USERS, 0, ".DEFAULT"))
+                    if (!registry.RegQueryQuota(RegistryLocation.HKEY_USERS, userInfo.SID.ToString()) && Convert.ToUInt32(settings["MaxStore"]) > 0)
                     {
-                        m_logger.InfoFormat("can't reset GPO settings for user DEFAULT");
+                        m_logger.InfoFormat("no quota GPO settings for user {0}", userInfo.SID.ToString());
+                        if (!Roaming.SetGPO(RegistryLocation.HKEY_USERS, Convert.ToUInt32(settings["MaxStore"]), userInfo.SID.ToString()))
+                        {
+                            m_logger.InfoFormat("failed to set quota GPO for user {0}", userInfo.SID.ToString());
+                        }
+                        else
+                        {
+                            m_logger.InfoFormat("done quota GPO settings for user {0}", userInfo.SID.ToString());
+                            try
+                            {
+                                Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(changeDescription.SessionId, "proquota.exe");
+                            }
+                            catch (Exception ex)
+                            {
+                                m_logger.ErrorFormat("Can't run application {0} because {1}", "proquota.exe", ex.ToString());
+                            }
+                        }
                     }
 
                     m_logger.DebugFormat("removing Roaming Profile {0}", settings["RoamingDest_real"]);
