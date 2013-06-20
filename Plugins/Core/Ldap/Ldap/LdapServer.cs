@@ -278,6 +278,7 @@ namespace pGina.Plugin.Ldap
         public string FindFirstDN(string searchBase, string filter)
         {
             SearchRequest req = new SearchRequest(searchBase, filter, System.DirectoryServices.Protocols.SearchScope.Subtree, null);
+            req.Aliases = (DereferenceAlias)((int)Settings.Store.Dereference);
             SearchResponse resp = (SearchResponse)m_conn.SendRequest(req);
 
             if (resp.Entries.Count > 0)
@@ -325,6 +326,7 @@ namespace pGina.Plugin.Ldap
             try
             {
                 SearchRequest req = new SearchRequest(groupDn, filter, SearchScope.Base, new string[] {"dn"});
+                req.Aliases = (DereferenceAlias)((int)Settings.Store.Dereference);
                 SearchResponse resp = (SearchResponse)m_conn.SendRequest(req);
                 return resp.Entries.Count > 0;
             }

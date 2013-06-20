@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2012, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -95,6 +95,9 @@ namespace pGina.Plugin.Ldap
 
             string grpMemberAttrib = Settings.Store.GroupMemberAttrib;
             this.groupMemberAttrTB.Text = grpMemberAttrib;
+
+            int derefValue = Settings.Store.Dereference;
+            this.DereferenceComboBox.SelectedIndex = derefValue;
 
             // Authentication tab
             bool allowEmpty = Settings.Store.AllowEmptyPasswords;
@@ -319,7 +322,8 @@ namespace pGina.Plugin.Ldap
             Settings.Store.SetEncryptedSetting("SearchPW", searchPassTextBox.Text);
             Settings.Store.GroupDnPattern = this.groupDNPattern.Text.Trim();
             Settings.Store.GroupMemberAttrib = this.groupMemberAttrTB.Text.Trim();
-            
+            Settings.Store.Dereference = this.DereferenceComboBox.SelectedIndex;
+
             // Authentication
             Settings.Store.AllowEmptyPasswords = this.allowEmptyPwCB.Checked;
             Settings.Store.DnPattern = dnPatternTextBox.Text.Trim();

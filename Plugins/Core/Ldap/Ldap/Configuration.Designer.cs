@@ -50,19 +50,21 @@
             this.searchDnTextBox = new System.Windows.Forms.TextBox();
             this.authzRequireAuthCB = new System.Windows.Forms.CheckBox();
             this.authzAllowOnErrorCB = new System.Windows.Forms.CheckBox();
-            this.ldapServerGroupBox = new System.Windows.Forms.GroupBox();
-            this.showPwCB = new System.Windows.Forms.CheckBox();
-            this.searchPassTextBox = new System.Windows.Forms.TextBox();
-            this.sslCertFileBrowseButton = new System.Windows.Forms.Button();
             this.sslCertFileTextBox = new System.Windows.Forms.TextBox();
             this.groupMemberAttrTB = new System.Windows.Forms.TextBox();
             this.groupDNPattern = new System.Windows.Forms.TextBox();
+            this.allowEmptyPwCB = new System.Windows.Forms.CheckBox();
+            this.dnPatternTextBox = new System.Windows.Forms.TextBox();
+            this.ldapServerGroupBox = new System.Windows.Forms.GroupBox();
+            this.DereferenceComboBox = new System.Windows.Forms.ComboBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.showPwCB = new System.Windows.Forms.CheckBox();
+            this.searchPassTextBox = new System.Windows.Forms.TextBox();
+            this.sslCertFileBrowseButton = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.allowEmptyPwCB = new System.Windows.Forms.CheckBox();
             this.searchContextsTextBox = new System.Windows.Forms.TextBox();
             this.searchFilterTextBox = new System.Windows.Forms.TextBox();
-            this.dnPatternTextBox = new System.Windows.Forms.TextBox();
             this.cancelButton = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.authTabPage = new System.Windows.Forms.TabPage();
@@ -95,7 +97,7 @@
             // 
             // saveButton
             // 
-            this.saveButton.Location = new System.Drawing.Point(607, 464);
+            this.saveButton.Location = new System.Drawing.Point(601, 500);
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(81, 26);
             this.saveButton.TabIndex = 0;
@@ -115,8 +117,8 @@
             // 
             // ldapHostTextBox
             // 
-            this.ldapHostTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.ldapHostTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.ldapHostTextBox.Location = new System.Drawing.Point(110, 19);
             this.ldapHostTextBox.Name = "ldapHostTextBox";
             this.ldapHostTextBox.Size = new System.Drawing.Size(462, 20);
@@ -144,8 +146,8 @@
             this.label1.TabIndex = 7;
             this.label1.Text = "SSL Certificate File";
             this.descriptionToolTip.SetToolTip(this.label1, "File containing the LDAP server\'s public certificate.  If this is left blank (and" +
-                    " \"Validate\" is checked) the server\'s\r\ncertificate is verified against the Window" +
-                    "s certificate store.");
+        " \"Validate\" is checked) the server\'s\r\ncertificate is verified against the Window" +
+        "s certificate store.");
             // 
             // ldapPortTextBox
             // 
@@ -186,7 +188,7 @@
             this.dnPatternLabel.TabIndex = 0;
             this.dnPatternLabel.Text = "User DN Pattern";
             this.descriptionToolTip.SetToolTip(this.dnPatternLabel, "The pattern to use when creating a DN from a user name.\r\n%u can be used to indica" +
-                    "te the user name.\r\n");
+        "te the user name.\r\n");
             // 
             // searchForDnCheckBox
             // 
@@ -197,7 +199,7 @@
             this.searchForDnCheckBox.TabIndex = 2;
             this.searchForDnCheckBox.Text = "Search for DN";
             this.descriptionToolTip.SetToolTip(this.searchForDnCheckBox, "Whether or not to search a set of LDAP trees for the\r\nDN rather than using the ab" +
-                    "ove pattern.");
+        "ove pattern.");
             this.searchForDnCheckBox.UseVisualStyleBackColor = true;
             this.searchForDnCheckBox.CheckedChanged += new System.EventHandler(this.searchForDnCheckBox_CheckedChanged);
             // 
@@ -220,7 +222,7 @@
             this.searchContextsLabel.TabIndex = 5;
             this.searchContextsLabel.Text = "Search Context(s)";
             this.descriptionToolTip.SetToolTip(this.searchContextsLabel, "A list of one or more DNs (one per line) that indicate\r\nroots of LDAP subtrees th" +
-                    "at will be searched.");
+        "at will be searched.");
             // 
             // label2
             // 
@@ -231,7 +233,7 @@
             this.label2.TabIndex = 8;
             this.label2.Text = "Search DN";
             this.descriptionToolTip.SetToolTip(this.label2, "The DN to use when connecting to the server in order\r\nto perform the search.  If " +
-                    "this is left blank, an anonymous\r\nbind will be attempted.");
+        "this is left blank, an anonymous\r\nbind will be attempted.");
             // 
             // label3
             // 
@@ -252,7 +254,7 @@
             this.timeoutLabel.TabIndex = 10;
             this.timeoutLabel.Text = "Timeout";
             this.descriptionToolTip.SetToolTip(this.timeoutLabel, "The number of seconds to wait for a server to respond before giving up \r\nand movi" +
-                    "ng on to the next server.");
+        "ng on to the next server.");
             // 
             // timeoutTextBox
             // 
@@ -261,7 +263,7 @@
             this.timeoutTextBox.Size = new System.Drawing.Size(76, 20);
             this.timeoutTextBox.TabIndex = 11;
             this.descriptionToolTip.SetToolTip(this.timeoutTextBox, "The number of seconds to wait for a server to respond before\r\ngiving up and movin" +
-                    "g on to the next server in the list.\r\n");
+        "g on to the next server in the list.\r\n");
             // 
             // searchDnTextBox
             // 
@@ -270,7 +272,7 @@
             this.searchDnTextBox.Size = new System.Drawing.Size(335, 20);
             this.searchDnTextBox.TabIndex = 9;
             this.descriptionToolTip.SetToolTip(this.searchDnTextBox, "Optional.  Used when searching for group \r\nmembership and other search operations" +
-                    "\r\n");
+        "\r\n");
             // 
             // authzRequireAuthCB
             // 
@@ -292,11 +294,60 @@
             this.authzAllowOnErrorCB.TabIndex = 20;
             this.authzAllowOnErrorCB.Text = "Allow when server is unreachable";
             this.descriptionToolTip.SetToolTip(this.authzAllowOnErrorCB, "When the LDAP server is down or another unexpected error \r\noccurs, authorization " +
-                    "succeeds if this is checked. ");
+        "succeeds if this is checked. ");
             this.authzAllowOnErrorCB.UseVisualStyleBackColor = true;
+            // 
+            // sslCertFileTextBox
+            // 
+            this.sslCertFileTextBox.Location = new System.Drawing.Point(109, 71);
+            this.sslCertFileTextBox.Name = "sslCertFileTextBox";
+            this.sslCertFileTextBox.Size = new System.Drawing.Size(463, 20);
+            this.sslCertFileTextBox.TabIndex = 8;
+            this.descriptionToolTip.SetToolTip(this.sslCertFileTextBox, "Optional:  If left empty, the certificate will be validated\r\nagainst the Windows " +
+        "certificate store.");
+            // 
+            // groupMemberAttrTB
+            // 
+            this.groupMemberAttrTB.Location = new System.Drawing.Point(535, 149);
+            this.groupMemberAttrTB.Name = "groupMemberAttrTB";
+            this.groupMemberAttrTB.Size = new System.Drawing.Size(135, 20);
+            this.groupMemberAttrTB.TabIndex = 3;
+            this.descriptionToolTip.SetToolTip(this.groupMemberAttrTB, "The attribute that stores the group\'s membership.");
+            // 
+            // groupDNPattern
+            // 
+            this.groupDNPattern.Location = new System.Drawing.Point(110, 149);
+            this.groupDNPattern.Name = "groupDNPattern";
+            this.groupDNPattern.Size = new System.Drawing.Size(326, 20);
+            this.groupDNPattern.TabIndex = 1;
+            this.descriptionToolTip.SetToolTip(this.groupDNPattern, "A pattern that describes how to generate a group DN\r\nfrom a group name.  Use %g a" +
+        "s a place holder for the \r\ngroup name.");
+            // 
+            // allowEmptyPwCB
+            // 
+            this.allowEmptyPwCB.AutoSize = true;
+            this.allowEmptyPwCB.Location = new System.Drawing.Point(6, 6);
+            this.allowEmptyPwCB.Name = "allowEmptyPwCB";
+            this.allowEmptyPwCB.Size = new System.Drawing.Size(137, 17);
+            this.allowEmptyPwCB.TabIndex = 13;
+            this.allowEmptyPwCB.Text = "Allow Empty Passwords";
+            this.descriptionToolTip.SetToolTip(this.allowEmptyPwCB, "When selected, empty passwords are used in bind\r\nattempts.  Otherwise, an empty p" +
+        "assword causes\r\nauthentication to immediately fail.");
+            this.allowEmptyPwCB.UseVisualStyleBackColor = true;
+            // 
+            // dnPatternTextBox
+            // 
+            this.dnPatternTextBox.Location = new System.Drawing.Point(110, 33);
+            this.dnPatternTextBox.Name = "dnPatternTextBox";
+            this.dnPatternTextBox.Size = new System.Drawing.Size(463, 20);
+            this.dnPatternTextBox.TabIndex = 1;
+            this.descriptionToolTip.SetToolTip(this.dnPatternTextBox, "Pattern used to generate a DN from a user name.  Use\r\n%u as a placeholder for the" +
+        " user name.");
             // 
             // ldapServerGroupBox
             // 
+            this.ldapServerGroupBox.Controls.Add(this.DereferenceComboBox);
+            this.ldapServerGroupBox.Controls.Add(this.label8);
             this.ldapServerGroupBox.Controls.Add(this.showPwCB);
             this.ldapServerGroupBox.Controls.Add(this.timeoutTextBox);
             this.ldapServerGroupBox.Controls.Add(this.timeoutLabel);
@@ -317,12 +368,35 @@
             this.ldapServerGroupBox.Controls.Add(this.groupDNPattern);
             this.ldapServerGroupBox.Controls.Add(this.label5);
             this.ldapServerGroupBox.Controls.Add(this.label4);
-            this.ldapServerGroupBox.Location = new System.Drawing.Point(12, 12);
+            this.ldapServerGroupBox.Location = new System.Drawing.Point(12, 9);
             this.ldapServerGroupBox.Name = "ldapServerGroupBox";
-            this.ldapServerGroupBox.Size = new System.Drawing.Size(676, 180);
+            this.ldapServerGroupBox.Size = new System.Drawing.Size(676, 207);
             this.ldapServerGroupBox.TabIndex = 3;
             this.ldapServerGroupBox.TabStop = false;
             this.ldapServerGroupBox.Text = "LDAP Server";
+            // 
+            // DereferenceComboBox
+            // 
+            this.DereferenceComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.DereferenceComboBox.FormattingEnabled = true;
+            this.DereferenceComboBox.Items.AddRange(new object[] {
+            "Never",
+            "In searching",
+            "When finding base object",
+            "Always"});
+            this.DereferenceComboBox.Location = new System.Drawing.Point(116, 175);
+            this.DereferenceComboBox.Name = "DereferenceComboBox";
+            this.DereferenceComboBox.Size = new System.Drawing.Size(175, 21);
+            this.DereferenceComboBox.TabIndex = 14;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(6, 178);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(104, 13);
+            this.label8.TabIndex = 13;
+            this.label8.Text = "Dereference aliases:";
             // 
             // showPwCB
             // 
@@ -353,32 +427,6 @@
             this.sslCertFileBrowseButton.UseVisualStyleBackColor = true;
             this.sslCertFileBrowseButton.Click += new System.EventHandler(this.sslCertFileBrowseButton_Click);
             // 
-            // sslCertFileTextBox
-            // 
-            this.sslCertFileTextBox.Location = new System.Drawing.Point(109, 71);
-            this.sslCertFileTextBox.Name = "sslCertFileTextBox";
-            this.sslCertFileTextBox.Size = new System.Drawing.Size(463, 20);
-            this.sslCertFileTextBox.TabIndex = 8;
-            this.descriptionToolTip.SetToolTip(this.sslCertFileTextBox, "Optional:  If left empty, the certificate will be validated\r\nagainst the Windows " +
-                    "certificate store.");
-            // 
-            // groupMemberAttrTB
-            // 
-            this.groupMemberAttrTB.Location = new System.Drawing.Point(535, 149);
-            this.groupMemberAttrTB.Name = "groupMemberAttrTB";
-            this.groupMemberAttrTB.Size = new System.Drawing.Size(135, 20);
-            this.groupMemberAttrTB.TabIndex = 3;
-            this.descriptionToolTip.SetToolTip(this.groupMemberAttrTB, "The attribute that stores the group\'s membership.");
-            // 
-            // groupDNPattern
-            // 
-            this.groupDNPattern.Location = new System.Drawing.Point(110, 149);
-            this.groupDNPattern.Name = "groupDNPattern";
-            this.groupDNPattern.Size = new System.Drawing.Size(326, 20);
-            this.groupDNPattern.TabIndex = 1;
-            this.descriptionToolTip.SetToolTip(this.groupDNPattern, "A pattern that describes how to generate a group DN\r\nfrom a group name.  Use %g a" +
-                    "s a place holder for the \r\ngroup name.");
-            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -397,18 +445,6 @@
             this.label4.TabIndex = 0;
             this.label4.Text = "Group DN Pattern";
             // 
-            // allowEmptyPwCB
-            // 
-            this.allowEmptyPwCB.AutoSize = true;
-            this.allowEmptyPwCB.Location = new System.Drawing.Point(6, 6);
-            this.allowEmptyPwCB.Name = "allowEmptyPwCB";
-            this.allowEmptyPwCB.Size = new System.Drawing.Size(137, 17);
-            this.allowEmptyPwCB.TabIndex = 13;
-            this.allowEmptyPwCB.Text = "Allow Empty Passwords";
-            this.descriptionToolTip.SetToolTip(this.allowEmptyPwCB, "When selected, empty passwords are used in bind\r\nattempts.  Otherwise, an empty p" +
-                    "assword causes\r\nauthentication to immediately fail.");
-            this.allowEmptyPwCB.UseVisualStyleBackColor = true;
-            // 
             // searchContextsTextBox
             // 
             this.searchContextsTextBox.Location = new System.Drawing.Point(110, 117);
@@ -425,18 +461,9 @@
             this.searchFilterTextBox.Size = new System.Drawing.Size(462, 20);
             this.searchFilterTextBox.TabIndex = 4;
             // 
-            // dnPatternTextBox
-            // 
-            this.dnPatternTextBox.Location = new System.Drawing.Point(110, 33);
-            this.dnPatternTextBox.Name = "dnPatternTextBox";
-            this.dnPatternTextBox.Size = new System.Drawing.Size(463, 20);
-            this.dnPatternTextBox.TabIndex = 1;
-            this.descriptionToolTip.SetToolTip(this.dnPatternTextBox, "Pattern used to generate a DN from a user name.  Use\r\n%u as a placeholder for the" +
-                    " user name.");
-            // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(524, 464);
+            this.cancelButton.Location = new System.Drawing.Point(524, 500);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(76, 26);
             this.cancelButton.TabIndex = 5;
@@ -449,7 +476,7 @@
             this.tabControl1.Controls.Add(this.authTabPage);
             this.tabControl1.Controls.Add(this.authzTabPage);
             this.tabControl1.Controls.Add(this.gatewayTabPage);
-            this.tabControl1.Location = new System.Drawing.Point(12, 198);
+            this.tabControl1.Location = new System.Drawing.Point(12, 234);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(670, 260);
@@ -692,7 +719,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(699, 502);
+            this.ClientSize = new System.Drawing.Size(699, 538);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.ldapServerGroupBox);
@@ -770,5 +797,7 @@
         private System.Windows.Forms.TextBox gatwayRemoteGroupTB;
         private System.Windows.Forms.CheckBox authzRequireAuthCB;
         private System.Windows.Forms.CheckBox authzAllowOnErrorCB;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.ComboBox DereferenceComboBox;
     }
 }
