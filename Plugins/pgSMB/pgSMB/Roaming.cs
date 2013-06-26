@@ -649,6 +649,29 @@ namespace pGina.Plugin.pgSMB
             }
         }
 
+        public static Boolean CreateRoamingFolder(Dictionary<string, string> settings, string username)
+        {
+            if (!Directory.Exists(settings["RoamingDest_real"]))
+            {
+                try
+                {
+                    Directory.CreateDirectory(settings["RoamingDest_real"]);
+                }
+                catch
+                {
+                    m_logger.WarnFormat("Can't create Directory {0}", settings["RoamingDest_real"]);
+                    return false;
+                }
+            }
+            if (!AddDirectorySecurity(settings["RoamingDest_real"], username, FileSystemRights.Write | FileSystemRights.ReadAndExecute, AccessControlType.Allow, InheritanceFlags.None, PropagationFlags.None))
+            {
+                m_logger.WarnFormat("Can't set ACL for Directory {0}", settings["RoamingDest_real"]);
+                return false;
+            }
+
+            return true;
+        }
+
         public static Boolean email(string mailAddress, string smtpAddress, string username, string password, string subject, string body)
         {
             Boolean ret = true;
