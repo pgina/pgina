@@ -649,37 +649,23 @@ namespace pGina.Plugin.pgSMB
             }
         }
 
-        private static Boolean AddDirectorySecurity(string Directory, string Account, FileSystemRights Rights, AccessControlType ControlType)
+        public static Boolean CreateRoamingFolder(Dictionary<string, string> settings, string username)
         {
-            DirectoryInfo dInfo = new DirectoryInfo(Directory);
-            DirectorySecurity dSecurity = dInfo.GetAccessControl();
-
-            try
+            if (!Directory.Exists(settings["RoamingDest_real"]))
             {
-                foreach (FileSystemAccessRule user in dSecurity.GetAccessRules(true, true, typeof(System.Security.Principal.NTAccount)))
+                try
                 {
-                    m_logger.DebugFormat("ACL user:{0}", user.IdentityReference.Value);
-                    if (user.IdentityReference.Value.StartsWith("S-1-5-21-"))
-                    {
-                        m_logger.DebugFormat("delete unknown user: {0}", user.IdentityReference.Value);
-                        dSecurity.RemoveAccessRule(user);
-                    }
+                    Directory.CreateDirectory(settings["RoamingDest_real"]);
+                }
+                catch
+                {
+                    m_logger.WarnFormat("Can't create Directory {0}", settings["RoamingDest_real"]);
+                    return false;
                 }
             }
-            catch (Exception ex)
+            if (!AddDirectorySecurity(settings["RoamingDest_real"], username, FileSystemRights.Write | FileSystemRights.ReadAndExecute, AccessControlType.Allow, InheritanceFlags.None, PropagationFlags.None))
             {
-                m_logger.DebugFormat("RemoveAccessRule failed for {0} with error {1}", Directory, ex.Message);
-                return false;
-            }
-
-            dSecurity.AddAccessRule(new FileSystemAccessRule(Account, Rights, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, ControlType));
-            try
-            {
-                dInfo.SetAccessControl(dSecurity);
-            }
-            catch (Exception ex)
-            {
-                m_logger.DebugFormat("SetAccessControl for {0} failed with error {1}",Directory ,ex.Message);
+                m_logger.WarnFormat("Can't set ACL for Directory {0}", settings["RoamingDest_real"]);
                 return false;
             }
 

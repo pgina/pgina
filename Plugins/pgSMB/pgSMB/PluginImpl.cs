@@ -320,6 +320,7 @@ namespace pGina.Plugin.pgSMB
         private void cleanup(UserInformation userInfo, int sessionID)
         {
             Dictionary<string, string> settings = GetSettings(userInfo.Username);
+            Roaming.CreateRoamingFolder(settings, userInfo.Username);
 
             try
             {
