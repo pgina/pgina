@@ -16,7 +16,7 @@ namespace pGina.Plugin.RADIUS
 {
     class RADIUSClient
     {
-        public string server { get; set; }
+        public string[] servers { get; set; }
         public int authenticationPort { get; set; }
         public int accountingPort { get; set; }
         public string sharedKey { get; set; } //Private shared key for server
@@ -45,20 +45,20 @@ namespace pGina.Plugin.RADIUS
         private ILog m_logger = LogManager.GetLogger("RADIUSPlugin");
 
 
-        public RADIUSClient(string server, int authport, int acctingport, string sharedKey, string NAS_Id) : 
-            this(server, authport, acctingport, sharedKey, timeout: 3000, retry: 3, sessionId:null, NAS_IP_Address:null, NAS_Identifier: NAS_Id) 
+        public RADIUSClient(string[] servers, int authport, int acctingport, string sharedKey, string NAS_Id) :
+            this(servers, authport, acctingport, sharedKey, timeout: 3000, retry: 3, sessionId:null, NAS_IP_Address:null, NAS_Identifier: NAS_Id)
         {
         }
 
-        public RADIUSClient(string server, int authport, int acctingport, string sharedKey, string sessionId, string NAS_Id) :
-            this(server, authport, acctingport, sharedKey, timeout: 3000, retry: 3, sessionId: sessionId, NAS_IP_Address: null, NAS_Identifier: NAS_Id)
+        public RADIUSClient(string[] servers, int authport, int acctingport, string sharedKey, string sessionId, string NAS_Id) :
+            this(servers, authport, acctingport, sharedKey, timeout: 3000, retry: 3, sessionId: sessionId, NAS_IP_Address: null, NAS_Identifier: NAS_Id)
         {
         }
 
-        public RADIUSClient(string server, int authport, int acctingport, string sharedKey, 
+        public RADIUSClient(string[] servers, int authport, int acctingport, string sharedKey,
             int timeout, int retry, string sessionId, byte[] NAS_IP_Address, string NAS_Identifier)
         {
-            this.server = server;
+            this.servers = servers;
             this.authenticationPort = authport;
             this.accountingPort = acctingport;
             this.sharedKey = sharedKey;
@@ -76,11 +76,6 @@ namespace pGina.Plugin.RADIUS
         //Sets username value and authenticated members IFF successful
         public bool Authenticate(string username, string password)
         {
-            UdpClient client = new UdpClient(server, authenticationPort);
-            client.Client.SendTimeout = timeout;
-            client.Client.ReceiveTimeout = timeout;
-
-
             Packet authPacket = new Packet(Packet.Code.Access_Request, identifier, sharedKey);
             authPacket.sharedKey = sharedKey;
             
@@ -99,53 +94,56 @@ namespace pGina.Plugin.RADIUS
 
             m_logger.DebugFormat("Attempting to send {0} for user {1}", authPacket.code, username);
 
-            int retryCt = 0;
-            while (true)
+            for (int retryCt = 0; retryCt <= maxRetries; retryCt++)
             {
-                try
+                foreach (string server in servers)
                 {
-                    client.Send(authPacket.toBytes(), authPacket.length);
+                    UdpClient client = new UdpClient(server, authenticationPort);
+                    client.Client.SendTimeout = timeout;
+                    client.Client.ReceiveTimeout = timeout;
 
-                    //Listen for response, since the server has been specified, we don't need to re-specify server
-                    IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-                    byte[] respBytes = client.Receive(ref RemoteIpEndPoint);
-                    Packet responsePacket = new Packet(respBytes);
-
-                    //Verify packet authenticator is correct
-                    if (!responsePacket.verifyResponseAuthenticator(authPacket.authenticator, sharedKey))
-                        throw new RADIUSException(String.Format("Received response to authentication with code: {0}, but an incorrect response authenticator was supplied.", responsePacket.code));
-
-                    lastReceievedPacket = responsePacket;
-
-                    client.Close();
-
-                    m_logger.DebugFormat("Received authentication response: {0} for user {1}", responsePacket.code, username);
-
-                    if (responsePacket.code == Packet.Code.Access_Accept)
+                    try
                     {
-                        this.authenticated = true;
-                        return true;
+                        client.Send(authPacket.toBytes(), authPacket.length);
+
+                        //Listen for response, since the server has been specified, we don't need to re-specify server
+                        IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                        byte[] respBytes = client.Receive(ref RemoteIpEndPoint);
+                        Packet responsePacket = new Packet(respBytes);
+
+                        //Verify packet authenticator is correct
+                        if (!responsePacket.verifyResponseAuthenticator(authPacket.authenticator, sharedKey))
+                            throw new RADIUSException(String.Format("Received response to authentication with code: {0}, but an incorrect response authenticator was supplied.", responsePacket.code));
+
+                        lastReceievedPacket = responsePacket;
+
+                        client.Close();
+
+                        m_logger.DebugFormat("Received authentication response: {0} for user {1}", responsePacket.code, username);
+
+                        if (responsePacket.code == Packet.Code.Access_Accept)
+                        {
+                            this.authenticated = true;
+                            return true;
+                        }
+
+                        else
+                            return false;
                     }
 
-                    else
-                        return false;
-                }
-                
-                //SocketException is thrown if the  server does not respond by end of timeout
-                catch (SocketException se)
-                {
-                    m_logger.DebugFormat("Authentication attempt {0}/{1} failed. Reason: {2}", retryCt+1, maxRetries, se.Message); 
-                    retryCt++;
-                    if (retryCt >= maxRetries)
-                        throw new RADIUSException(String.Format("No response from server after {0} tries.", maxRetries), se);
-                }
-                catch (Exception e)
-                {
-                    throw new RADIUSException("Unexpected error while trying to authenticate.", e);
-                }
+                    //SocketException is thrown if the  server does not respond by end of timeout
+                    catch (SocketException se)
+                    {
+                        m_logger.DebugFormat("Authentication attempt {0}/{1} using {2} failed. Reason: {3}", retryCt + 1, maxRetries + 1, server, se.Message);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new RADIUSException("Unexpected error while trying to authenticate.", e);
+                    }
 
-                
+                }
             }
+            throw new RADIUSException(String.Format("No response from server(s) after {0} tries.", maxRetries + 1));
         }
 
         //Sends a start accounting request to the RADIUS server, returns true on acknowledge of request
@@ -170,50 +168,50 @@ namespace pGina.Plugin.RADIUS
                 accountingRequest.addAttribute(Packet.AttributeType.Acct_Authentic, (int)authType);
 
             m_logger.DebugFormat("Attempting to send {0} for user {1}", accountingRequest.code, username);
-            int retryCt = 0;
-            while (true)
+
+            for (int retryCt = 0; retryCt <= maxRetries; retryCt++)
             {
-                try
+                foreach (string server in servers)
                 {
                     //Accounting request packet created, sending data...
                     UdpClient client = new UdpClient(server, accountingPort);
                     client.Client.SendTimeout = timeout;
                     client.Client.ReceiveTimeout = timeout;
 
-                    client.Send(accountingRequest.toBytes(), accountingRequest.length);
+                    try
+                    {
+                        client.Send(accountingRequest.toBytes(), accountingRequest.length);
 
-                    //Listen for response, since the server has been specified, we don't need to re-specify server
-                    IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-                    byte[] respBytes = client.Receive(ref RemoteIpEndPoint);
-                    Packet responsePacket = new Packet(respBytes);
+                        //Listen for response, since the server has been specified, we don't need to re-specify server
+                        IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                        byte[] respBytes = client.Receive(ref RemoteIpEndPoint);
+                        Packet responsePacket = new Packet(respBytes);
 
-                    //Verify packet response is good, authenticator should be MD5(Code+ID+Length+RequestAuth+Attributes+Secret)
-                    if (!responsePacket.verifyResponseAuthenticator(accountingRequest.authenticator, sharedKey))
-                        throw new RADIUSException(String.Format("Received response to accounting request with code: {0}, but an incorrect response authenticator was supplied.", responsePacket.code));
+                        //Verify packet response is good, authenticator should be MD5(Code+ID+Length+RequestAuth+Attributes+Secret)
+                        if (!responsePacket.verifyResponseAuthenticator(accountingRequest.authenticator, sharedKey))
+                            throw new RADIUSException(String.Format("Received response to accounting request with code: {0}, but an incorrect response authenticator was supplied.", responsePacket.code));
 
-                    lastReceievedPacket = responsePacket;
+                        lastReceievedPacket = responsePacket;
 
-                    client.Close();
+                        client.Close();
 
-                    m_logger.DebugFormat("Received accounting response: {0} for user {1}", responsePacket.code, username);
+                        m_logger.DebugFormat("Received accounting response: {0} for user {1}", responsePacket.code, username);
 
-                    return responsePacket.code == Packet.Code.Accounting_Response;
-                }
+                        return responsePacket.code == Packet.Code.Accounting_Response;
+                    }
 
-                //SocketException is thrown if the  server does not respond by end of timeout
-                catch (SocketException se)
-                {
-                    m_logger.DebugFormat("Accounting start attempt {0}/{1} failed. Reason: {2}", retryCt + 1, maxRetries, se.Message); 
-                    retryCt++;
-                    if (retryCt >= maxRetries)
-                        throw new RADIUSException(String.Format("No response from server after {0} tries.", maxRetries), se);
-                }
-                catch (Exception e)
-                {
-                    throw new RADIUSException("Unexpected error while trying start accounting.", e);
+                    //SocketException is thrown if the  server does not respond by end of timeout
+                    catch (SocketException se)
+                    {
+                        m_logger.DebugFormat("Accounting start attempt {0}/{1} using {2} failed. Reason: {3}", retryCt + 1, maxRetries + 1, server, se.Message);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new RADIUSException("Unexpected error while trying start accounting.", e);
+                    }
                 }
             }
-
+            throw new RADIUSException(String.Format("No response from server(s) after {0} tries.", maxRetries + 1));
         }
 
         public bool stopAccounting(string username, Packet.Acct_Terminate_CauseType? terminateCause)
@@ -227,49 +225,50 @@ namespace pGina.Plugin.RADIUS
             if(terminateCause != null)
                 accountingRequest.addAttribute(Packet.AttributeType.Acct_Terminate_Cause, (int) Packet.Acct_Terminate_CauseType.User_Request);
 
-            //Accounting request packet created, sending data...
-            UdpClient client = new UdpClient(server, accountingPort);
-            client.Client.SendTimeout = timeout;
-            client.Client.ReceiveTimeout = timeout;
-
             m_logger.DebugFormat("Attempting to send {0} for user {1}", accountingRequest.code, username);
-            int retryCt = 0;
-            while (true)
+
+            for (int retryCt = 0; retryCt <= maxRetries; retryCt++)
             {
-                try
+                foreach (string server in servers)
                 {
-                    client.Send(accountingRequest.toBytes(), accountingRequest.length);
+                    //Accounting request packet created, sending data...
+                    UdpClient client = new UdpClient(server, accountingPort);
+                    client.Client.SendTimeout = timeout;
+                    client.Client.ReceiveTimeout = timeout;
 
-                    //Listen for response, since the server has been specified, we don't need to re-specify server
-                    IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-                    byte[] respBytes = client.Receive(ref RemoteIpEndPoint);
-                    Packet responsePacket = new Packet(respBytes);
+                    try
+                    {
+                        client.Send(accountingRequest.toBytes(), accountingRequest.length);
 
-                    //Verify packet response is good, authenticator should be MD5(Code+ID+Length+RequestAuth+Attributes+Secret)
-                    if (!responsePacket.verifyResponseAuthenticator(accountingRequest.authenticator, sharedKey))
-                        throw new RADIUSException(String.Format("Received response to accounting request with code: {0}, but an incorrect response authenticator was supplied.", responsePacket.code));
+                        //Listen for response, since the server has been specified, we don't need to re-specify server
+                        IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                        byte[] respBytes = client.Receive(ref RemoteIpEndPoint);
+                        Packet responsePacket = new Packet(respBytes);
 
-                    lastReceievedPacket = responsePacket;
+                        //Verify packet response is good, authenticator should be MD5(Code+ID+Length+RequestAuth+Attributes+Secret)
+                        if (!responsePacket.verifyResponseAuthenticator(accountingRequest.authenticator, sharedKey))
+                            throw new RADIUSException(String.Format("Received response to accounting request with code: {0}, but an incorrect response authenticator was supplied.", responsePacket.code));
 
-                    client.Close();
+                        lastReceievedPacket = responsePacket;
 
-                    m_logger.DebugFormat("Received accounting response: {0} for user {1}", responsePacket.code, username);
+                        client.Close();
 
-                    return responsePacket.code == Packet.Code.Accounting_Response;
-                    //SocketException is thrown if the  server does not respond by end of timeout
-                }
-                catch (SocketException se)
-                {
-                    m_logger.DebugFormat("Accounting stop attempt {0}/{1} failed. Reason: {2}", retryCt + 1, maxRetries, se.Message); 
-                    retryCt++;
-                    if (retryCt >= maxRetries)
-                        throw new RADIUSException(String.Format("No response from server after {0} tries.", maxRetries), se);
-                }
-                catch (Exception e)
-                {
-                    throw new RADIUSException("Unexpected error while trying stop accounting.", e);
+                        m_logger.DebugFormat("Received accounting response: {0} for user {1}", responsePacket.code, username);
+
+                        return responsePacket.code == Packet.Code.Accounting_Response;
+                        //SocketException is thrown if the  server does not respond by end of timeout
+                    }
+                    catch (SocketException se)
+                    {
+                        m_logger.DebugFormat("Accounting stop attempt {0}/{1} using {2} failed. Reason: {3}", retryCt + 1, maxRetries + 1, server, se.Message);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new RADIUSException("Unexpected error while trying stop accounting.", e);
+                    }
                 }
             }
+            throw new RADIUSException(String.Format("No response from server(s) after {0} tries.", maxRetries + 1));
         }
     }
 
