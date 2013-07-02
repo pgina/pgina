@@ -77,7 +77,7 @@
             // 
             // serverTB
             // 
-            this.serverTB.Location = new System.Drawing.Point(59, 16);
+            this.serverTB.Location = new System.Drawing.Point(64, 16);
             this.serverTB.Name = "serverTB";
             this.serverTB.Size = new System.Drawing.Size(200, 20);
             this.serverTB.TabIndex = 1;
@@ -87,9 +87,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 19);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(41, 13);
+            this.label1.Size = new System.Drawing.Size(52, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Server:";
+            this.label1.Text = "Server(s):";
             // 
             // authPortTB
             // 
@@ -145,7 +145,7 @@
             // 
             // timeoutTB
             // 
-            this.timeoutTB.Location = new System.Drawing.Point(59, 39);
+            this.timeoutTB.Location = new System.Drawing.Point(64, 39);
             this.timeoutTB.Name = "timeoutTB";
             this.timeoutTB.Size = new System.Drawing.Size(28, 20);
             this.timeoutTB.TabIndex = 5;
@@ -153,7 +153,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(93, 42);
+            this.label5.Location = new System.Drawing.Point(96, 42);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(47, 13);
             this.label5.TabIndex = 6;
@@ -178,7 +178,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(146, 42);
+            this.label7.Location = new System.Drawing.Point(148, 42);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(35, 13);
             this.label7.TabIndex = 7;
