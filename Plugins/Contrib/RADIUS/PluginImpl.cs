@@ -220,7 +220,7 @@ namespace pGina.Plugin.RADIUS
         //Returns the client instantiated based on registry settings
         private RADIUSClient GetClient(string sessionId)
         {
-            string server = Settings.Store.Server;
+            string[] servers = Regex.Split(Settings.Store.Server.Trim(), @"\s+");
             int authport = Settings.Store.AuthPort;
             int acctport = Settings.Store.AcctPort;
             string sharedKey = Settings.Store.GetEncryptedSetting("SharedSecret");
@@ -237,7 +237,7 @@ namespace pGina.Plugin.RADIUS
                 ipAddr = getIPAddress();
 
             
-            RADIUSClient client = new RADIUSClient(server, authport, acctport, sharedKey, timeout, retry, sessionId, ipAddr, machineName);
+            RADIUSClient client = new RADIUSClient(servers, authport, acctport, sharedKey, timeout, retry, sessionId, ipAddr, machineName);
 
 
             return client;
