@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,7 @@
 #include "TileUiTypes.h"
 #include "TileUiLogon.h"
 #include "TileUiUnlock.h"
+#include "TileUiChangePassword.h"
 #include "SerializationHelpers.h"
 #include "ServiceStateHelper.h"
 #include "ProviderGuid.h"
@@ -257,10 +258,11 @@ namespace pGina
 													__deref_out_opt PWSTR* ppwszOptionalStatusText, __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
 		{
 			pDEBUG(L"Credential::GetSerialization, enter");
-			// If we are operating in a non CredUI scenario, then 
-			// Credential::Connect will have executed prior to this method, which contacts the
-			// service, so m_loginResult should have the result from the plugins. Otherwise,
-			// consider this the attempt to login!
+
+			// If we are operating in a CPUS_LOGON, CPUS_CHANGE_PASSWORD or CPUS_UNLOCK_WORKSTATION scenario, then 
+			// Credential::Connect will have executed prior to this method, which calls
+			// ProcessLoginAttempt, so m_loginResult should have the result from the plugins. 
+			// Otherwise, we need to execute plugins for the appropriate scenario.
 			if(m_usageScenario == CPUS_CREDUI)
 			{
 				ProcessLoginAttempt(NULL);
@@ -278,23 +280,44 @@ namespace pGina
 
 			if(!m_loginResult.Result())
 			{
-				pERROR(L"Credential::GetSerialization: Failed login");
+				pERROR(L"Credential::GetSerialization: Failed attempt");
 				if(m_loginResult.Message().length() > 0)
 				{
 					SHStrDupW(m_loginResult.Message().c_str(), ppwszOptionalStatusText);					
 				}
 				else
 				{
-					SHStrDupW(L"ProcessLoginForUser failed, but a specific error message was not provided", ppwszOptionalStatusText);
+					SHStrDupW(L"Plugins did not provide a specific error message", ppwszOptionalStatusText);
 				}
 				
-				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
+				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 				*pcpsiOptionalStatusIcon = CPSI_ERROR;
 				return S_FALSE;
 			}
 
-			// At this point the info has passed to the service and been validated, so now we have to pack it up and provide it back to
-			// LogonUI/Winlogon as a serialized/packed logon structure.
+			// If this is the change password scenario, we don't want to continue any 
+			// further.  Just notify the user that the change was successful, and return
+			// false, because we don't want Windows to actually process this change.  It was already
+			// processed by the plugins, so there's nothing more to do.
+			if( m_loginResult.Result() && CPUS_CHANGE_PASSWORD == m_usageScenario ) {
+				if(m_loginResult.Message().length() > 0)
+				{
+					SHStrDupW(m_loginResult.Message().c_str(), ppwszOptionalStatusText);					
+				}
+				else
+				{
+					SHStrDupW(L"pGina: Your password was successfully changed", ppwszOptionalStatusText);
+				}
+
+				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;						
+				*pcpsiOptionalStatusIcon = CPSI_SUCCESS;
+				return S_FALSE;
+			}
+
+			// At this point we have a successful logon, and we're not in the 
+			// change password scenario.  The successful login info is validated and available
+			// in m_loginResult. So now we pack it up and provide it back to
+			// LogonUI/Winlogon as a serialized/packed structure.
 
 			pGina::Memory::ObjectCleanupPool cleanup;
 
@@ -347,7 +370,7 @@ namespace pGina
 					}
 				}
 			}
-			else
+			else if( CPUS_LOGON == m_usageScenario || CPUS_UNLOCK_WORKSTATION == m_usageScenario )
 			{
 				// Init kiul
 				KERB_INTERACTIVE_UNLOCK_LOGON kiul;
@@ -373,7 +396,8 @@ namespace pGina
 			return S_OK;
         }
     
-		IFACEMETHODIMP Credential::ReportResult(__in NTSTATUS ntsStatus, __in NTSTATUS ntsSubstatus, __deref_out_opt PWSTR* ppwszOptionalStatusText, 
+		IFACEMETHODIMP Credential::ReportResult(__in NTSTATUS ntsStatus, __in NTSTATUS ntsSubstatus, 
+												__deref_out_opt PWSTR* ppwszOptionalStatusText, 
 												__out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
 		{
 			pDEBUG(L"Credential::ReportResult(0x%08x, 0x%08x) called", ntsStatus, ntsSubstatus);
@@ -438,7 +462,7 @@ namespace pGina
 				}				
 			}			
 
-
+			// Fill the username field (if necessary)
 			if(username != NULL)
 			{				
 				SHStrDupW(username, &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
@@ -446,7 +470,7 @@ namespace pGina
 			else if(m_usageScenario == CPUS_UNLOCK_WORKSTATION)
 			{
 				DWORD mySession = pGina::Helpers::GetCurrentSessionId();
-				std::wstring username, domain;    // Username and domain to be determined
+				std::wstring sessionUname, domain;    // Username and domain to be determined
 				std::wstring usernameFieldValue;  // The value for the username field
 				std::wstring machineName = pGina::Helpers::GetMachineName();
 
@@ -463,13 +487,13 @@ namespace pGina
 
 				// Are we configured to use the original username?
 				if( pGina::Registry::GetBool(L"UseOriginalUsernameInUnlockScenario", false) )
-					username = userInfo.OriginalUsername();
+					sessionUname = userInfo.OriginalUsername();
 				else
-					username = userInfo.Username();
+					sessionUname = userInfo.Username();
 
 				// If we didn't get a username/domain from the service, try to get it from WTS
-				if( username.empty() )
-					username = pGina::Helpers::GetSessionUsername(mySession);
+				if( sessionUname.empty() )
+					sessionUname = pGina::Helpers::GetSessionUsername(mySession);
 				if( domain.empty() )
 					domain = pGina::Helpers::GetSessionDomainName(mySession);
 					
@@ -480,13 +504,19 @@ namespace pGina
 					usernameFieldValue += L"\\";
 				}
 
-				usernameFieldValue += username;
+				usernameFieldValue += sessionUname;
 				
 				SHStrDupW(usernameFieldValue.c_str(), &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
+			} else if( CPUS_CHANGE_PASSWORD == m_usageScenario ) {
+				DWORD mySession = pGina::Helpers::GetCurrentSessionId();
+
+				std::wstring sessionUname = pGina::Helpers::GetSessionUsername(mySession);
+
+				SHStrDupW(sessionUname.c_str(), &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
 			}
 
 			if(password != NULL)
-			{				
+			{	
 				SHStrDupW(password, &(m_fields->fields[m_fields->passwordFieldIdx].wstr));
 			}
 
@@ -600,7 +630,12 @@ namespace pGina
 		IFACEMETHODIMP Credential::Connect( IQueryContinueWithStatus *pqcws )
 		{
 			pDEBUG(L"Credential::Connect()");
-			ProcessLoginAttempt(pqcws);
+			if( CPUS_CREDUI == m_usageScenario || CPUS_LOGON == m_usageScenario ) {
+				ProcessLoginAttempt(pqcws);
+			} else if( CPUS_CHANGE_PASSWORD == m_usageScenario ) {
+				ProcessChangePasswordAttempt();
+			}
+			
 			return S_OK;
 		}
 
@@ -612,11 +647,7 @@ namespace pGina
 		void Credential::ProcessLoginAttempt(IQueryContinueWithStatus *pqcws)
 		{
 			// Reset m_loginResult
-			m_loginResult.Username(L"");
-			m_loginResult.Password(L"");
-			m_loginResult.Domain(L"");
-			m_loginResult.Message(L"");
-			m_loginResult.Result(false);
+			m_loginResult.Clear();
 			m_logonCancelled = false;
 
 			// Workout what our username, and password are.  Plugins are responsible for
@@ -681,6 +712,41 @@ namespace pGina
 					m_logonCancelled = true;
 				}
 			}			
+		}
+
+		void Credential::ProcessChangePasswordAttempt() 
+		{
+			pDEBUG(L"ProcessChangePasswordAttempt()");
+			m_loginResult.Clear();
+			m_logonCancelled = false;
+
+			// Get strings from fields
+			PWSTR username = FindUsernameValue();			
+			PWSTR oldPassword = FindPasswordValue();  // This is the old password
+			
+			// Find the new password and confirm new password fields
+			PWSTR newPassword = NULL;
+			PWSTR newPasswordConfirm = NULL;
+			if(m_fields) {
+				newPassword = m_fields->fields[CredProv::CPUIFI_NEW_PASSWORD].wstr;
+				newPasswordConfirm = m_fields->fields[CredProv::CPUIFI_CONFIRM_NEW_PASSWORD].wstr;
+			}
+
+			// Check that the new password and confirmation are exactly the same, if not
+			// return a failure.
+			if( wcscmp(newPassword, newPasswordConfirm ) != 0 ) {
+				m_loginResult.Result(false);
+				m_loginResult.Message(L"New passwords do not match");
+				return;
+			}
+
+			// TODO: Execute plugins
+
+			// We ignore everything in m_loginResult except Message and Result
+
+			// Dummy values for testing.
+			m_loginResult.Message(L"Plugins said no way");
+			m_loginResult.Result(false);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -87,6 +87,7 @@ namespace pGina
 			PWSTR   FindPasswordValue();
 			DWORD   FindStatusId();
 			void	ProcessLoginAttempt(IQueryContinueWithStatus *pqcws);
+			void    ProcessChangePasswordAttempt();
 
 			bool	IsFieldDynamic(DWORD dwFieldID);
 			std::wstring GetTextForField(DWORD dwFieldID);

@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@
 
 #include "TileUiLogon.h"
 #include "TileUiUnlock.h"
+#include "TileUiChangePassword.h"
 #include "ProviderGuid.h"
 #include "SerializationHelpers.h"
 #include "ServiceStateHelper.h"
@@ -126,11 +127,10 @@ namespace pGina
 			case CPUS_LOGON:
 			case CPUS_UNLOCK_WORKSTATION:
 			case CPUS_CREDUI:
+			case CPUS_CHANGE_PASSWORD:
 				m_usageScenario = cpus;
 				m_usageFlags = dwFlags;
 				return S_OK;
-			case CPUS_CHANGE_PASSWORD:			
-				return E_NOTIMPL;	// Todo: Support this
 
 			case CPUS_PLAP:
 			case CPUS_INVALID:
@@ -266,6 +266,9 @@ namespace pGina
 			case CPUS_UNLOCK_WORKSTATION:
 				*pdwCount = LOIFI_NUM_FIELDS;
 				return S_OK;
+			case CPUS_CHANGE_PASSWORD:
+				*pdwCount = CPUIFI_NUM_FIELDS;
+				return S_OK;
 			default:
 				pERROR(L"Provider::GetFieldDescriptorCount: No UI known for the usage scenario: 0x%08x", m_usageScenario);
 				return S_FALSE;
@@ -285,6 +288,8 @@ namespace pGina
 				return GetFieldDescriptorForUi(s_logonFields, dwIndex, ppcpfd);
 			case CPUS_UNLOCK_WORKSTATION:
 				return GetFieldDescriptorForUi(s_unlockFields, dwIndex, ppcpfd);
+			case CPUS_CHANGE_PASSWORD:
+				return GetFieldDescriptorForUi(s_changePasswordFields, dwIndex, ppcpfd);
 			default:
 				return E_INVALIDARG;
 			}
@@ -342,6 +347,9 @@ namespace pGina
 					break;
 				case CPUS_UNLOCK_WORKSTATION:
 					m_credential->Initialize(m_usageScenario, s_unlockFields, m_usageFlags, serializedUser, serializedPass);					
+					break;
+				case CPUS_CHANGE_PASSWORD:
+					m_credential->Initialize(m_usageScenario, s_changePasswordFields, m_usageFlags, serializedUser, serializedPass);
 					break;
 				default:
 					return E_INVALIDARG;

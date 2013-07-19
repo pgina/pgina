@@ -79,6 +79,11 @@ namespace pGina
 					std::wstring Message() { return m_message; }
 					void Message(std::wstring const& v) { m_message = v; }
 
+					void Clear() { 
+						Username(L""); Password(L""); Domain(L""); 
+						Result(false); Message(L""); 
+					}
+
 				private:
 					std::wstring m_username;
 					std::wstring m_domain;

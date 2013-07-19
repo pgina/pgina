@@ -58,6 +58,13 @@ namespace Microsoft
 			__out DWORD* pcb
 			);
 
+		// pack the credentials into a buffer for the change password scenario
+		HRESULT KerbChangePasswordPack(
+			__in const KERB_CHANGEPASSWORD_REQUEST & kcpReqIn,
+			__deref_out_bcount(*pcb) BYTE** prgb,
+			__out DWORD* pcb
+			);
+
 		//get the authentication package that will be used for our logon attempt
 		HRESULT RetrieveNegotiateAuthPackage(
 			__out ULONG * pulAuthPackage

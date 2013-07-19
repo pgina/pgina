@@ -575,5 +575,68 @@ namespace Microsoft
 
 			return hr;
 		}
+
+		// Pack the strings appropriately for WinLogon/LSA (see KerbInteractiveUnlockLogonPack)
+		HRESULT KerbChangePasswordPack(
+			__in const KERB_CHANGEPASSWORD_REQUEST & kcpReqIn,
+			__deref_out_bcount(*pcb) BYTE** prgb,
+			__out DWORD* pcb
+			)
+		{
+			HRESULT hr;
+
+			// The size of the output packed structure
+			DWORD cb = sizeof(kcpReqIn) +
+				kcpReqIn.AccountName.Length +
+				kcpReqIn.DomainName.Length +
+				kcpReqIn.NewPassword.Length +
+				kcpReqIn.OldPassword.Length;
+
+			// Allocate space for the struct and the packed data
+			KERB_CHANGEPASSWORD_REQUEST* pkcpReqOut = (KERB_CHANGEPASSWORD_REQUEST*)CoTaskMemAlloc(cb);
+
+			if (pkcpReqOut)
+			{
+				// Copy the non-string stuff
+				pkcpReqOut->Impersonating = kcpReqIn.Impersonating;
+				pkcpReqOut->MessageType = kcpReqIn.MessageType;
+
+				//
+				// point pbBuffer at the beginning of the extra space
+				//
+				BYTE* pbBuffer = (BYTE*)pkcpReqOut + sizeof(*pkcpReqOut);
+
+				//
+				// copy each string,
+				// fix up appropriate buffer pointer to be offset,
+				// advance buffer pointer over copied characters in extra space
+				//
+				_UnicodeStringPackedUnicodeStringCopy(kcpReqIn.AccountName, (PWSTR)pbBuffer, &pkcpReqOut->AccountName);
+				pkcpReqOut->AccountName.Buffer = (PWSTR)(pbBuffer - (BYTE*)pkcpReqOut);
+				pbBuffer += pkcpReqOut->AccountName.Length;
+
+				_UnicodeStringPackedUnicodeStringCopy(kcpReqIn.DomainName, (PWSTR)pbBuffer, &pkcpReqOut->DomainName);
+				pkcpReqOut->DomainName.Buffer = (PWSTR)(pbBuffer - (BYTE*)pkcpReqOut);
+				pbBuffer += pkcpReqOut->DomainName.Length;
+
+				_UnicodeStringPackedUnicodeStringCopy(kcpReqIn.NewPassword, (PWSTR)pbBuffer, &pkcpReqOut->NewPassword);
+				pkcpReqOut->NewPassword.Buffer = (PWSTR)(pbBuffer - (BYTE*)pkcpReqOut);
+				pbBuffer += pkcpReqOut->NewPassword.Length;
+
+				_UnicodeStringPackedUnicodeStringCopy(kcpReqIn.OldPassword, (PWSTR)pbBuffer, &pkcpReqOut->OldPassword);
+				pkcpReqOut->OldPassword.Buffer = (PWSTR)(pbBuffer - (BYTE*)pkcpReqOut);
+
+				*prgb = (BYTE*)pkcpReqOut;
+				*pcb = cb;
+
+				hr = S_OK;
+			}
+			else
+			{
+				hr = E_OUTOFMEMORY;
+			}
+
+			return hr;
+		}
 	}
 }
