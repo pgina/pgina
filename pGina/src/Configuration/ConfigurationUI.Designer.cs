@@ -82,14 +82,18 @@
             this.eventBtnDown = new System.Windows.Forms.Button();
             this.eventBtnUp = new System.Windows.Forms.Button();
             this.eventDGV = new System.Windows.Forms.DataGridView();
-            this.groupBox8 = new System.Windows.Forms.GroupBox();
-            this.gatewayBtnDown = new System.Windows.Forms.Button();
-            this.gatewayBtnUp = new System.Windows.Forms.Button();
-            this.gatewayDGV = new System.Windows.Forms.DataGridView();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.authorizeBtnDown = new System.Windows.Forms.Button();
             this.authorizeBtnUp = new System.Windows.Forms.Button();
             this.authorizeDGV = new System.Windows.Forms.DataGridView();
+            this.groupBox8 = new System.Windows.Forms.GroupBox();
+            this.gatewayBtnDown = new System.Windows.Forms.Button();
+            this.gatewayBtnUp = new System.Windows.Forms.Button();
+            this.gatewayDGV = new System.Windows.Forms.DataGridView();
+            this.groupBox19 = new System.Windows.Forms.GroupBox();
+            this.changePasswordOrderBtnDown = new System.Windows.Forms.Button();
+            this.changePasswordOrderBtnUp = new System.Windows.Forms.Button();
+            this.changePasswordOrderDGV = new System.Windows.Forms.DataGridView();
             this.m_simTab = new System.Windows.Forms.TabPage();
             this.viewLogBtn = new System.Windows.Forms.Button();
             this.groupBox13 = new System.Windows.Forms.GroupBox();
@@ -150,10 +154,6 @@
             this.btnOkay = new System.Windows.Forms.Button();
             this.m_pginaVersionLbl = new System.Windows.Forms.Label();
             this.btnSaveAndClose = new System.Windows.Forms.Button();
-            this.groupBox19 = new System.Windows.Forms.GroupBox();
-            this.changePasswordOrderDGV = new System.Windows.Forms.DataGridView();
-            this.changePasswordOrderBtnUp = new System.Windows.Forms.Button();
-            this.changePasswordOrderBtnDown = new System.Windows.Forms.Button();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
             this.groupBox17.SuspendLayout();
@@ -173,10 +173,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).BeginInit();
             this.groupBox11.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.eventDGV)).BeginInit();
-            this.groupBox8.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).BeginInit();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).BeginInit();
+            this.groupBox8.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).BeginInit();
+            this.groupBox19.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.changePasswordOrderDGV)).BeginInit();
             this.m_simTab.SuspendLayout();
             this.groupBox13.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.simFinalResultPB)).BeginInit();
@@ -195,8 +197,6 @@
             this.groupBox18.SuspendLayout();
             this.groupBox9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCredProvFilter)).BeginInit();
-            this.groupBox19.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.changePasswordOrderDGV)).BeginInit();
             this.SuspendLayout();
             // 
             // m_tabs
@@ -796,6 +796,54 @@
             this.eventDGV.Size = new System.Drawing.Size(197, 239);
             this.eventDGV.TabIndex = 0;
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.authorizeBtnDown);
+            this.groupBox2.Controls.Add(this.authorizeBtnUp);
+            this.groupBox2.Controls.Add(this.authorizeDGV);
+            this.groupBox2.Location = new System.Drawing.Point(264, 3);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(255, 264);
+            this.groupBox2.TabIndex = 17;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Authorization";
+            // 
+            // authorizeBtnDown
+            // 
+            this.authorizeBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.authorizeBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.authorizeBtnDown.Location = new System.Drawing.Point(218, 136);
+            this.authorizeBtnDown.Name = "authorizeBtnDown";
+            this.authorizeBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.authorizeBtnDown.TabIndex = 16;
+            this.authorizeBtnDown.UseVisualStyleBackColor = true;
+            this.authorizeBtnDown.Click += new System.EventHandler(this.authorizeBtnDown_Click);
+            // 
+            // authorizeBtnUp
+            // 
+            this.authorizeBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.authorizeBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.authorizeBtnUp.Location = new System.Drawing.Point(218, 103);
+            this.authorizeBtnUp.Name = "authorizeBtnUp";
+            this.authorizeBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.authorizeBtnUp.TabIndex = 15;
+            this.authorizeBtnUp.UseVisualStyleBackColor = true;
+            this.authorizeBtnUp.Click += new System.EventHandler(this.authorizeBtnUp_Click);
+            // 
+            // authorizeDGV
+            // 
+            this.authorizeDGV.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.authorizeDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.authorizeDGV.Location = new System.Drawing.Point(15, 20);
+            this.authorizeDGV.Name = "authorizeDGV";
+            this.authorizeDGV.Size = new System.Drawing.Size(197, 238);
+            this.authorizeDGV.TabIndex = 0;
+            // 
             // groupBox8
             // 
             this.groupBox8.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -844,53 +892,54 @@
             this.gatewayDGV.Size = new System.Drawing.Size(198, 238);
             this.gatewayDGV.TabIndex = 0;
             // 
-            // groupBox2
+            // groupBox19
             // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.groupBox19.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox2.Controls.Add(this.authorizeBtnDown);
-            this.groupBox2.Controls.Add(this.authorizeBtnUp);
-            this.groupBox2.Controls.Add(this.authorizeDGV);
-            this.groupBox2.Location = new System.Drawing.Point(264, 3);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(255, 264);
-            this.groupBox2.TabIndex = 17;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Authorization";
+            this.groupBox19.Controls.Add(this.changePasswordOrderBtnDown);
+            this.groupBox19.Controls.Add(this.changePasswordOrderBtnUp);
+            this.groupBox19.Controls.Add(this.changePasswordOrderDGV);
+            this.groupBox19.Location = new System.Drawing.Point(3, 273);
+            this.groupBox19.Name = "groupBox19";
+            this.groupBox19.Size = new System.Drawing.Size(255, 265);
+            this.groupBox19.TabIndex = 22;
+            this.groupBox19.TabStop = false;
+            this.groupBox19.Text = "Change Password";
             // 
-            // authorizeBtnDown
+            // changePasswordOrderBtnDown
             // 
-            this.authorizeBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.authorizeBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.authorizeBtnDown.Location = new System.Drawing.Point(218, 136);
-            this.authorizeBtnDown.Name = "authorizeBtnDown";
-            this.authorizeBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.authorizeBtnDown.TabIndex = 16;
-            this.authorizeBtnDown.UseVisualStyleBackColor = true;
-            this.authorizeBtnDown.Click += new System.EventHandler(this.authorizeBtnDown_Click);
+            this.changePasswordOrderBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.changePasswordOrderBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.changePasswordOrderBtnDown.Location = new System.Drawing.Point(220, 137);
+            this.changePasswordOrderBtnDown.Name = "changePasswordOrderBtnDown";
+            this.changePasswordOrderBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.changePasswordOrderBtnDown.TabIndex = 2;
+            this.changePasswordOrderBtnDown.Text = "button2";
+            this.changePasswordOrderBtnDown.UseVisualStyleBackColor = true;
+            this.changePasswordOrderBtnDown.Click += new System.EventHandler(this.changePasswordOrderBtnDown_Click);
             // 
-            // authorizeBtnUp
+            // changePasswordOrderBtnUp
             // 
-            this.authorizeBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.authorizeBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.authorizeBtnUp.Location = new System.Drawing.Point(218, 103);
-            this.authorizeBtnUp.Name = "authorizeBtnUp";
-            this.authorizeBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.authorizeBtnUp.TabIndex = 15;
-            this.authorizeBtnUp.UseVisualStyleBackColor = true;
-            this.authorizeBtnUp.Click += new System.EventHandler(this.authorizeBtnUp_Click);
+            this.changePasswordOrderBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.changePasswordOrderBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.changePasswordOrderBtnUp.Location = new System.Drawing.Point(221, 104);
+            this.changePasswordOrderBtnUp.Name = "changePasswordOrderBtnUp";
+            this.changePasswordOrderBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.changePasswordOrderBtnUp.TabIndex = 1;
+            this.changePasswordOrderBtnUp.UseVisualStyleBackColor = true;
+            this.changePasswordOrderBtnUp.Click += new System.EventHandler(this.changePasswordOrderBtnUp_Click);
             // 
-            // authorizeDGV
+            // changePasswordOrderDGV
             // 
-            this.authorizeDGV.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.changePasswordOrderDGV.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.authorizeDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.authorizeDGV.Location = new System.Drawing.Point(15, 20);
-            this.authorizeDGV.Name = "authorizeDGV";
-            this.authorizeDGV.Size = new System.Drawing.Size(197, 238);
-            this.authorizeDGV.TabIndex = 0;
+            this.changePasswordOrderDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.changePasswordOrderDGV.Location = new System.Drawing.Point(15, 19);
+            this.changePasswordOrderDGV.Name = "changePasswordOrderDGV";
+            this.changePasswordOrderDGV.Size = new System.Drawing.Size(197, 239);
+            this.changePasswordOrderDGV.TabIndex = 0;
             // 
             // m_simTab
             // 
@@ -1542,53 +1591,6 @@
             this.btnSaveAndClose.UseVisualStyleBackColor = true;
             this.btnSaveAndClose.Click += new System.EventHandler(this.btnSaveAndClose_Click);
             // 
-            // groupBox19
-            // 
-            this.groupBox19.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox19.Controls.Add(this.changePasswordOrderBtnDown);
-            this.groupBox19.Controls.Add(this.changePasswordOrderBtnUp);
-            this.groupBox19.Controls.Add(this.changePasswordOrderDGV);
-            this.groupBox19.Location = new System.Drawing.Point(3, 273);
-            this.groupBox19.Name = "groupBox19";
-            this.groupBox19.Size = new System.Drawing.Size(255, 265);
-            this.groupBox19.TabIndex = 22;
-            this.groupBox19.TabStop = false;
-            this.groupBox19.Text = "Change Password";
-            // 
-            // changePasswordOrderDGV
-            // 
-            this.changePasswordOrderDGV.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.changePasswordOrderDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.changePasswordOrderDGV.Location = new System.Drawing.Point(15, 19);
-            this.changePasswordOrderDGV.Name = "changePasswordOrderDGV";
-            this.changePasswordOrderDGV.Size = new System.Drawing.Size(197, 239);
-            this.changePasswordOrderDGV.TabIndex = 0;
-            // 
-            // changePasswordOrderBtnUp
-            // 
-            this.changePasswordOrderBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.changePasswordOrderBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
-            this.changePasswordOrderBtnUp.Location = new System.Drawing.Point(221, 104);
-            this.changePasswordOrderBtnUp.Name = "changePasswordOrderBtnUp";
-            this.changePasswordOrderBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.changePasswordOrderBtnUp.TabIndex = 1;
-            this.changePasswordOrderBtnUp.UseVisualStyleBackColor = true;
-            // 
-            // changePasswordOrderBtnDown
-            // 
-            this.changePasswordOrderBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.changePasswordOrderBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
-            this.changePasswordOrderBtnDown.Location = new System.Drawing.Point(220, 137);
-            this.changePasswordOrderBtnDown.Name = "changePasswordOrderBtnDown";
-            this.changePasswordOrderBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.changePasswordOrderBtnDown.TabIndex = 2;
-            this.changePasswordOrderBtnDown.Text = "button2";
-            this.changePasswordOrderBtnDown.UseVisualStyleBackColor = true;
-            // 
             // ConfigurationUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1627,10 +1629,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.authenticateDGV)).EndInit();
             this.groupBox11.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.eventDGV)).EndInit();
-            this.groupBox8.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).EndInit();
             this.groupBox2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.authorizeDGV)).EndInit();
+            this.groupBox8.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).EndInit();
+            this.groupBox19.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.changePasswordOrderDGV)).EndInit();
             this.m_simTab.ResumeLayout(false);
             this.groupBox13.ResumeLayout(false);
             this.groupBox13.PerformLayout();
@@ -1658,8 +1662,6 @@
             this.groupBox9.ResumeLayout(false);
             this.groupBox9.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCredProvFilter)).EndInit();
-            this.groupBox19.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.changePasswordOrderDGV)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -1051,6 +1051,18 @@ namespace pGina.Configuration
                 MoveDown(this.eventDGV, this.eventDGV.SelectedRows[0].Index);
         }
 
+        private void changePasswordOrderBtnUp_Click(object sender, EventArgs e)
+        {
+            if (this.changePasswordOrderDGV.SelectedRows.Count > 0)
+                MoveUp(this.changePasswordOrderDGV, this.changePasswordOrderDGV.SelectedRows[0].Index);
+        }
+
+        private void changePasswordOrderBtnDown_Click(object sender, EventArgs e)
+        {
+            if (this.changePasswordOrderDGV.SelectedRows.Count > 0)
+                MoveDown(this.changePasswordOrderDGV, this.changePasswordOrderDGV.SelectedRows[0].Index);
+        }
+
         private void btnLaunchCredUI_Click(object sender, EventArgs e)
         {
             ResetSimUI();
@@ -1515,5 +1527,7 @@ namespace pGina.Configuration
         {
             this.motdTB.Enabled = this.enableMotdCB.Checked;
         }
+
+        
     }
 }
