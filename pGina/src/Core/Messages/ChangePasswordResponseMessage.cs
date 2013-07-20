@@ -28,24 +28,38 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Dynamic;
 
 namespace pGina.Core.Messages
 {
-    public enum MessageType
+    public class ChangePasswordResponseMessage : ChangePasswordRequestMessage
     {
-        Unknown         = 0x00,
-        Hello           = 0x01,
-        Disconnect      = 0x02,
-        Ack             = 0x03,
-        Log             = 0x04,
-        LoginRequest    = 0x05,
-        LoginResponse   = 0x06,
-        DynLabelRequest = 0x07,
-        DynLabelResponse = 0x08,
-        LoginInfoChange = 0x09,
-        UserInfoRequest = 0x0a,
-        UserInfoResponse = 0x0b,
-        ChangePasswordRequest = 0x0c,
-        ChangePasswordResponse = 0x0d
+        public string Message { get; set; }
+        public bool Result { get; set; }
+
+        public ChangePasswordResponseMessage(IDictionary<string, object> expandoVersion)
+        {
+            FromDict(expandoVersion);
+        }
+
+        public ChangePasswordResponseMessage()
+        {
+        }
+
+        public override void FromDict(IDictionary<string, object> expandoVersion)
+        {
+            base.FromDict(expandoVersion);
+            Message = (string)expandoVersion["Message"];
+            Result = (bool)expandoVersion["Result"];
+        }
+
+        public override IDictionary<string, object> ToDict()
+        {
+            Dictionary<string, object> dict = base.ToDict() as Dictionary<string, object>;
+            dict.Add("Message", this.Message);
+            dict.Add("Result", this.Result);
+            dict["MessageType"] = (byte)MessageType.ChangePasswordResponse;
+            return dict;
+        }
     }
 }

@@ -220,6 +220,8 @@ namespace pGina.Service.Impl
                     return HandleLoginInfoChange(new LoginInfoChangeMessage(msg)).ToDict();
                 case MessageType.UserInfoRequest:
                     return HandleUserInfoRequest(new UserInformationRequestMessage(msg)).ToDict();
+                case MessageType.ChangePasswordRequest:
+                    return HandleChangePasswordRequest(new ChangePasswordRequestMessage(msg)).ToDict();
                 default:
                     return null;                // Unknowns get disconnected
             }
@@ -388,6 +390,30 @@ namespace pGina.Service.Impl
             }
 
             return motd;
+        }
+
+        private ChangePasswordResponseMessage HandleChangePasswordRequest(ChangePasswordRequestMessage msg)
+        {
+            try
+            {
+                m_logger.DebugFormat("Processing ChangePasswordRequest for: {0} domain: {1}",
+                    msg.Username, msg.Domain);
+
+                // TODO: Execute plugins and get the final result
+
+                return new ChangePasswordResponseMessage()
+                {
+                    Result = true,
+                    Message = "This is a test result",
+                    Username = msg.Username,
+                    Domain = msg.Domain
+                };
+            }
+            catch (Exception e)
+            {
+                m_logger.ErrorFormat("Internal error, unexpected exception while handling change password request: {0}", e);
+                return new ChangePasswordResponseMessage() { Result = false, Message = "Internal error" };
+            }
         }
     }
 }

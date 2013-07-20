@@ -462,6 +462,70 @@ namespace pGina
 		{
 			pGina::Threading::ScopedLock lock(m_mutex);
 			return m_serviceRunning;
-		}		
+		}	
+
+		/* static */
+		User::LoginResult User::ProcessChangePasswordForUser(const wchar_t *username, const wchar_t *domain,
+				const wchar_t *oldPassword, const wchar_t *newPassword)
+		{			
+			// Write a log message to the service
+			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
+			std::wstring pipePath = L"\\\\.\\pipe\\";
+			pipePath += pipeName;					
+
+			// Start a cleanup pool for messages we collect along the way
+			pGina::Memory::ObjectCleanupPool cleanup;
+
+			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);			
+			if(pipeClient.Connect())
+			{				
+				// Always send hello first, expect hello in return
+				pGina::Protocol::HelloMessage hello;
+				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);		
+				cleanup.Add(reply);
+
+				if(reply && reply->Type() != pGina::Protocol::Hello)
+					return LoginResult();
+				
+				// Then send a change password request message, expect a loginresult message
+				pGina::Protocol::ChangePasswordRequestMessage request(username, domain, oldPassword, newPassword);
+				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, request);
+				cleanup.Add(reply);
+
+				if(reply && reply->Type() != pGina::Protocol::ChangePasswordResponse)
+					return LoginResult();
+
+				pGina::Protocol::ChangePasswordResponseMessage * responseMsg = 
+					static_cast<pGina::Protocol::ChangePasswordResponseMessage *>(reply);
+				
+				// Send disconnect, expect ack, then close
+				pGina::Protocol::DisconnectMessage disconnect;
+				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, disconnect);
+				cleanup.Add(reply);		
+
+				// We close regardless, no need to check reply type..
+				pipeClient.Close();		
+
+				// If a domain was not specified, we must set it to local machine else no u/p will work regardless
+				if(responseMsg->Domain().length() == 0)
+				{
+					Log::Warn(L"Plugins did not set a domain name, assuming local machine!");
+					responseMsg->Domain(pGina::Helpers::GetMachineName());
+				}
+
+				// Password is ignored by credential provider.
+				return LoginResult(responseMsg->Result(), 
+					responseMsg->Username(), 
+					responseMsg->OldPassword(),
+					responseMsg->Domain(),
+					responseMsg->Message());				
+			}
+			else
+			{
+				Log::Warn(L"Unable to connect to pGina service pipe - LastError: 0x%08x, giving up.", GetLastError());
+			}
+
+			return LoginResult();
+		}
 	}
 }

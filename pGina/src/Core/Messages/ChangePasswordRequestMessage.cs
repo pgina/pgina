@@ -28,24 +28,43 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Dynamic;
 
 namespace pGina.Core.Messages
 {
-    public enum MessageType
+    public class ChangePasswordRequestMessage : MessageBase
     {
-        Unknown         = 0x00,
-        Hello           = 0x01,
-        Disconnect      = 0x02,
-        Ack             = 0x03,
-        Log             = 0x04,
-        LoginRequest    = 0x05,
-        LoginResponse   = 0x06,
-        DynLabelRequest = 0x07,
-        DynLabelResponse = 0x08,
-        LoginInfoChange = 0x09,
-        UserInfoRequest = 0x0a,
-        UserInfoResponse = 0x0b,
-        ChangePasswordRequest = 0x0c,
-        ChangePasswordResponse = 0x0d
+        public string Username { get; set; }
+        public string Domain { get; set; }
+        public string OldPassword { get; set; }
+        public string NewPassword { get; set; }
+
+        public ChangePasswordRequestMessage(IDictionary<string, object> expandoVersion)
+        {
+            FromDict(expandoVersion);
+        }
+
+        public ChangePasswordRequestMessage()
+        {
+        }
+
+        public override void FromDict(IDictionary<string, object> expandoVersion)
+        {
+            Username = (string)expandoVersion["Username"];
+            Domain = (string)expandoVersion["Domain"];
+            OldPassword = (string)expandoVersion["OldPassword"];
+            NewPassword = (string)expandoVersion["NewPassword"];
+        }
+
+        public override IDictionary<string, object> ToDict()
+        {
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            dict.Add("Username", this.Username);
+            dict.Add("Domain", this.Domain);
+            dict.Add("OldPassword", this.OldPassword);
+            dict.Add("NewPassword", this.NewPassword);
+            dict.Add("MessageType", (byte)MessageType.ChangePasswordRequest);
+            return dict;
+        }
     }
 }
