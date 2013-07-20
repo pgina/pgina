@@ -146,4 +146,18 @@ namespace pGina.Shared.Interfaces
         void EndChain(Types.SessionProperties props);
     }
 
+    /// <summary>
+    /// Plugins that want to support the change password scenario should
+    /// implement this interface.
+    /// </summary>
+    public interface IPluginChangePassword : IPluginBase
+    {
+        /// <summary>
+        /// Attempt to change the password.
+        /// </summary>
+        /// <param name="props">This will contain a ChangePasswordInfo singleton object that 
+        /// contains the username, domain, old and new passwords.</param>
+        /// <returns>Success/failure of the change password operation.</returns>
+        Types.BooleanResult ChangePassword(Types.SessionProperties props);
+    }
 }

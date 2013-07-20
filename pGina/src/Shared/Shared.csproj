@@ -55,6 +55,7 @@
     <Compile Include="Registration\Settings.cs" />
     <Compile Include="Settings\DynamicSettings.cs" />
     <Compile Include="Types\BooleanResult.cs" />
+    <Compile Include="Types\ChangePasswordInfo.cs" />
     <Compile Include="Types\GroupInformation.cs" />
     <Compile Include="Interfaces\IPlugin.cs" />
     <Compile Include="Logging\Logging.cs" />

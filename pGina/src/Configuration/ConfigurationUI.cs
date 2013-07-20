@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2012, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -80,6 +80,7 @@ namespace pGina.Configuration
         private const string AUTHORIZATION_COLUMN = "Authorization";
         private const string GATEWAY_COLUMN = "Gateway";
         private const string NOTIFICATION_COLUMN = "Notification";
+        private const string CHANGE_PASSWORD_COLUMN = "Change Password";
 
         // Cred Prov Filter data grid view
         private const string CPF_CP_NAME_COLUMN = "Name";
@@ -435,6 +436,7 @@ namespace pGina.Configuration
             InitPluginOrderDGV(this.authorizeDGV);
             InitPluginOrderDGV(this.gatewayDGV);
             InitPluginOrderDGV(this.eventDGV);
+            InitPluginOrderDGV(this.changePasswordOrderDGV);
             
             // Load order lists from the registry
             LoadPluginOrderListsFromReg();
@@ -501,7 +503,14 @@ namespace pGina.Configuration
                 Name = NOTIFICATION_COLUMN,
                 HeaderText = "Notification",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            });            
+            });
+
+            pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = CHANGE_PASSWORD_COLUMN,
+                HeaderText = "Change Password",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
 
             pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
             {
@@ -560,7 +569,10 @@ namespace pGina.Configuration
                         break;
                     case NOTIFICATION_COLUMN:
                         SyncStateToList(checkBoxState, plug, eventDGV);
-                        break;                    
+                        break;
+                    case CHANGE_PASSWORD_COLUMN:
+                        SyncStateToList(checkBoxState, plug, changePasswordOrderDGV);
+                        break;
                 }                
             }
         }
@@ -630,13 +642,14 @@ namespace pGina.Configuration
 
                     this.m_plugins.Add(p.Uuid.ToString(), p);
                     pluginsDG.Rows.Add(
-                        new object[] { p.Name, false, false, false, false, p.Description, p.Version, p.Uuid.ToString() });
+                        new object[] { p.Name, false, false, false, false, false, p.Description, p.Version, p.Uuid.ToString() });
                     DataGridViewRow row = pluginsDG.Rows[i];
 
                     this.SetupCheckBoxCell<IPluginAuthentication>(row.Cells[AUTHENTICATION_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginAuthorization>(row.Cells[AUTHORIZATION_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginAuthenticationGateway>(row.Cells[GATEWAY_COLUMN], p);
-                    this.SetupCheckBoxCell<IPluginEventNotifications>(row.Cells[NOTIFICATION_COLUMN], p);                    
+                    this.SetupCheckBoxCell<IPluginEventNotifications>(row.Cells[NOTIFICATION_COLUMN], p);
+                    this.SetupCheckBoxCell<IPluginChangePassword>(row.Cells[CHANGE_PASSWORD_COLUMN], p);
                 }
             }
 
@@ -662,7 +675,8 @@ namespace pGina.Configuration
             LoadPluginOrderListFromReg<IPluginAuthentication>(authenticateDGV);
             LoadPluginOrderListFromReg<IPluginAuthenticationGateway>(gatewayDGV);
             LoadPluginOrderListFromReg<IPluginAuthorization>(authorizeDGV);
-            LoadPluginOrderListFromReg<IPluginEventNotifications>(eventDGV);            
+            LoadPluginOrderListFromReg<IPluginEventNotifications>(eventDGV);
+            LoadPluginOrderListFromReg<IPluginChangePassword>(changePasswordOrderDGV);
         }
 
         private void LoadPluginOrderListFromReg<T>(DataGridView grid) where T : class, IPluginBase
@@ -694,7 +708,10 @@ namespace pGina.Configuration
                     SyncStateToList((bool)row.Cells[GATEWAY_COLUMN].Value, plug, gatewayDGV);
                 
                 if (!row.Cells[NOTIFICATION_COLUMN].ReadOnly)
-                    SyncStateToList((bool)row.Cells[NOTIFICATION_COLUMN].Value, plug, eventDGV);                
+                    SyncStateToList((bool)row.Cells[NOTIFICATION_COLUMN].Value, plug, eventDGV);
+
+                if (!row.Cells[CHANGE_PASSWORD_COLUMN].ReadOnly)
+                    SyncStateToList((bool)row.Cells[CHANGE_PASSWORD_COLUMN].Value, plug, changePasswordOrderDGV);
             }
 
             // Remove any plugins that are no longer in the main list from the
@@ -702,7 +719,8 @@ namespace pGina.Configuration
             this.RemoveAllNotInMainList(authorizeDGV);
             this.RemoveAllNotInMainList(authenticateDGV);
             this.RemoveAllNotInMainList(gatewayDGV);
-            this.RemoveAllNotInMainList(eventDGV);            
+            this.RemoveAllNotInMainList(eventDGV);
+            this.RemoveAllNotInMainList(changePasswordOrderDGV);
         }
 
         private void RemoveAllNotInMainList(DataGridView dgv)
@@ -818,6 +836,8 @@ namespace pGina.Configuration
                         mask |= (int)Core.PluginLoader.State.GatewayEnabled;
                     if (Convert.ToBoolean(row.Cells[NOTIFICATION_COLUMN].Value))
                         mask |= (int)Core.PluginLoader.State.NotificationEnabled;
+                    if (Convert.ToBoolean(row.Cells[CHANGE_PASSWORD_COLUMN].Value))
+                        mask |= (int)Core.PluginLoader.State.ChangePasswordEnabled;
                     
                     Core.Settings.Get.SetSetting(p.Uuid.ToString(), mask);
                 }
@@ -833,13 +853,14 @@ namespace pGina.Configuration
             SavePluginOrder(authenticateDGV, typeof(IPluginAuthentication));
             SavePluginOrder(authorizeDGV, typeof(IPluginAuthorization));
             SavePluginOrder(gatewayDGV, typeof(IPluginAuthenticationGateway));
-            SavePluginOrder(eventDGV, typeof(IPluginEventNotifications));            
+            SavePluginOrder(eventDGV, typeof(IPluginEventNotifications));
+            SavePluginOrder(changePasswordOrderDGV, typeof(IPluginChangePassword));
         }
 
         private void SavePluginOrder(DataGridView grid, Type pluginType)
         {
             string setting = pluginType.Name + "_Order";
-            List<string> orderedList = new List<string>();            
+            List<string> orderedList = new List<string>();
             foreach (DataGridViewRow row in grid.Rows)
             {
                 orderedList.Add((string)row.Cells[PLUGIN_UUID_COLUMN].Value);
