@@ -740,13 +740,8 @@ namespace pGina
 				return;
 			}
 
-			// TODO: Execute plugins
-
-			// We ignore everything in m_loginResult except Message and Result
-
-			// Dummy values for testing.
-			m_loginResult.Message(L"Plugins said no way");
-			m_loginResult.Result(false);
+			m_loginResult = 
+				pGina::Transactions::User::ProcessChangePasswordForUser( username, L"", oldPassword, newPassword );
 		}
 	}
 }
