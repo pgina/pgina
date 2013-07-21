@@ -42,7 +42,7 @@ using pGina.Shared.Types;
 namespace pGina.Plugin.LocalMachine
 {
 
-    public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration
+    public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration, IPluginChangePassword
     {
         // Per-instance logger
         private ILog m_logger = LogManager.GetLogger("LocalMachine");
@@ -522,6 +522,36 @@ namespace pGina.Plugin.LocalMachine
                     }
                 }
             }
-        }                
+        }
+
+        public BooleanResult ChangePassword(ChangePasswordInfo cpInfo, ChangePasswordPluginActivityInfo pluginInfo)
+        {
+            m_logger.Debug("ChangePassword()");
+
+            // Verify the old password
+            if (Abstractions.WindowsApi.pInvokes.ValidateCredentials(cpInfo.Username, cpInfo.OldPassword))
+            {
+                m_logger.DebugFormat("Authenticated via old password: {0}", cpInfo.Username);
+            }
+            else
+            {
+                return new BooleanResult { Success = false, Message = "Current password or username is not valid." };
+            }
+
+            using (UserPrincipal user = LocalAccount.GetUserPrincipal(cpInfo.Username))
+            {
+                if (user != null)
+                {
+                    m_logger.DebugFormat("Found principal, changing password for {0}", cpInfo.Username);
+                    user.SetPassword(cpInfo.NewPassword);
+                }
+                else
+                {
+                    return new BooleanResult { Success = false, Message = "Local machine plugin internal error: directory entry not found." };
+                }
+            }
+
+            return new BooleanResult { Success = true, Message = "Local password successfully changed." };
+        }
     }
 }
