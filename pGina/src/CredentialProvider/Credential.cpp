@@ -731,7 +731,7 @@ namespace pGina
 				newPassword = m_fields->fields[CredProv::CPUIFI_NEW_PASSWORD].wstr;
 				newPasswordConfirm = m_fields->fields[CredProv::CPUIFI_CONFIRM_NEW_PASSWORD].wstr;
 			}
-
+			
 			// Check that the new password and confirmation are exactly the same, if not
 			// return a failure.
 			if( wcscmp(newPassword, newPasswordConfirm ) != 0 ) {
@@ -742,6 +742,13 @@ namespace pGina
 
 			m_loginResult = 
 				pGina::Transactions::User::ProcessChangePasswordForUser( username, L"", oldPassword, newPassword );
+
+			if( m_loginResult.Message().empty() ) {
+				if( m_loginResult.Result() )
+					m_loginResult.Message(L"Password was successfully changed");
+				else
+					m_loginResult.Message(L"Failed to change password, no message from plugins.");
+			}
 		}
 	}
 }

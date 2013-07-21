@@ -555,7 +555,7 @@ namespace pGina
 				msg->Property<std::wstring>(L"Username", Username(), pGina::Messaging::String);
 				msg->Property<std::wstring>(L"Domain", Domain(), pGina::Messaging::String);
 				msg->Property<std::wstring>(L"OldPassword", OldPassword(), pGina::Messaging::String);
-				msg->Property<std::wstring>(L"NewPassword", OldPassword(), pGina::Messaging::String);
+				msg->Property<std::wstring>(L"NewPassword", NewPassword(), pGina::Messaging::String);
 				return msg;
 			}
 
