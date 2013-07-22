@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2012, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@ using pGina.Shared.Types;
 
 namespace pGina.Plugin.Ldap
 {
-    public class LdapPlugin : IStatefulPlugin, IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration
+    public class LdapPlugin : IStatefulPlugin, IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration, IPluginChangePassword
     {
         public static readonly Guid LdapUuid = new Guid("{0F52390B-C781-43AE-BD62-553C77FA4CF7}");
         private ILog m_logger = LogManager.GetLogger("LdapPlugin");
@@ -358,6 +358,34 @@ namespace pGina.Plugin.Ldap
                 message = "No groups added.";
 
             return new BooleanResult() { Success = true, Message = message };
+        }
+
+        public BooleanResult ChangePassword( ChangePasswordInfo cpInfo, ChangePasswordPluginActivityInfo pluginInfo)
+        {
+            m_logger.Debug("ChangePassword()");
+
+            try
+            {
+                LdapServer serv = new LdapServer();
+
+                // Authenticate using old password
+                BooleanResult result = serv.Authenticate(cpInfo.Username, cpInfo.OldPassword);
+                if (!result.Success)
+                {
+                    return new BooleanResult { Success = false, Message = "Password change failed: Invalid LDAP username or password." };
+                }
+
+                // Set the new password
+                serv.SetPassword(cpInfo.Username, cpInfo.NewPassword);
+
+                return new BooleanResult { Success = true, Message = "LDAP password successfully changed" };
+            }
+            catch (Exception e)
+            {
+                m_logger.ErrorFormat("Exception in ChangePassword: {0}", e);
+                return new BooleanResult() { Success = false, Message = "Error in LDAP plugin." };
+            }
+
         }
     }
 }

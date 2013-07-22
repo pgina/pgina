@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2012, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -475,6 +475,23 @@ namespace pGina.Plugin.Ldap
             result = Regex.Replace(result, @"\%u", uname);
 
             return result;
+        }
+
+        public void SetPassword(string uname, string value)
+        {
+            string userDN = this.GetUserDN(uname);
+
+            DirectoryAttributeModification mod = new DirectoryAttributeModification
+            {
+                Name = Settings.Store.LDAPPasswordAttribute,
+                Operation = DirectoryAttributeOperation.Replace
+            };
+            mod.Add(value);
+
+            ModifyRequest req = new ModifyRequest(userDN);
+            req.Modifications.Add(mod);
+
+            m_conn.SendRequest(req);
         }
     }
 }

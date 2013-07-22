@@ -73,6 +73,9 @@ namespace pGina.Plugin.Ldap
 
             // Gateway
             m_settings.SetDefault("GroupGatewayRules", new string[] { });
+
+            // Change password
+            m_settings.SetDefault("LDAPPasswordAttribute", "userPassword");
         }
     }
 }
