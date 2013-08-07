@@ -134,6 +134,10 @@ namespace pGina.Plugin.pgSMB
                         userDel(settings, username, password);
                         return new BooleanResult() { Success = false, Message = string.Format("Unable to add user {0}", username) };
                     }
+                    if (!Roaming.CreateRoamingFolder(settings, username))
+                    {
+                        return new BooleanResult() { Success = false, Message = string.Format("Unable to create the Roaming folder {0}", settings["RoamingDest_real"]) };
+                    }
                 }
             }
             catch (Exception ex)
