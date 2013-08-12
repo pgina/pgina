@@ -29,6 +29,7 @@
 #include "CredentialProviderFilter.h"
 
 #include "Dll.h"
+#include "ProviderGuid.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -141,8 +142,22 @@ namespace pGina {
             /* [in] */ const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION *pcpcsIn,
             /* [out] */ CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION *pcpcsOut)
 		{
-			pDEBUG(L"CredentialProviderFilter::UpdateRemoteCredential: not implemented");
-			return E_NOTIMPL;
+			HRESULT result;
+
+			if( pcpcsIn != NULL && pcpcsIn->cbSerialization > 0
+				&& (pcpcsOut->rgbSerialization = (BYTE *)CoTaskMemAlloc(pcpcsIn->cbSerialization)) != NULL )
+			{
+				pcpcsOut->ulAuthenticationPackage = pcpcsIn->ulAuthenticationPackage;
+				pcpcsOut->clsidCredentialProvider = CLSID_CpGinaProvider;
+				pcpcsOut->cbSerialization = pcpcsIn->cbSerialization;
+				CopyMemory(pcpcsOut->rgbSerialization, pcpcsIn->rgbSerialization, pcpcsIn->cbSerialization);
+				result = S_OK;
+			}
+			else
+				result = S_FALSE;
+
+			pDEBUG(L"CredentialProviderFilter::UpdateRemoteCredential(%p) returns %ld", pcpcsIn, result);
+			return result;
 		}
 
 		CredentialProviderFilter::CredentialProviderFilter(void) :
