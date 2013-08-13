@@ -314,7 +314,7 @@ namespace pGina
 			
 			// If we were given creds via SetSerialization, and they appear complete, then we can 
 			//  make that credential our default and attempt an autologon.
-			if(SerializedCredsAppearComplete())
+			if(SerializedUserNameAvailable() && SerializedPasswordAvailable())
 			{
 				*pdwDefault = 0;
 				*pbAutoLogonWithDefault = TRUE;
@@ -331,13 +331,12 @@ namespace pGina
 
 				pGina::Memory::ObjectCleanupPool cleanup;
 				
-				PWSTR serializedUser = NULL, serializedPass = NULL;
-				if(SerializedCredsAppearComplete())
-				{
-					GetSerializedCredentials(&serializedUser, &serializedPass, NULL);
+				PWSTR serializedUser, serializedPass;
+				GetSerializedCredentials(&serializedUser, &serializedPass, NULL);
+				if(serializedUser != NULL)
 					cleanup.Add(new pGina::Memory::LocalFreeCleanup(serializedUser));
+				if(serializedPass != NULL)
 					cleanup.Add(new pGina::Memory::LocalFreeCleanup(serializedPass));					
-				}
 
 				switch(m_usageScenario)
 				{
@@ -407,47 +406,90 @@ namespace pGina
 			return S_OK;    
 		}
 
-		bool Provider::SerializedCredsAppearComplete()
+		bool Provider::SerializedUserNameAvailable()
 		{
 			// Did we get any creds?
 			if(!m_setSerialization)
 			{
-				pDEBUG(L"SerializedCredsAppearComplete: No serialized creds set");
+				pDEBUG(L"SerializedUserNameAvailable: No serialized creds set");
 				return false;
 			}
 
-			// Can we work out a username and a password at a minimum?
-			if(m_setSerialization->Logon.UserName.Length && m_setSerialization->Logon.UserName.Buffer &&
-				m_setSerialization->Logon.Password.Length && m_setSerialization->Logon.Password.Buffer)
+			// Did we get a username?
+			if(m_setSerialization->Logon.UserName.Length && m_setSerialization->Logon.UserName.Buffer)
 				return true;
 
-			pDEBUG(L"SerializedCredsAppearComplete: couldn't work out username & password");
+			pDEBUG(L"SerializedUserNameAvailable: couldn't work out username");
+			return false;
+		}
+
+		bool Provider::SerializedPasswordAvailable()
+		{
+			// Did we get any creds?
+			if(!m_setSerialization)
+			{
+				pDEBUG(L"SerializedPasswordAvailable: No serialized creds set");
+				return false;
+			}
+
+			// Did we get a password?
+			if(m_setSerialization->Logon.Password.Length && m_setSerialization->Logon.Password.Buffer)
+				return true;
+
+			pDEBUG(L"SerializedPasswordAvailable: couldn't work out password");
+			return false;
+		}
+
+		bool Provider::SerializedDomainNameAvailable()
+		{
+			// Did we get any creds?
+			if(!m_setSerialization)
+			{
+				pDEBUG(L"SerializedDomainNameAvailable: No serialized creds set");
+				return false;
+			}
+
+			// Did we get a domain name?
+			if(m_setSerialization->Logon.LogonDomainName.Length && m_setSerialization->Logon.LogonDomainName.Buffer)
+				return true;
+
+			pDEBUG(L"SerializedDomainNameAvailable: couldn't work out domain name");
 			return false;
 		}
 
 		void Provider::GetSerializedCredentials(PWSTR *username, PWSTR *password, PWSTR *domain)
 		{							
-			if(!SerializedCredsAppearComplete()) return;
-
 			if(username)
 			{
-				*username = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.UserName.Length + sizeof(wchar_t));
-				CopyMemory(*username, m_setSerialization->Logon.UserName.Buffer, m_setSerialization->Logon.UserName.Length);
+				if(SerializedUserNameAvailable())
+				{
+					*username = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.UserName.Length + sizeof(wchar_t));
+					CopyMemory(*username, m_setSerialization->Logon.UserName.Buffer, m_setSerialization->Logon.UserName.Length);
+				}
+				else
+					*username = NULL;
 			}
 
 			if(password)
 			{
-				*password = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.Password.Length + sizeof(wchar_t));
-				CopyMemory(*password, m_setSerialization->Logon.Password.Buffer, m_setSerialization->Logon.Password.Length);
+				if(SerializedPasswordAvailable())
+				{
+					*password = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.Password.Length + sizeof(wchar_t));
+					CopyMemory(*password, m_setSerialization->Logon.Password.Buffer, m_setSerialization->Logon.Password.Length);
+				}
+				else
+					*password = NULL;
 			}
 
 			if(domain)
 			{
-				if(m_setSerialization->Logon.LogonDomainName.Length && m_setSerialization->Logon.LogonDomainName.Buffer)
+				if(SerializedDomainNameAvailable())
 				{
 					*domain = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.LogonDomainName.Length + sizeof(wchar_t));
 					CopyMemory(*domain, m_setSerialization->Logon.LogonDomainName.Buffer, m_setSerialization->Logon.LogonDomainName.Length);
 				}
+				else
+					*domain = NULL;
 			}
 		}
 

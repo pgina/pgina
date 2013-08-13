@@ -466,6 +466,12 @@ namespace pGina
 			if(username != NULL)
 			{				
 				SHStrDupW(username, &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
+
+				// If the username field has focus, hand focus over to the password field
+				if(m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState == CPFIS_FOCUSED) {
+					m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
+					m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
+				}
 			}
 			else if(m_usageScenario == CPUS_UNLOCK_WORKSTATION)
 			{
