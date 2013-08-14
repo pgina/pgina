@@ -312,7 +312,16 @@ namespace pGina.Plugin.pgSMB
                     catch (Exception ex)
                     {
                         m_logger.Debug(ex.Message);
-                        Thread.Sleep(1000);
+                        if (x == Convert.ToUInt32(settings["ConnectRetry"])-1)
+                        {
+                            if (!Connect2share(settings["SMBshare"], null, null, 0, true))
+                                m_logger.WarnFormat("unable to disconnect from {0}", settings["RoamingSource"]);
+                            return false;
+                        }
+                        else
+                        {
+                            Thread.Sleep(1000);
+                        }
                     }
                 }
                 try
