@@ -443,10 +443,10 @@ namespace pGina.Plugin.LocalMachine
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
             try
             {
-                String.IsNullOrEmpty(userInfo.Username);
-                String.IsNullOrEmpty(userInfo.Password);
-                String.IsNullOrEmpty(userInfo.Description);
-                String.IsNullOrEmpty(userInfo.SID.ToString());
+                String.IsNullOrEmpty(userInfo.Username.Length.ToString());
+                String.IsNullOrEmpty(userInfo.Password.Length.ToString());
+                String.IsNullOrEmpty(userInfo.Description.Length.ToString());
+                String.IsNullOrEmpty(userInfo.SID.ToString().Length.ToString());
             }
             catch
             {
