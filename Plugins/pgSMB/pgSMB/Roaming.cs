@@ -316,6 +316,7 @@ namespace pGina.Plugin.pgSMB
                         {
                             if (!Connect2share(settings["SMBshare"], null, null, 0, true))
                                 m_logger.WarnFormat("unable to disconnect from {0}", settings["RoamingSource"]);
+                            ReplaceFileSecurity(ThereIsTheProfile, new IdentityReference[] { new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null) }, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.None, PropagationFlags.None);
                             return false;
                         }
                         else
@@ -588,6 +589,28 @@ namespace pGina.Plugin.pgSMB
             catch (Exception ex)
             {
                 m_logger.ErrorFormat("Unable to SetAccessControl for {0} error {1}", Directory, ex.Message);
+                return false;
+            }
+            return true;
+        }
+
+        private static Boolean ReplaceFileSecurity(string File, IdentityReference[] Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
+        {
+            FileInfo fInfo = new FileInfo(File);
+            FileSecurity fSecurity = fInfo.GetAccessControl();
+
+            try
+            {
+                fSecurity.SetAccessRuleProtection(true, false);
+                foreach (IdentityReference account in Account)
+                {
+                    fSecurity.ResetAccessRule(new FileSystemAccessRule(account, Rights, Inherit, Propagation, ControlType));
+                }
+                fInfo.SetAccessControl(fSecurity);
+            }
+            catch (Exception ex)
+            {
+                m_logger.ErrorFormat("Unable to SetAccessControl for {0} error {1}", File, ex.Message);
                 return false;
             }
             return true;
