@@ -66,7 +66,14 @@ namespace pGina.Plugin.pgSMB
             {
                 if (!Directory.Exists(settings["RoamingSource"]))
                 {
-                    return new BooleanResult() { Success = false, Message = string.Format("Unable to find Directory {0}", settings["RoamingSource"]) };
+                    try
+                    {
+                        Directory.CreateDirectory(settings["RoamingSource"]);
+                    }
+                    catch (Exception ex)
+                    {
+                        m_logger.DebugFormat("CreateDirectory({0}) failed {1}", settings["RoamingSource"], ex.Message);
+                    }
                 }
                 string remote_file = settings["RoamingSource"] + "\\" + settings["Filename"];
                 if (File.Exists(remote_file) || File.Exists(remote_file + ".bak"))
