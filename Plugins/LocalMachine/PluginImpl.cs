@@ -119,7 +119,7 @@ namespace pGina.Plugin.LocalMachine
             try
             {
                 Locker.TryEnterReadLock(-1);
-                if (RunningTasks.Keys.Contains(username))
+                if (RunningTasks.Keys.Contains(username.ToLower()))
                 {
                     m_logger.InfoFormat("LoginUserRequest() logoff in process for {0}", username);
                     return true;
@@ -443,10 +443,10 @@ namespace pGina.Plugin.LocalMachine
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
             try
             {
-                String.IsNullOrEmpty(userInfo.Username);
-                String.IsNullOrEmpty(userInfo.Password);
-                String.IsNullOrEmpty(userInfo.Description);
-                String.IsNullOrEmpty(userInfo.SID.ToString());
+                String.IsNullOrEmpty(userInfo.Username.Length.ToString());
+                String.IsNullOrEmpty(userInfo.Password.Length.ToString());
+                String.IsNullOrEmpty(userInfo.Description.Length.ToString());
+                String.IsNullOrEmpty(userInfo.SID.ToString().Length.ToString());
             }
             catch
             {
@@ -463,7 +463,7 @@ namespace pGina.Plugin.LocalMachine
                     try
                     {
                         Locker.TryEnterWriteLock(-1);
-                        RunningTasks.Add(userInfo.Username, true);
+                        RunningTasks.Add(userInfo.Username.ToLower(), true);
                     }
                     finally
                     {
@@ -531,7 +531,7 @@ namespace pGina.Plugin.LocalMachine
             try
             {
                 Locker.TryEnterWriteLock(-1);
-                RunningTasks.Remove(userInfo.Username);
+                RunningTasks.Remove(userInfo.Username.ToLower());
             }
             finally
             {
