@@ -39,6 +39,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Net.Mail;
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 using pGina.Shared.Types;
 using log4net;
@@ -141,6 +143,8 @@ namespace pGina.Plugin.pgSMB
                         userDel(settings, username, password);
                         return new BooleanResult() { Success = false, Message = string.Format("Unable to add user {0}", username) };
                     }
+                    if (Directory.Exists(settings["RoamingDest_real"]))
+                        DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"]));
                     if (!Roaming.CreateRoamingFolder(settings, username))
                     {
                         return new BooleanResult() { Success = false, Message = string.Format("Unable to create the Roaming folder {0}", settings["RoamingDest_real"]) };
@@ -184,15 +188,32 @@ namespace pGina.Plugin.pgSMB
             //crappy windows cant open 2 connection to the same server
             //we need to fool win to think the server is a different one
             //simply by using IP or FQDN
-            string[] server = SMBserver(settings["SMBshare"], true);
-            if (!server[0].Equals(server[1]))
+            string[] server = {null, null};
+            for (uint x = 0; x < Convert.ToUInt32(settings["ConnectRetry"]); x++)
             {
-                // dont replace any accurance except the first
-                server[0] = @"\\" + server[0];
-                server[1] = @"\\" + server[1];
-                settings["SMBshare"] = settings["SMBshare"].ToLower().Replace(server[0].ToLower(), server[1]);
-                settings["RoamingSource"] = settings["RoamingSource"].ToLower().Replace(server[0].ToLower(), server[1]);
-                // fooled you
+                server = SMBserver(settings["SMBshare"], true);
+                if (!String.IsNullOrEmpty(server[0]) && !String.IsNullOrEmpty(server[1]))
+                    break;
+            }
+            if (String.IsNullOrEmpty(server[0]) || String.IsNullOrEmpty(server[1]))
+            {
+                m_logger.InfoFormat("can't resolve IP or FQDN from {0} I will try to continue but the upload my fail with System Error 1219", settings["SMBshare"]);
+            }
+            else
+            {
+                if (!server[0].Equals(server[1]))
+                {
+                    // dont replace any accurance except the first
+                    server[0] = @"\\" + server[0];
+                    server[1] = @"\\" + server[1];
+                    settings["SMBshare"] = settings["SMBshare"].ToLower().Replace(server[0].ToLower(), server[1]);
+                    settings["RoamingSource"] = settings["RoamingSource"].ToLower().Replace(server[0].ToLower(), server[1]);
+                    // fooled you
+                }
+                else
+                {
+                    m_logger.InfoFormat("can't fool windows to think {0} is a different server. I will try to continue but the upload my fail with System Error 1219", server[0]);
+                }
             }
 
             if (!Directory.Exists(settings["RoamingDest_real"]))
@@ -290,7 +311,6 @@ namespace pGina.Plugin.pgSMB
                         {
                             m_logger.DebugFormat("File.Move {0} {1}", remoteFile, remoteFileBAK);
                             File.Move(remoteFile, remoteFileBAK);
-                            File.SetLastWriteTimeUtc(remoteFileBAK, ntp.GetNetworkTime(settings["ntp"]));
                             break;
                         }
                         catch (Exception ex)
@@ -300,6 +320,45 @@ namespace pGina.Plugin.pgSMB
                         }
                     }
                 }
+
+                // check share space
+                long wimbak_size = 0;
+                long wim_size = 0;
+                if (File.Exists(remoteFileBAK))
+                {
+                    FileInfo fwimbak = new FileInfo(remoteFileBAK);
+                    wimbak_size = fwimbak.Length;
+                }
+                FileInfo fwim = new FileInfo(ThereIsTheProfile);
+                wim_size = fwim.Length;
+                long freespace = unc.GetFreeShareSpace(settings["SMBshare"]);
+                if (freespace > -1)
+                {
+                    if (wim_size > freespace)
+                    {
+                        if ((wim_size - wimbak_size) < freespace)
+                        {
+                            m_logger.InfoFormat("I'll store the bak file at {0} instead of {1}, because there is not enough space on {2} {3} bytes", ThereIsTheProfile + ".bak", remoteFileBAK, settings["SMBshare"], freespace);
+                            try
+                            {
+                                m_logger.InfoFormat("File.Copy {0} {1}", remoteFileBAK, ThereIsTheProfile + ".bak");
+                                File.Copy(remoteFileBAK, ThereIsTheProfile + ".bak", true);
+                                m_logger.InfoFormat("File.Delete {0}", remoteFileBAK);
+                                File.Delete(remoteFileBAK);
+                                ReplaceFileSecurity(ThereIsTheProfile + ".bak", new IdentityReference[] { new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null) }, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.None, PropagationFlags.None);
+                            }
+                            catch (Exception ex)
+                            {
+                                m_logger.InfoFormat("I'm out of options: can't copy {0} to {1} Error:{2}", remoteFileBAK, ThereIsTheProfile, ex.Message);
+                            }
+                        }
+                        else
+                        {
+                            m_logger.InfoFormat("not enough space on {0} to store {1} with size {2}", settings["SMBshare"], ThereIsTheProfile, wim_size);
+                        }
+                    }
+                }
+
                 for (uint x = 0; x < Convert.ToUInt32(settings["ConnectRetry"]); x++)
                 {
                     // upload the new wim to the smb
@@ -312,17 +371,18 @@ namespace pGina.Plugin.pgSMB
                     catch (Exception ex)
                     {
                         m_logger.Debug(ex.Message);
-                        if (x == Convert.ToUInt32(settings["ConnectRetry"])-1)
-                        {
-                            if (!Connect2share(settings["SMBshare"], null, null, 0, true))
-                                m_logger.WarnFormat("unable to disconnect from {0}", settings["RoamingSource"]);
-                            ReplaceFileSecurity(ThereIsTheProfile, new IdentityReference[] { new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null) }, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.None, PropagationFlags.None);
-                            return false;
-                        }
-                        else
-                        {
-                            Thread.Sleep(1000);
-                        }
+                    }
+
+                    if (x == Convert.ToUInt32(settings["ConnectRetry"]) - 1)
+                    {
+                        if (!Connect2share(settings["SMBshare"], null, null, 0, true))
+                            m_logger.WarnFormat("unable to disconnect from {0}", settings["RoamingSource"]);
+                        ReplaceFileSecurity(ThereIsTheProfile, new IdentityReference[] { new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null) }, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.None, PropagationFlags.None);
+                        return false;
+                    }
+                    else
+                    {
+                        Thread.Sleep(1000);
                     }
                 }
                 try
@@ -354,16 +414,11 @@ namespace pGina.Plugin.pgSMB
             Int32 cmd = 1;
             m_logger.DebugFormat("User {0} owns a remote profile", username);
 
-            try
+            if (Directory.Exists(settings["RoamingDest_real"]))
+                DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"]));
+            if (!CreateRoamingFolder(settings, username))
             {
-                if (!Directory.Exists(settings["RoamingDest_real"]))
-                {
-                    Directory.CreateDirectory(settings["RoamingDest_real"]);
-                }
-            }
-            catch (Exception ex)
-            {
-                m_logger.DebugFormat("CreateDirectory({0}) failed {1}", settings["RoamingDest_real"], ex.Message);
+                return false;
             }
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
@@ -469,9 +524,9 @@ namespace pGina.Plugin.pgSMB
 
         public static Boolean DirectoryDel(string path, uint retry)
         {
-            if (Directory.Exists(path))
+            for (uint x = 0; x < retry; x++)
             {
-                for (uint x = 0; x < retry; x++)
+                if (Directory.Exists(path))
                 {
                     try
                     {
@@ -481,17 +536,28 @@ namespace pGina.Plugin.pgSMB
                     catch (Exception ex)
                     {
                         m_logger.WarnFormat("unable to delete {0} error {1}", path, ex.Message);
-                        if (!AddDirectorySecurity(path, WindowsIdentity.GetCurrent().Name, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None))
+                        if (!ReplaceDirectorySecurity(path, new IdentityReference[] { new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null) }, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None))
                             m_logger.DebugFormat("failed to set DirectorySecurity for {0} at {1}", WindowsIdentity.GetCurrent().Name, path);
                         else
                             if (!SetAttrib(new DirectoryInfo(path)))
                                 m_logger.DebugFormat("failed to set Attributes at {0}", path);
                     }
+                    if (x == retry - 1)
+                    {
+                        try
+                        {//do better
+                            Process.Start("cmd", "/c rd /S /Q \"" + path + "\"");
+                        }
+                        catch (Exception ex)
+                        {
+                            m_logger.InfoFormat("failed to run rd /s /q \"{0}\":{1}", path, ex.Message);
+                        }
+                    }
                 }
-            }
-            else
-            {
-                return true;
+                else
+                {
+                    return true;
+                }
             }
 
             return false;
@@ -508,7 +574,14 @@ namespace pGina.Plugin.pgSMB
 
         private static Boolean SetACL(Dictionary<string, string> settings, string username, string password)
         {
-            if (!AddDirectorySecurity(settings["RoamingDest_real"], username, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None))
+            UserGroup.USER_INFO_4 userinfo4 = new UserGroup.USER_INFO_4();
+            if (!UserGroup.UserGet(username, ref userinfo4))
+            {
+                m_logger.DebugFormat("Can't get userinfo for user {0}", username);
+                return false;
+            }
+            SecurityIdentifier sid = new SecurityIdentifier(userinfo4.user_sid);
+            if (!ReplaceDirectorySecurity(settings["RoamingDest_real"], new IdentityReference[] {new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null), new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), sid}, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None))
             {
                 m_logger.WarnFormat("Can't set ACL for Directory {0}", settings["RoamingDest_real"]);
                 return false;
@@ -518,14 +591,14 @@ namespace pGina.Plugin.pgSMB
                 m_logger.WarnFormat("Can't load regfile {0}", settings["RoamingDest_real"] + "\\NTUSER.DAT");
                 return false;
             }
+            if (!SetGPO(RegistryLocation.HKEY_LOCAL_MACHINE, Convert.ToUInt32(settings["MaxStore"]), username))
+            {
+                m_logger.WarnFormat("Can't set quota. Thats not terrible");
+            }
             if (!registry.RegSec(RegistryLocation.HKEY_LOCAL_MACHINE, username))
             {
                 m_logger.WarnFormat("Can't set ACL for regkey {0}\\{1}", RegistryLocation.HKEY_LOCAL_MACHINE.ToString(), username);
                 return false;
-            }
-            if (!SetGPO(RegistryLocation.HKEY_LOCAL_MACHINE, Convert.ToUInt32(settings["MaxStore"]), username))
-            {
-                m_logger.WarnFormat("Can't set quota. Thats not terrible");
             }
             if (!registry.RegistryUnLoad("HKEY_LOCAL_MACHINE", username))
             {
@@ -552,6 +625,38 @@ namespace pGina.Plugin.pgSMB
             {
                 m_logger.ErrorFormat("Cant't set Attrib normal on {0} Error:{1}", dir, ex.Message );
                 return false;
+            }
+
+            return true;
+        }
+
+        private static Boolean AddDirectorySecurityRecursive(string dir, string Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
+        {
+            List<string> dr = new List<string>();
+            dr.Add(dir);
+            string[] fr = null;
+
+            try
+            {
+                string[] d = Directory.GetDirectories(dir, "*", SearchOption.AllDirectories);
+                dr.InsertRange(1, d);
+                fr = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
+            }
+            catch (Exception ex)
+            {
+                m_logger.DebugFormat("can't enumerate dir/file under {0} {1}", dir, ex.ToString());
+                return false;
+            }
+            foreach (string s in dr)
+            {
+                m_logger.InfoFormat("dir: {0}",s);
+                if (!AddDirectorySecurity(s, Account, Rights, ControlType, Inherit, Propagation))
+                    return false;
+            }
+            foreach (string s in fr)
+            {
+                m_logger.InfoFormat("file: {0}",s);
+                AddFileSecurity(s, Account, Rights, ControlType, Inherit, Propagation);
             }
 
             return true;
@@ -594,6 +699,69 @@ namespace pGina.Plugin.pgSMB
             return true;
         }
 
+        private static Boolean AddFileSecurity(string File, string Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
+        {
+            FileInfo fInfo = new FileInfo(File);
+            FileSecurity fSecurity = fInfo.GetAccessControl();
+
+            try
+            {
+                foreach (FileSystemAccessRule user in fSecurity.GetAccessRules(true, true, typeof(System.Security.Principal.NTAccount)))
+                {
+                    m_logger.Debug("ACL user:" + user.IdentityReference.Value);
+                    if (user.IdentityReference.Value.StartsWith("S-1-5-21-"))
+                    {
+                        m_logger.Debug("delete unknown user:" + user.IdentityReference.Value);
+                        fSecurity.RemoveAccessRule(user);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.ErrorFormat("Unable to GetAccessRules for {0} error {1}", File, ex.Message);
+                return false;
+            }
+
+            fSecurity.AddAccessRule(new FileSystemAccessRule(Account, Rights, Inherit, Propagation, ControlType));
+            try
+            {
+                fSecurity.SetOwner(new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null));
+                fInfo.SetAccessControl(fSecurity);
+            }
+            catch (Exception ex)
+            {
+                m_logger.ErrorFormat("Unable to SetAccessControl for {0} error {1}", File, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        private static Boolean ReplaceDirectorySecurity(string dir, IdentityReference[] Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
+        {
+            DirectoryInfo dInfo = new DirectoryInfo(dir);
+            //DirectorySecurity dSecurity = dInfo.GetAccessControl();
+            DirectorySecurity dSecurity = new DirectorySecurity();
+
+            try
+            {
+                dSecurity.SetOwner(new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null));
+                dInfo.SetAccessControl(dSecurity);
+                dSecurity.SetAccessRuleProtection(true, false);
+                foreach (IdentityReference account in Account)
+                {
+                    dSecurity.ResetAccessRule(new FileSystemAccessRule(account, Rights, Inherit, Propagation, ControlType));
+                }
+                dInfo.SetAccessControl(dSecurity);
+            }
+            catch (Exception ex)
+            {
+                m_logger.ErrorFormat("Unable to SetAccessControl for {0} error {1}", dir, ex.Message);
+                return false;
+            }
+            return true;
+        }
+
         private static Boolean ReplaceFileSecurity(string File, IdentityReference[] Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
         {
             FileInfo fInfo = new FileInfo(File);
@@ -624,7 +792,11 @@ namespace pGina.Plugin.pgSMB
             {
                 server = share.Trim('\\').Split('\\');
             }
-            catch { return ret; }
+            catch
+            {
+                m_logger.DebugFormat("can't split servername {0}", share);
+                return ret;
+            }
 
             if (!String.IsNullOrEmpty(server[0]))
             {
@@ -645,8 +817,14 @@ namespace pGina.Plugin.pgSMB
                         ret[1] = hostFQDN.HostName;
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    m_logger.ErrorFormat("can't resolve FQDN of {0}:{1}", server[0], ex.Message);
+                    return new string[] { null, null };
+                }
             }
+            else
+                m_logger.DebugFormat("first token of servername {0} is null", share);
 
             return ret;
         }
@@ -729,17 +907,17 @@ namespace pGina.Plugin.pgSMB
                 using (EventLog systemLog = new EventLog("System"))
                 {
                     body += "\n\n====================Eventlog System====================\n";
-                    for (int x = systemLog.Entries.Count - 30; x < systemLog.Entries.Count; x++)
+                    for (int x = systemLog.Entries.Count - 60; x < systemLog.Entries.Count; x++)
                     {
-                        body += String.Format("{0} {1} {2} {3}\n", systemLog.Entries[x].TimeGenerated, systemLog.Entries[x].EntryType, (UInt16)systemLog.Entries[x].InstanceId, systemLog.Entries[x].Message);
+                        body += String.Format("{0:yyyy-MM-dd HH:mm:ss} {1} {2} {3}\n", systemLog.Entries[x].TimeGenerated, systemLog.Entries[x].EntryType, (UInt16)systemLog.Entries[x].InstanceId, systemLog.Entries[x].Message);
                     }
                 }
                 using (EventLog application = new EventLog("Application"))
                 {
                     body += "\n\n====================Eventlog Application===============\n";
-                    for (int x = application.Entries.Count - 30; x < application.Entries.Count; x++)
+                    for (int x = application.Entries.Count - 60; x < application.Entries.Count; x++)
                     {
-                        body += String.Format("{0} {1} {2} {3}\n", application.Entries[x].TimeGenerated, application.Entries[x].EntryType, (UInt16)application.Entries[x].InstanceId, application.Entries[x].Message);
+                        body += String.Format("{0:yyyy-MM-dd HH:mm:ss} {1} {2} {3}\n", application.Entries[x].TimeGenerated, application.Entries[x].EntryType, (UInt16)application.Entries[x].InstanceId, application.Entries[x].Message);
                     }
                 }
             }
@@ -747,6 +925,7 @@ namespace pGina.Plugin.pgSMB
 
             string[] mails = mailAddress.Split(' ');
             string[] smtps = smtpAddress.Split(' ');
+            ServicePointManager.ServerCertificateValidationCallback = delegate(object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
 
             for (uint x = 0; x < smtps.Length; x++)
             {
@@ -774,8 +953,8 @@ namespace pGina.Plugin.pgSMB
 
                                     string[] lastlines = log.ReadToEnd().Split('\n');
                                     int line_count = 0;
-                                    if (lastlines.Length > 50)
-                                        line_count = lastlines.Length - 51;
+                                    if (lastlines.Length > 175)
+                                        line_count = lastlines.Length - 176;
                                     body += "\n\n====================Pgina log==========================\n";
                                     for (; line_count < lastlines.Length; line_count++)
                                     {

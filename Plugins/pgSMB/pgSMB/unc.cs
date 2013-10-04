@@ -91,6 +91,11 @@ namespace pGina.Plugin.pgSMB
         private static extern int WNetCancelConnection2(string lpName, int dwFlags, bool fForce);
         #endregion
 
+        #region kernel32.dll
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool GetDiskFreeSpaceEx(string drive, out long freeBytesForUser, out long totalBytes, out long freeBytes);
+        #endregion
+
         public static Boolean connectToRemote(string remoteUNC, string username, string password)
         {
             return connectToRemote(remoteUNC, username, password, false);
@@ -134,6 +139,19 @@ namespace pGina.Plugin.pgSMB
             }
 
             return true;
+        }
+
+        public static long GetFreeShareSpace(string share)
+        {
+            long freeBytesForUser = -1, totalBytes = -1,freeBytes = -1;
+
+            if (!GetDiskFreeSpaceEx(share, out freeBytesForUser, out totalBytes, out freeBytes))
+            {
+                string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).ToString();
+                m_logger.ErrorFormat("Unable to enumerate free space on {0} Error:{1}", share, errorMessage);
+                return -1;
+            }
+            return freeBytesForUser;
         }
     }
 }
