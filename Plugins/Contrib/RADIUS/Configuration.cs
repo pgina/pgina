@@ -57,6 +57,7 @@ namespace pGina.Plugin.RADIUS
             Settings.Store.SetEncryptedSetting("SharedSecret", secretTB.Text);
             Settings.Store.Timeout = timeout;
             Settings.Store.Retry = retry;
+            Settings.Store.AllowSessionTimeout = allowSessionTimeoutCB.Checked;
             Settings.Store.UseModifiedName = useModifiedNameCB.Checked;
             Settings.Store.IPSuggestion = ipAddrSuggestionTB.Text.Trim();
             Settings.Store.MachineIdentifier = (int)machineId;
@@ -71,6 +72,7 @@ namespace pGina.Plugin.RADIUS
             secretTB.Text = Settings.Store.GetEncryptedSetting("SharedSecret") ;
             timeoutTB.Text = String.Format("{0:0.00}", (int)Settings.Store.Timeout / 1000.0);
             retryTB.Text = String.Format("{0}", (int)Settings.Store.Retry);
+            allowSessionTimeoutCB.Checked = Settings.Store.AllowSessionTimeout;
             ipAddrSuggestionTB.Text = Settings.Store.IPSuggestion;
             useModifiedNameCB.Checked = Settings.Store.UseModifiedName;
 

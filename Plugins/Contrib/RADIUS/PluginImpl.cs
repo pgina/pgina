@@ -54,8 +54,9 @@ namespace pGina.Plugin.RADIUS
         private string m_defaultDescription = "A RADIUS Authentication and Accounting Plugin";
         private dynamic m_settings = null;
 
-        private Dictionary<string, string> sessionIDs;
-        private Object sessionIDLock;
+        private Dictionary<string, string> m_acctingSessionIDs;
+        private SessionLimiter m_sessionLimiter = null;
+        private Timer m_sessionTimer = null;
 
         public RADIUSPlugin()
         {
@@ -108,7 +109,27 @@ namespace pGina.Plugin.RADIUS
                 RADIUSClient client = GetClient(null); //No session ID is required for auth, only accounting
                 bool result = client.Authenticate(userInfo.Username, userInfo.Password);
                 if (result)
+                {
+                    if (m_settings.AllowSessionTimeout)
+                    {
+                        Packet p = client.lastReceievedPacket;
+                        if (p.getAttributeTypes().Contains(Packet.AttributeType.Session_Timeout))
+                        {   //We have a Session Timeout attribute. 
+                            byte[] bTimeout = client.lastReceievedPacket.getRawAttribute(Packet.AttributeType.Session_Timeout);
+
+                            int seconds = BitConverter.ToInt32(bTimeout, 0);
+                            m_logger.DebugFormat("Setting timeout for {} to {} seconds.", userInfo.Username, seconds);
+
+                            if (m_sessionTimer == null)
+                            {
+                                m_sessionTimer = new Timer(new TimerCallback(SessionLimiterCallback),
+                                    null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(60));
+                            }
+
+                        }
+                    }
                     return new BooleanResult() { Success = result };
+                }
                 return new BooleanResult() { Success = result, Message = "Invalid username or password." };
             }
             catch (RADIUSException re)
@@ -138,9 +159,9 @@ namespace pGina.Plugin.RADIUS
             {
                 //Create a new unique id for this accounting session and store it
                 String sessionId = Guid.NewGuid().ToString();
-                lock (sessionIDLock)
+                lock (m_acctingSessionIDs)
                 {
-                    sessionIDs.Add(username, sessionId);
+                    m_acctingSessionIDs.Add(username, sessionId);
                 }
 
                 //Determine which plugin authenticated the user (if any)
@@ -178,16 +199,27 @@ namespace pGina.Plugin.RADIUS
             {
                 //Check if guid was stored from accounting start request (if not, no point in sending a stop request)
                 string sessionId = null;
-                lock (sessionIDLock)
+                lock (m_acctingSessionIDs)
                 {
-                    sessionId = sessionIDs.ContainsKey(username) ? sessionIDs[username] : null;
+                    sessionId = m_acctingSessionIDs.ContainsKey(username) ? m_acctingSessionIDs[username] : null;
 
                     if (sessionId == null)
                     {
                         m_logger.ErrorFormat("Error sending accounting stop request. No guid available for {0}", username);
                         return;
                     } //Remove the session id since we're logging off
-                    sessionIDs.Remove(username);
+                    m_acctingSessionIDs.Remove(username);
+                }
+
+                if (m_sessionLimiter != null)
+                {
+                    m_sessionLimiter.Remove(changeDescription.SessionId);
+                    if (m_sessionLimiter.Count() == 0)
+                    {
+                        m_sessionTimer.Dispose();
+                        m_sessionTimer = null;
+                    }
+
                 }
 
                 try
@@ -211,8 +243,10 @@ namespace pGina.Plugin.RADIUS
 
         public void Starting() 
         { 
-            sessionIDs = new Dictionary<string, string>();
-            sessionIDLock = new Object();
+            m_acctingSessionIDs = new Dictionary<string, string>();
+            
+            if(m_settings.AllowSessionTimeout)
+                m_sessionLimiter = new SessionLimiter();
         }
         public void Stopping() { }
 
@@ -266,6 +300,15 @@ namespace pGina.Plugin.RADIUS
             if (fallback != null)
                 return fallback.GetAddressBytes();
             return new byte[] { 0, 0, 0, 0 };
+        }
+
+        private void SessionLimiterCallback(object state)
+        {
+            foreach(int sess in m_sessionLimiter.ExpiredSessions()){
+                m_logger.DebugFormat("Logging off session{0}.", sess);
+                bool result = Abstractions.WindowsApi.pInvokes.LogoffSession(sess);
+                m_logger.DebugFormat("Log off {0}.", result ? "successful" : "failed");
+            }
         }
     }
 }

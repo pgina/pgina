@@ -46,18 +46,19 @@
             this.retryTB = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.ipAddressButton = new System.Windows.Forms.RadioButton();
-            this.machineNameButton = new System.Windows.Forms.RadioButton();
             this.bothButton = new System.Windows.Forms.RadioButton();
+            this.machineNameButton = new System.Windows.Forms.RadioButton();
+            this.ipAddressButton = new System.Windows.Forms.RadioButton();
             this.label9 = new System.Windows.Forms.Label();
             this.ipAddrSuggestionTB = new System.Windows.Forms.TextBox();
             this.useModifiedNameCB = new System.Windows.Forms.CheckBox();
+            this.allowSessionTimeoutCB = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(272, 202);
+            this.btnOk.Location = new System.Drawing.Point(272, 222);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 19;
@@ -67,7 +68,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(353, 202);
+            this.btnCancel.Location = new System.Drawing.Point(353, 222);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 20;
@@ -212,16 +213,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Machine Identifier";
             // 
-            // ipAddressButton
+            // bothButton
             // 
-            this.ipAddressButton.AutoSize = true;
-            this.ipAddressButton.Location = new System.Drawing.Point(7, 20);
-            this.ipAddressButton.Name = "ipAddressButton";
-            this.ipAddressButton.Size = new System.Drawing.Size(100, 17);
-            this.ipAddressButton.TabIndex = 0;
-            this.ipAddressButton.TabStop = true;
-            this.ipAddressButton.Text = "IP Address Only";
-            this.ipAddressButton.UseVisualStyleBackColor = true;
+            this.bothButton.AutoSize = true;
+            this.bothButton.Location = new System.Drawing.Point(328, 20);
+            this.bothButton.Name = "bothButton";
+            this.bothButton.Size = new System.Drawing.Size(47, 17);
+            this.bothButton.TabIndex = 2;
+            this.bothButton.TabStop = true;
+            this.bothButton.Text = "Both";
+            this.bothButton.UseVisualStyleBackColor = true;
             // 
             // machineNameButton
             // 
@@ -234,21 +235,21 @@
             this.machineNameButton.Text = "Machine Name Only";
             this.machineNameButton.UseVisualStyleBackColor = true;
             // 
-            // bothButton
+            // ipAddressButton
             // 
-            this.bothButton.AutoSize = true;
-            this.bothButton.Location = new System.Drawing.Point(328, 20);
-            this.bothButton.Name = "bothButton";
-            this.bothButton.Size = new System.Drawing.Size(47, 17);
-            this.bothButton.TabIndex = 2;
-            this.bothButton.TabStop = true;
-            this.bothButton.Text = "Both";
-            this.bothButton.UseVisualStyleBackColor = true;
+            this.ipAddressButton.AutoSize = true;
+            this.ipAddressButton.Location = new System.Drawing.Point(7, 20);
+            this.ipAddressButton.Name = "ipAddressButton";
+            this.ipAddressButton.Size = new System.Drawing.Size(100, 17);
+            this.ipAddressButton.TabIndex = 0;
+            this.ipAddressButton.TabStop = true;
+            this.ipAddressButton.Text = "IP Address Only";
+            this.ipAddressButton.UseVisualStyleBackColor = true;
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(12, 182);
+            this.label9.Location = new System.Drawing.Point(12, 196);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(117, 13);
             this.label9.TabIndex = 17;
@@ -256,7 +257,7 @@
             // 
             // ipAddrSuggestionTB
             // 
-            this.ipAddrSuggestionTB.Location = new System.Drawing.Point(135, 179);
+            this.ipAddrSuggestionTB.Location = new System.Drawing.Point(135, 193);
             this.ipAddrSuggestionTB.Name = "ipAddrSuggestionTB";
             this.ipAddrSuggestionTB.Size = new System.Drawing.Size(118, 20);
             this.ipAddrSuggestionTB.TabIndex = 18;
@@ -264,18 +265,29 @@
             // useModifiedNameCB
             // 
             this.useModifiedNameCB.AutoSize = true;
-            this.useModifiedNameCB.Location = new System.Drawing.Point(12, 153);
+            this.useModifiedNameCB.Location = new System.Drawing.Point(15, 176);
             this.useModifiedNameCB.Name = "useModifiedNameCB";
             this.useModifiedNameCB.Size = new System.Drawing.Size(207, 17);
             this.useModifiedNameCB.TabIndex = 16;
             this.useModifiedNameCB.Text = "Use modified username for accounting";
             this.useModifiedNameCB.UseVisualStyleBackColor = true;
             // 
+            // allowSessionTimeoutCB
+            // 
+            this.allowSessionTimeoutCB.AutoSize = true;
+            this.allowSessionTimeoutCB.Location = new System.Drawing.Point(15, 153);
+            this.allowSessionTimeoutCB.Name = "allowSessionTimeoutCB";
+            this.allowSessionTimeoutCB.Size = new System.Drawing.Size(126, 17);
+            this.allowSessionTimeoutCB.TabIndex = 21;
+            this.allowSessionTimeoutCB.Text = "Allow session timeout";
+            this.allowSessionTimeoutCB.UseVisualStyleBackColor = true;
+            // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(442, 231);
+            this.ClientSize = new System.Drawing.Size(442, 253);
+            this.Controls.Add(this.allowSessionTimeoutCB);
             this.Controls.Add(this.useModifiedNameCB);
             this.Controls.Add(this.ipAddrSuggestionTB);
             this.Controls.Add(this.label9);
@@ -335,5 +347,6 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox ipAddrSuggestionTB;
         private System.Windows.Forms.CheckBox useModifiedNameCB;
+        private System.Windows.Forms.CheckBox allowSessionTimeoutCB;
     }
 }
