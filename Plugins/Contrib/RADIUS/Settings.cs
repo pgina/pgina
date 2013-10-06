@@ -28,6 +28,7 @@ namespace pGina.Plugin.RADIUS
             m_settings.SetDefault("Timeout", 2500); //in ms
             m_settings.SetDefault("Retry", 3);
             m_settings.SetDefault("MachineIdentifier", (int)MachineIdentifier.IP_Address);
+            m_settings.SetDefault("AllowSessionTimeout", false);
             m_settings.SetDefault("UseModifiedName", false);
             m_settings.SetDefault("IPSuggestion", "");
             

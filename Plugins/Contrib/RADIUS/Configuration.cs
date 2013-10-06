@@ -57,6 +57,7 @@ namespace pGina.Plugin.RADIUS
             Settings.Store.SetEncryptedSetting("SharedSecret", secretTB.Text);
             Settings.Store.Timeout = timeout;
             Settings.Store.Retry = retry;
+            Settings.Store.AllowSessionTimeout = allowSessionTimeoutCB.Checked;
             Settings.Store.UseModifiedName = useModifiedNameCB.Checked;
             Settings.Store.IPSuggestion = ipAddrSuggestionTB.Text.Trim();
             Settings.Store.MachineIdentifier = (int)machineId;
