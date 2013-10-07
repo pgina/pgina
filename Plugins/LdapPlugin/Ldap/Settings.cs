@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2012, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -74,7 +74,11 @@ namespace pGina.Plugin.Ldap
             m_settings.SetDefault("GroupGatewayRules", new string[] { });
 
             // Change password
-            m_settings.SetDefault("LDAPPasswordAttribute", "userPassword");
+            m_settings.SetDefault("ChangePasswordAttributes",
+                new string[] { 
+                    new PasswordAttributeEntry { Name = "userPassword", Method = HashMethod.SHA1 }.ToRegistryString()
+                }
+            );
         }
     }
 }

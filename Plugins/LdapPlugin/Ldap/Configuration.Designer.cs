@@ -86,11 +86,17 @@
             this.gatewayLocalGroupTB = new System.Windows.Forms.TextBox();
             this.gatewayRulesListBox = new System.Windows.Forms.ListBox();
             this.addGatewayGroupRuleButton = new System.Windows.Forms.Button();
+            this.tabPageChangePassword = new System.Windows.Forms.TabPage();
+            this.changePasswordDeleteAttribBtn = new System.Windows.Forms.Button();
+            this.label9 = new System.Windows.Forms.Label();
+            this.passwordAttributesDGV = new System.Windows.Forms.DataGridView();
             this.ldapServerGroupBox.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.authTabPage.SuspendLayout();
             this.authzTabPage.SuspendLayout();
             this.gatewayTabPage.SuspendLayout();
+            this.tabPageChangePassword.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.passwordAttributesDGV)).BeginInit();
             this.SuspendLayout();
             // 
             // saveButton
@@ -449,7 +455,8 @@
             this.tabControl1.Controls.Add(this.authTabPage);
             this.tabControl1.Controls.Add(this.authzTabPage);
             this.tabControl1.Controls.Add(this.gatewayTabPage);
-            this.tabControl1.Location = new System.Drawing.Point(12, 198);
+            this.tabControl1.Controls.Add(this.tabPageChangePassword);
+            this.tabControl1.Location = new System.Drawing.Point(12, 234);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(670, 260);
@@ -688,6 +695,46 @@
             this.addGatewayGroupRuleButton.UseVisualStyleBackColor = true;
             this.addGatewayGroupRuleButton.Click += new System.EventHandler(this.addGatewayGroupRuleButton_Click);
             // 
+            // tabPageChangePassword
+            // 
+            this.tabPageChangePassword.Controls.Add(this.changePasswordDeleteAttribBtn);
+            this.tabPageChangePassword.Controls.Add(this.label9);
+            this.tabPageChangePassword.Controls.Add(this.passwordAttributesDGV);
+            this.tabPageChangePassword.Location = new System.Drawing.Point(4, 22);
+            this.tabPageChangePassword.Name = "tabPageChangePassword";
+            this.tabPageChangePassword.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageChangePassword.Size = new System.Drawing.Size(662, 234);
+            this.tabPageChangePassword.TabIndex = 3;
+            this.tabPageChangePassword.Text = "Change Password";
+            this.tabPageChangePassword.UseVisualStyleBackColor = true;
+            // 
+            // changePasswordDeleteAttribBtn
+            // 
+            this.changePasswordDeleteAttribBtn.Location = new System.Drawing.Point(577, 195);
+            this.changePasswordDeleteAttribBtn.Name = "changePasswordDeleteAttribBtn";
+            this.changePasswordDeleteAttribBtn.Size = new System.Drawing.Size(77, 27);
+            this.changePasswordDeleteAttribBtn.TabIndex = 2;
+            this.changePasswordDeleteAttribBtn.Text = "Remove";
+            this.changePasswordDeleteAttribBtn.UseVisualStyleBackColor = true;
+            this.changePasswordDeleteAttribBtn.Click += new System.EventHandler(this.changePasswordDeleteAttribBtn_Click);
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(6, 3);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(103, 13);
+            this.label9.TabIndex = 1;
+            this.label9.Text = "Password Attributes:";
+            // 
+            // passwordAttributesDGV
+            // 
+            this.passwordAttributesDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.passwordAttributesDGV.Location = new System.Drawing.Point(6, 19);
+            this.passwordAttributesDGV.Name = "passwordAttributesDGV";
+            this.passwordAttributesDGV.Size = new System.Drawing.Size(648, 170);
+            this.passwordAttributesDGV.TabIndex = 0;
+            // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -708,6 +755,9 @@
             this.authzTabPage.PerformLayout();
             this.gatewayTabPage.ResumeLayout(false);
             this.gatewayTabPage.PerformLayout();
+            this.tabPageChangePassword.ResumeLayout(false);
+            this.tabPageChangePassword.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.passwordAttributesDGV)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -770,5 +820,11 @@
         private System.Windows.Forms.TextBox gatwayRemoteGroupTB;
         private System.Windows.Forms.CheckBox authzRequireAuthCB;
         private System.Windows.Forms.CheckBox authzAllowOnErrorCB;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.ComboBox DereferenceComboBox;
+        private System.Windows.Forms.TabPage tabPageChangePassword;
+        private System.Windows.Forms.DataGridView passwordAttributesDGV;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Button changePasswordDeleteAttribBtn;
     }
 }

@@ -384,8 +384,15 @@ namespace pGina.Plugin.Ldap
                     return new BooleanResult { Success = false, Message = "Password change failed: Invalid LDAP username or password." };
                 }
 
-                // Set the new password
-                serv.SetPassword(cpInfo.Username, cpInfo.NewPassword);
+                // Set the password attributes
+                List<PasswordAttributeEntry> attribs = CPAttributeSettings.Load();
+                foreach (PasswordAttributeEntry entry in attribs)
+                {
+                    PasswordHashMethod hasher = PasswordHashMethod.methods[entry.Method];
+
+                    m_logger.DebugFormat("Setting attribute {0} using hash method {1}", entry.Name, hasher.Name);
+                    serv.SetUserAttribute(cpInfo.Username, entry.Name, hasher.hash(cpInfo.NewPassword));
+                }
 
                 return new BooleanResult { Success = true, Message = "LDAP password successfully changed" };
             }

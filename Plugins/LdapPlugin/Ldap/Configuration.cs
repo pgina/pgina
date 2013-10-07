@@ -49,12 +49,48 @@ namespace pGina.Plugin.Ldap
         public Configuration()
         {
             InitializeComponent();
-
+            
+            InitUI();
             LoadSettings();
             UpdateSslElements();
             UpdateAuthenticationElements();
 
             this.gatewayRuleGroupMemberCB.SelectedIndex = 0;
+        }
+
+        private void InitUI()
+        {
+            this.passwordAttributesDGV.RowHeadersVisible = true;
+            this.passwordAttributesDGV.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            this.passwordAttributesDGV.MultiSelect = false;
+            this.passwordAttributesDGV.AllowUserToAddRows = true;
+
+            this.passwordAttributesDGV.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                Name = "Attribute Name",
+                DataPropertyName = "Name",
+                HeaderText = "Attribute Name",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                ReadOnly = false
+            });
+            DataGridViewComboBoxColumn combCol = new DataGridViewComboBoxColumn()
+            {
+                Name = "Hash Method",
+                DataPropertyName = "HashMethod",
+                HeaderText = "Hash Method",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
+                Width = 250,
+                DisplayMember = "Name",
+                ValueMember = "Method",
+            };
+            this.passwordAttributesDGV.DefaultValuesNeeded += passwordAttributesDGV_DefaultValuesNeeded;
+            combCol.Items.AddRange(PasswordHashMethod.methods.Values.ToArray());
+            this.passwordAttributesDGV.Columns.Add(combCol);
+        }
+
+        void passwordAttributesDGV_DefaultValuesNeeded(object sender, DataGridViewRowEventArgs e)
+        {
+            e.Row.Cells[1].Value = HashMethod.PLAIN;
         }
 
         private void LoadSettings()
@@ -151,6 +187,12 @@ namespace pGina.Plugin.Ldap
             List<GroupGatewayRule> gwLst = GroupRuleLoader.GetGatewayRules();
             foreach (GroupGatewayRule rule in gwLst)
                 this.gatewayRulesListBox.Items.Add(rule);
+
+            ////////////// Change Password tab ///////////////
+            List<PasswordAttributeEntry> attribs = CPAttributeSettings.Load();
+
+            foreach(PasswordAttributeEntry entry in attribs)
+                this.passwordAttributesDGV.Rows.Add( entry.Name, entry.Method );
         }
 
         private void sslCertFileBrowseButton_Click(object sender, EventArgs e)
@@ -349,6 +391,27 @@ namespace pGina.Plugin.Ldap
                 m_logger.DebugFormat("Saving rule: {0}", item);
             }
             GroupRuleLoader.SaveGatewayRules(gwList);
+
+            // Change Password
+            List<PasswordAttributeEntry> entries = new List<PasswordAttributeEntry>();
+            foreach (DataGridViewRow row in this.passwordAttributesDGV.Rows)
+            {
+                if (row.Cells[0].Value != null && row.Cells[1].Value != null)
+                {
+                    string attribName = row.Cells[0].Value.ToString();
+                    if (!string.IsNullOrEmpty(attribName))
+                    {
+                        PasswordAttributeEntry entry = new PasswordAttributeEntry
+                        {
+                            Name = attribName,
+                            Method = (HashMethod)(row.Cells[1].Value)
+                        };
+                        entries.Add(entry);
+                    }
+                }
+                
+            }
+            CPAttributeSettings.Save(entries);
         }
 
         private void showPwCB_CheckedChanged(object sender, EventArgs e)
@@ -467,6 +530,12 @@ namespace pGina.Plugin.Ldap
             }
         }
 
-
+        private void changePasswordDeleteAttribBtn_Click(object sender, EventArgs e)
+        {
+            if (this.passwordAttributesDGV.SelectedRows.Count > 0)
+            {
+                this.passwordAttributesDGV.Rows.Remove(this.passwordAttributesDGV.SelectedRows[0]);
+            }
+        }
     }
 }
