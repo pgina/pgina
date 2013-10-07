@@ -34,6 +34,9 @@
     <Reference Include="Abstractions">
       <HintPath>..\..\..\SDK\Abstractions.dll</HintPath>
     </Reference>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>..\..\..\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\..\..\SDK\log4net.dll</HintPath>
     </Reference>
@@ -54,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CPAttributeSettings.cs" />
     <Compile Include="Configuration.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -62,6 +66,7 @@
     </Compile>
     <Compile Include="GroupRules.cs" />
     <Compile Include="LdapServer.cs" />
+    <Compile Include="PasswordHashMethod.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

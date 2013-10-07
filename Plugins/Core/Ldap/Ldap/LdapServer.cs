@@ -477,13 +477,13 @@ namespace pGina.Plugin.Ldap
             return result;
         }
 
-        public void SetPassword(string uname, string value)
+        public void SetUserAttribute(string uname, string attribute, string value)
         {
             string userDN = this.GetUserDN(uname);
 
             DirectoryAttributeModification mod = new DirectoryAttributeModification
             {
-                Name = Settings.Store.LDAPPasswordAttribute,
+                Name = attribute,
                 Operation = DirectoryAttributeOperation.Replace
             };
             mod.Add(value);

@@ -38,7 +38,7 @@ using pGina.Shared.Settings;
 
 namespace pGina.Plugin.Sample
 {
-    public class SimplePlugin : IPluginConfiguration, IPluginAuthentication
+    public class SimplePlugin : IPluginConfiguration, IPluginAuthentication, IPluginChangePassword
     {
         private ILog m_logger = LogManager.GetLogger("SimplePlugin");
         public static Guid SimpleUuid = new Guid("{16FC47C0-F17B-4D99-A820-EDBF0B0C764A}");
@@ -114,5 +114,10 @@ namespace pGina.Plugin.Sample
 
         public void Starting() { }
         public void Stopping() { }
+
+        public BooleanResult ChangePassword(ChangePasswordInfo cpInfo, ChangePasswordPluginActivityInfo pluginInfo)
+        {
+            return new BooleanResult() { Success = true, Message = "Success from the sample plugin" };
+        }
     }
 }
