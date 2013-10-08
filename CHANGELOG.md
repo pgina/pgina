@@ -1,3 +1,12 @@
+3.2.0.0 BETA (2013/10/17)
+---------------------------
+ - Support for changing passwords (#26)
+ - Change password plugin support: LDAP and LocalMachine
+ - Accepts credentials from RDP clients (#208) (weiss)
+ - RADIUS plugin: support for multiple servers (#205) (weiss)
+ - LDAP plugin: support for dereferencing
+ - Switch to IDictionary in RPC 
+
 3.1.8.0 (2013/06/03)
 ---------------------------
  - First stable release for 3.1
