@@ -19,8 +19,12 @@ namespace pGina.Plugin.RADIUS
         {
             InitializeComponent();
             secretTB.UseSystemPasswordChar = true;
+            sendNasIdentifierCB.CheckedChanged += cbDisableTBInput;
+            sendCalledStationCB.CheckedChanged += cbDisableTBInput;
+
             load();
         }
+
 
 
         private bool save()
@@ -45,11 +49,24 @@ namespace pGina.Plugin.RADIUS
                 return false;
             }
 
-            MachineIdentifier machineId = MachineIdentifier.IP_Address;
-            if (machineNameButton.Checked) 
-                machineId = MachineIdentifier.Machine_Name;
-            else if (bothButton.Checked) 
-                machineId = MachineIdentifier.Both;
+            if (!sendNasIpAddrCB.Checked && !sendNasIdentifierCB.Checked)
+            {
+                MessageBox.Show("Send NAS IP Address or Send NAS Identifier must be checked under Authentication Options");
+                return false;
+            }
+
+            if (sendNasIdentifierCB.Checked && String.IsNullOrEmpty(sendNasIdentifierTB.Text.Trim()))
+            {
+                MessageBox.Show("NAS Identifier can not be blank if the option is enabled.");
+                return false;
+            }
+
+            if (sendCalledStationCB.Checked && String.IsNullOrEmpty(sendCalledStationTB.Text.Trim()))
+            {
+                MessageBox.Show("Called-Station-ID can not be blank if the option is enabled.");
+                return false;
+            }
+
 
             Settings.Store.Server = serverTB.Text.Trim();
             Settings.Store.AuthPort = authport;
@@ -57,10 +74,21 @@ namespace pGina.Plugin.RADIUS
             Settings.Store.SetEncryptedSetting("SharedSecret", secretTB.Text);
             Settings.Store.Timeout = timeout;
             Settings.Store.Retry = retry;
-            Settings.Store.AllowSessionTimeout = allowSessionTimeoutCB.Checked;
+
+            Settings.Store.SendNASIPAddress = sendNasIpAddrCB.Checked;
+            Settings.Store.SendNASIdentifier = sendNasIdentifierCB.Checked;
+            Settings.Store.NASIdentifier = sendNasIdentifierTB.Text.Trim();
+            Settings.Store.SendCalledStationID = sendCalledStationCB.Checked;
+            Settings.Store.CalledStationID = sendCalledStationTB.Text.Trim();
+
+            Settings.Store.SendInterimUpdates = sendInterimUpdatesCB.Checked;
+
+            Settings.Store.AllowSessionTimeout = sessionTimeoutCB.Checked;
+            Settings.Store.WisprSessionTerminate = wisprTimeoutCB.Checked;
+            
             Settings.Store.UseModifiedName = useModifiedNameCB.Checked;
             Settings.Store.IPSuggestion = ipAddrSuggestionTB.Text.Trim();
-            Settings.Store.MachineIdentifier = (int)machineId;
+
             return true;
         }
 
@@ -72,17 +100,26 @@ namespace pGina.Plugin.RADIUS
             secretTB.Text = Settings.Store.GetEncryptedSetting("SharedSecret") ;
             timeoutTB.Text = String.Format("{0:0.00}", (int)Settings.Store.Timeout / 1000.0);
             retryTB.Text = String.Format("{0}", (int)Settings.Store.Retry);
-            allowSessionTimeoutCB.Checked = Settings.Store.AllowSessionTimeout;
+
+            sendNasIdentifierCB.Checked = Settings.Store.SendNASIPAddress;
+            sendNasIdentifierCB.Checked = Settings.Store.SendNASIdentifier;
+            sendNasIdentifierTB.Text = Settings.Store.NASIdentifier;
+            sendCalledStationCB.Checked = Settings.Store.SendCalledStationID;
+            sendCalledStationTB.Text = Settings.Store.CalledStationID;
+
+            sendInterimUpdatesCB.Checked = Settings.Store.SendInterimUpdates;
+
+            sessionTimeoutCB.Checked = Settings.Store.AllowSessionTimeout;
+            wisprTimeoutCB.Checked = Settings.Store.WisprSessionTerminate;
+
             ipAddrSuggestionTB.Text = Settings.Store.IPSuggestion;
             useModifiedNameCB.Checked = Settings.Store.UseModifiedName;
+        }
 
-            MachineIdentifier mid = (MachineIdentifier)((int)Settings.Store.MachineIdentifier);
-            if (mid == MachineIdentifier.IP_Address)
-                ipAddressButton.Checked = true;
-            else if (mid == MachineIdentifier.Machine_Name)
-                machineNameButton.Checked = true;
-            else
-                bothButton.Checked = true;
+        private void cbDisableTBInput(object sender, EventArgs e)
+        {
+            sendNasIdentifierTB.Enabled = sendNasIdentifierCB.Checked;
+            sendCalledStationTB.Enabled = sendCalledStationCB.Checked;
         }
 
         private void btnOk_Click(object sender, EventArgs e)
@@ -102,6 +139,12 @@ namespace pGina.Plugin.RADIUS
         private void showSecretChanged(object sender, EventArgs e)
         {
             secretTB.UseSystemPasswordChar = !showSecretCB.Checked;
+        }
+
+
+        private void Configuration_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

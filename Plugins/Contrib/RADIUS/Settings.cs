@@ -27,8 +27,19 @@ namespace pGina.Plugin.RADIUS
             m_settings.SetDefaultEncryptedSetting("SharedSecret", "");
             m_settings.SetDefault("Timeout", 2500); //in ms
             m_settings.SetDefault("Retry", 3);
-            m_settings.SetDefault("MachineIdentifier", (int)MachineIdentifier.IP_Address);
+
+            m_settings.SetDefault("SendNASIPAddress", true);
+            m_settings.SetDefault("SendNASIdentifier", true);
+            m_settings.SetDefault("NASIdentifier", "%computername");
+            m_settings.SetDefault("SendCalledStationID", false);
+            m_settings.SetDefault("CalledStationID", "%macaddr");
+
+            m_settings.SetDefault("SendInterimUpdates", false);
+
             m_settings.SetDefault("AllowSessionTimeout", false);
+            m_settings.SetDefault("WisprSessionTerminate", false);
+            
+
             m_settings.SetDefault("UseModifiedName", false);
             m_settings.SetDefault("IPSuggestion", "");
             

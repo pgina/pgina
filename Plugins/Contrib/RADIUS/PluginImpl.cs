@@ -32,6 +32,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Sockets;
+using System.Net.NetworkInformation;
 
 using log4net;
 
@@ -45,7 +47,21 @@ namespace pGina.Plugin.RADIUS
 
     //TODO: Keep track of sessionID, needs to be unique for each session, but be maintained through auth and accounting
 
-    enum MachineIdentifier { IP_Address = 0, Machine_Name, Both}
+    //Caled-Station-ID - MAC Addr
+    //NAS-Identifier - Customizable
+
+    //Acct-Interim-Interval - radius accting, sends accting updates every x seconds
+
+
+    //Idle-Timeout - Unsure if possible / pgina's responsibility
+    //Session-Timeout = 178518 - Still needs to work correctly
+    //WISPr-Session-Terminate-Time := "2014-03-11T23:59:59"
+
+    //Return server response message
+
+    //(6:02:09 AM) emias: Oooska: Acct-Status-Type isn't set to "Start" or "Stop", but to some invalid values.  And the Acct-Unique-Session-Id isn't identical on login and logout.
+
+    //Select network adapter?
 
     public class RADIUSPlugin : IPluginConfiguration, IPluginAuthentication, IPluginEventNotifications
     {
@@ -125,6 +141,7 @@ namespace pGina.Plugin.RADIUS
                                 m_sessionTimer = new Timer(new TimerCallback(SessionLimiterCallback),
                                     null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(60));
                             }
+                            //m_sessionLimiter.Add(properties.Id, seconds);
 
                         }
                     }
@@ -260,15 +277,21 @@ namespace pGina.Plugin.RADIUS
             string sharedKey = Settings.Store.GetEncryptedSetting("SharedSecret");
             int timeout = Settings.Store.Timeout;
             int retry = Settings.Store.Retry;
-                
-            MachineIdentifier mid = (MachineIdentifier)((int)Settings.Store.MachineIdentifier);
-            byte[] ipAddr = null;
-            string machineName = null;
 
-            if(mid == MachineIdentifier.Machine_Name || mid == MachineIdentifier.Both)
-                machineName = Environment.MachineName;
-            if(mid == MachineIdentifier.IP_Address || mid == MachineIdentifier.Both)
-                ipAddr = getIPAddress();
+
+            byte[] ipAddr = null;
+            string nasIdentifier = null;
+            
+            if((bool)m_settings.Store.SendNASIPAddress)
+                ipAddr = getNetworkInfo().Item1;
+
+            if((bool)m_settings.Store.SendNASIdentifier){
+                nasIdentifier = (String)m_settings.Store.NASIdentifier;
+                nasIdentifier = nasIdentifier.Contains('%') ? replaceSymbols(nasIdentifier) : nasIdentifier;
+            }
+
+
+ 
 
             
             RADIUSClient client = new RADIUSClient(servers, authport, acctport, sharedKey, timeout, retry, sessionId, ipAddr, machineName);
@@ -276,30 +299,44 @@ namespace pGina.Plugin.RADIUS
 
             return client;
         }
+
+        private string replaceSymbols(string str)
+        {
+            Tuple<byte[], string> networkInfo = getNetworkInfo();
+            return str.Replace("%macaddr", networkInfo.Item2)
+                .Replace("%ipaddr", String.Join(".", networkInfo.Item1))
+                .Replace("%computername", Environment.MachineName);
+        }
         
-        //Returns the current IPv4 address
+        //Returns a tuple containing the current IPv4 address and mac address for the adapter
         //If ipAddressRegex is set, this will attempt to return the first address that matches the expression
-        //Otherwise it returns the first viable IP address or 0.0.0.0 if no viable address is found
-        private byte[] getIPAddress()
+        //Otherwise it returns the first viable IP address or 0.0.0.0 if no viable address is found. An empty
+        //string is sent if no mac address is determined.
+        private Tuple<byte[], string> getNetworkInfo()
         {
             string ipAddressRegex = Settings.Store.IPSuggestion;
-            IPAddress[] ipList = Dns.GetHostAddresses("");
-            IPAddress fallback = null;
-            // Grab the first IPv4 address in the list
-            foreach (IPAddress addr in ipList)
-            {
-                if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-                {
-                    if (fallback == null)
-                        fallback = addr; //Grab the first viable IP address as a fallback
-                    if (ipAddressRegex != null && Regex.Match(addr.ToString(), ipAddressRegex).Success)
-                        return addr.GetAddressBytes();
+           
+            //Fallback values
+            byte[] ipAddr = null;
+            string macAddr = null;
+
+            //Check each network adapter. 
+            foreach(NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces()){
+                foreach (UnicastIPAddressInformation ipaddr in nic.GetIPProperties().UnicastAddresses)
+                {   //Check to see if the NIC has any valid IP addresses.
+                    if (ipaddr.Address.AddressFamily == AddressFamily.InterNetwork)
+                        if (String.IsNullOrEmpty(ipAddressRegex) || //IP address, grab first adapter or check if it matches ip regex
+                          Regex.Match(ipaddr.Address.ToString(), ipAddressRegex).Success)
+                            return Tuple.Create(ipaddr.Address.GetAddressBytes(), nic.GetPhysicalAddress().ToString());
+                        else if(ipAddr == null && macAddr == null){ //Fallback, grab info from first device
+                            ipAddr = ipaddr.Address.GetAddressBytes();
+                            macAddr = nic.GetPhysicalAddress().ToString();
+                        }
                 }
             }
-
-            if (fallback != null)
-                return fallback.GetAddressBytes();
-            return new byte[] { 0, 0, 0, 0 };
+            if (ipAddr == null) ipAddr = new byte[] { 0, 0, 0, 0 };
+            if (macAddr == null) macAddr = "";
+            return Tuple.Create(ipAddr, macAddr);
         }
 
         private void SessionLimiterCallback(object state)

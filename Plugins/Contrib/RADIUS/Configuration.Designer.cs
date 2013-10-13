@@ -45,33 +45,42 @@
             this.label7 = new System.Windows.Forms.Label();
             this.retryTB = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.bothButton = new System.Windows.Forms.RadioButton();
-            this.machineNameButton = new System.Windows.Forms.RadioButton();
-            this.ipAddressButton = new System.Windows.Forms.RadioButton();
             this.label9 = new System.Windows.Forms.Label();
             this.ipAddrSuggestionTB = new System.Windows.Forms.TextBox();
             this.useModifiedNameCB = new System.Windows.Forms.CheckBox();
-            this.allowSessionTimeoutCB = new System.Windows.Forms.CheckBox();
-            this.groupBox1.SuspendLayout();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.sendCalledStationTB = new System.Windows.Forms.TextBox();
+            this.sendCalledStationCB = new System.Windows.Forms.CheckBox();
+            this.sendNasIdentifierTB = new System.Windows.Forms.TextBox();
+            this.sendNasIdentifierCB = new System.Windows.Forms.CheckBox();
+            this.sendNasIpAddrCB = new System.Windows.Forms.CheckBox();
+            this.sessionTimeoutCB = new System.Windows.Forms.CheckBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.sendInterimUpdatesCB = new System.Windows.Forms.CheckBox();
+            this.wisprTimeoutCB = new System.Windows.Forms.CheckBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(272, 222);
+            this.btnOk.Location = new System.Drawing.Point(272, 393);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
-            this.btnOk.TabIndex = 19;
+            this.btnOk.TabIndex = 22;
             this.btnOk.Text = "Save";
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(353, 222);
+            this.btnCancel.Location = new System.Drawing.Point(353, 393);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 20;
+            this.btnCancel.TabIndex = 23;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -201,97 +210,168 @@
             this.label8.TabIndex = 9;
             this.label8.Text = "times";
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.bothButton);
-            this.groupBox1.Controls.Add(this.machineNameButton);
-            this.groupBox1.Controls.Add(this.ipAddressButton);
-            this.groupBox1.Location = new System.Drawing.Point(15, 104);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(413, 43);
-            this.groupBox1.TabIndex = 15;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Machine Identifier";
-            // 
-            // bothButton
-            // 
-            this.bothButton.AutoSize = true;
-            this.bothButton.Location = new System.Drawing.Point(328, 20);
-            this.bothButton.Name = "bothButton";
-            this.bothButton.Size = new System.Drawing.Size(47, 17);
-            this.bothButton.TabIndex = 2;
-            this.bothButton.TabStop = true;
-            this.bothButton.Text = "Both";
-            this.bothButton.UseVisualStyleBackColor = true;
-            // 
-            // machineNameButton
-            // 
-            this.machineNameButton.AutoSize = true;
-            this.machineNameButton.Location = new System.Drawing.Point(151, 20);
-            this.machineNameButton.Name = "machineNameButton";
-            this.machineNameButton.Size = new System.Drawing.Size(121, 17);
-            this.machineNameButton.TabIndex = 1;
-            this.machineNameButton.TabStop = true;
-            this.machineNameButton.Text = "Machine Name Only";
-            this.machineNameButton.UseVisualStyleBackColor = true;
-            // 
-            // ipAddressButton
-            // 
-            this.ipAddressButton.AutoSize = true;
-            this.ipAddressButton.Location = new System.Drawing.Point(7, 20);
-            this.ipAddressButton.Name = "ipAddressButton";
-            this.ipAddressButton.Size = new System.Drawing.Size(100, 17);
-            this.ipAddressButton.TabIndex = 0;
-            this.ipAddressButton.TabStop = true;
-            this.ipAddressButton.Text = "IP Address Only";
-            this.ipAddressButton.UseVisualStyleBackColor = true;
-            // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(12, 196);
+            this.label9.Location = new System.Drawing.Point(18, 366);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(117, 13);
-            this.label9.TabIndex = 17;
+            this.label9.TabIndex = 19;
             this.label9.Text = "IP Address Suggestion:";
             // 
             // ipAddrSuggestionTB
             // 
-            this.ipAddrSuggestionTB.Location = new System.Drawing.Point(135, 193);
+            this.ipAddrSuggestionTB.Location = new System.Drawing.Point(130, 363);
             this.ipAddrSuggestionTB.Name = "ipAddrSuggestionTB";
-            this.ipAddrSuggestionTB.Size = new System.Drawing.Size(118, 20);
-            this.ipAddrSuggestionTB.TabIndex = 18;
+            this.ipAddrSuggestionTB.Size = new System.Drawing.Size(98, 20);
+            this.ipAddrSuggestionTB.TabIndex = 20;
             // 
             // useModifiedNameCB
             // 
             this.useModifiedNameCB.AutoSize = true;
-            this.useModifiedNameCB.Location = new System.Drawing.Point(15, 176);
+            this.useModifiedNameCB.Location = new System.Drawing.Point(21, 335);
             this.useModifiedNameCB.Name = "useModifiedNameCB";
             this.useModifiedNameCB.Size = new System.Drawing.Size(207, 17);
-            this.useModifiedNameCB.TabIndex = 16;
+            this.useModifiedNameCB.TabIndex = 18;
             this.useModifiedNameCB.Text = "Use modified username for accounting";
             this.useModifiedNameCB.UseVisualStyleBackColor = true;
             // 
-            // allowSessionTimeoutCB
+            // groupBox2
             // 
-            this.allowSessionTimeoutCB.AutoSize = true;
-            this.allowSessionTimeoutCB.Location = new System.Drawing.Point(15, 153);
-            this.allowSessionTimeoutCB.Name = "allowSessionTimeoutCB";
-            this.allowSessionTimeoutCB.Size = new System.Drawing.Size(126, 17);
-            this.allowSessionTimeoutCB.TabIndex = 21;
-            this.allowSessionTimeoutCB.Text = "Allow session timeout";
-            this.allowSessionTimeoutCB.UseVisualStyleBackColor = true;
+            this.groupBox2.Controls.Add(this.sendCalledStationTB);
+            this.groupBox2.Controls.Add(this.sendCalledStationCB);
+            this.groupBox2.Controls.Add(this.sendNasIdentifierTB);
+            this.groupBox2.Controls.Add(this.sendNasIdentifierCB);
+            this.groupBox2.Controls.Add(this.sendNasIpAddrCB);
+            this.groupBox2.Location = new System.Drawing.Point(15, 104);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(413, 97);
+            this.groupBox2.TabIndex = 15;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Authentication Options";
+            // 
+            // sendCalledStationTB
+            // 
+            this.sendCalledStationTB.Location = new System.Drawing.Point(114, 63);
+            this.sendCalledStationTB.Name = "sendCalledStationTB";
+            this.sendCalledStationTB.Size = new System.Drawing.Size(103, 20);
+            this.sendCalledStationTB.TabIndex = 4;
+            this.sendCalledStationTB.Text = "%macaddr";
+            // 
+            // sendCalledStationCB
+            // 
+            this.sendCalledStationCB.AutoSize = true;
+            this.sendCalledStationCB.Location = new System.Drawing.Point(7, 65);
+            this.sendCalledStationCB.Name = "sendCalledStationCB";
+            this.sendCalledStationCB.Size = new System.Drawing.Size(111, 17);
+            this.sendCalledStationCB.TabIndex = 3;
+            this.sendCalledStationCB.Text = "Called-Station-ID: ";
+            this.sendCalledStationCB.UseVisualStyleBackColor = true;
+            // 
+            // sendNasIdentifierTB
+            // 
+            this.sendNasIdentifierTB.Location = new System.Drawing.Point(101, 42);
+            this.sendNasIdentifierTB.Name = "sendNasIdentifierTB";
+            this.sendNasIdentifierTB.Size = new System.Drawing.Size(116, 20);
+            this.sendNasIdentifierTB.TabIndex = 2;
+            this.sendNasIdentifierTB.Text = "%computername";
+            // 
+            // sendNasIdentifierCB
+            // 
+            this.sendNasIdentifierCB.AutoSize = true;
+            this.sendNasIdentifierCB.Checked = true;
+            this.sendNasIdentifierCB.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.sendNasIdentifierCB.Location = new System.Drawing.Point(7, 44);
+            this.sendNasIdentifierCB.Name = "sendNasIdentifierCB";
+            this.sendNasIdentifierCB.Size = new System.Drawing.Size(97, 17);
+            this.sendNasIdentifierCB.TabIndex = 1;
+            this.sendNasIdentifierCB.Text = "NAS Identifier: ";
+            this.sendNasIdentifierCB.UseVisualStyleBackColor = true;
+            // 
+            // sendNasIpAddrCB
+            // 
+            this.sendNasIpAddrCB.AutoSize = true;
+            this.sendNasIpAddrCB.Checked = true;
+            this.sendNasIpAddrCB.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.sendNasIpAddrCB.Location = new System.Drawing.Point(7, 20);
+            this.sendNasIpAddrCB.Name = "sendNasIpAddrCB";
+            this.sendNasIpAddrCB.Size = new System.Drawing.Size(320, 17);
+            this.sendNasIpAddrCB.TabIndex = 0;
+            this.sendNasIpAddrCB.Text = "Send Host IP Address During Authentication (NAS-IP-Address)";
+            this.sendNasIpAddrCB.UseVisualStyleBackColor = true;
+            // 
+            // sessionTimeoutCB
+            // 
+            this.sessionTimeoutCB.AutoSize = true;
+            this.sessionTimeoutCB.Location = new System.Drawing.Point(7, 19);
+            this.sessionTimeoutCB.Name = "sessionTimeoutCB";
+            this.sessionTimeoutCB.Size = new System.Drawing.Size(140, 17);
+            this.sessionTimeoutCB.TabIndex = 0;
+            this.sessionTimeoutCB.Text = "Enable Session Timeout";
+            this.sessionTimeoutCB.UseVisualStyleBackColor = true;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.sendInterimUpdatesCB);
+            this.groupBox3.Location = new System.Drawing.Point(15, 207);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(413, 46);
+            this.groupBox3.TabIndex = 16;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Accounting Options";
+            // 
+            // sendInterimUpdatesCB
+            // 
+            this.sendInterimUpdatesCB.AutoSize = true;
+            this.sendInterimUpdatesCB.Location = new System.Drawing.Point(7, 20);
+            this.sendInterimUpdatesCB.Name = "sendInterimUpdatesCB";
+            this.sendInterimUpdatesCB.Size = new System.Drawing.Size(128, 17);
+            this.sendInterimUpdatesCB.TabIndex = 0;
+            this.sendInterimUpdatesCB.Text = "Send Interim Updates";
+            this.sendInterimUpdatesCB.UseVisualStyleBackColor = true;
+            // 
+            // wisprTimeoutCB
+            // 
+            this.wisprTimeoutCB.AutoSize = true;
+            this.wisprTimeoutCB.Location = new System.Drawing.Point(6, 42);
+            this.wisprTimeoutCB.Name = "wisprTimeoutCB";
+            this.wisprTimeoutCB.Size = new System.Drawing.Size(173, 17);
+            this.wisprTimeoutCB.TabIndex = 1;
+            this.wisprTimeoutCB.Text = "WISPr Session Terminate Time";
+            this.wisprTimeoutCB.UseVisualStyleBackColor = true;
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.sessionTimeoutCB);
+            this.groupBox4.Controls.Add(this.wisprTimeoutCB);
+            this.groupBox4.Location = new System.Drawing.Point(15, 259);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(413, 70);
+            this.groupBox4.TabIndex = 17;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Timeout Options";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(235, 366);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(89, 13);
+            this.label10.TabIndex = 21;
+            this.label10.Text = "(regex supported)";
             // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(442, 253);
-            this.Controls.Add(this.allowSessionTimeoutCB);
+            this.ClientSize = new System.Drawing.Size(442, 424);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.groupBox4);
+            this.Controls.Add(this.groupBox3);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.useModifiedNameCB);
             this.Controls.Add(this.ipAddrSuggestionTB);
             this.Controls.Add(this.label9);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.retryTB);
             this.Controls.Add(this.label7);
@@ -314,8 +394,13 @@
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "RADIUS Plugin Configuration";
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.Load += new System.EventHandler(this.Configuration_Load);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -340,13 +425,20 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox retryTB;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.RadioButton bothButton;
-        private System.Windows.Forms.RadioButton machineNameButton;
-        private System.Windows.Forms.RadioButton ipAddressButton;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox ipAddrSuggestionTB;
         private System.Windows.Forms.CheckBox useModifiedNameCB;
-        private System.Windows.Forms.CheckBox allowSessionTimeoutCB;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.TextBox sendNasIdentifierTB;
+        private System.Windows.Forms.CheckBox sendNasIdentifierCB;
+        private System.Windows.Forms.CheckBox sendNasIpAddrCB;
+        private System.Windows.Forms.CheckBox sessionTimeoutCB;
+        private System.Windows.Forms.TextBox sendCalledStationTB;
+        private System.Windows.Forms.CheckBox sendCalledStationCB;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.CheckBox sendInterimUpdatesCB;
+        private System.Windows.Forms.CheckBox wisprTimeoutCB;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.Label label10;
     }
 }
