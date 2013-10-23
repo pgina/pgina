@@ -358,16 +358,17 @@ namespace pGina.Plugin.LocalMachine
                     {
                         foreach (string group in limitToGroupList)
                         {
-                            if (!ListedInGroup(group, null, properties))
+                            if (ListedInGroup(group, null, properties))
                             {
-                                return new BooleanResult()
-                                {
-                                    Success = false,
-                                    Message = string.Format("Users group list does not include the required group ({0}), denying access", group)
-                                };
+                                return new BooleanResult() { Success = true };
                             }
                         }
                     }
+                    return new BooleanResult()
+                    {
+                        Success = false,
+                        Message = "User is not a member of one of the required groups, denying access"
+                    };
                 }
 
                 return new BooleanResult() { Success = true };
