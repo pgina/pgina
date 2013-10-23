@@ -65,7 +65,9 @@ namespace pGina
 			__override ~Provider();
 
 			IFACEMETHODIMP GetFieldDescriptorForUi(UI_FIELDS const& fields, DWORD index, CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR **ppcpfd);
-			bool SerializedCredsAppearComplete();
+			bool SerializedUserNameAvailable();
+			bool SerializedPasswordAvailable();
+			bool SerializedDomainNameAvailable();
 			void GetSerializedCredentials(PWSTR *username, PWSTR *password, PWSTR *domain);			
 
 		private:
