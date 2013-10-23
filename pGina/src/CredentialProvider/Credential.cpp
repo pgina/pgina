@@ -215,14 +215,17 @@ namespace pGina
 			   m_fields->fields[dwFieldID].fieldDescriptor.cpft != CPFT_LARGE_TEXT)
 				return E_INVALIDARG;
 
-			PWSTR *currentValue = &m_fields->fields[dwFieldID].wstr;
-			if(*currentValue)
+			if(m_fields->fields[dwFieldID].wstr)
 			{
-				CoTaskMemFree(*currentValue);
-				*currentValue = NULL;
+				CoTaskMemFree(m_fields->fields[dwFieldID].wstr);
+				m_fields->fields[dwFieldID].wstr = NULL;
 			}
 
-			return SHStrDupW(pwz, currentValue);			
+			if(pwz)
+			{
+				return SHStrDupW(pwz, &m_fields->fields[dwFieldID].wstr);
+			}
+			return S_OK;
 		}
 
 		IFACEMETHODIMP Credential::SetCheckboxValue(__in DWORD dwFieldID, __in BOOL bChecked)
