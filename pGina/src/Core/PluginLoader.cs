@@ -50,6 +50,7 @@ namespace pGina.Core
             AuthorizeEnabled     = 1 << 2,
             GatewayEnabled       = 1 << 3,
             NotificationEnabled  = 1 << 4,
+            ChangePasswordEnabled = 1 << 5,
         }
 
         public static string[] PluginDirectories
@@ -293,6 +294,9 @@ namespace pGina.Core
                 return true;
 
             if (typeof(T) == typeof(IPluginLogoffRequestAddTime) && TestMask(mask, State.NotificationEnabled))
+                return true;
+
+            if (typeof(T) == typeof(IPluginChangePassword) && TestMask(mask, State.ChangePasswordEnabled))
                 return true;
 
             return false;

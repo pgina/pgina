@@ -38,18 +38,20 @@ namespace pGina
 	{
 		typedef enum MessageType
 		{
-			Unknown         = 0x00,
-			Hello           = 0x01,
+			Unknown	 = 0x00,
+			Hello	   = 0x01,
 			Disconnect      = 0x02,
-			Ack             = 0x03,
-			Log             = 0x04,
+			Ack	     = 0x03,
+			Log	     = 0x04,
 			LoginRequest    = 0x05,
 			LoginResponse   = 0x06,
 			DynLabelRequest = 0x07,
 			DynLabelResponse= 0x08,
 			LoginInfoChange = 0x09,
 			UserInfoRequest = 0x0a,
-			UserInfoResponse = 0x0b
+			UserInfoResponse = 0x0b,
+			ChangePasswordRequest = 0x0c,
+			ChangePasswordResponse = 0x0d,
 		};
 				
 		class MessageBase 
@@ -71,7 +73,7 @@ namespace pGina
 			}
 
 			MessageType Type() { return m_type; }
-			void        Type(MessageType t) { m_type = t; }
+			void	Type(MessageType t) { m_type = t; }
 			
 		protected:
 			MessageType m_type;
@@ -270,7 +272,7 @@ namespace pGina
 				std::wstring Message() { return m_message; }
 				void		 Message(std::wstring const& v) { m_message = v; }
 
-				bool         Result() { return m_result; }
+				bool	 Result() { return m_result; }
 				void		 Result(bool v) { m_result = v; }
 
 				virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
@@ -449,7 +451,6 @@ namespace pGina
 			std::wstring m_domain;
 		};
 
-
 		class LoginInfoChangeMessage : public LoginRequestMessage
 		{
 			public:				
@@ -494,6 +495,130 @@ namespace pGina
 			private:
 				int m_fromSession;
 				int m_toSession;
+		};
+
+		class ChangePasswordRequestMessage : public MessageBase
+		{
+		public:
+			ChangePasswordRequestMessage()
+			{
+				Type(ChangePasswordRequest);
+				Username(L"");
+				Domain(L"");
+				OldPassword(L"");
+				NewPassword(L"");
+				SessionFromProcessId();
+			}
+
+			ChangePasswordRequestMessage(std::wstring const& username, std::wstring const& domain,
+				std::wstring const& oldPassword, std::wstring const& newPassword)
+			{
+				Type(ChangePasswordRequest);
+				Username(username);
+				Domain(domain);
+				OldPassword(oldPassword);
+				NewPassword(newPassword);
+				SessionFromProcessId();
+			}
+
+			std::wstring const& Username() { return m_username; }
+			void				Username(std::wstring const& v) { m_username = v; }
+
+			std::wstring const& OldPassword() { return m_oldPassword; }
+			void			 OldPassword(std::wstring const& v) { m_oldPassword = v; }
+
+			std::wstring const& NewPassword() { return m_newPassword; }
+			void			 NewPassword(std::wstring const& v) { m_newPassword = v; }
+
+			std::wstring const& Domain() { return m_domain; }
+			void			 Domain(std::wstring const& v) { m_domain = v; }
+
+			DWORD				Session() { return m_session; }
+			void				Session(DWORD const& v) { m_session = v; }
+
+			virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
+			{
+				MessageBase::FromDynamicMessage(msg);
+
+				if(msg->Exists<std::wstring>(L"Username"))
+					Username(msg->Property<std::wstring>(L"Username"));
+
+				if(msg->Exists<std::wstring>(L"Domain"))
+					Domain(msg->Property<std::wstring>(L"Domain"));
+
+				if(msg->Exists<int>(L"Session"))
+					Session(msg->Property<int>(L"Session"));
+
+				if(msg->Exists<std::wstring>(L"OldPassword"))
+					OldPassword(msg->Property<std::wstring>(L"OldPassword"));
+
+				if(msg->Exists<std::wstring>(L"NewPassword"))
+					OldPassword(msg->Property<std::wstring>(L"NewPassword"));
+			}
+
+			virtual pGina::Messaging::Message * ToDynamicMessage()
+			{				
+				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();				
+				msg->Property<std::wstring>(L"Username", Username(), pGina::Messaging::String);
+				msg->Property<std::wstring>(L"Domain", Domain(), pGina::Messaging::String);
+				msg->Property<int>(L"Session", Session(), pGina::Messaging::Integer);
+				msg->Property<std::wstring>(L"OldPassword", OldPassword(), pGina::Messaging::String);
+				msg->Property<std::wstring>(L"NewPassword", NewPassword(), pGina::Messaging::String);
+				return msg;
+			}
+
+		protected:
+			std::wstring m_username;
+			std::wstring m_domain;
+			int m_session;
+			std::wstring m_oldPassword;
+			std::wstring m_newPassword;
+
+		protected:
+			void SessionFromProcessId()
+			{
+				DWORD sessionId = -1;
+				if(ProcessIdToSessionId(GetCurrentProcessId(), &sessionId))
+					Session(sessionId);
+			}
+		};
+
+		class ChangePasswordResponseMessage : public ChangePasswordRequestMessage
+		{
+			public:
+				ChangePasswordResponseMessage()
+				{
+					Type(ChangePasswordResponse);
+				}
+
+				std::wstring Message() { return m_message; }
+				void		 Message(std::wstring const& v) { m_message = v; }
+
+				bool Result() { return m_result; }
+				void		 Result(bool v) { m_result = v; }
+
+				virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
+				{
+					ChangePasswordRequestMessage::FromDynamicMessage(msg);
+
+					if(msg->Exists<std::wstring>(L"Message"))
+						Message(msg->Property<std::wstring>(L"Message"));
+
+					if(msg->Exists<bool>(L"Result"))
+						Result(msg->Property<bool>(L"Result"));
+				}
+
+				virtual pGina::Messaging::Message * ToDynamicMessage()
+				{				
+					pGina::Messaging::Message * msg = ChangePasswordRequestMessage::ToDynamicMessage();				
+					msg->Property<std::wstring>(L"Message", Message(), pGina::Messaging::String);
+					msg->Property<bool>(L"Result", Result(), pGina::Messaging::Boolean);					
+					return msg;
+				}
+
+			private:
+				bool m_result;
+				std::wstring m_message;
 		};
 	}
 }

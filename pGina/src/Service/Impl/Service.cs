@@ -117,7 +117,7 @@ namespace pGina.Service.Impl
                 int maxClients = Core.Settings.Get.MaxClients;
                 m_logger.DebugFormat("Service created - PipeName: {0} MaxClients: {1}", pipeName, maxClients);
                 m_logger.DebugFormat("System Info: {0}", Abstractions.Windows.OsInfo.OsDescription());
-                m_server = new PipeServer(pipeName, maxClients, (Func<dynamic, dynamic>)HandleMessage);
+                m_server = new PipeServer(pipeName, maxClients, (Func<IDictionary<string, object>, IDictionary<string, object>>)HandleMessage);
                 m_logger.DebugFormat("Using plugin directories: ");
                 foreach (string dir in PluginDirectories)
                     m_logger.DebugFormat("  {0}", dir); 
@@ -204,12 +204,12 @@ namespace pGina.Service.Impl
         //  the connection remains open and operations on behalf of this client
         //  should occur in this thread etc.  The current managed thread id 
         //  can be used to differentiate between instances if scope requires.
-        private dynamic HandleMessage(dynamic msg)
+        private IDictionary<string, object> HandleMessage(IDictionary<string, object> msg)
         {
             int instance = Thread.CurrentThread.ManagedThreadId;
             ILog logger = LogManager.GetLogger(string.Format("HandleMessage[{0}]", instance));
 
-            MessageType type = (MessageType)msg.MessageType;
+            MessageType type = (MessageType) Enum.ToObject(typeof (MessageType), msg["MessageType"]);
 
             // Very noisy, not usually worth having on, configurable via "TraceMsgTraffic" boolean
             bool traceMsgTraffic = pGina.Core.Settings.Get.GetSetting("TraceMsgTraffic", false);
@@ -223,22 +223,24 @@ namespace pGina.Service.Impl
                 case MessageType.Disconnect:
                     // We ack, and mark this as LastMessage, which tells the pipe framework
                     //  not to expect further messages
-                    dynamic disconnectAck = new EmptyMessage(MessageType.Ack).ToExpando();  // Ack
-                    disconnectAck.LastMessage = true;
+                    IDictionary<string, object> disconnectAck = new EmptyMessage(MessageType.Ack).ToDict();  // Ack
+                    disconnectAck["LastMessage"] = true; 
                     return disconnectAck;
                 case MessageType.Hello:
-                    return new EmptyMessage(MessageType.Hello).ToExpando();  // Ack with our own hello
+                    return new EmptyMessage(MessageType.Hello).ToDict();  // Ack with our own hello
                 case MessageType.Log:
                     HandleLogMessage(new LogMessage(msg));
-                    return new EmptyMessage(MessageType.Ack).ToExpando();  // Ack
+                    return new EmptyMessage(MessageType.Ack).ToDict();  // Ack
                 case MessageType.LoginRequest:
-                    return HandleLoginRequest(new LoginRequestMessage(msg)).ToExpando();                
+                    return HandleLoginRequest(new LoginRequestMessage(msg)).ToDict();
                 case MessageType.DynLabelRequest:
-                    return HandleDynamicLabelRequest(new DynamicLabelRequestMessage(msg)).ToExpando();
+                    return HandleDynamicLabelRequest(new DynamicLabelRequestMessage(msg)).ToDict();
                 case MessageType.LoginInfoChange:
-                    return HandleLoginInfoChange(new LoginInfoChangeMessage(msg)).ToExpando();
+                    return HandleLoginInfoChange(new LoginInfoChangeMessage(msg)).ToDict();
                 case MessageType.UserInfoRequest:
-                    return HandleUserInfoRequest(new UserInformationRequestMessage(msg)).ToExpando();
+                    return HandleUserInfoRequest(new UserInformationRequestMessage(msg)).ToDict();
+                case MessageType.ChangePasswordRequest:
+                    return HandleChangePasswordRequest(new ChangePasswordRequestMessage(msg)).ToDict();
                 default:
                     return null;                // Unknowns get disconnected
             }
@@ -436,6 +438,69 @@ namespace pGina.Service.Impl
             }
 
             return motd;
+        }
+
+        private ChangePasswordResponseMessage HandleChangePasswordRequest(ChangePasswordRequestMessage msg)
+        {
+            try
+            {
+                m_logger.DebugFormat("Processing ChangePasswordRequest for: {0} domain: {1} session: {2}", msg.Username, msg.Domain, msg.Session);
+
+                SessionProperties properties = m_sessionPropertyCache.Get(msg.Session);
+                UserInformation userinfo = properties.GetTrackedSingle<UserInformation>();
+                userinfo.oldPassword = msg.OldPassword;
+                userinfo.Password = msg.NewPassword;
+                properties.AddTrackedSingle<UserInformation>(userinfo);
+
+                ChangePasswordPluginActivityInfo pluginInfo = new ChangePasswordPluginActivityInfo();
+                pluginInfo.LoadedPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginChangePassword>();
+                BooleanResult finalResult = new BooleanResult { Success = false, Message = "" };
+
+                // One success means the final result is a success, and we return the message from
+                // the last success. Otherwise, we return the message from the last failure.
+                foreach ( IPluginChangePassword plug in PluginLoader.GetOrderedPluginsOfType<IPluginChangePassword>() )
+                {
+                    // Execute the plugin
+                    m_logger.DebugFormat("ChangePassword: executing {0}", plug.Uuid);
+                    BooleanResult pluginResult = plug.ChangePassword(properties, pluginInfo);
+
+                    // Add result to our list of plugin results
+                    pluginInfo.AddResult(plug.Uuid, pluginResult);
+
+                    m_logger.DebugFormat("ChangePassword: result from {0} is {1} message: {2}", plug.Uuid, pluginResult.Success, pluginResult.Message);
+
+                    if (pluginResult.Success)
+                    {
+                        finalResult.Success = true;
+                        finalResult.Message = pluginResult.Message;
+                    }
+                    else
+                    {
+                        userinfo.Password = msg.OldPassword;
+                        properties.AddTrackedSingle<UserInformation>(userinfo);
+
+                        if (!finalResult.Success)
+                        {
+                            finalResult.Message = pluginResult.Message;
+                        }
+                    }
+                }
+
+                m_logger.DebugFormat("ChangePassword: returning final result {0}, message {1}", finalResult.Success, finalResult.Message);
+
+                return new ChangePasswordResponseMessage()
+                {
+                    Result = finalResult.Success,
+                    Message = finalResult.Message,
+                    Username = msg.Username,
+                    Domain = msg.Domain
+                };
+            }
+            catch (Exception e)
+            {
+                m_logger.ErrorFormat("Internal error, unexpected exception while handling change password request: {0}", e);
+                return new ChangePasswordResponseMessage() { Result = false, Message = "Internal error" };
+            }
         }
     }
 }

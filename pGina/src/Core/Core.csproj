@@ -44,6 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Messages\ChangePasswordRequestMessage.cs" />
+    <Compile Include="Messages\ChangePasswordResponseMessage.cs" />
     <Compile Include="Messages\DynamicLabelRequestMessage.cs" />
     <Compile Include="Messages\DynamicLabelResponseMessage.cs" />
     <Compile Include="Messages\EmptyMessage.cs" />

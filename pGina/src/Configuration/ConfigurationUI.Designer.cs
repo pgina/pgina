@@ -69,6 +69,10 @@
             this.btnAdd = new System.Windows.Forms.Button();
             this.lstPluginDirs = new System.Windows.Forms.ListView();
             this.m_pluginOrderTab = new System.Windows.Forms.TabPage();
+            this.groupBox17 = new System.Windows.Forms.GroupBox();
+            this.passwdBtnDown = new System.Windows.Forms.Button();
+            this.passwdBtnUp = new System.Windows.Forms.Button();
+            this.passwdDGV = new System.Windows.Forms.DataGridView();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.gatewayBtnDown = new System.Windows.Forms.Button();
             this.gatewayBtnUp = new System.Windows.Forms.Button();
@@ -156,6 +160,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.m_pluginOrderTab.SuspendLayout();
+            this.groupBox17.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.passwdDGV)).BeginInit();
             this.groupBox8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).BeginInit();
             this.groupBox11.SuspendLayout();
@@ -600,6 +606,7 @@
             // 
             // m_pluginOrderTab
             // 
+            this.m_pluginOrderTab.Controls.Add(this.groupBox17);
             this.m_pluginOrderTab.Controls.Add(this.groupBox8);
             this.m_pluginOrderTab.Controls.Add(this.groupBox11);
             this.m_pluginOrderTab.Controls.Add(this.groupBox2);
@@ -786,6 +793,52 @@
             this.authenticateDGV.Name = "authenticateDGV";
             this.authenticateDGV.Size = new System.Drawing.Size(309, 131);
             this.authenticateDGV.TabIndex = 0;
+            // 
+            // groupBox17
+            // 
+            this.groupBox17.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox17.Controls.Add(this.passwdBtnDown);
+            this.groupBox17.Controls.Add(this.passwdBtnUp);
+            this.groupBox17.Controls.Add(this.passwdDGV);
+            this.groupBox17.Location = new System.Drawing.Point(199, 366);
+            this.groupBox17.Name = "groupBox17";
+            this.groupBox17.Size = new System.Drawing.Size(376, 169);
+            this.groupBox17.TabIndex = 22;
+            this.groupBox17.TabStop = false;
+            this.groupBox17.Text = "Change Password";
+            // 
+            // passwdBtnDown
+            // 
+            this.passwdBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.passwdBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
+            this.passwdBtnDown.Location = new System.Drawing.Point(339, 89);
+            this.passwdBtnDown.Name = "passwdBtnDown";
+            this.passwdBtnDown.Size = new System.Drawing.Size(26, 27);
+            this.passwdBtnDown.TabIndex = 16;
+            this.passwdBtnDown.UseVisualStyleBackColor = true;
+            this.passwdBtnDown.Click += new System.EventHandler(this.passwdBtnDown_Click);
+            // 
+            // passwdBtnUp
+            // 
+            this.passwdBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.passwdBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
+            this.passwdBtnUp.Location = new System.Drawing.Point(339, 56);
+            this.passwdBtnUp.Name = "passwdBtnUp";
+            this.passwdBtnUp.Size = new System.Drawing.Size(26, 27);
+            this.passwdBtnUp.TabIndex = 15;
+            this.passwdBtnUp.UseVisualStyleBackColor = true;
+            this.passwdBtnUp.Click += new System.EventHandler(this.passwdBtnUp_Click);
+            // 
+            // passwdDGV
+            // 
+            this.passwdDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.passwdDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.passwdDGV.Location = new System.Drawing.Point(15, 19);
+            this.passwdDGV.Name = "passwdDGV";
+            this.passwdDGV.Size = new System.Drawing.Size(318, 131);
+            this.passwdDGV.TabIndex = 0;
             // 
             // m_simTab
             // 
@@ -1314,8 +1367,7 @@
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(411, 13);
             this.label18.TabIndex = 6;
-            this.label18.Text = "To disable the built-in Microsoft credential provider, select \"PasswordProvider\" " +
-    "above.";
+            this.label18.Text = "To disable the built-in Microsoft credential provider, select \"PasswordProvider\" above.";
             // 
             // dgvCredProvFilter
             // 
@@ -1420,6 +1472,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pluginsDG)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.m_pluginOrderTab.ResumeLayout(false);
+            this.groupBox17.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.passwdDGV)).EndInit();
             this.groupBox8.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gatewayDGV)).EndInit();
             this.groupBox11.ResumeLayout(false);
@@ -1506,6 +1560,10 @@
         private System.Windows.Forms.Button eventBtnDown;
         private System.Windows.Forms.Button eventBtnUp;
         private System.Windows.Forms.DataGridView eventDGV;
+        private System.Windows.Forms.GroupBox groupBox17;
+        private System.Windows.Forms.Button passwdBtnDown;
+        private System.Windows.Forms.Button passwdBtnUp;
+        private System.Windows.Forms.DataGridView passwdDGV;
         private System.Windows.Forms.Button btnLaunchCredUI;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;

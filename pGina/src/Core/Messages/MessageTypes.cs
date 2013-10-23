@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2012, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,8 @@ namespace pGina.Core.Messages
         DynLabelResponse = 0x08,
         LoginInfoChange = 0x09,
         UserInfoRequest = 0x0a,
-        UserInfoResponse = 0x0b
+        UserInfoResponse = 0x0b,
+        ChangePasswordRequest = 0x0c,
+        ChangePasswordResponse = 0x0d
     }
 }

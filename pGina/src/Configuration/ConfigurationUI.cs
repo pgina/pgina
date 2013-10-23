@@ -80,6 +80,7 @@ namespace pGina.Configuration
         private const string AUTHORIZATION_COLUMN = "Authorization";
         private const string GATEWAY_COLUMN = "Gateway";
         private const string NOTIFICATION_COLUMN = "Notification";
+        private const string PASSWORD_COLUMN = "Change Password";
 
         // Cred Prov Filter data grid view
         private const string CPF_CP_NAME_COLUMN = "Name";
@@ -429,6 +430,7 @@ namespace pGina.Configuration
             InitPluginOrderDGV(this.authorizeDGV);
             InitPluginOrderDGV(this.gatewayDGV);
             InitPluginOrderDGV(this.eventDGV);
+            InitPluginOrderDGV(this.passwdDGV);
             
             // Load order lists from the registry
             LoadPluginOrderListsFromReg();
@@ -497,6 +499,13 @@ namespace pGina.Configuration
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });            
 
+            pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = PASSWORD_COLUMN,
+                HeaderText = "Change Password",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            });
+
             pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 Name = PLUGIN_DESC_COLUMN,
@@ -555,6 +564,9 @@ namespace pGina.Configuration
                     case NOTIFICATION_COLUMN:
                         SyncStateToList(checkBoxState, plug, eventDGV);
                         break;                    
+                    case PASSWORD_COLUMN:
+                        SyncStateToList(checkBoxState, plug, passwdDGV);
+                        break;
                 }                
             }
         }
@@ -624,13 +636,14 @@ namespace pGina.Configuration
 
                     this.m_plugins.Add(p.Uuid.ToString(), p);
                     pluginsDG.Rows.Add(
-                        new object[] { p.Name, false, false, false, false, p.Description, p.Version, p.Uuid.ToString() });
+                        new object[] { p.Name, false, false, false, false, false, p.Description, p.Version, p.Uuid.ToString() });
                     DataGridViewRow row = pluginsDG.Rows[i];
 
                     this.SetupCheckBoxCell<IPluginAuthentication>(row.Cells[AUTHENTICATION_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginAuthorization>(row.Cells[AUTHORIZATION_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginAuthenticationGateway>(row.Cells[GATEWAY_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginEventNotifications>(row.Cells[NOTIFICATION_COLUMN], p);                    
+                    this.SetupCheckBoxCell<IPluginChangePassword>(row.Cells[PASSWORD_COLUMN], p);
                 }
             }
 
@@ -657,6 +670,7 @@ namespace pGina.Configuration
             LoadPluginOrderListFromReg<IPluginAuthenticationGateway>(gatewayDGV);
             LoadPluginOrderListFromReg<IPluginAuthorization>(authorizeDGV);
             LoadPluginOrderListFromReg<IPluginEventNotifications>(eventDGV);            
+            LoadPluginOrderListFromReg<IPluginChangePassword>(passwdDGV);
         }
 
         private void LoadPluginOrderListFromReg<T>(DataGridView grid) where T : class, IPluginBase
@@ -689,6 +703,9 @@ namespace pGina.Configuration
                 
                 if (!row.Cells[NOTIFICATION_COLUMN].ReadOnly)
                     SyncStateToList((bool)row.Cells[NOTIFICATION_COLUMN].Value, plug, eventDGV);                
+
+                if (!row.Cells[PASSWORD_COLUMN].ReadOnly)
+                    SyncStateToList((bool)row.Cells[PASSWORD_COLUMN].Value, plug, passwdDGV);
             }
 
             // Remove any plugins that are no longer in the main list from the
@@ -697,6 +714,7 @@ namespace pGina.Configuration
             this.RemoveAllNotInMainList(authenticateDGV);
             this.RemoveAllNotInMainList(gatewayDGV);
             this.RemoveAllNotInMainList(eventDGV);            
+            this.RemoveAllNotInMainList(passwdDGV);
         }
 
         private void RemoveAllNotInMainList(DataGridView dgv)
@@ -812,7 +830,9 @@ namespace pGina.Configuration
                         mask |= (int)Core.PluginLoader.State.GatewayEnabled;
                     if (Convert.ToBoolean(row.Cells[NOTIFICATION_COLUMN].Value))
                         mask |= (int)Core.PluginLoader.State.NotificationEnabled;
-                    
+                    if (Convert.ToBoolean(row.Cells[PASSWORD_COLUMN].Value))
+                        mask |= (int)Core.PluginLoader.State.ChangePasswordEnabled;
+
                     Core.Settings.Get.SetSetting(p.Uuid.ToString(), mask);
                 }
                 catch (Exception e)
@@ -828,6 +848,7 @@ namespace pGina.Configuration
             SavePluginOrder(authorizeDGV, typeof(IPluginAuthorization));
             SavePluginOrder(gatewayDGV, typeof(IPluginAuthenticationGateway));
             SavePluginOrder(eventDGV, typeof(IPluginEventNotifications));            
+            SavePluginOrder(passwdDGV, typeof(IPluginChangePassword));
         }
 
         private void SavePluginOrder(DataGridView grid, Type pluginType)
@@ -1021,6 +1042,18 @@ namespace pGina.Configuration
                 MoveDown(this.eventDGV, this.eventDGV.SelectedRows[0].Index);
         }
 
+        private void passwdBtnUp_Click(object sender, EventArgs e)
+        {
+            if (this.passwdDGV.SelectedRows.Count > 0)
+                MoveUp(this.passwdDGV, this.passwdDGV.SelectedRows[0].Index);
+        }
+
+        private void passwdBtnDown_Click(object sender, EventArgs e)
+        {
+            if (this.passwdDGV.SelectedRows.Count > 0)
+                MoveDown(this.passwdDGV, this.passwdDGV.SelectedRows[0].Index);
+        }
+
         private void btnLaunchCredUI_Click(object sender, EventArgs e)
         {
             ResetSimUI();
@@ -1063,11 +1096,13 @@ namespace pGina.Configuration
             List<IPluginAuthorization> authzPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthorization>();
             List<IPluginAuthenticationGateway> gatewayPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthenticationGateway>();
             List<IPluginEventNotifications> notePlugins = PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>();
+            List<IPluginChangePassword> passwdPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginChangePassword>();
 
             result.Add("Authentication: " + (string.Join(", ", authPlugins.Select(p => p.Name))));
             result.Add("Authorization: " + (string.Join(", ", authzPlugins.Select(p => p.Name))));
             result.Add("Gateway: " + (string.Join(", ", gatewayPlugins.Select(p => p.Name))));
             result.Add("Notification: " + (string.Join(", ", notePlugins.Select(p => p.Name))));
+            result.Add("Change Password: " + (string.Join(", ", passwdPlugins.Select(p => p.Name))));
             
             return result;
         }
@@ -1143,10 +1178,10 @@ namespace pGina.Configuration
                 string pipeName = Core.Settings.Get.ServicePipeName;
                 PipeClient client = new PipeClient(pipeName);
                 client.Start(
-                    (Func<dynamic, dynamic>)
+                    (Func<IDictionary<string, object>, IDictionary<string, object>>)
                     ((m) =>
-                    {
-                        MessageType type = (MessageType) m.MessageType;
+                        {
+                        MessageType type = (MessageType)Enum.ToObject(typeof(MessageType), m["MessageType"]);
                         
                         // Acceptable server responses are Hello, and LoginResponse                        
                         switch (type)
@@ -1158,7 +1193,7 @@ namespace pGina.Configuration
                                     Username = m_username.Text,
                                     Password = m_password.Text,
                                 };
-                                return requestMsg.ToExpando();                                
+                                return requestMsg.ToDict();
                             case MessageType.LoginResponse:
                                 LoginResponseMessage responseMsg = new LoginResponseMessage(m);
                                 m_usernameResult.Text = responseMsg.Username;
@@ -1170,7 +1205,7 @@ namespace pGina.Configuration
                                     this.simFinalResultMessageTB.Text = responseMsg.Message;
                                 }
                                 // Respond with a disconnect, we're done
-                                return (new EmptyMessage(MessageType.Disconnect).ToExpando());
+                                return (new EmptyMessage(MessageType.Disconnect).ToDict());
                             case MessageType.Ack:   // Ack to our disconnect
                                 return null;    
                             default:
@@ -1178,7 +1213,7 @@ namespace pGina.Configuration
                                 return null;                                
                         }                                                
                     }),
-                (new EmptyMessage(MessageType.Hello)).ToExpando(), 1000);
+                (new EmptyMessage(MessageType.Hello)).ToDict(), 1000);
             }
             catch (Exception e)
             {

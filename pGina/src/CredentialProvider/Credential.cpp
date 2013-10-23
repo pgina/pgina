@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2011, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,7 @@
 #include "TileUiTypes.h"
 #include "TileUiLogon.h"
 #include "TileUiUnlock.h"
+#include "TileUiChangePassword.h"
 #include "SerializationHelpers.h"
 #include "ServiceStateHelper.h"
 #include "ProviderGuid.h"
@@ -65,7 +66,7 @@ namespace pGina
 
 		IFACEMETHODIMP_(ULONG) Credential::AddRef()
 		{
-	        return InterlockedIncrement(&m_referenceCount);
+		return InterlockedIncrement(&m_referenceCount);
 		}
 
 		IFACEMETHODIMP_(ULONG) Credential::Release()
@@ -246,6 +247,7 @@ namespace pGina
 			PWSTR username = FindUsernameValue();			
 			PWSTR password = FindPasswordValue();
 			PWSTR domain = NULL;
+			pGina::Transactions::User::LoginResult loginResult;
 			
 			pGina::Protocol::LoginRequestMessage::LoginReason reason = pGina::Protocol::LoginRequestMessage::Login;
 			switch(m_usageScenario)
@@ -257,7 +259,7 @@ namespace pGina
 					SHStrDupW(L"Your login request failed, because the pGina service is not running!\nOnly useres from the local administrator group are able to login.\n\nPlease contact your system administrator.\nReboot the machine to fix this issue.", ppwszOptionalStatusText);
 					SetStringValue(m_fields->usernameFieldIdx, (PCWSTR)L"");
 					SetStringValue(m_fields->passwordFieldIdx, (PCWSTR)L"");
-				
+
 					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 					*pcpsiOptionalStatusIcon = CPSI_ERROR;
 					return S_FALSE;
@@ -269,6 +271,48 @@ namespace pGina
 			case CPUS_CREDUI:
 				reason = pGina::Protocol::LoginRequestMessage::CredUI;
 				break;
+			case CPUS_CHANGE_PASSWORD:
+				PWSTR newPassword = NULL;
+				PWSTR newPasswordConfirm = NULL;
+				
+				if(m_fields)
+				{
+					newPassword = m_fields->fields[CredProv::CPUIFI_NEW_PASSWORD].wstr;
+					newPasswordConfirm = m_fields->fields[CredProv::CPUIFI_CONFIRM_NEW_PASSWORD].wstr;
+				}
+				
+				// Check that the new password and confirmation are exactly the same, if not
+				// return a failure.
+				if( wcscmp(newPassword, newPasswordConfirm ) != 0 ) {
+					SHStrDupW(L"New passwords do not match", ppwszOptionalStatusText);
+					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
+					*pcpsiOptionalStatusIcon = CPSI_ERROR;
+					return S_FALSE;
+				}
+
+				loginResult = pGina::Transactions::User::ProcessChangePasswordForUser( username, L"", password, newPassword );
+				
+				if( !loginResult.Result() )
+				{
+					if(loginResult.Message().empty())
+					{
+						loginResult.Message(L"Failed to change password, no message from plugins.");
+					}
+					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);
+					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
+					*pcpsiOptionalStatusIcon = CPSI_ERROR;
+					return S_FALSE;
+				}
+
+				if(loginResult.Message().length() > 0)
+					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);
+				else
+					SHStrDupW(L"pGina: Your password was successfully changed", ppwszOptionalStatusText);
+				
+				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
+				*pcpsiOptionalStatusIcon = CPSI_SUCCESS;
+				return S_OK;
+				break;
 			}
 
 			wchar_t title[128] = {};
@@ -276,17 +320,17 @@ namespace pGina
 			HANDLE hThread_dialog = CreateThread(NULL, 0, Credential::Thread_dialog, (LPVOID) title, 0, NULL);
 
 			pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);
-			pGina::Transactions::User::LoginResult loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password, reason);
+			loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password, reason);
 			if(!loginResult.Result())
 			{
-				pERROR(L"Credential::GetSerialization: Failed login");
+				pERROR(L"Credential::GetSerialization: Failed attempt");
 				if(loginResult.Message().length() > 0)
 				{
 					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);					
 				}
 				else
 				{
-					SHStrDupW(L"ProcessLoginForUser failed, but a specific error message was not provided", ppwszOptionalStatusText);
+					SHStrDupW(L"Plugins did not provide a specific error message", ppwszOptionalStatusText);
 				}
 				SetStringValue(m_fields->usernameFieldIdx, (PCWSTR)L"");
 				SetStringValue(m_fields->passwordFieldIdx, (PCWSTR)L"");
@@ -356,7 +400,7 @@ namespace pGina
 					}
 				}
 			}
-			else
+			else if( CPUS_LOGON == m_usageScenario || CPUS_UNLOCK_WORKSTATION == m_usageScenario )
 			{
 				// Init kiul
 				KERB_INTERACTIVE_UNLOCK_LOGON kiul;
@@ -386,8 +430,8 @@ namespace pGina
 						
 			pcpcs->ulAuthenticationPackage = authPackage;
 			pcpcs->clsidCredentialProvider = CLSID_CpGinaProvider;
-			*pcpgsr = CPGSR_RETURN_CREDENTIAL_FINISHED;            
-            
+			*pcpgsr = CPGSR_RETURN_CREDENTIAL_FINISHED;	    
+	    
 			Credential::Thread_dialog_close(hThread_dialog);
 			return S_OK;
 		}
@@ -451,7 +495,7 @@ namespace pGina
 				m_fields->fields[x].fieldStatePair = fields.fields[x].fieldStatePair;
 				m_fields->fields[x].fieldDataSource = fields.fields[x].fieldDataSource;
 				m_fields->fields[x].wstr = NULL;
-				if(fields.fields[x].wstr)
+				if(fields.fields[x].wstr && !IsFieldDynamic(x))
 				{
 					SHStrDup(fields.fields[x].wstr, &m_fields->fields[x].wstr);
 				}
@@ -554,9 +598,10 @@ namespace pGina
 				{
 					if(m_fields->fields[x].wstr)
 					{
-						size_t len = lstrlen(m_fields->fields[x].wstr);
+						size_t len = wcslen(m_fields->fields[x].wstr);
 						SecureZeroMemory(m_fields->fields[x].wstr, len * sizeof(wchar_t));
 						CoTaskMemFree(m_fields->fields[x].wstr);						
+						m_fields->fields[x].wstr = NULL;
 
 						// If we've been advised, we can tell the UI so the UI correctly reflects that this
 						//	field is not set any longer (set it to empty string)

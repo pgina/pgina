@@ -79,6 +79,11 @@ namespace pGina
 					std::wstring Message() { return m_message; }
 					void Message(std::wstring const& v) { m_message = v; }
 
+                                        void Clear() {
+                                                Username(L""); Password(L""); Domain(L"");
+                                                Result(false); Message(L"");
+                                        }
+
 				private:
 					std::wstring m_username;
 					std::wstring m_domain;
@@ -89,6 +94,8 @@ namespace pGina
 
 			static LoginResult ProcessLoginForUser(const wchar_t *username, const wchar_t *domain, const wchar_t *password, pGina::Protocol::LoginRequestMessage::LoginReason reason);
 			static bool LocalLoginForUser(const wchar_t *username, const wchar_t *password);
+
+			static LoginResult ProcessChangePasswordForUser( const wchar_t *username, const wchar_t *domain, const wchar_t *oldPassword, const wchar_t *newPassword ); 
 		};
 
 		/* Generic transaction for receiving some text for a field in the UI. */

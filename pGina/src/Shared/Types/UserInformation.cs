@@ -66,6 +66,11 @@ namespace pGina.Shared.Types
         public string Password { get; set; }
 
         /// <summary>
+        /// The old password
+        /// </summary>
+        public string oldPassword { get; set; }
+
+        /// <summary>
         /// Description of this user
         /// </summary>
         public string Description { get; set; }

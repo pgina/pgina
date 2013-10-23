@@ -83,6 +83,12 @@ namespace pGina
 						case UserInfoResponse:
 							reply = (MessageBase *) (new UserInformationResponseMessage());
 							break;
+						case ChangePasswordRequest:
+							reply = (MessageBase *) (new ChangePasswordRequestMessage());
+							break;
+						case ChangePasswordResponse:
+							reply = (MessageBase *) (new ChangePasswordResponseMessage());
+							break;
 						}
 					}
 
