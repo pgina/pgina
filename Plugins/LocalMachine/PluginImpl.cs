@@ -43,7 +43,7 @@ using pGina.Shared.Types;
 namespace pGina.Plugin.LocalMachine
 {
 
-    public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration, IPluginEventNotifications, IPluginLogoffRequestAddTime
+    public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration, IPluginEventNotifications, IPluginLogoffRequestAddTime, IPluginChangePassword
     {
         // Per-instance logger
         private ILog m_logger = LogManager.GetLogger("LocalMachine");
@@ -151,6 +151,38 @@ namespace pGina.Plugin.LocalMachine
             }
 
             return -1;
+        }
+
+        public BooleanResult ChangePassword(SessionProperties properties, ChangePasswordPluginActivityInfo pluginInfo)
+        {
+            m_logger.Debug("ChangePassword()");
+
+            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+
+            // Verify the old password
+            if (Abstractions.WindowsApi.pInvokes.ValidateCredentials(userInfo.Username, userInfo.oldPassword))
+            {
+                m_logger.DebugFormat("Authenticated via old password: {0}", userInfo.Username);
+            }
+            else
+            {
+                return new BooleanResult { Success = false, Message = "Current password or username is not valid." };
+            }
+
+            using (UserPrincipal user = LocalAccount.GetUserPrincipal(userInfo.Username))
+            {
+                if (user != null)
+                {
+                    m_logger.DebugFormat("Found principal, changing password for {0}", userInfo.Username);
+                    user.SetPassword(userInfo.Password);
+                }
+                else
+                {
+                    return new BooleanResult { Success = false, Message = "Local machine plugin internal error: directory entry not found." };
+                }
+            }
+
+            return new BooleanResult { Success = true, Message = "Local password successfully changed." };
         }
 
         public BooleanResult AuthenticatedUserGateway(SessionProperties properties)
