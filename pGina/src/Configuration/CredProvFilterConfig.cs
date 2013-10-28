@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2012, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -52,10 +52,19 @@ namespace pGina.Configuration
                         {
                             if (cpKey != null)
                             {
-                                CredProv credProv = new CredProv
+                                CredProv credProv = null;
+                                try
                                 {
-                                    Uuid = new Guid(sub)
-                                };
+                                    credProv = new CredProv
+                                    {
+                                        Uuid = new Guid(sub)
+                                    };
+                                }
+                                catch (System.FormatException)
+                                {
+                                    // Ignore entries that are not GUIDs
+                                    continue;
+                                }
 
                                 object name = cpKey.GetValue("");
 
