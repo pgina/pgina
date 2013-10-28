@@ -21,6 +21,9 @@ namespace pGina.Plugin.RADIUS
             m_settings = new pGinaDynamicSettings(RADIUSPlugin.SimpleUuid);
 
             // Set default values for settings (if not already set)
+            m_settings.SetDefault("EnableAuth", true);
+            m_settings.SetDefault("EnableAcct", false);
+            
             m_settings.SetDefault("Server", "");
             m_settings.SetDefault("AuthPort", 1812); //Authentication port
             m_settings.SetDefault("AcctPort", 1813); //Authorization port
@@ -35,6 +38,8 @@ namespace pGina.Plugin.RADIUS
             m_settings.SetDefault("CalledStationID", "%macaddr");
 
             m_settings.SetDefault("SendInterimUpdates", false);
+            m_settings.SetDefault("ForceInterimUpdates", false);
+            m_settings.SetDefault("InterimUpdateTime", 900); //900sec = 15 min
 
             m_settings.SetDefault("AllowSessionTimeout", false);
             m_settings.SetDefault("WisprSessionTerminate", false);

@@ -24,6 +24,7 @@ namespace pGina.Plugin.RADIUS
         public byte[] authenticator { get; private set; }
 
 
+        //This really needs to support multiple attribute types
         private Dictionary<AttributeType, byte[]> avp = new Dictionary<AttributeType, byte[]>();
         private byte[] _avpBytes = null; //Byte representation of dictionary; required to calculate length
         private byte[] avpBytes //Returns a current byte[] representation of AVP dictionary
@@ -81,17 +82,23 @@ namespace pGina.Plugin.RADIUS
                 byte length = data[index++]; //length includes the type and length byte
                 byte[] value = new byte[length - 2];
                 System.Buffer.BlockCopy(data, index, value, 0, value.Length);
-                avp.Add(atype, value);
+                if(!avp.Keys.Contains(atype))  //TEMPORARY WORK AROUND (AVP should be a list instead of a dict)
+                    avp.Add(atype, value);
                 index += value.Length;
             }
 
+        }
+
+        public bool containsAttribute(AttributeType type)
+        {
+            return this.avp.ContainsKey(type);
         }
 
         //Adds the specified attribute type and corresponding string data to AVP list
         public void addAttribute(AttributeType type, string value)
         {
             if (String.IsNullOrEmpty(value))
-                return; //Drop empty string value fields
+                throw new ArgumentException("Value can not be empty");
             addRawAttribute(type, Encoding.UTF8.GetBytes(value));
         }
 
@@ -350,11 +357,11 @@ namespace pGina.Plugin.RADIUS
             Acct_Session_Time, Acct_Input_Packets, Acct_Output_Packets, Acct_Terminate_Cause, Acct_Multi_Session_Id,
             Acct_Link_Count, UNASSIGNED_52, UNASSIGNED_53, UNASSIGNED_54, UNASSIGNED_55,
             UNASSIGNED_56, UNASSIGNED_57, UNASSIGNED_58, UNASSIGNED_59, CHAP_Challenge,
-            NAS_Port_Type, Port_Limit, Login_LAT_Port
+            NAS_Port_Type, Port_Limit, Login_LAT_Port, Acct_Interim_Interval = (byte)84
         };
 
-        public enum Acct_AuthenticType { Not_Specified = 0, RADIUS, Local, Remote }
-        public enum Acct_Status_TypeType { Start = 1, Stop, Interim_Update }
-        public enum Acct_Terminate_CauseType { User_Request = 1, Session_Timeout = 5}
+        public enum Acct_Authentic { Not_Specified = 0, RADIUS, Local, Remote }
+        public enum Acct_Status_Type { Start = 1, Stop, Interim_Update }
+        public enum Acct_Terminate_Cause { User_Request = 1, Idle_Timeout = 4,  Session_Timeout = 5}
     }
 }
