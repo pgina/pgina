@@ -90,7 +90,7 @@ namespace pGina.Plugin.RADIUS
             if (String.IsNullOrEmpty(NAS_Identifier) && NAS_IP_Address == null)
                 throw new RADIUSException("A NAS_Identifier or NAS_IP_Address (or both) must be supplied.");
             if(NAS_IP_Address != null)
-                authPacket.addRawAttribute(Packet.AttributeType.NAS_IP_Address, NAS_IP_Address);
+                authPacket.addAttribute(Packet.AttributeType.NAS_IP_Address, NAS_IP_Address);
             if (!String.IsNullOrEmpty(NAS_Identifier))
                 authPacket.addAttribute(Packet.AttributeType.NAS_Identifier, NAS_Identifier);
             if (!String.IsNullOrEmpty(called_station_id))
@@ -164,7 +164,7 @@ namespace pGina.Plugin.RADIUS
             if (String.IsNullOrEmpty(NAS_Identifier) && NAS_IP_Address == null)
                 throw new RADIUSException("A NAS_Identifier or NAS_IP_Address (or both) must be supplied.");
             if (NAS_IP_Address != null)
-                accountingRequest.addRawAttribute(Packet.AttributeType.NAS_IP_Address, NAS_IP_Address);
+                accountingRequest.addAttribute(Packet.AttributeType.NAS_IP_Address, NAS_IP_Address);
             if (!String.IsNullOrEmpty(NAS_Identifier))
                 accountingRequest.addAttribute(Packet.AttributeType.NAS_Identifier, NAS_Identifier);
 

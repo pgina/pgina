@@ -133,6 +133,9 @@ namespace pGina.Plugin.RADIUS
             // Get user info
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
 
+            if(String.IsNullOrEmpty(userInfo.Username) || String.IsNullOrEmpty(userInfo.Password))
+                return new BooleanResult() { Success = false, Message = "Username and password must be provided." };
+
             try
             {
                 RADIUSClient client = GetClient(); 
@@ -145,38 +148,31 @@ namespace pGina.Plugin.RADIUS
                     //Check for session timeout
                     if ((bool)Settings.Store.AllowSessionTimeout && p.containsAttribute(Packet.AttributeType.Session_Timeout))
                     {   
-                        byte[] bTimeout = client.lastReceievedPacket.getRawAttribute(Packet.AttributeType.Session_Timeout);
-                        Array.Reverse(bTimeout); //Curse you endianness
-                        int seconds = BitConverter.ToInt32(bTimeout, 0);
+                        int seconds = client.lastReceievedPacket.getFirstIntAttribute(Packet.AttributeType.Session_Timeout);
                         session.SetSessionTimeout(seconds, SessionTimeoutCallback);
                         m_logger.DebugFormat("Setting timeout for {0} to {1} seconds.", userInfo.Username, seconds);
                     }
 
                     if (p.containsAttribute(Packet.AttributeType.Idle_Timeout))
                     {
-                        byte[] bIdleTimeout = client.lastReceievedPacket.getRawAttribute(Packet.AttributeType.Idle_Timeout);
-                        Array.Reverse(bIdleTimeout);
-                        int seconds = BitConverter.ToInt32(bIdleTimeout, 0);
+                        int seconds = client.lastReceievedPacket.getFirstIntAttribute(Packet.AttributeType.Idle_Timeout);
                         m_logger.DebugFormat("idle timeout value: {0}", seconds);
+                    }
+
+                    if (p.containsAttribute(Packet.AttributeType.Filter_Id))
+                    {
+                        //Debug purposes only
+                        foreach (string val in p.getStringAttributes(Packet.AttributeType.Filter_Id))
+                        {
+                            m_logger.DebugFormat("Filter-Id: {0}", val);
+                        }
                     }
 
                     if ((bool)Settings.Store.WisprSessionTerminate && p.containsAttribute(Packet.AttributeType.Vendor_Specific))
                     {
                         //TODO:Wispr-Terminate-Time is vendor specific, first 3 bytes are vendor, 4th byte should be 9, then the timestamp string.
-                        byte[] attr = p.getRawAttribute(Packet.AttributeType.Vendor_Specific);
-
-                        m_logger.DebugFormat("Vendor-Specific bytes: {0}", BitConverter.ToString(attr));
-
-                        byte[] vendor = new ArraySegment<byte>(attr, 0, 3).Array;
-
-                        byte type = attr[3];
-
-                        byte[] value = new ArraySegment<byte>(attr, 4, attr.Length - 4).Array;
-                        string timestamp = System.Text.Encoding.UTF8.GetString(value);
-
-                        m_logger.DebugFormat("Vendor specific attribute type. Vendor {0}, Type: {1}, Value: {2}", String.Join("-", vendor), type, timestamp);
+                                              
                         
-                        //TODO: Create callback based on timestamp value.
                     }
 
                     //Check for interim-update
@@ -186,10 +182,7 @@ namespace pGina.Plugin.RADIUS
 
                         if (p.containsAttribute(Packet.AttributeType.Acct_Interim_Interval))
                         {
-                            byte[] interval = client.lastReceievedPacket.getRawAttribute(Packet.AttributeType.Acct_Interim_Interval);
-                            Array.Reverse(interval);
-                            seconds = BitConverter.ToInt32(interval, 0);
-
+                            seconds = client.lastReceievedPacket.getFirstIntAttribute(Packet.AttributeType.Acct_Interim_Interval);
                             m_logger.DebugFormat("Interim update seconds from packets: {0}", seconds);
                             
                         }
@@ -224,7 +217,7 @@ namespace pGina.Plugin.RADIUS
 
                     string message = null;
                     if (p.containsAttribute(Packet.AttributeType.Reply_Message))
-                        message = p.getAttribute(Packet.AttributeType.Reply_Message);
+                        message = p.getFirstStringAttribute(Packet.AttributeType.Reply_Message);
 
                     return new BooleanResult() { Success = result, Message = message };
                 }
@@ -234,7 +227,7 @@ namespace pGina.Plugin.RADIUS
                 if (client.lastReceievedPacket != null
                     && client.lastReceievedPacket.containsAttribute(Packet.AttributeType.Reply_Message))
                 {
-                    msg = client.lastReceievedPacket.getAttribute(Packet.AttributeType.Reply_Message);
+                    msg = client.lastReceievedPacket.getFirstStringAttribute(Packet.AttributeType.Reply_Message);
                 }
 
                 return new BooleanResult() { Success = result, Message = msg };
