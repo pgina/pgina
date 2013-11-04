@@ -454,7 +454,7 @@ namespace pGina.Service.Impl
 
                 ChangePasswordPluginActivityInfo pluginInfo = new ChangePasswordPluginActivityInfo();
                 pluginInfo.LoadedPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginChangePassword>();
-                BooleanResult finalResult = new BooleanResult { Success = false, Message = "" };
+                BooleanResult Result = new BooleanResult();
 
                 // One success means the final result is a success, and we return the message from
                 // the last success. Otherwise, we return the message from the last failure.
@@ -462,36 +462,22 @@ namespace pGina.Service.Impl
                 {
                     // Execute the plugin
                     m_logger.DebugFormat("ChangePassword: executing {0}", plug.Uuid);
-                    BooleanResult pluginResult = plug.ChangePassword(properties, pluginInfo);
+                    Result = plug.ChangePassword(properties, pluginInfo);
 
-                    // Add result to our list of plugin results
-                    pluginInfo.AddResult(plug.Uuid, pluginResult);
+                    m_logger.DebugFormat("ChangePassword: result from {0} is {1} message: {2}", plug.Uuid, Result.Success, Result.Message);
 
-                    m_logger.DebugFormat("ChangePassword: result from {0} is {1} message: {2}", plug.Uuid, pluginResult.Success, pluginResult.Message);
-
-                    if (pluginResult.Success)
-                    {
-                        finalResult.Success = true;
-                        finalResult.Message = pluginResult.Message;
-                    }
-                    else
+                    if (!Result.Success)
                     {
                         userinfo.Password = msg.OldPassword;
                         properties.AddTrackedSingle<UserInformation>(userinfo);
-
-                        if (!finalResult.Success)
-                        {
-                            finalResult.Message = pluginResult.Message;
-                        }
+                        break;
                     }
                 }
 
-                m_logger.DebugFormat("ChangePassword: returning final result {0}, message {1}", finalResult.Success, finalResult.Message);
-
                 return new ChangePasswordResponseMessage()
                 {
-                    Result = finalResult.Success,
-                    Message = finalResult.Message,
+                    Result = Result.Success,
+                    Message = Result.Message,
                     Username = msg.Username,
                     Domain = msg.Domain
                 };
