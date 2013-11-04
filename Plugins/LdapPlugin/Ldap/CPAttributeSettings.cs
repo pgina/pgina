@@ -33,10 +33,10 @@ using System.Security.Cryptography;
 
 namespace pGina.Plugin.Ldap
 {
-    class PasswordAttributeEntry
+    class AttributeEntry
     {
         public string Name { get; set; }
-        public HashMethod Method { get; set; }
+        public Methods Method { get; set; }
 
         public string ToRegistryString()
         {
@@ -49,30 +49,30 @@ namespace pGina.Plugin.Ldap
             if (parts.Length == 2)
             {
                 Name = parts[0];
-                Method = (HashMethod)Enum.Parse(typeof(HashMethod), parts[1]);
+                Method = (Methods)Enum.Parse(typeof(Methods), parts[1]);
             }
         }
     }
 
     class CPAttributeSettings
     {
-        public static List<PasswordAttributeEntry> Load()
+        public static List<AttributeEntry> Load()
         {
             string[] values = Settings.Store.ChangePasswordAttributes;
-            List<PasswordAttributeEntry> result = new List<PasswordAttributeEntry>();
+            List<AttributeEntry> result = new List<AttributeEntry>();
             foreach (string entry in values)
             {
-                PasswordAttributeEntry pae = new PasswordAttributeEntry();
+                AttributeEntry pae = new AttributeEntry();
                 pae.FromRegistryString(entry);
                 result.Add(pae);
             }
             return result;
         }
 
-        public static void Save(List<PasswordAttributeEntry> values)
+        public static void Save(List<AttributeEntry> values)
         {
             List<string> regList = new List<string>();
-            foreach (PasswordAttributeEntry entry in values)
+            foreach (AttributeEntry entry in values)
             {
                 regList.Add(entry.ToRegistryString());
             }

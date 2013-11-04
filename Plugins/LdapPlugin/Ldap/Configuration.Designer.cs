@@ -456,7 +456,7 @@
             this.tabControl1.Controls.Add(this.authzTabPage);
             this.tabControl1.Controls.Add(this.gatewayTabPage);
             this.tabControl1.Controls.Add(this.tabPageChangePassword);
-            this.tabControl1.Location = new System.Drawing.Point(12, 234);
+            this.tabControl1.Location = new System.Drawing.Point(12, 198);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(670, 260);
@@ -725,7 +725,7 @@
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(103, 13);
             this.label9.TabIndex = 1;
-            this.label9.Text = "Password Attributes:";
+            this.label9.Text = "Attributes:";
             // 
             // passwordAttributesDGV
             // 
@@ -820,8 +820,6 @@
         private System.Windows.Forms.TextBox gatwayRemoteGroupTB;
         private System.Windows.Forms.CheckBox authzRequireAuthCB;
         private System.Windows.Forms.CheckBox authzAllowOnErrorCB;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.ComboBox DereferenceComboBox;
         private System.Windows.Forms.TabPage tabPageChangePassword;
         private System.Windows.Forms.DataGridView passwordAttributesDGV;
         private System.Windows.Forms.Label label9;

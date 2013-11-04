@@ -429,6 +429,45 @@ namespace pGina.Plugin.Ldap
         }
 
         /// <summary>
+        /// Will search an attribute and return the corresponding values
+        /// <para>The DN where the search will start at</para>
+        /// <para>string array of attributes to search at</para>
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<string, List<string>> GetUserAttribValue(string userDN, string[] Attrib)
+        {
+            Dictionary<string, List<string>> ret = new Dictionary<string, List<string>>();
+
+            try
+            {
+                SearchRequest req = new SearchRequest(userDN, "(objectClass=*)", SearchScope.Subtree, Attrib);
+                SearchResponse resp = (SearchResponse)m_conn.SendRequest(req);
+
+                foreach (SearchResultEntry entry in resp.Entries)
+                {
+                    foreach (String name in entry.Attributes.AttributeNames)
+                    {
+                        List<string> values = new List<string>();
+                        foreach (object val in entry.Attributes[name].GetValues(typeof(string)))
+                        {
+                            string value = val.ToString();
+                            if (!String.IsNullOrEmpty(value))
+                                values.Add(value);
+                        }
+                        if (values.Count > 0)
+                            ret.Add(name.ToLower(),values);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                m_logger.FatalFormat("GetUserAttribValue Error:{0}",e.Message);
+            }
+
+            return ret;
+        }
+
+        /// <summary>
         /// Attempts to find the DN for the user by searching a set of LDAP trees.
         /// The base DN for each of the trees is retrieved from Settings.Store.SearchContexts.
         /// The search filter is taken from Settings.Store.SearchFilter.  If all
@@ -502,21 +541,57 @@ namespace pGina.Plugin.Ldap
             return result;
         }
 
-        public void SetUserAttribute(string uname, string attribute, string value)
+        public bool SetUserAttribute(string uname, string attribute, string value)
         {
             string userDN = this.GetUserDN(uname);
 
-            DirectoryAttributeModification mod = new DirectoryAttributeModification
+            try
             {
-                Name = attribute,
-                Operation = DirectoryAttributeOperation.Replace
-            };
-            mod.Add(value);
+                DirectoryAttributeModification mod = new DirectoryAttributeModification
+                {
+                    Name = attribute,
+                    Operation = DirectoryAttributeOperation.Replace
+                };
+                mod.Add(value);
+                ModifyRequest req = new ModifyRequest(userDN);
+                req.Modifications.Add(mod);
+                m_conn.SendRequest(req);
+            }
+            catch (Exception e)
+            {
+                m_logger.FatalFormat("can't add attribute:{0} because of error:{1}", attribute, e.Message);
+                return false;
+            }
 
-            ModifyRequest req = new ModifyRequest(userDN);
-            req.Modifications.Add(mod);
+            if (attribute.ToLower().Equals("sambapwdlastset"))
+            {
+                Dictionary<string, List<string>> SearchResult = GetUserAttribValue(userDN, new string[] { "shadowMax", "sambaPwdMustChange" });
 
-            m_conn.SendRequest(req);
+                if (SearchResult.ContainsKey("shadowmax") && SearchResult.ContainsKey("sambapwdmustchange"))
+                {
+                    int shadowMax = 0;
+
+                    try
+                    {
+                        shadowMax = Convert.ToInt32(SearchResult["shadowmax"].First());
+                    }
+                    catch (Exception e)
+                    {
+                        m_logger.FatalFormat("SetUserAttribute: Unable to convert return from GetUserAttribValue to int {0}", e.Message);
+                        return false;
+                    }
+
+                    if (shadowMax > 0)
+                    {
+                        TimeMethod time = TimeMethod.methods[Methods.Timestamps];
+                        string t = time.time(new TimeSpan(shadowMax, 0, 0, 0));
+                        if (!t.Equals("0"))
+                            if (!SetUserAttribute(uname, "sambaPwdMustChange", t))
+                                return false;
+                    }
+                }
+            }
+            return true;
         }
     }
 }

@@ -369,39 +369,52 @@ namespace pGina.Plugin.Ldap
             return new BooleanResult() { Success = true, Message = message };
         }
 
-        public BooleanResult ChangePassword( ChangePasswordInfo cpInfo, ChangePasswordPluginActivityInfo pluginInfo)
+        public BooleanResult ChangePassword(SessionProperties properties, ChangePasswordPluginActivityInfo pluginInfo)
         {
             m_logger.Debug("ChangePassword()");
 
-            try
+            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+
+            using (LdapServer serv = new LdapServer())
             {
-                LdapServer serv = new LdapServer();
-
-                // Authenticate using old password
-                BooleanResult result = serv.Authenticate(cpInfo.Username, cpInfo.OldPassword);
-                if (!result.Success)
+                try
                 {
-                    return new BooleanResult { Success = false, Message = "Password change failed: Invalid LDAP username or password." };
+                    // Authenticate using old password
+                    BooleanResult result = serv.Authenticate(userInfo.Username, userInfo.oldPassword);
+                    if (!result.Success)
+                    {
+                        return new BooleanResult { Success = false, Message = "Password change failed: Invalid LDAP username or password." };
+                    }
+    
+                    // Set the password attributes
+                    List<AttributeEntry> attribs = CPAttributeSettings.Load();
+                    foreach (AttributeEntry entry in attribs)
+                    {
+                        if (entry.Method.HasFlag(Methods.Timestamps) || entry.Method.HasFlag(Methods.Timestampd))
+                        {
+                            TimeMethod time = TimeMethod.methods[entry.Method];
+    
+                            m_logger.DebugFormat("Setting attribute {0} using method {1}", entry.Name, time.Name);
+                            if (!serv.SetUserAttribute(userInfo.Username, entry.Name, time.time()))
+                                return new BooleanResult { Success = false, Message = "LDAPplugin failed by setting an attribute\nFor more details please consult the log!" };
+                        }
+                        else
+                        {
+                            AttribMethod hasher = AttribMethod.methods[entry.Method];
+    
+                            m_logger.DebugFormat("Setting attribute {0} using method {1}", entry.Name, hasher.Name);
+                            if (!serv.SetUserAttribute(userInfo.Username, entry.Name, hasher.hash(userInfo.Password)))
+                                return new BooleanResult { Success = false, Message = "LDAPplugin failed by setting an attribute\nFor more details please consult the log!" };
+                        }
+                    }
+                    return new BooleanResult { Success = true, Message = "LDAP password successfully changed" };
                 }
-
-                // Set the password attributes
-                List<PasswordAttributeEntry> attribs = CPAttributeSettings.Load();
-                foreach (PasswordAttributeEntry entry in attribs)
+                catch (Exception e)
                 {
-                    PasswordHashMethod hasher = PasswordHashMethod.methods[entry.Method];
-
-                    m_logger.DebugFormat("Setting attribute {0} using hash method {1}", entry.Name, hasher.Name);
-                    serv.SetUserAttribute(cpInfo.Username, entry.Name, hasher.hash(cpInfo.NewPassword));
+                    m_logger.ErrorFormat("Exception in ChangePassword: {0}", e);
+                    return new BooleanResult() { Success = false, Message = "Error in LDAP plugin." };
                 }
-
-                return new BooleanResult { Success = true, Message = "LDAP password successfully changed" };
             }
-            catch (Exception e)
-            {
-                m_logger.ErrorFormat("Exception in ChangePassword: {0}", e);
-                return new BooleanResult() { Success = false, Message = "Error in LDAP plugin." };
-            }
-
         }
     }
 }

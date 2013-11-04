@@ -75,22 +75,23 @@ namespace pGina.Plugin.Ldap
             });
             DataGridViewComboBoxColumn combCol = new DataGridViewComboBoxColumn()
             {
-                Name = "Hash Method",
-                DataPropertyName = "HashMethod",
-                HeaderText = "Hash Method",
+                Name = "Method",
+                DataPropertyName = "Method",
+                HeaderText = "Method",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
                 Width = 250,
                 DisplayMember = "Name",
                 ValueMember = "Method",
             };
             this.passwordAttributesDGV.DefaultValuesNeeded += passwordAttributesDGV_DefaultValuesNeeded;
-            combCol.Items.AddRange(PasswordHashMethod.methods.Values.ToArray());
+            combCol.Items.AddRange(AttribMethod.methods.Values.ToArray());
+            combCol.Items.AddRange(TimeMethod.methods.Values.ToArray());
             this.passwordAttributesDGV.Columns.Add(combCol);
         }
 
         void passwordAttributesDGV_DefaultValuesNeeded(object sender, DataGridViewRowEventArgs e)
         {
-            e.Row.Cells[1].Value = HashMethod.PLAIN;
+            e.Row.Cells[1].Value = Methods.PLAIN;
         }
 
         private void LoadSettings()
@@ -189,9 +190,9 @@ namespace pGina.Plugin.Ldap
                 this.gatewayRulesListBox.Items.Add(rule);
 
             ////////////// Change Password tab ///////////////
-            List<PasswordAttributeEntry> attribs = CPAttributeSettings.Load();
+            List<AttributeEntry> attribs = CPAttributeSettings.Load();
 
-            foreach(PasswordAttributeEntry entry in attribs)
+            foreach (AttributeEntry entry in attribs)
                 this.passwordAttributesDGV.Rows.Add( entry.Name, entry.Method );
         }
 
@@ -393,7 +394,7 @@ namespace pGina.Plugin.Ldap
             GroupRuleLoader.SaveGatewayRules(gwList);
 
             // Change Password
-            List<PasswordAttributeEntry> entries = new List<PasswordAttributeEntry>();
+            List<AttributeEntry> entries = new List<AttributeEntry>();
             foreach (DataGridViewRow row in this.passwordAttributesDGV.Rows)
             {
                 if (row.Cells[0].Value != null && row.Cells[1].Value != null)
@@ -401,10 +402,10 @@ namespace pGina.Plugin.Ldap
                     string attribName = row.Cells[0].Value.ToString();
                     if (!string.IsNullOrEmpty(attribName))
                     {
-                        PasswordAttributeEntry entry = new PasswordAttributeEntry
+                        AttributeEntry entry = new AttributeEntry
                         {
                             Name = attribName,
-                            Method = (HashMethod)(row.Cells[1].Value)
+                            Method = (Methods)(row.Cells[1].Value)
                         };
                         entries.Add(entry);
                     }

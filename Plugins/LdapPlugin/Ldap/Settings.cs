@@ -76,7 +76,7 @@ namespace pGina.Plugin.Ldap
             // Change password
             m_settings.SetDefault("ChangePasswordAttributes",
                 new string[] { 
-                    new PasswordAttributeEntry { Name = "userPassword", Method = HashMethod.SHA1 }.ToRegistryString()
+                    new AttributeEntry { Name = "userPassword", Method = Methods.SHA1 }.ToRegistryString()
                 }
             );
         }
