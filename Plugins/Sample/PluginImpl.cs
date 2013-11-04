@@ -115,7 +115,7 @@ namespace pGina.Plugin.Sample
         public void Starting() { }
         public void Stopping() { }
 
-        public BooleanResult ChangePassword(ChangePasswordInfo cpInfo, ChangePasswordPluginActivityInfo pluginInfo)
+        public BooleanResult ChangePassword(SessionProperties properties, ChangePasswordPluginActivityInfo pluginInfo)
         {
             return new BooleanResult() { Success = true, Message = "Success from the sample plugin" };
         }
