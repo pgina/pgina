@@ -39,10 +39,6 @@
             this.ldapPortTextBox = new System.Windows.Forms.TextBox();
             this.ldapPortLabel = new System.Windows.Forms.Label();
             this.useSslCheckBox = new System.Windows.Forms.CheckBox();
-            this.dnPatternLabel = new System.Windows.Forms.Label();
-            this.searchForDnCheckBox = new System.Windows.Forms.CheckBox();
-            this.searchFilterLabel = new System.Windows.Forms.Label();
-            this.searchContextsLabel = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.timeoutLabel = new System.Windows.Forms.Label();
@@ -50,22 +46,32 @@
             this.searchDnTextBox = new System.Windows.Forms.TextBox();
             this.authzRequireAuthCB = new System.Windows.Forms.CheckBox();
             this.authzAllowOnErrorCB = new System.Windows.Forms.CheckBox();
+            this.sslCertFileTextBox = new System.Windows.Forms.TextBox();
+            this.groupMemberAttrTB = new System.Windows.Forms.TextBox();
+            this.groupDNPattern = new System.Windows.Forms.TextBox();
+            this.allowEmptyPwCB = new System.Windows.Forms.CheckBox();
+            this.searchContextsLabel = new System.Windows.Forms.Label();
+            this.dnPatternTextBox = new System.Windows.Forms.TextBox();
+            this.searchFilterLabel = new System.Windows.Forms.Label();
+            this.dnPatternLabel = new System.Windows.Forms.Label();
+            this.searchForDnCheckBox = new System.Windows.Forms.CheckBox();
             this.ldapServerGroupBox = new System.Windows.Forms.GroupBox();
             this.showPwCB = new System.Windows.Forms.CheckBox();
             this.searchPassTextBox = new System.Windows.Forms.TextBox();
             this.sslCertFileBrowseButton = new System.Windows.Forms.Button();
-            this.sslCertFileTextBox = new System.Windows.Forms.TextBox();
-            this.groupMemberAttrTB = new System.Windows.Forms.TextBox();
-            this.groupDNPattern = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.allowEmptyPwCB = new System.Windows.Forms.CheckBox();
-            this.searchContextsTextBox = new System.Windows.Forms.TextBox();
-            this.searchFilterTextBox = new System.Windows.Forms.TextBox();
-            this.dnPatternTextBox = new System.Windows.Forms.TextBox();
             this.cancelButton = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.authTabPage = new System.Windows.Forms.TabPage();
+            this.authtab = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.searchContextsTextBox = new System.Windows.Forms.TextBox();
+            this.searchFilterTextBox = new System.Windows.Forms.TextBox();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.Column1 = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.authzTabPage = new System.Windows.Forms.TabPage();
             this.authzRuleDeleteBtn = new System.Windows.Forms.Button();
             this.authzRuleDownBtn = new System.Windows.Forms.Button();
@@ -91,7 +97,11 @@
             this.label9 = new System.Windows.Forms.Label();
             this.passwordAttributesDGV = new System.Windows.Forms.DataGridView();
             this.ldapServerGroupBox.SuspendLayout();
-            this.tabControl1.SuspendLayout();
+            this.authTabPage.SuspendLayout();
+            this.authtab.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.authTabPage.SuspendLayout();
             this.authzTabPage.SuspendLayout();
             this.gatewayTabPage.SuspendLayout();
@@ -183,51 +193,6 @@
             this.useSslCheckBox.UseVisualStyleBackColor = true;
             this.useSslCheckBox.CheckedChanged += new System.EventHandler(this.useSslCheckBox_CheckedChanged);
             // 
-            // dnPatternLabel
-            // 
-            this.dnPatternLabel.AutoSize = true;
-            this.dnPatternLabel.Location = new System.Drawing.Point(6, 36);
-            this.dnPatternLabel.Name = "dnPatternLabel";
-            this.dnPatternLabel.Size = new System.Drawing.Size(85, 13);
-            this.dnPatternLabel.TabIndex = 0;
-            this.dnPatternLabel.Text = "User DN Pattern";
-            this.descriptionToolTip.SetToolTip(this.dnPatternLabel, "The pattern to use when creating a DN from a user name.\r\n%u can be used to indica" +
-                    "te the user name.\r\n");
-            // 
-            // searchForDnCheckBox
-            // 
-            this.searchForDnCheckBox.AutoSize = true;
-            this.searchForDnCheckBox.Location = new System.Drawing.Point(6, 68);
-            this.searchForDnCheckBox.Name = "searchForDnCheckBox";
-            this.searchForDnCheckBox.Size = new System.Drawing.Size(94, 17);
-            this.searchForDnCheckBox.TabIndex = 2;
-            this.searchForDnCheckBox.Text = "Search for DN";
-            this.descriptionToolTip.SetToolTip(this.searchForDnCheckBox, "Whether or not to search a set of LDAP trees for the\r\nDN rather than using the ab" +
-                    "ove pattern.");
-            this.searchForDnCheckBox.UseVisualStyleBackColor = true;
-            this.searchForDnCheckBox.CheckedChanged += new System.EventHandler(this.searchForDnCheckBox_CheckedChanged);
-            // 
-            // searchFilterLabel
-            // 
-            this.searchFilterLabel.AutoSize = true;
-            this.searchFilterLabel.Location = new System.Drawing.Point(6, 94);
-            this.searchFilterLabel.Name = "searchFilterLabel";
-            this.searchFilterLabel.Size = new System.Drawing.Size(66, 13);
-            this.searchFilterLabel.TabIndex = 3;
-            this.searchFilterLabel.Text = "Search Filter";
-            this.descriptionToolTip.SetToolTip(this.searchFilterLabel, "The filter to use when searching.\r\n%u is replaced with the user name\r\n");
-            // 
-            // searchContextsLabel
-            // 
-            this.searchContextsLabel.AutoSize = true;
-            this.searchContextsLabel.Location = new System.Drawing.Point(6, 120);
-            this.searchContextsLabel.Name = "searchContextsLabel";
-            this.searchContextsLabel.Size = new System.Drawing.Size(91, 13);
-            this.searchContextsLabel.TabIndex = 5;
-            this.searchContextsLabel.Text = "Search Context(s)";
-            this.descriptionToolTip.SetToolTip(this.searchContextsLabel, "A list of one or more DNs (one per line) that indicate\r\nroots of LDAP subtrees th" +
-                    "at will be searched.");
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -301,6 +266,98 @@
                     "succeeds if this is checked. ");
             this.authzAllowOnErrorCB.UseVisualStyleBackColor = true;
             // 
+            // sslCertFileTextBox
+            // 
+            this.sslCertFileTextBox.Location = new System.Drawing.Point(109, 71);
+            this.sslCertFileTextBox.Name = "sslCertFileTextBox";
+            this.sslCertFileTextBox.Size = new System.Drawing.Size(463, 20);
+            this.sslCertFileTextBox.TabIndex = 8;
+            this.descriptionToolTip.SetToolTip(this.sslCertFileTextBox, "Optional:  If left empty, the certificate will be validated\r\nagainst the Windows " +
+                    "certificate store.");
+            // 
+            // groupMemberAttrTB
+            // 
+            this.groupMemberAttrTB.Location = new System.Drawing.Point(535, 149);
+            this.groupMemberAttrTB.Name = "groupMemberAttrTB";
+            this.groupMemberAttrTB.Size = new System.Drawing.Size(135, 20);
+            this.groupMemberAttrTB.TabIndex = 3;
+            this.descriptionToolTip.SetToolTip(this.groupMemberAttrTB, "The attribute that stores the group\'s membership.");
+            // 
+            // groupDNPattern
+            // 
+            this.groupDNPattern.Location = new System.Drawing.Point(110, 149);
+            this.groupDNPattern.Name = "groupDNPattern";
+            this.groupDNPattern.Size = new System.Drawing.Size(326, 20);
+            this.groupDNPattern.TabIndex = 1;
+            this.descriptionToolTip.SetToolTip(this.groupDNPattern, "A pattern that describes how to generate a group DN\r\nfrom a group name.  Use %g a" +
+                    "s a place holder for the \r\ngroup name.");
+            // 
+            // allowEmptyPwCB
+            // 
+            this.allowEmptyPwCB.AutoSize = true;
+            this.allowEmptyPwCB.Location = new System.Drawing.Point(6, 6);
+            this.allowEmptyPwCB.Name = "allowEmptyPwCB";
+            this.allowEmptyPwCB.Size = new System.Drawing.Size(137, 17);
+            this.allowEmptyPwCB.TabIndex = 14;
+            this.allowEmptyPwCB.Text = "Allow Empty Passwords";
+            this.descriptionToolTip.SetToolTip(this.allowEmptyPwCB, "When selected, empty passwords are used in bind\r\nattempts.  Otherwise, an empty p" +
+                    "assword causes\r\nauthentication to immediately fail.");
+            this.allowEmptyPwCB.UseVisualStyleBackColor = true;
+            // 
+            // searchContextsLabel
+            // 
+            this.searchContextsLabel.AutoSize = true;
+            this.searchContextsLabel.Location = new System.Drawing.Point(3, 94);
+            this.searchContextsLabel.Name = "searchContextsLabel";
+            this.searchContextsLabel.Size = new System.Drawing.Size(91, 13);
+            this.searchContextsLabel.TabIndex = 20;
+            this.searchContextsLabel.Text = "Search Context(s)";
+            this.descriptionToolTip.SetToolTip(this.searchContextsLabel, "A list of one or more DNs (one per line) that indicate\r\nroots of LDAP subtrees th" +
+                    "at will be searched.");
+            // 
+            // dnPatternTextBox
+            // 
+            this.dnPatternTextBox.Location = new System.Drawing.Point(107, 33);
+            this.dnPatternTextBox.Name = "dnPatternTextBox";
+            this.dnPatternTextBox.Size = new System.Drawing.Size(543, 20);
+            this.dnPatternTextBox.TabIndex = 16;
+            this.descriptionToolTip.SetToolTip(this.dnPatternTextBox, "Pattern used to generate a DN from a user name.  Use\r\n%u as a placeholder for the" +
+                    " user name.");
+            // 
+            // searchFilterLabel
+            // 
+            this.searchFilterLabel.AutoSize = true;
+            this.searchFilterLabel.Location = new System.Drawing.Point(3, 68);
+            this.searchFilterLabel.Name = "searchFilterLabel";
+            this.searchFilterLabel.Size = new System.Drawing.Size(66, 13);
+            this.searchFilterLabel.TabIndex = 18;
+            this.searchFilterLabel.Text = "Search Filter";
+            this.descriptionToolTip.SetToolTip(this.searchFilterLabel, "The filter to use when searching.\r\n%u is replaced with the user name\r\n");
+            // 
+            // dnPatternLabel
+            // 
+            this.dnPatternLabel.AutoSize = true;
+            this.dnPatternLabel.Location = new System.Drawing.Point(3, 26);
+            this.dnPatternLabel.Name = "dnPatternLabel";
+            this.dnPatternLabel.Size = new System.Drawing.Size(85, 13);
+            this.dnPatternLabel.TabIndex = 15;
+            this.dnPatternLabel.Text = "User DN Pattern";
+            this.descriptionToolTip.SetToolTip(this.dnPatternLabel, "The pattern to use when creating a DN from a user name.\r\n%u can be used to indica" +
+                    "te the user name.\r\n");
+            // 
+            // searchForDnCheckBox
+            // 
+            this.searchForDnCheckBox.AutoSize = true;
+            this.searchForDnCheckBox.Location = new System.Drawing.Point(7, 42);
+            this.searchForDnCheckBox.Name = "searchForDnCheckBox";
+            this.searchForDnCheckBox.Size = new System.Drawing.Size(94, 17);
+            this.searchForDnCheckBox.TabIndex = 17;
+            this.searchForDnCheckBox.Text = "Search for DN";
+            this.descriptionToolTip.SetToolTip(this.searchForDnCheckBox, "Whether or not to search a set of LDAP trees for the\r\nDN rather than using the ab" +
+                    "ove pattern.");
+            this.searchForDnCheckBox.UseVisualStyleBackColor = true;
+            this.searchForDnCheckBox.CheckedChanged += new System.EventHandler(this.searchForDnCheckBox_CheckedChanged);
+            // 
             // ldapServerGroupBox
             // 
             this.ldapServerGroupBox.Controls.Add(this.showPwCB);
@@ -359,32 +416,6 @@
             this.sslCertFileBrowseButton.UseVisualStyleBackColor = true;
             this.sslCertFileBrowseButton.Click += new System.EventHandler(this.sslCertFileBrowseButton_Click);
             // 
-            // sslCertFileTextBox
-            // 
-            this.sslCertFileTextBox.Location = new System.Drawing.Point(109, 71);
-            this.sslCertFileTextBox.Name = "sslCertFileTextBox";
-            this.sslCertFileTextBox.Size = new System.Drawing.Size(463, 20);
-            this.sslCertFileTextBox.TabIndex = 8;
-            this.descriptionToolTip.SetToolTip(this.sslCertFileTextBox, "Optional:  If left empty, the certificate will be validated\r\nagainst the Windows " +
-                    "certificate store.");
-            // 
-            // groupMemberAttrTB
-            // 
-            this.groupMemberAttrTB.Location = new System.Drawing.Point(535, 149);
-            this.groupMemberAttrTB.Name = "groupMemberAttrTB";
-            this.groupMemberAttrTB.Size = new System.Drawing.Size(135, 20);
-            this.groupMemberAttrTB.TabIndex = 3;
-            this.descriptionToolTip.SetToolTip(this.groupMemberAttrTB, "The attribute that stores the group\'s membership.");
-            // 
-            // groupDNPattern
-            // 
-            this.groupDNPattern.Location = new System.Drawing.Point(110, 149);
-            this.groupDNPattern.Name = "groupDNPattern";
-            this.groupDNPattern.Size = new System.Drawing.Size(326, 20);
-            this.groupDNPattern.TabIndex = 1;
-            this.descriptionToolTip.SetToolTip(this.groupDNPattern, "A pattern that describes how to generate a group DN\r\nfrom a group name.  Use %g a" +
-                    "s a place holder for the \r\ngroup name.");
-            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -402,43 +433,6 @@
             this.label4.Size = new System.Drawing.Size(92, 13);
             this.label4.TabIndex = 0;
             this.label4.Text = "Group DN Pattern";
-            // 
-            // allowEmptyPwCB
-            // 
-            this.allowEmptyPwCB.AutoSize = true;
-            this.allowEmptyPwCB.Location = new System.Drawing.Point(6, 6);
-            this.allowEmptyPwCB.Name = "allowEmptyPwCB";
-            this.allowEmptyPwCB.Size = new System.Drawing.Size(137, 17);
-            this.allowEmptyPwCB.TabIndex = 13;
-            this.allowEmptyPwCB.Text = "Allow Empty Passwords";
-            this.descriptionToolTip.SetToolTip(this.allowEmptyPwCB, "When selected, empty passwords are used in bind\r\nattempts.  Otherwise, an empty p" +
-                    "assword causes\r\nauthentication to immediately fail.");
-            this.allowEmptyPwCB.UseVisualStyleBackColor = true;
-            // 
-            // searchContextsTextBox
-            // 
-            this.searchContextsTextBox.Location = new System.Drawing.Point(110, 117);
-            this.searchContextsTextBox.Multiline = true;
-            this.searchContextsTextBox.Name = "searchContextsTextBox";
-            this.searchContextsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.searchContextsTextBox.Size = new System.Drawing.Size(462, 89);
-            this.searchContextsTextBox.TabIndex = 6;
-            // 
-            // searchFilterTextBox
-            // 
-            this.searchFilterTextBox.Location = new System.Drawing.Point(110, 91);
-            this.searchFilterTextBox.Name = "searchFilterTextBox";
-            this.searchFilterTextBox.Size = new System.Drawing.Size(462, 20);
-            this.searchFilterTextBox.TabIndex = 4;
-            // 
-            // dnPatternTextBox
-            // 
-            this.dnPatternTextBox.Location = new System.Drawing.Point(110, 33);
-            this.dnPatternTextBox.Name = "dnPatternTextBox";
-            this.dnPatternTextBox.Size = new System.Drawing.Size(463, 20);
-            this.dnPatternTextBox.TabIndex = 1;
-            this.descriptionToolTip.SetToolTip(this.dnPatternTextBox, "Pattern used to generate a DN from a user name.  Use\r\n%u as a placeholder for the" +
-                    " user name.");
             // 
             // cancelButton
             // 
@@ -464,14 +458,7 @@
             // 
             // authTabPage
             // 
-            this.authTabPage.Controls.Add(this.searchContextsTextBox);
-            this.authTabPage.Controls.Add(this.searchContextsLabel);
-            this.authTabPage.Controls.Add(this.allowEmptyPwCB);
-            this.authTabPage.Controls.Add(this.dnPatternTextBox);
-            this.authTabPage.Controls.Add(this.searchFilterTextBox);
-            this.authTabPage.Controls.Add(this.searchFilterLabel);
-            this.authTabPage.Controls.Add(this.dnPatternLabel);
-            this.authTabPage.Controls.Add(this.searchForDnCheckBox);
+            this.authTabPage.Controls.Add(this.authtab);
             this.authTabPage.Location = new System.Drawing.Point(4, 22);
             this.authTabPage.Name = "authTabPage";
             this.authTabPage.Padding = new System.Windows.Forms.Padding(3);
@@ -479,6 +466,88 @@
             this.authTabPage.TabIndex = 0;
             this.authTabPage.Text = "Authentication";
             this.authTabPage.UseVisualStyleBackColor = true;
+            // 
+            // authtab
+            // 
+            this.authtab.Controls.Add(this.tabPage1);
+            this.authtab.Controls.Add(this.tabPage2);
+            this.authtab.Location = new System.Drawing.Point(0, 0);
+            this.authtab.Name = "authtab";
+            this.authtab.SelectedIndex = 0;
+            this.authtab.Size = new System.Drawing.Size(666, 238);
+            this.authtab.TabIndex = 16;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.searchContextsTextBox);
+            this.tabPage1.Controls.Add(this.searchContextsLabel);
+            this.tabPage1.Controls.Add(this.dnPatternTextBox);
+            this.tabPage1.Controls.Add(this.searchFilterTextBox);
+            this.tabPage1.Controls.Add(this.searchFilterLabel);
+            this.tabPage1.Controls.Add(this.dnPatternLabel);
+            this.tabPage1.Controls.Add(this.searchForDnCheckBox);
+            this.tabPage1.Controls.Add(this.allowEmptyPwCB);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(658, 212);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Bind";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // searchContextsTextBox
+            // 
+            this.searchContextsTextBox.Location = new System.Drawing.Point(107, 91);
+            this.searchContextsTextBox.Multiline = true;
+            this.searchContextsTextBox.Name = "searchContextsTextBox";
+            this.searchContextsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.searchContextsTextBox.Size = new System.Drawing.Size(543, 115);
+            this.searchContextsTextBox.TabIndex = 21;
+            // 
+            // searchFilterTextBox
+            // 
+            this.searchFilterTextBox.Location = new System.Drawing.Point(107, 65);
+            this.searchFilterTextBox.Name = "searchFilterTextBox";
+            this.searchFilterTextBox.Size = new System.Drawing.Size(543, 20);
+            this.searchFilterTextBox.TabIndex = 19;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.dataGridView1);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(658, 212);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Attribute converter";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Column1,
+            this.Column2});
+            this.dataGridView1.Location = new System.Drawing.Point(6, 6);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(645, 200);
+            this.dataGridView1.TabIndex = 17;
+            // 
+            // Column1
+            // 
+            this.Column1.HeaderText = "Windows";
+            this.Column1.Name = "Column1";
+            this.Column1.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Column1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.Column1.ToolTipText = "available attributes";
+            this.Column1.Width = 250;
+            // 
+            // Column2
+            // 
+            this.Column2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Column2.HeaderText = "LDAP";
+            this.Column2.Name = "Column2";
+            this.Column2.ToolTipText = "LDAP attribute (case sensitive)";
             // 
             // authzTabPage
             // 
@@ -750,7 +819,11 @@
             this.ldapServerGroupBox.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.authTabPage.ResumeLayout(false);
-            this.authTabPage.PerformLayout();
+            this.authtab.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.authzTabPage.ResumeLayout(false);
             this.authzTabPage.PerformLayout();
             this.gatewayTabPage.ResumeLayout(false);
@@ -776,13 +849,6 @@
         private System.Windows.Forms.TextBox sslCertFileTextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox validateServerCertCheckBox;
-        private System.Windows.Forms.Label searchFilterLabel;
-        private System.Windows.Forms.CheckBox searchForDnCheckBox;
-        private System.Windows.Forms.TextBox dnPatternTextBox;
-        private System.Windows.Forms.Label dnPatternLabel;
-        private System.Windows.Forms.TextBox searchContextsTextBox;
-        private System.Windows.Forms.Label searchContextsLabel;
-        private System.Windows.Forms.TextBox searchFilterTextBox;
         private System.Windows.Forms.TextBox searchDnTextBox;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
@@ -791,7 +857,6 @@
         private System.Windows.Forms.Label timeoutLabel;
         private System.Windows.Forms.TextBox searchPassTextBox;
         private System.Windows.Forms.CheckBox showPwCB;
-        private System.Windows.Forms.CheckBox allowEmptyPwCB;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage authTabPage;
         private System.Windows.Forms.TabPage authzTabPage;
@@ -824,5 +889,19 @@
         private System.Windows.Forms.DataGridView passwordAttributesDGV;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Button changePasswordDeleteAttribBtn;
+        private System.Windows.Forms.TabControl authtab;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TextBox searchContextsTextBox;
+        private System.Windows.Forms.Label searchContextsLabel;
+        private System.Windows.Forms.TextBox dnPatternTextBox;
+        private System.Windows.Forms.TextBox searchFilterTextBox;
+        private System.Windows.Forms.Label searchFilterLabel;
+        private System.Windows.Forms.Label dnPatternLabel;
+        private System.Windows.Forms.CheckBox searchForDnCheckBox;
+        private System.Windows.Forms.CheckBox allowEmptyPwCB;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridViewComboBoxColumn Column1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
     }
 }

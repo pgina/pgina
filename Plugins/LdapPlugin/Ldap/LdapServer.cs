@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Reflection;
 using System.DirectoryServices.Protocols;
 using System.Security.Cryptography.X509Certificates;
 using System.Net;
@@ -361,7 +361,7 @@ namespace pGina.Plugin.Ldap
         /// Attempt to authenticate the user by binding to the LDAP server.
         /// </summary>
         /// <returns></returns>
-        public BooleanResult Authenticate(string uname, string password)
+        public BooleanResult Authenticate(string uname, string password, SessionProperties properties)
         {
             // Check for empty password.  If configured to do so, we fail on 
             // empty passwords.
@@ -406,6 +406,58 @@ namespace pGina.Plugin.Ldap
 
                 // If we get here, the authentication was successful, we're done!
                 m_logger.DebugFormat("LDAP DN {0} successfully bound to server, return success", ldapCredential.UserName);
+
+                try
+                {
+                    string[] AttribConv = Settings.Store.AttribConv;
+                    Dictionary<string, string> Convert_attribs = new Dictionary<string, string>();
+                    foreach (string str in AttribConv)
+                    {
+                        if (Regex.IsMatch(str, @"\w\t\w"))
+                        {
+                            // Convert_attribs.add("Email", "mail")
+                            Convert_attribs.Add(str.Substring(0, str.IndexOf('\t')).Trim(), str.Substring(str.IndexOf('\t')).Trim());
+                        }
+                    }
+                    if (Convert_attribs.Count > 0)
+                    {
+                        // search all values at once
+                        Dictionary<string, List<string>> search = GetUserAttribValue(userDN, Convert_attribs.Values.ToArray());
+                        if (search.Count > 0)
+                        {
+                            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+                            foreach (KeyValuePair<string, List<string>> search_p in search)
+                            {
+                                foreach (KeyValuePair<string, string> Convert_attribs_p in Convert_attribs)
+                                {
+                                    // Convert_attribs_p.add("Email", "mail")
+                                    // search_p.add("mail", "user@test.local")
+                                    // if Convert_attribs_p.value == search_p.key (if mail == mail)
+                                    if (Convert_attribs_p.Value.Equals(search_p.Key, StringComparison.CurrentCultureIgnoreCase))
+                                    {
+                                        // loop through all props of UserInformation
+                                        foreach (PropertyInfo prop in userInfo.GetType().GetProperties())
+                                        {
+                                            // if prop.name == Convert_attribs_p.key (if Email == Email)
+                                            if (prop.Name.Equals(Convert_attribs_p.Key, StringComparison.CurrentCultureIgnoreCase))
+                                            {
+                                                // set this value (userinfo.Email = "user@test.local")
+                                                // will only use the first value (an attrib can contain more than one value!)
+                                                prop.SetValue(userInfo, search_p.Value.First(), null);
+                                                m_logger.DebugFormat("convert attrib:[{0}] to [{1}] value:[{2}]", Convert_attribs_p.Key, search_p.Key, search_p.Value.First());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("can't convert ldap value", e.Message);
+                }
+
                 return new BooleanResult { Success = true };
             } // end if(userDN != null)
             else

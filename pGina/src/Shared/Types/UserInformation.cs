@@ -80,6 +80,41 @@ namespace pGina.Shared.Types
         /// </summary>
         public string Fullname { get; set; }
 
+        /// <summary>
+        /// The email address associated with this user account.
+        /// </summary>
+        public string Email { get; set; }
+
+        /// <summary>
+        /// The LoginScript associated with this user account.
+        /// </summary>
+        public string LoginScript { get; set; }
+
+        /// <summary>
+        /// User Profile: Full Name
+        /// </summary>
+        public string usri4_full_name { get; set; }
+
+        /// <summary>
+        /// User Profile: max profile size in kbytes
+        /// </summary>
+        public string usri4_max_storage { get; set; }
+
+        /// <summary>
+        /// User Profile: Where to store the roaming profile
+        /// </summary>
+        public string usri4_profile { get; set; }
+
+        /// <summary>
+        /// User Profile: Home drive letter
+        /// </summary>
+        public string usri4_home_dir_drive { get; set; }
+
+        /// <summary>
+        /// User Profile: Home drive path
+        /// </summary>
+        public string usri4_home_dir { get; set; }
+
         public UserInformation()
         {
             Groups = new List<GroupInformation>();

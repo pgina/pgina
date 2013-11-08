@@ -86,6 +86,7 @@ namespace pGina.Plugin.Ldap
             this.passwordAttributesDGV.DefaultValuesNeeded += passwordAttributesDGV_DefaultValuesNeeded;
             combCol.Items.AddRange(AttribMethod.methods.Values.ToArray());
             combCol.Items.AddRange(TimeMethod.methods.Values.ToArray());
+            combCol.Items.AddRange(AttribConvert.Attribs.ToArray());
             this.passwordAttributesDGV.Columns.Add(combCol);
         }
 
@@ -155,6 +156,41 @@ namespace pGina.Plugin.Ldap
                 else ctxs += ctx;
             }
             searchContextsTextBox.Text = ctxs;
+
+            // AttribConverter Grid
+            string[] AttribConv = Settings.Store.AttribConv;
+            Column1.DataSource = AttribConvert.Attribs.ToArray();
+            dataGridView1.ColumnCount = 2;
+            for (int x = 0; x < AttribConv.Count(); x++)
+            {
+                string[] split = AttribConv[x].Split('\t');
+                if (split.Count() == 2)
+                {
+                    split[0] = split[0].Trim();
+                    split[1] = split[1].Trim();
+                    if (!String.IsNullOrEmpty(split[0]) && !String.IsNullOrEmpty(split[1]))
+                    {
+                        if (AttribConvert.Attribs.Contains(split[0]))
+                        //if (Array.Exists(WinValues(), element => element == split[0]))
+                        {
+                            int index = AttribConvert.Attribs.IndexOf(split[0]);
+                            //int index = Array.FindIndex(WinValues(), item => item == split[0]);
+
+                            DataGridViewRow row = new DataGridViewRow();
+                            DataGridViewComboBoxCell CellSample = new DataGridViewComboBoxCell();
+                            CellSample.DataSource = AttribConvert.Attribs.ToArray(); // list of the string items that I want to insert in ComboBox.
+                            CellSample.Value = AttribConvert.Attribs[index]; // default value for the ComboBox
+                            row.Cells.Add(CellSample);
+
+                            row.Cells.Add(new DataGridViewTextBoxCell()
+                            {
+                                Value = split[1]
+                            });
+                            dataGridView1.Rows.Add(row);
+                        }
+                    }
+                }
+            }
 
             /////////////// Authorization tab /////////////////
             this.authzRuleMemberComboBox.SelectedIndex = 0;
@@ -369,6 +405,19 @@ namespace pGina.Plugin.Ldap
             Settings.Store.DoSearch = (searchForDnCheckBox.CheckState == CheckState.Checked);
             Settings.Store.SearchFilter = searchFilterTextBox.Text.Trim();
             Settings.Store.SearchContexts = Regex.Split(searchContextsTextBox.Text.Trim(), @"\s*\r?\n\s*");
+
+            List<string> AttribConv = new List<string>();
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                if (row.Cells[0].Value != null && row.Cells[1].Value != null)
+                {
+                    AttribConv.Add(row.Cells[0].Value.ToString() + "\t" + row.Cells[1].Value.ToString().Trim());
+                }
+            }
+            if (AttribConv.Count > 0)
+                Settings.Store.AttribConv = AttribConv.ToArray();
+            else
+                Settings.Store.AttribConv = new string[] { };
             
             // Authorization
             Settings.Store.AuthzRequireAuth = this.authzRequireAuthCB.Checked;

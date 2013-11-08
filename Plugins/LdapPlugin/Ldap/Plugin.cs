@@ -88,7 +88,7 @@ namespace pGina.Plugin.Ldap
 
                 // Authenticate the login
                 m_logger.DebugFormat("Attempting authentication for {0}", userInfo.Username);
-                return server.Authenticate(userInfo.Username, userInfo.Password);
+                return server.Authenticate(userInfo.Username, userInfo.Password, properties);
             }
             catch (Exception e)
             {
@@ -380,7 +380,7 @@ namespace pGina.Plugin.Ldap
                 try
                 {
                     // Authenticate using old password
-                    BooleanResult result = serv.Authenticate(userInfo.Username, userInfo.oldPassword);
+                    BooleanResult result = serv.Authenticate(userInfo.Username, userInfo.oldPassword, properties);
                     if (!result.Success)
                     {
                         return new BooleanResult { Success = false, Message = "Password change failed: Invalid LDAP username or password." };

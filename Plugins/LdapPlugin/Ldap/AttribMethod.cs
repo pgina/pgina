@@ -49,6 +49,21 @@ namespace pGina.Plugin.Ldap
         Timestampd,
     }
 
+    class AttribConvert
+    {
+        public static readonly List<string> Attribs = new List<string>(new string[] {
+        // the name must match properties in UserInformation
+                "Fullname",
+                "usri4_max_storage",
+                "usri4_profile",
+                "usri4_home_dir_drive",
+                "usri4_home_dir",
+                "Email",
+                "LoginScript",
+                "Fullname"
+            });
+    }
+
     abstract class AttribMethod
     {
         internal ILog m_logger = LogManager.GetLogger("LdapHash");
