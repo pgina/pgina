@@ -38,6 +38,7 @@ using System.Security.AccessControl;
 using System.IO;
 using Microsoft.Win32;
 using System.Threading;
+using System.Net;
 
 using pGina.Shared.Types;
 
@@ -304,7 +305,7 @@ namespace pGina.Plugin.LocalMachine
                     user.Save();
 
                     // Sync via DE
-                    SyncUserPrincipalInfo(user, userInfo);
+                    SyncUserPrincipalInfo(userInfo);
                     
                     // We have to re-fetch to get changes made via underlying DE
                     return GetUserPrincipal(user.Name);
@@ -312,19 +313,21 @@ namespace pGina.Plugin.LocalMachine
             }
 
             user = GetUserPrincipal(userInfo.Username);
-            if (user != null)
-                return user;
-            else
-                throw new Exception(
-                    String.Format("Unable to get user principal for account that apparently exists: {0}", userInfo.Username));
+            if (user == null)
+                m_logger.ErrorFormat("Unable to get user principal for account that apparently exists: {0}", userInfo.Username);
+
+            return user;
         }
 
-        private void SyncUserPrincipalInfo(UserPrincipal user, UserInformation info)
+        private void SyncUserPrincipalInfo(UserInformation info)
         {
             using(DirectoryEntry userDe = m_sam.Children.Find(info.Username, "User"))
             {
-                if(!string.IsNullOrEmpty(info.Description)) userDe.Properties["Description"].Value = info.Description;
-                if(!string.IsNullOrEmpty(info.Fullname)) userDe.Properties["FullName"].Value = info.Fullname;
+                if (!string.IsNullOrEmpty(info.Description)) userDe.Properties["Description"].Value = info.Description;
+                if (!string.IsNullOrEmpty(info.Fullname)) userDe.Properties["FullName"].Value = info.Fullname;
+                if (!string.IsNullOrEmpty(info.usri4_home_dir)) userDe.Properties["HomeDirectory"].Value = info.usri4_home_dir;
+                if (!string.IsNullOrEmpty(info.usri4_home_dir_drive)) userDe.Properties["HomeDirDrive"].Value = info.usri4_home_dir_drive;
+                if (!string.IsNullOrEmpty(info.usri4_profile)) userDe.Properties["Profile"].Value = info.usri4_profile;
                 userDe.Invoke("SetPassword", new object[] { info.Password });
                 userDe.CommitChanges();                
             }
@@ -345,10 +348,11 @@ namespace pGina.Plugin.LocalMachine
         public void SyncToLocalUser()
         {
             m_logger.Debug("SyncToLocalUser()");
+
             using (UserPrincipal user = CreateOrGetUserPrincipal(UserInfo))
             {
                 // Force password and fullname match (redundant if we just created, but oh well)
-                SyncUserPrincipalInfo(user, UserInfo);
+                SyncUserPrincipalInfo(UserInfo);
 
                 try
                 {
@@ -396,6 +400,20 @@ namespace pGina.Plugin.LocalMachine
                     throw new GroupSyncException(e);
                 }
             }
+
+            //set ntuser.dat permissions
+            if (!String.IsNullOrEmpty(UserInfo.usri4_profile) && !UserInfo.Description.Contains("pgSMB"))
+            {
+                if (Connect2share(UserInfo.usri4_profile + ((Environment.OSVersion.Version.Major == 6) ? ".V2" : ""), UserInfo.Username, UserInfo.Password, 3, false))
+                {
+                    if (File.Exists(UserInfo.usri4_profile + ((Environment.OSVersion.Version.Major == 6) ? ".V2" : "") + "\\NTUSER.DAT"))
+                    {
+                        SetACL(UserInfo);
+                        Connect2share(UserInfo.usri4_profile + ((Environment.OSVersion.Version.Major == 6) ? ".V2" : ""), null, null, 0, true);
+                    }
+                }
+            }
+
             m_logger.Debug("End SyncToLocalUser()");
         }
 
@@ -564,6 +582,113 @@ namespace pGina.Plugin.LocalMachine
             {
                 m_logger.Debug(ex.Message);
             }
+        }
+
+        private static Boolean Connect2share(string share, string username, string password, uint retry, Boolean DISconnect)
+        {
+            if (DISconnect)
+            {
+                m_logger.DebugFormat("Disconnect from {0}", share);
+                if (!unc.disconnectRemote(share))
+                    m_logger.WarnFormat("unable to disconnect from {0}", share);
+
+                return true;
+            }
+            else
+            {
+                string[] server = SMBserver(share, false);
+                if (String.IsNullOrEmpty(server[0]))
+                {
+                    m_logger.ErrorFormat("Can't extract SMB server from {0}", share);
+                    return false;
+                }
+
+                server[0] += "\\" + username;
+
+                for (int x = 1; x <= retry; x++)
+                {
+                    try
+                    {
+                        m_logger.DebugFormat("{0}. try to connect to {1} as {2}", x, share, server[0]);
+                        if (!unc.connectToRemote(share, server[0], password))
+                            m_logger.ErrorFormat("Failed to connect to share {0}", share);
+                        if (Directory.Exists(share))
+                            return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        m_logger.Error(ex.Message);
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        private static Boolean SetACL(UserInformation userInfo)
+        {
+            if (!registry.RegistryLoad("HKEY_LOCAL_MACHINE", userInfo.Username, userInfo.usri4_profile + ((Environment.OSVersion.Version.Major == 6) ? ".V2" : "") + "\\NTUSER.DAT"))
+            {
+                m_logger.WarnFormat("Can't load regfile {0}", userInfo.usri4_profile + ((Environment.OSVersion.Version.Major == 6) ? ".V2" : "") + "\\NTUSER.DAT");
+                return false;
+            }
+            if (!registry.RegSec(RegistryLocation.HKEY_LOCAL_MACHINE, userInfo.Username))
+            {
+                m_logger.WarnFormat("Can't set ACL for regkey {0}\\{1}", RegistryLocation.HKEY_LOCAL_MACHINE.ToString(), userInfo.Username);
+                return false;
+            }
+            if (!registry.RegistryUnLoad("HKEY_LOCAL_MACHINE", userInfo.Username))
+            {
+                m_logger.WarnFormat("Can't unload regkey {0}\\{1}", userInfo.usri4_profile + ((Environment.OSVersion.Version.Major == 6) ? ".V2" : ""), "NTUSER.DAT");
+                return false;
+            }
+
+            return true;
+        }
+
+        private static string[] SMBserver(string share, Boolean visversa)
+        {
+            string[] ret = { null, null };
+            string[] server;
+            try
+            {
+                server = share.Trim('\\').Split('\\');
+            }
+            catch
+            {
+                m_logger.DebugFormat("can't split servername {0}", share);
+                return ret;
+            }
+
+            if (!String.IsNullOrEmpty(server[0]))
+            {
+                ret[0] = server[0];
+                ret[1] = server[0];
+                if (!visversa)
+                    return ret;
+                try
+                {
+                    IPHostEntry hostFQDN = Dns.GetHostEntry(server[0]);
+                    if (hostFQDN.HostName.Equals(server[0], StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        IPAddress[] hostIPs = Dns.GetHostAddresses(server[0]);
+                        ret[1] = hostIPs[0].ToString();
+                    }
+                    else
+                    {
+                        ret[1] = hostFQDN.HostName;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    m_logger.ErrorFormat("can't resolve FQDN of {0}:{1}", server[0], ex.Message);
+                    return new string[] { null, null };
+                }
+            }
+            else
+                m_logger.DebugFormat("first token of servername {0} is null", share);
+
+            return ret;
         }
 
         /// <summary>

@@ -489,7 +489,7 @@ namespace pGina.Plugin.LocalMachine
 
             if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
             {
-                m_logger.DebugFormat("SessionChange SessionLogoff", changeDescription.SessionId);
+                m_logger.DebugFormat("SessionChange SessionLogoff for ID:{0} as user:{1}", changeDescription.SessionId, userInfo.Username);
 
                 if (userInfo.Description.Contains("pGina created"))
                 {
@@ -505,6 +505,46 @@ namespace pGina.Plugin.LocalMachine
 
                     Thread rem_local = new Thread(() => cleanup(userInfo, changeDescription.SessionId));
                     rem_local.Start();
+                }
+            }
+            if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
+            {
+                m_logger.DebugFormat("SessionChange SessionLogon for ID:{0} as user:{1}", changeDescription.SessionId, userInfo.Username);
+
+                if (!userInfo.Description.Contains("pgSMB"))
+                {
+                    if (!String.IsNullOrEmpty(userInfo.LoginScript))
+                    {
+                        try
+                        {
+                            Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(changeDescription.SessionId, userInfo.LoginScript);
+                        }
+                        catch (Exception ex)
+                        {
+                            m_logger.ErrorFormat("Can't run application {0} because {1}", userInfo.LoginScript, ex.ToString());
+                        }
+                    }
+
+                    if (!registry.RegQueryQuota(RegistryLocation.HKEY_USERS, userInfo.SID.ToString()) && Convert.ToUInt32(userInfo.usri4_max_storage) > 0)
+                    {
+                        m_logger.InfoFormat("no quota GPO settings for user {0}", userInfo.SID.ToString());
+                        if (!registry.RegQuota(RegistryLocation.HKEY_USERS, userInfo.SID.ToString(), Convert.ToUInt32(userInfo.usri4_max_storage)))
+                        {
+                            m_logger.InfoFormat("failed to set quota GPO for user {0}", userInfo.SID.ToString());
+                        }
+                        else
+                        {
+                            m_logger.InfoFormat("done quota GPO settings for user {0}", userInfo.SID.ToString());
+                            try
+                            {
+                                Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(changeDescription.SessionId, "proquota.exe");
+                            }
+                            catch (Exception ex)
+                            {
+                                m_logger.ErrorFormat("Can't run application {0} because {1}", "proquota.exe", ex.ToString());
+                            }
+                        }
+                    }
                 }
             }
         }
