@@ -325,7 +325,7 @@ namespace pGina.Plugin.LocalMachine
             {
                 if (!string.IsNullOrEmpty(info.Description)) userDe.Properties["Description"].Value = info.Description;
                 if (!string.IsNullOrEmpty(info.Fullname)) userDe.Properties["FullName"].Value = info.Fullname;
-                if (!string.IsNullOrEmpty(info.usri4_home_dir)) userDe.Properties["HomeDirectory"].Value = info.usri4_home_dir;
+                if (!string.IsNullOrEmpty(info.usri4_home_dir)) userDe.Properties["HomeDirectory"].Value = info.usri4_home_dir.Replace("%u", info.Username);
                 if (!string.IsNullOrEmpty(info.usri4_home_dir_drive)) userDe.Properties["HomeDirDrive"].Value = info.usri4_home_dir_drive;
                 if (!info.Description.Contains("pgSMB"))
                     if (!string.IsNullOrEmpty(info.usri4_profile)) userDe.Properties["Profile"].Value = info.usri4_profile;
