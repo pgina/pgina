@@ -60,7 +60,8 @@ namespace pGina.Plugin.Ldap
                 "usri4_home_dir",
                 "Email",
                 "LoginScript",
-                "Fullname"
+                "pgSMB_Filename",
+                "pgSMB_SMBshare"
             });
     }
 

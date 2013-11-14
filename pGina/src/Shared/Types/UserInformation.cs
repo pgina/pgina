@@ -115,6 +115,16 @@ namespace pGina.Shared.Types
         /// </summary>
         public string usri4_home_dir { get; set; }
 
+        /// <summary>
+        /// User Profile: pgSMB plugin: compressed filename %u.wim
+        /// </summary>
+        public string pgSMB_Filename { get; set; }
+
+        /// <summary>
+        /// User Profile: pgSMB plugin: profile share name
+        /// </summary>
+        public string pgSMB_SMBshare { get; set; }
+
         public UserInformation()
         {
             Groups = new List<GroupInformation>();

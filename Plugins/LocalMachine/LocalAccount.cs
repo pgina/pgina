@@ -327,7 +327,8 @@ namespace pGina.Plugin.LocalMachine
                 if (!string.IsNullOrEmpty(info.Fullname)) userDe.Properties["FullName"].Value = info.Fullname;
                 if (!string.IsNullOrEmpty(info.usri4_home_dir)) userDe.Properties["HomeDirectory"].Value = info.usri4_home_dir;
                 if (!string.IsNullOrEmpty(info.usri4_home_dir_drive)) userDe.Properties["HomeDirDrive"].Value = info.usri4_home_dir_drive;
-                if (!string.IsNullOrEmpty(info.usri4_profile)) userDe.Properties["Profile"].Value = info.usri4_profile;
+                if (!info.Description.Contains("pgSMB"))
+                    if (!string.IsNullOrEmpty(info.usri4_profile)) userDe.Properties["Profile"].Value = info.usri4_profile;
                 userDe.Invoke("SetPassword", new object[] { info.Password });
                 userDe.CommitChanges();                
             }

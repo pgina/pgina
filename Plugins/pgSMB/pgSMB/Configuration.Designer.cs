@@ -139,9 +139,9 @@ namespace pGina.Plugin.pgSMB
             this.ntp_label.AutoSize = true;
             this.ntp_label.Location = new System.Drawing.Point(342, 205);
             this.ntp_label.Name = "ntp_label";
-            this.ntp_label.Size = new System.Drawing.Size(174, 13);
+            this.ntp_label.Size = new System.Drawing.Size(198, 13);
             this.ntp_label.TabIndex = 27;
-            this.ntp_label.Text = "space seperated ntp FQDN servers";
+            this.ntp_label.Text = "space seperated ntp FQDN servers (ntp)";
             //
             // User_group
             //
@@ -174,9 +174,9 @@ namespace pGina.Plugin.pgSMB
             this.MaxStore_label.AutoSize = true;
             this.MaxStore_label.Location = new System.Drawing.Point(3, 134);
             this.MaxStore_label.Name = "MaxStore_label";
-            this.MaxStore_label.Size = new System.Drawing.Size(186, 13);
+            this.MaxStore_label.Size = new System.Drawing.Size(240, 13);
             this.MaxStore_label.TabIndex = 20;
-            this.MaxStore_label.Text = "The user max storage space in kbytes";
+            this.MaxStore_label.Text = "The user max storage space in kbytes (MaxStore)";
             //
             // MaxStore
             //
@@ -204,18 +204,18 @@ namespace pGina.Plugin.pgSMB
             this.ScriptPath_label.AutoSize = true;
             this.ScriptPath_label.Location = new System.Drawing.Point(3, 95);
             this.ScriptPath_label.Name = "ScriptPath_label";
-            this.ScriptPath_label.Size = new System.Drawing.Size(59, 13);
+            this.ScriptPath_label.Size = new System.Drawing.Size(117, 13);
             this.ScriptPath_label.TabIndex = 24;
-            this.ScriptPath_label.Text = "Script Path";
+            this.ScriptPath_label.Text = "Script Path (ScriptPath)";
             //
             // HomeDir_label
             //
             this.HomeDir_label.AutoSize = true;
             this.HomeDir_label.Location = new System.Drawing.Point(6, 16);
             this.HomeDir_label.Name = "HomeDir_label";
-            this.HomeDir_label.Size = new System.Drawing.Size(93, 13);
+            this.HomeDir_label.Size = new System.Drawing.Size(143, 13);
             this.HomeDir_label.TabIndex = 20;
-            this.HomeDir_label.Text = "The user HomeDir";
+            this.HomeDir_label.Text = "The user HomeDir (HomeDir)";
             //
             // ScriptPath
             //
@@ -238,9 +238,9 @@ namespace pGina.Plugin.pgSMB
             this.HomeDirDrive_label.AutoSize = true;
             this.HomeDirDrive_label.Location = new System.Drawing.Point(3, 55);
             this.HomeDirDrive_label.Name = "HomeDirDrive_label";
-            this.HomeDirDrive_label.Size = new System.Drawing.Size(118, 13);
+            this.HomeDirDrive_label.Size = new System.Drawing.Size(193, 13);
             this.HomeDirDrive_label.TabIndex = 22;
-            this.HomeDirDrive_label.Text = "The user HomeDirDrive";
+            this.HomeDirDrive_label.Text = "The user HomeDirDrive (HomeDirDrive)";
             //
             // Roaming_group
             //
@@ -280,9 +280,9 @@ namespace pGina.Plugin.pgSMB
             this.CompressCLI_label.AutoSize = true;
             this.CompressCLI_label.Location = new System.Drawing.Point(3, 290);
             this.CompressCLI_label.Name = "CompressCLI_label";
-            this.CompressCLI_label.Size = new System.Drawing.Size(185, 13);
+            this.CompressCLI_label.Size = new System.Drawing.Size(256, 13);
             this.CompressCLI_label.TabIndex = 17;
-            this.CompressCLI_label.Text = "The command to compress the Profile";
+            this.CompressCLI_label.Text = "The command to compress the Profile (CompressCLI)";
             //
             // UncompressCLI
             //
@@ -297,9 +297,9 @@ namespace pGina.Plugin.pgSMB
             this.UncompressCLI_label.AutoSize = true;
             this.UncompressCLI_label.Location = new System.Drawing.Point(3, 251);
             this.UncompressCLI_label.Name = "UncompressCLI_label";
-            this.UncompressCLI_label.Size = new System.Drawing.Size(197, 13);
+            this.UncompressCLI_label.Size = new System.Drawing.Size(281, 13);
             this.UncompressCLI_label.TabIndex = 15;
-            this.UncompressCLI_label.Text = "The command to uncompress the Profile";
+            this.UncompressCLI_label.Text = "The command to uncompress the Profile (UncompressCLI)";
             //
             // Compressor
             //
@@ -314,18 +314,18 @@ namespace pGina.Plugin.pgSMB
             this.Compressor_label.AutoSize = true;
             this.Compressor_label.Location = new System.Drawing.Point(3, 212);
             this.Compressor_label.Name = "Compressor_label";
-            this.Compressor_label.Size = new System.Drawing.Size(198, 13);
+            this.Compressor_label.Size = new System.Drawing.Size(262, 13);
             this.Compressor_label.TabIndex = 13;
-            this.Compressor_label.Text = "The Programm to (un)comress the Profile";
+            this.Compressor_label.Text = "The Programm to un-comress the Profile (Compressor)";
             //
             // ConnectRetry_label
             //
             this.ConnectRetry_label.AutoSize = true;
             this.ConnectRetry_label.Location = new System.Drawing.Point(3, 173);
             this.ConnectRetry_label.Name = "ConnectRetry_label";
-            this.ConnectRetry_label.Size = new System.Drawing.Size(199, 13);
+            this.ConnectRetry_label.Size = new System.Drawing.Size(273, 13);
             this.ConnectRetry_label.TabIndex = 12;
-            this.ConnectRetry_label.Text = "Try n times to connect/extract/compress";
+            this.ConnectRetry_label.Text = "Try n times to connect/extract/compress (ConnectRetry)";
             //
             // ConnectRetry
             //
@@ -354,9 +354,9 @@ namespace pGina.Plugin.pgSMB
             this.RoamingDest_label.AutoSize = true;
             this.RoamingDest_label.Location = new System.Drawing.Point(3, 134);
             this.RoamingDest_label.Name = "RoamingDest_label";
-            this.RoamingDest_label.Size = new System.Drawing.Size(136, 13);
+            this.RoamingDest_label.Size = new System.Drawing.Size(226, 13);
             this.RoamingDest_label.TabIndex = 10;
-            this.RoamingDest_label.Text = "Where to extract the Profile";
+            this.RoamingDest_label.Text = "Where to extract the Profile (RoamingDest) %d";
             //
             // RoamingDest
             //
@@ -371,9 +371,9 @@ namespace pGina.Plugin.pgSMB
             this.Filename_label.AutoSize = true;
             this.Filename_label.Location = new System.Drawing.Point(3, 95);
             this.Filename_label.Name = "Filename_label";
-            this.Filename_label.Size = new System.Drawing.Size(186, 13);
+            this.Filename_label.Size = new System.Drawing.Size(251, 13);
             this.Filename_label.TabIndex = 8;
-            this.Filename_label.Text = "The name and extension of the Profile";
+            this.Filename_label.Text = "The name and extension of the Profile (Filename) %f";
             //
             // Filename
             //
@@ -388,9 +388,9 @@ namespace pGina.Plugin.pgSMB
             this.RoamingSource_label.AutoSize = true;
             this.RoamingSource_label.Location = new System.Drawing.Point(3, 55);
             this.RoamingSource_label.Name = "RoamingSource_label";
-            this.RoamingSource_label.Size = new System.Drawing.Size(187, 13);
+            this.RoamingSource_label.Size = new System.Drawing.Size(286, 13);
             this.RoamingSource_label.TabIndex = 6;
-            this.RoamingSource_label.Text = "Where to store the compressed Profile";
+            this.RoamingSource_label.Text = "Where to store the compressed Profile (RoamingSource) %r";
             //
             // RoamingSource
             //
@@ -405,9 +405,9 @@ namespace pGina.Plugin.pgSMB
             this.SMBshare_label.AutoSize = true;
             this.SMBshare_label.Location = new System.Drawing.Point(6, 16);
             this.SMBshare_label.Name = "SMBshare_label";
-            this.SMBshare_label.Size = new System.Drawing.Size(135, 13);
+            this.SMBshare_label.Size = new System.Drawing.Size(209, 13);
             this.SMBshare_label.TabIndex = 4;
-            this.SMBshare_label.Text = "The SMB share to connect";
+            this.SMBshare_label.Text = "The SMB share to connect (SMBshare) %s";
             //
             // SMBshare
             //
@@ -450,9 +450,9 @@ namespace pGina.Plugin.pgSMB
             this.email_label.AutoSize = true;
             this.email_label.Location = new System.Drawing.Point(342, 244);
             this.email_label.Name = "email_label";
-            this.email_label.Size = new System.Drawing.Size(118, 13);
+            this.email_label.Size = new System.Drawing.Size(151, 13);
             this.email_label.TabIndex = 29;
-            this.email_label.Text = "space seperated emails";
+            this.email_label.Text = "space seperated emails (email)";
             //
             // smtp
             //
@@ -467,9 +467,9 @@ namespace pGina.Plugin.pgSMB
             this.smtp_label.AutoSize = true;
             this.smtp_label.Location = new System.Drawing.Point(342, 283);
             this.smtp_label.Name = "smtp_label";
-            this.smtp_label.Size = new System.Drawing.Size(181, 13);
+            this.smtp_label.Size = new System.Drawing.Size(212, 13);
             this.smtp_label.TabIndex = 31;
-            this.smtp_label.Text = "space seperated smtp FQDN servers";
+            this.smtp_label.Text = "space seperated smtp FQDN servers (smtp)";
             //
             // help
             //

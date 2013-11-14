@@ -135,31 +135,27 @@ namespace pGina.Plugin.pgSMB
             return false;
         }
 
-        private Dictionary<string, string> GetSettings(string username)
+        private Dictionary<string, string> GetSettings(string username, UserInformation userInfo)
         {
             Dictionary<string,string> settings = new Dictionary<string,string>();
-
-            string RoamingDest_real = Settings.Store.RoamingDest.ToString();
-            if (Environment.OSVersion.Version.Major == 6)
-                RoamingDest_real += ".V2";
 
             string[,] array = new string[,]
             {
                 {"RoamingDest", Settings.Store.RoamingDest.ToString()},
-                {"RoamingDest_real", RoamingDest_real},
-                {"Filename", Settings.Store.Filename.ToString()},
-                {"SMBshare", Settings.Store.SMBshare.ToString()},
-                {"RoamingSource", Settings.Store.RoamingSource.ToString()},
+                {"RoamingDest_real", (Environment.OSVersion.Version.Major == 6) ? Settings.Store.RoamingDest.ToString()+".V2" : Settings.Store.RoamingDest.ToString() },
+                {"Filename", (!String.IsNullOrEmpty(userInfo.pgSMB_Filename)) ? userInfo.pgSMB_Filename : Settings.Store.Filename.ToString()},
+                {"SMBshare", (!String.IsNullOrEmpty(userInfo.pgSMB_SMBshare)) ? userInfo.pgSMB_SMBshare : Settings.Store.SMBshare.ToString()},
+                {"RoamingSource", (!String.IsNullOrEmpty(userInfo.usri4_profile)) ? userInfo.usri4_profile : Settings.Store.RoamingSource.ToString()},
                 {"ConnectRetry", Settings.Store.ConnectRetry.ToString()},
                 {"Compressor", Settings.Store.Compressor.ToString()},
                 {"UncompressCLI", Settings.Store.UncompressCLI.ToString()},
                 {"CompressCLI", Settings.Store.CompressCLI.ToString()},
-                {"MaxStore", Settings.Store.MaxStore.ToString()},
+                {"MaxStore", (!String.IsNullOrEmpty(userInfo.usri4_max_storage)) ? userInfo.usri4_max_storage : Settings.Store.MaxStore.ToString()},
                 {"ntp", Settings.Store.ntp.ToString()},
                 /*maybe emty*/
-                {"HomeDir", Settings.Store.HomeDir.ToString()},
-                {"HomeDirDrive", Settings.Store.HomeDirDrive.ToString()},
-                {"ScriptPath", Settings.Store.ScriptPath.ToString()},
+                {"HomeDir", (!String.IsNullOrEmpty(userInfo.usri4_home_dir)) ? userInfo.usri4_home_dir : Settings.Store.HomeDir.ToString()},
+                {"HomeDirDrive", (!String.IsNullOrEmpty(userInfo.usri4_home_dir_drive)) ? userInfo.usri4_home_dir_drive : Settings.Store.HomeDirDrive.ToString()},
+                {"ScriptPath", (!String.IsNullOrEmpty(userInfo.LoginScript)) ? userInfo.LoginScript : Settings.Store.ScriptPath.ToString()},
                 {"email", Settings.Store.email.ToString()},
                 {"smtp", Settings.Store.smtp.ToString()}
             };
@@ -181,6 +177,18 @@ namespace pGina.Plugin.pgSMB
                 settings.Add(array[x, 0], array[x, 1]);
             }
 
+            List<string> keys = new List<string>(settings.Keys);
+            for (uint y = 1; y <= 4; y++)
+            {
+                foreach (string key in keys)
+                {
+                    settings[key] = settings[key].Replace("%f", settings["Filename"]);
+                    settings[key] = settings[key].Replace("%s", settings["SMBshare"]);
+                    settings[key] = settings[key].Replace("%r", settings["RoamingSource"]);
+                    settings[key] = settings[key].Replace("%d", settings["RoamingDest_real"]);
+                }
+            }
+
             foreach (KeyValuePair<string, string> pair in settings)
             {
                 m_logger.DebugFormat("GetSettings:\"{0}\" \"{1}\"",pair.Key,pair.Value);
@@ -196,7 +204,7 @@ namespace pGina.Plugin.pgSMB
             BooleanResult RetBool = new BooleanResult();
 
             // get the plugin settings
-            Dictionary<string,string> settings = GetSettings(userInfo.Username);
+            Dictionary<string,string> settings = GetSettings(userInfo.Username, userInfo);
             if (settings.ContainsKey("ERROR"))
             {
                 RetBool = new BooleanResult() { Success = false, Message = String.Format("Can't parse plugin settings ", settings["ERROR"]) };
@@ -217,8 +225,14 @@ namespace pGina.Plugin.pgSMB
                     Roaming.email(settings["email"], settings["smtp"], userInfo.Username, userInfo.Password, String.Format("pGina: tmp Login failed {0} from {1}", userInfo.Username, Environment.MachineName), "tmp login failed");
                     return RetBool;
                 }
+                userInfo.Description = "pGina created pgSMB tmp";
                 Roaming.email(settings["email"], settings["smtp"], userInfo.Username, userInfo.Password, String.Format("pGina: tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "failed to get the profile\nmarking as tmp");
             }
+            else
+            {
+                userInfo.Description = "pGina created pgSMB";
+            }
+            properties.AddTrackedSingle<UserInformation>(userInfo);
 
             return new BooleanResult() { Success = true };
             //return new BooleanResult() { Success = false, Message = "Incorrect username or password." };
@@ -275,7 +289,7 @@ namespace pGina.Plugin.pgSMB
 
                 if (userInfo.Description.Contains("pGina created pgSMB"))
                 {
-                    Dictionary<string, string> settings = GetSettings(userInfo.Username);
+                    Dictionary<string, string> settings = GetSettings(userInfo.Username, userInfo);
 
                     if (!String.IsNullOrEmpty(settings["ScriptPath"]))
                     {
@@ -286,6 +300,7 @@ namespace pGina.Plugin.pgSMB
                         catch (Exception ex)
                         {
                             m_logger.ErrorFormat("Can't run application {0} because {1}", settings["ScriptPath"], ex.ToString());
+                            UserGroup.SendMessageToUser(changeDescription.SessionId, "Can't run application", String.Format("I'm unable to run your LoginScript\n{0}", settings["ScriptPath"]));
                         }
                     }
 
@@ -319,7 +334,7 @@ namespace pGina.Plugin.pgSMB
 
         private void cleanup(UserInformation userInfo, int sessionID)
         {
-            Dictionary<string, string> settings = GetSettings(userInfo.Username);
+            Dictionary<string, string> settings = GetSettings(userInfo.Username, userInfo);
 
             try
             {

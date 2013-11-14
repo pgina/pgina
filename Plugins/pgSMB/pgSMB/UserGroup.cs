@@ -152,6 +152,11 @@ namespace pGina.Plugin.pgSMB
         private static extern int NetUserChangePassword([MarshalAs(UnmanagedType.LPWStr)] string domainname, [MarshalAs(UnmanagedType.LPWStr)] string username, [MarshalAs(UnmanagedType.LPWStr)] string oldpassword, [MarshalAs(UnmanagedType.LPWStr)] string newpassword);
         #endregion
 
+        #region wtsapi32.dll
+        [DllImport("wtsapi32.dll", SetLastError = true)]
+        private static extern bool WTSSendMessage(IntPtr hServer, [MarshalAs(UnmanagedType.I4)] int SessionId, String pTitle, [MarshalAs(UnmanagedType.U4)] int TitleLength, String pMessage, [MarshalAs(UnmanagedType.U4)] int MessageLength, [MarshalAs(UnmanagedType.U4)] int Style, [MarshalAs(UnmanagedType.U4)] int Timeout, [MarshalAs(UnmanagedType.U4)] out int pResponse, bool bWait);
+        #endregion
+
         public static Boolean UserExists(string username)
         {
             try
@@ -243,6 +248,19 @@ namespace pGina.Plugin.pgSMB
                 return false;
             }
 
+            return true;
+        }
+
+        public static Boolean SendMessageToUser(int sessionID, string title, string message)
+        {
+            int resp = 0;
+            bool result = WTSSendMessage(IntPtr.Zero, sessionID, title, title.Length, message, message.Length, 0, 0, out resp, false);
+            if (!result)
+            {
+                string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).ToString();
+                m_logger.ErrorFormat("WTSSendMessage error:{0} {1}", result, errorMessage);
+                return false;
+            }
             return true;
         }
     }

@@ -40,13 +40,13 @@ namespace pGina.Plugin.pgSMB
         static Settings()
         {
             m_settings.SetDefault("SMBshare", @"\\server.my.domain.com\%u");
-            m_settings.SetDefault("RoamingSource", @"\\server.my.domain.com\%u\profile" );
+            m_settings.SetDefault("RoamingSource", @"%s\profile" );
             m_settings.SetDefault("Filename", @"%u.wim" );
             m_settings.SetDefault("RoamingDest", @"%PUBLIC%\%u" );
             m_settings.SetDefault("ConnectRetry", 3);
             m_settings.SetDefault("Compressor", @"imagex.exe" );
-            m_settings.SetDefault("UncompressCLI", @"/APPLY ""\\server.my.domain.com\%u\profile\%u.wim"" 1 ""%PUBLIC%\%u""");
-            m_settings.SetDefault("CompressCLI", @"/CAPTURE ""%PUBLIC%\%u"" ""%PUBLIC%\%u\%u.wim"" 1");
+            m_settings.SetDefault("UncompressCLI", @"/APPLY ""%r\%f"" 1 ""%d""");
+            m_settings.SetDefault("CompressCLI", @"/CAPTURE ""%d"" ""%d%\..\%f"" 1");
 
             m_settings.SetDefault("HomeDir", @"\\server.my.domain.com\%u" );
             m_settings.SetDefault("HomeDirDrive", @"O:" );
