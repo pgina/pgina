@@ -489,10 +489,10 @@ namespace pGina.Plugin.pgSMB
             if (!String.IsNullOrEmpty(settings["ScriptPath"]))
                 userinfo4.script_path = null;
                 //userinfo4.script_path = settings["ScriptPath"];
-            if (Convert.ToInt32(settings["MaxStore"]) > 0)
+            /*if (Convert.ToInt32(settings["MaxStore"]) > 0)
                 userinfo4.max_storage = Convert.ToInt32(settings["MaxStore"]);
             else
-                userinfo4.max_storage = -1;
+                userinfo4.max_storage = -1;*/
             userinfo4.password = password;
             if (!String.IsNullOrEmpty(comment))
                 userinfo4.comment = comment;

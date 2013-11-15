@@ -442,9 +442,16 @@ namespace pGina.Plugin.Ldap
                                             if (prop.Name.Equals(Convert_attribs_p.Key, StringComparison.CurrentCultureIgnoreCase))
                                             {
                                                 // set this value (userinfo.Email = "user@test.local")
-                                                // will only use the first value (an attrib can contain more than one value!)
-                                                prop.SetValue(userInfo, search_p.Value.First(), null);
-                                                m_logger.DebugFormat("convert attrib:[{0}] to [{1}] value:[{2}]", Convert_attribs_p.Key, search_p.Key, search_p.Value.First());
+                                                try
+                                                {
+                                                    object o = Convert.ChangeType(search_p.Value.First(), prop.PropertyType);
+                                                    prop.SetValue(userInfo, o, null);
+                                                    m_logger.DebugFormat("convert attrib:[{0}] to [{1}] value:[{2}]", search_p.Key, Convert_attribs_p.Key, search_p.Value.First());
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    m_logger.ErrorFormat("can't convert attrib:[{0}] to [{1}] Error:[{2}]", search_p.Key, Convert_attribs_p.Key, ex.Message);
+                                                }
                                             }
                                         }
                                     }

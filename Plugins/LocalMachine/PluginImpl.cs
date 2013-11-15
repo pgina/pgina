@@ -474,14 +474,7 @@ namespace pGina.Plugin.LocalMachine
                 return;
 
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-            try
-            {
-                String.IsNullOrEmpty(userInfo.Username.Length.ToString());
-                String.IsNullOrEmpty(userInfo.Password.Length.ToString());
-                String.IsNullOrEmpty(userInfo.Description.Length.ToString());
-                String.IsNullOrEmpty(userInfo.SID.ToString().Length.ToString());
-            }
-            catch
+            if (!userInfo.HasSID)
             {
                 m_logger.InfoFormat("SessionChange Event denied for ID:{0}", changeDescription.SessionId);
                 return;

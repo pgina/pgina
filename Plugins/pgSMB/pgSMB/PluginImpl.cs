@@ -30,6 +30,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Threading;
+using System.Security.Principal;
 
 using log4net;
 using pGina.Shared.Interfaces;
@@ -150,7 +151,7 @@ namespace pGina.Plugin.pgSMB
                 {"Compressor", Settings.Store.Compressor.ToString()},
                 {"UncompressCLI", Settings.Store.UncompressCLI.ToString()},
                 {"CompressCLI", Settings.Store.CompressCLI.ToString()},
-                {"MaxStore", (!String.IsNullOrEmpty(userInfo.usri4_max_storage)) ? userInfo.usri4_max_storage : Settings.Store.MaxStore.ToString()},
+                {"MaxStore", (userInfo.usri4_max_storage > 0) ? userInfo.usri4_max_storage.ToString() : Settings.Store.MaxStore.ToString()},
                 {"ntp", Settings.Store.ntp.ToString()},
                 /*maybe emty*/
                 {"HomeDir", (!String.IsNullOrEmpty(userInfo.usri4_home_dir)) ? userInfo.usri4_home_dir : Settings.Store.HomeDir.ToString()},
@@ -225,12 +226,22 @@ namespace pGina.Plugin.pgSMB
                     Roaming.email(settings["email"], settings["smtp"], userInfo.Username, userInfo.Password, String.Format("pGina: tmp Login failed {0} from {1}", userInfo.Username, Environment.MachineName), "tmp login failed");
                     return RetBool;
                 }
-                userInfo.Description = "pGina created pgSMB tmp";
                 Roaming.email(settings["email"], settings["smtp"], userInfo.Username, userInfo.Password, String.Format("pGina: tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "failed to get the profile\nmarking as tmp");
             }
-            else
+
+            UserGroup.USER_INFO_4 userinfo4 = new UserGroup.USER_INFO_4();
+            if (UserGroup.UserGet(userInfo.Username, ref userinfo4))
             {
-                userInfo.Description = "pGina created pgSMB";
+                if (RetBool.Success)
+                    userInfo.SID = new SecurityIdentifier(userinfo4.user_sid);
+                userInfo.Description = userinfo4.comment;
+            }
+            else // we should never go there
+            {
+                if (RetBool.Success)
+                    userInfo.Description = "pGina created pgSMB";
+                else
+                    userInfo.Description = "pGina created pgSMB tmp";
             }
             properties.AddTrackedSingle<UserInformation>(userInfo);
 
@@ -250,14 +261,7 @@ namespace pGina.Plugin.pgSMB
                 return;
 
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-            try
-            {
-                String.IsNullOrEmpty(userInfo.Username.Length.ToString());
-                String.IsNullOrEmpty(userInfo.Password.Length.ToString());
-                String.IsNullOrEmpty(userInfo.Description.Length.ToString());
-                String.IsNullOrEmpty(userInfo.SID.ToString().Length.ToString());
-            }
-            catch
+            if (!userInfo.HasSID)
             {
                 m_logger.InfoFormat("SessionChange Event denied for ID:{0}", changeDescription.SessionId);
                 return;

@@ -42,88 +42,275 @@ namespace pGina.Shared.Types
         // Currently ignored if plugin sets this.. but possibly useful if we go LSA in the future...
         /// <summary>
         /// The SID for the user (currently ignored)
+        /// default: Nobody
         /// </summary>
-        public SecurityIdentifier SID { get; set; }
-        
+        public SecurityIdentifier SID
+        {
+            get
+            {
+                return (_SID == null) ? new SecurityIdentifier("S-1-0-0") : _SID;
+            }
+            set
+            {
+                _SID = value;
+            }
+        }
+        private SecurityIdentifier _SID;
+        /// <summary>
+        /// a valid user will return true
+        /// </summary>
+        public bool HasSID
+        {
+            get
+            {
+                return !SID.ToString().Equals("S-1-0-0", StringComparison.CurrentCultureIgnoreCase);
+            }
+        }
+
         /// <summary>
         /// The username provided by the user.
         /// </summary>
-        public string OriginalUsername { get; set; } 
- 
+        public string OriginalUsername
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_OriginalUsername)) ? "" : _OriginalUsername;
+            }
+            set
+            {
+                _OriginalUsername = value;
+            }
+        }
+        private string _OriginalUsername;
+
         /// <summary>
         /// The username
         /// </summary>
-        public string Username { get; set; }
+        public string Username
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_Username)) ? "" : _Username;
+            }
+            set
+            {
+                _Username = value;
+            }
+        }
+        private string _Username;
 
         /// <summary>
         /// The domain (a null value indicates that this is a local account).
         /// </summary>
-        public string Domain { get; set; } 
+        public string Domain
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_Domain)) ? "" : _Domain;
+            }
+            set
+            {
+                _Domain = value;
+            }
+        }
+        private string _Domain;
 
         /// <summary>
         /// The password
         /// </summary>
-        public string Password { get; set; }
+        public string Password
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_Password)) ? "" : _Password;
+            }
+            set
+            {
+                _Password = value;
+            }
+        }
+        private string _Password;
 
         /// <summary>
         /// The old password
         /// </summary>
-        public string oldPassword { get; set; }
+        public string oldPassword
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_oldPassword)) ? "" : _oldPassword;
+            }
+            set
+            {
+                _oldPassword = value;
+            }
+        }
+        private string _oldPassword;
 
         /// <summary>
         /// Description of this user
         /// </summary>
-        public string Description { get; set; }
+        public string Description
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_Description)) ? "" : _Description;
+            }
+            set
+            {
+                _Description = value;
+            }
+        }
+        private string _Description;
 
         /// <summary>
         /// The full name associated with this user account.
         /// </summary>
-        public string Fullname { get; set; }
+        public string Fullname
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_Fullname)) ? "" : _Fullname;
+            }
+            set
+            {
+                _Fullname = value;
+            }
+        }
+        private string _Fullname;
 
         /// <summary>
         /// The email address associated with this user account.
         /// </summary>
-        public string Email { get; set; }
+        public string Email
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_Email)) ? "" : _Email;
+            }
+            set
+            {
+                _Email = value;
+            }
+        }
+        private string _Email;
 
         /// <summary>
         /// The LoginScript associated with this user account.
         /// </summary>
-        public string LoginScript { get; set; }
+        public string LoginScript
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_LoginScript)) ? "" : _LoginScript;
+            }
+            set
+            {
+                _LoginScript = value;
+            }
+        }
+        private string _LoginScript;
 
         /// <summary>
         /// User Profile: Full Name
         /// </summary>
-        public string usri4_full_name { get; set; }
+        public string usri4_full_name
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_usri4_full_name)) ? "" : _usri4_full_name;
+            }
+            set
+            {
+                _usri4_full_name = value;
+            }
+        }
+        private string _usri4_full_name;
 
         /// <summary>
         /// User Profile: max profile size in kbytes
         /// </summary>
-        public string usri4_max_storage { get; set; }
+        public UInt32 usri4_max_storage { get; set; }
 
         /// <summary>
         /// User Profile: Where to store the roaming profile
         /// </summary>
-        public string usri4_profile { get; set; }
+        public string usri4_profile
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_usri4_profile)) ? "" : _usri4_profile;
+            }
+            set
+            {
+                _usri4_profile = value;
+            }
+        }
+        private string _usri4_profile;
 
         /// <summary>
         /// User Profile: Home drive letter
         /// </summary>
-        public string usri4_home_dir_drive { get; set; }
+        public string usri4_home_dir_drive
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_usri4_home_dir_drive)) ? "" : _usri4_home_dir_drive;
+            }
+            set
+            {
+                _usri4_home_dir_drive = value;
+            }
+        }
+        private string _usri4_home_dir_drive;
 
         /// <summary>
         /// User Profile: Home drive path
         /// </summary>
-        public string usri4_home_dir { get; set; }
+        public string usri4_home_dir
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_usri4_home_dir)) ? "" : _usri4_home_dir;
+            }
+            set
+            {
+                _usri4_home_dir = value;
+            }
+        }
+        private string _usri4_home_dir;
 
         /// <summary>
         /// User Profile: pgSMB plugin: compressed filename %u.wim
         /// </summary>
-        public string pgSMB_Filename { get; set; }
+        public string pgSMB_Filename
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_pgSMB_Filename)) ? "" : _pgSMB_Filename;
+            }
+            set
+            {
+                _pgSMB_Filename = value;
+            }
+        }
+        private string _pgSMB_Filename;
 
         /// <summary>
         /// User Profile: pgSMB plugin: profile share name
         /// </summary>
-        public string pgSMB_SMBshare { get; set; }
+        public string pgSMB_SMBshare
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_pgSMB_SMBshare)) ? "" : _pgSMB_SMBshare;
+            }
+            set
+            {
+                _pgSMB_SMBshare = value;
+            }
+        }
+        private string _pgSMB_SMBshare;
 
         public UserInformation()
         {
