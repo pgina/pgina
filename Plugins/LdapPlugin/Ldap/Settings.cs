@@ -51,12 +51,13 @@ namespace pGina.Plugin.Ldap
             m_settings.SetDefault("LdapPort", 389);
             m_settings.SetDefault("LdapTimeout", 10);
             m_settings.SetDefault("UseSsl", false);
+            m_settings.SetDefault("UseTls", false);
             m_settings.SetDefault("RequireCert", false);
             m_settings.SetDefault("ServerCertFile", "");            
             m_settings.SetDefault("SearchDN", "");
             m_settings.SetDefaultEncryptedSetting("SearchPW", "");
-            m_settings.SetDefault("GroupDnPattern", "cn=%g,ou=Group,dc=example,dc=com");
-            m_settings.SetDefault("GroupMemberAttrib", "memberUid");
+            //m_settings.SetDefault("GroupDnPattern", "cn=%g,ou=Group,dc=example,dc=com");
+            //m_settings.SetDefault("GroupMemberAttrib", "memberUid");
             m_settings.SetDefault("AttribConv", new string[] { });
 
             // Authentication
@@ -67,19 +68,17 @@ namespace pGina.Plugin.Ldap
             m_settings.SetDefault("SearchContexts", new string[] { });
 
             // Authorization
-            m_settings.SetDefault("GroupAuthzRules", new string[] { (new GroupAuthzRule(true)).ToRegString() });
+            //m_settings.SetDefault("GroupAuthzRules", new string[] { (new GroupAuthzRule(true)).ToRegString() });
+            m_settings.SetDefault("GroupAuthzRules", new string[] { });
             m_settings.SetDefault("AuthzRequireAuth", false);
             m_settings.SetDefault("AuthzAllowOnError", true);
+            m_settings.SetDefault("AuthzDefault", true);
 
             // Gateway
             m_settings.SetDefault("GroupGatewayRules", new string[] { });
 
             // Change password
-            m_settings.SetDefault("ChangePasswordAttributes",
-                new string[] { 
-                    new AttributeEntry { Name = "userPassword", Method = Methods.SHA1 }.ToRegistryString()
-                }
-            );
+            m_settings.SetDefault("ChangePasswordAttributes", new string[] { });
         }
     }
 }

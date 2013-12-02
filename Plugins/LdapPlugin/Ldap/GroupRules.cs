@@ -31,9 +31,9 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 using System.Text.RegularExpressions;
+using System.DirectoryServices.Protocols;
 
 using pGina.Shared.Types;
-
 using log4net;
 
 namespace pGina.Plugin.Ldap
@@ -67,7 +67,6 @@ namespace pGina.Plugin.Ldap
         {
             List<GroupAuthzRule> rules = new List<GroupAuthzRule>();
             string[] strRules = Settings.Store.GroupAuthzRules;
-
             foreach (string str in strRules)
             {
                 GroupAuthzRule rule = GroupAuthzRule.FromRegString(str);
@@ -99,16 +98,24 @@ namespace pGina.Plugin.Ldap
 
     public abstract class GroupRule
     {
-        public string Group { get { return m_group; } }
-        protected string m_group;
-
         public Condition RuleCondition { get { return m_condition; } }
         protected Condition m_condition;
 
-        public GroupRule( string grp, Condition c )
+        public string path { get { return m_path; } }
+        protected string m_path;
+
+        public string filter { get { return m_filter; } }
+        protected string m_filter;
+
+        public SearchScope SearchScope { get { return m_searchscope; } }
+        protected SearchScope m_searchscope;
+
+        public GroupRule( string p, Condition c, string f, SearchScope s )
         {
-            m_group = grp;
             m_condition = c;
+            m_searchscope = s;
+            m_path = p;
+            m_filter = f;
         }
 
         public bool RuleMatch(bool userIsMember)
@@ -122,7 +129,7 @@ namespace pGina.Plugin.Ldap
             }
         }
 
-        public enum Condition { MEMBER_OF, NOT_MEMBER_OF, ALWAYS }        
+        public enum Condition { MEMBER_OF, NOT_MEMBER_OF, ALWAYS }
         public abstract string ToRegString();
     }
 
@@ -131,36 +138,55 @@ namespace pGina.Plugin.Ldap
         public bool AllowOnMatch { get { return m_allowOnMatch; } }
         private bool m_allowOnMatch;
 
-        public GroupAuthzRule(bool allow) : base("", Condition.ALWAYS)
+        public GroupAuthzRule(bool allow) : base("", Condition.ALWAYS, "", SearchScope.Base)
         {
             m_allowOnMatch = allow;
         }
 
-        public GroupAuthzRule(string grp, Condition c, bool allow) : base(grp, c)
+        public GroupAuthzRule(string path, Condition c, bool allow, string filter, SearchScope scope) : base(path, c, filter, scope)
         {
             m_allowOnMatch = allow;
         }
 
         override public string ToRegString()
         {
-            return string.Format("{0}\n{1}\n{2}", m_group, ((int)RuleCondition),(m_allowOnMatch ? "1" : "0") );
+            return string.Format("{0}\t{1}\t{2}\t{3}\t{4}", (int)m_condition, (int)m_searchscope, m_path, m_filter, m_allowOnMatch ? "1" : "0");
         }
 
         public static GroupAuthzRule FromRegString(string str)
         {
-            string[] parts = Regex.Split(str, @"\n");
-            if (parts.Length == 3)
+            str = str.Trim();
+            if (Regex.IsMatch(str, @"[0-1]\t[0-2]\t([\w%]+=[\w% ]+,?)+\t\(.*\)\t[0|1]"))
             {
-                string grp = parts[0];
-                Condition c = (Condition)(Convert.ToInt32(parts[1]));
-                bool allow = Convert.ToInt32(parts[2]) != 0;
-                return new GroupAuthzRule(grp, c, allow);
+                string[] parts = Regex.Split(str, @"\t");
+                if (parts.Length == 5)
+                {
+                    Condition c = (Condition)(Convert.ToInt32(parts[0]));
+                    SearchScope scope = (SearchScope)Convert.ToInt32(parts[1]);
+                    string path = parts[2];
+                    string filter = parts[3];
+                    bool allow = Convert.ToInt32(parts[4]) != 0;
+                    return new GroupAuthzRule(path, c, allow, filter, scope);
+                }
             }
             return null;
         }
 
         override public string ToString()
         {
+            string sScope = "";
+            switch ( SearchScope )
+            {
+                case System.DirectoryServices.Protocols.SearchScope.Base:
+                    sScope = "Base";
+                    break;
+                case System.DirectoryServices.Protocols.SearchScope.OneLevel:
+                    sScope = "OneLevel";
+                    break;
+                case System.DirectoryServices.Protocols.SearchScope.Subtree:
+                    sScope = "Subtree";
+                    break;
+            }
             string str = "";
             switch( RuleCondition )
             {
@@ -168,15 +194,20 @@ namespace pGina.Plugin.Ldap
                     str = "Always";
                     break;
                 case Condition.MEMBER_OF:
-                    str = string.Format("If member of LDAP group \"{0}\"", m_group);
+                    str = string.Format("If \"{0}\" level {1} in \"{2}\"", m_filter, sScope, m_path);
                     break;
                 case Condition.NOT_MEMBER_OF:
-                    str = string.Format("If not member of LDAP group \"{0}\"", m_group);
+                    str = string.Format("!If \"{0}\" level {1} in \"{2}\"", m_filter, sScope, m_path);
                     break;
             }
             if (m_allowOnMatch) str += " allow.";
             else str += " deny.";
 
+            if (str.Length > 110)
+            {
+                int strip = str.Length - 113;
+                str = str.Replace(m_path, m_path.Remove(m_path.Length - strip) + "...");
+            }
             return str;
         }
     }
@@ -186,35 +217,54 @@ namespace pGina.Plugin.Ldap
         public string LocalGroup { get { return m_localGroup; } }
         private string m_localGroup;
 
-        public GroupGatewayRule(string localGroup) : base("", Condition.ALWAYS)
+        public GroupGatewayRule(string localGroup) : base("", Condition.ALWAYS, "", SearchScope.Base)
         {
             m_localGroup = localGroup;
         }
-        public GroupGatewayRule(string grp, Condition c, string addTo) : base(grp,c)
+        public GroupGatewayRule(string path, Condition c, string addTo, string filter, SearchScope scope) : base(path, c, filter, scope)
         {
             m_localGroup = addTo;
         }
 
         public static GroupGatewayRule FromRegString(string str)
         {
-            string[] parts = Regex.Split(str, @"\n");
-            if (parts.Length == 3)
+            str = str.Trim();
+            if (Regex.IsMatch(str, @"[0-1]\t[0-2]\t([\w%]+=[\w% ]+,?)+\t\(.*\)\t[\w-]+") || Regex.IsMatch(str, @"2\t0\t\t\t[\w-]+"))
             {
-                string grp = parts[0];
-                Condition c = (Condition)(Convert.ToInt32(parts[1]));
-                string addTo = parts[2];
-                return new GroupGatewayRule(grp, c, addTo);
+                string[] parts = Regex.Split(str, @"\t");
+                if (parts.Length == 5)
+                {
+                    Condition c = (Condition)(Convert.ToInt32(parts[0]));
+                    SearchScope scope = (SearchScope)Convert.ToInt32(parts[1]);
+                    string path = parts[2];
+                    string filter = parts[3];
+                    string addTo = parts[4];
+                    return new GroupGatewayRule(path, c, addTo, filter, scope);
+                }
             }
             return null;
         }
 
         override public string ToRegString()
         {
-            return m_group + "\n" + ((int)RuleCondition) + "\n" + m_localGroup;
+            return string.Format("{0}\t{1}\t{2}\t{3}\t{4}", (int)m_condition, (int)m_searchscope, m_path, m_filter, m_localGroup);
         }
 
         override public string ToString()
         {
+            string sScope = "";
+            switch (SearchScope)
+            {
+                case System.DirectoryServices.Protocols.SearchScope.Base:
+                    sScope = "Base";
+                    break;
+                case System.DirectoryServices.Protocols.SearchScope.OneLevel:
+                    sScope = "OneLevel";
+                    break;
+                case System.DirectoryServices.Protocols.SearchScope.Subtree:
+                    sScope = "Subtree";
+                    break;
+            }
             string str = "";
             switch (RuleCondition)
             {
@@ -222,13 +272,19 @@ namespace pGina.Plugin.Ldap
                     str = "Always";
                     break;
                 case Condition.MEMBER_OF:
-                    str = string.Format("If member of LDAP group \"{0}\"", m_group);
+                    str = string.Format("If \"{0}\" level {1} in \"{2}\"", m_filter, sScope, m_path);
                     break;
                 case Condition.NOT_MEMBER_OF:
-                    str = string.Format("If not member of LDAP group \"{0}\"", m_group);
+                    str = string.Format("!If \"{0}\" level {1} in \"{2}\"", m_filter, sScope, m_path);
                     break;
             }
-            str += string.Format(" add to local group \"{0}\"", m_localGroup);
+            str += string.Format(" add to \"{0}\"", m_localGroup);
+
+            if (str.Length > 110)
+            {
+                int strip = str.Length - 113;
+                str = str.Replace(m_path, m_path.Remove(m_path.Length - strip) + "...");
+            }
             return str;
         }
     }

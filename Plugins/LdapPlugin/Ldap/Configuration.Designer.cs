@@ -47,20 +47,17 @@
             this.authzRequireAuthCB = new System.Windows.Forms.CheckBox();
             this.authzAllowOnErrorCB = new System.Windows.Forms.CheckBox();
             this.sslCertFileTextBox = new System.Windows.Forms.TextBox();
-            this.groupMemberAttrTB = new System.Windows.Forms.TextBox();
-            this.groupDNPattern = new System.Windows.Forms.TextBox();
             this.allowEmptyPwCB = new System.Windows.Forms.CheckBox();
             this.searchContextsLabel = new System.Windows.Forms.Label();
             this.dnPatternTextBox = new System.Windows.Forms.TextBox();
             this.searchFilterLabel = new System.Windows.Forms.Label();
             this.dnPatternLabel = new System.Windows.Forms.Label();
             this.searchForDnCheckBox = new System.Windows.Forms.CheckBox();
+            this.useTlsCheckBox = new System.Windows.Forms.CheckBox();
             this.ldapServerGroupBox = new System.Windows.Forms.GroupBox();
             this.showPwCB = new System.Windows.Forms.CheckBox();
             this.searchPassTextBox = new System.Windows.Forms.TextBox();
             this.sslCertFileBrowseButton = new System.Windows.Forms.Button();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             this.cancelButton = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.authTabPage = new System.Windows.Forms.TabPage();
@@ -73,6 +70,10 @@
             this.Column1 = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.authzTabPage = new System.Windows.Forms.TabPage();
+            this.AuthPathLabel = new System.Windows.Forms.Label();
+            this.AuthFilterLabel = new System.Windows.Forms.Label();
+            this.authzRuleFilter = new System.Windows.Forms.TextBox();
+            this.authzRuleScope = new System.Windows.Forms.ComboBox();
             this.authzRuleDeleteBtn = new System.Windows.Forms.Button();
             this.authzRuleDownBtn = new System.Windows.Forms.Button();
             this.authzRuleUpBtn = new System.Windows.Forms.Button();
@@ -82,27 +83,30 @@
             this.authzRuleAddButton = new System.Windows.Forms.Button();
             this.authzRulesListBox = new System.Windows.Forms.ListBox();
             this.authzRuleActionComboBox = new System.Windows.Forms.ComboBox();
-            this.authzRuleGroupTB = new System.Windows.Forms.TextBox();
+            this.authzRulePathTB = new System.Windows.Forms.TextBox();
             this.authzRuleMemberComboBox = new System.Windows.Forms.ComboBox();
             this.gatewayTabPage = new System.Windows.Forms.TabPage();
-            this.gatwayRemoteGroupTB = new System.Windows.Forms.TextBox();
+            this.GatewayPathLabel = new System.Windows.Forms.Label();
+            this.GatewayFilterLabel = new System.Windows.Forms.Label();
+            this.gatewayRuleFilter = new System.Windows.Forms.TextBox();
+            this.gatewayRuleScope = new System.Windows.Forms.ComboBox();
+            this.gatwayRulePathTB = new System.Windows.Forms.TextBox();
             this.gatewayRuleGroupMemberCB = new System.Windows.Forms.ComboBox();
             this.gatewayRuleDeleteBtn = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
-            this.gatewayLocalGroupTB = new System.Windows.Forms.TextBox();
+            this.gatewayRuleLocalGroupTB = new System.Windows.Forms.TextBox();
             this.gatewayRulesListBox = new System.Windows.Forms.ListBox();
-            this.addGatewayGroupRuleButton = new System.Windows.Forms.Button();
+            this.gatewayRuleAddButton = new System.Windows.Forms.Button();
             this.tabPageChangePassword = new System.Windows.Forms.TabPage();
-            this.changePasswordDeleteAttribBtn = new System.Windows.Forms.Button();
             this.label9 = new System.Windows.Forms.Label();
             this.passwordAttributesDGV = new System.Windows.Forms.DataGridView();
             this.ldapServerGroupBox.SuspendLayout();
+            this.tabControl1.SuspendLayout();
             this.authTabPage.SuspendLayout();
             this.authtab.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            this.authTabPage.SuspendLayout();
             this.authzTabPage.SuspendLayout();
             this.gatewayTabPage.SuspendLayout();
             this.tabPageChangePassword.SuspendLayout();
@@ -142,7 +146,7 @@
             // validateServerCertCheckBox
             // 
             this.validateServerCertCheckBox.AutoSize = true;
-            this.validateServerCertCheckBox.Location = new System.Drawing.Point(440, 47);
+            this.validateServerCertCheckBox.Location = new System.Drawing.Point(512, 47);
             this.validateServerCertCheckBox.Name = "validateServerCertCheckBox";
             this.validateServerCertCheckBox.Size = new System.Drawing.Size(148, 17);
             this.validateServerCertCheckBox.TabIndex = 6;
@@ -154,11 +158,11 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 74);
+            this.label1.Location = new System.Drawing.Point(6, 74);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(96, 13);
+            this.label1.Size = new System.Drawing.Size(102, 13);
             this.label1.TabIndex = 7;
-            this.label1.Text = "SSL Certificate File";
+            this.label1.Text = "SSL/TLS Certificate";
             this.descriptionToolTip.SetToolTip(this.label1, "File containing the LDAP server\'s public certificate.  If this is left blank (and" +
                     " \"Validate\" is checked) the server\'s\r\ncertificate is verified against the Window" +
                     "s certificate store.");
@@ -275,23 +279,6 @@
             this.descriptionToolTip.SetToolTip(this.sslCertFileTextBox, "Optional:  If left empty, the certificate will be validated\r\nagainst the Windows " +
                     "certificate store.");
             // 
-            // groupMemberAttrTB
-            // 
-            this.groupMemberAttrTB.Location = new System.Drawing.Point(535, 149);
-            this.groupMemberAttrTB.Name = "groupMemberAttrTB";
-            this.groupMemberAttrTB.Size = new System.Drawing.Size(135, 20);
-            this.groupMemberAttrTB.TabIndex = 3;
-            this.descriptionToolTip.SetToolTip(this.groupMemberAttrTB, "The attribute that stores the group\'s membership.");
-            // 
-            // groupDNPattern
-            // 
-            this.groupDNPattern.Location = new System.Drawing.Point(110, 149);
-            this.groupDNPattern.Name = "groupDNPattern";
-            this.groupDNPattern.Size = new System.Drawing.Size(326, 20);
-            this.groupDNPattern.TabIndex = 1;
-            this.descriptionToolTip.SetToolTip(this.groupDNPattern, "A pattern that describes how to generate a group DN\r\nfrom a group name.  Use %g a" +
-                    "s a place holder for the \r\ngroup name.");
-            // 
             // allowEmptyPwCB
             // 
             this.allowEmptyPwCB.AutoSize = true;
@@ -358,8 +345,21 @@
             this.searchForDnCheckBox.UseVisualStyleBackColor = true;
             this.searchForDnCheckBox.CheckedChanged += new System.EventHandler(this.searchForDnCheckBox_CheckedChanged);
             // 
+            // useTlsCheckBox
+            // 
+            this.useTlsCheckBox.AutoSize = true;
+            this.useTlsCheckBox.Location = new System.Drawing.Point(437, 47);
+            this.useTlsCheckBox.Name = "useTlsCheckBox";
+            this.useTlsCheckBox.Size = new System.Drawing.Size(68, 17);
+            this.useTlsCheckBox.TabIndex = 13;
+            this.useTlsCheckBox.Text = "Use TLS";
+            this.descriptionToolTip.SetToolTip(this.useTlsCheckBox, "Whether or not to use TLS encryption.");
+            this.useTlsCheckBox.UseVisualStyleBackColor = true;
+            this.useTlsCheckBox.CheckedChanged += new System.EventHandler(this.useTlsCheckBox_CheckedChanged);
+            // 
             // ldapServerGroupBox
             // 
+            this.ldapServerGroupBox.Controls.Add(this.useTlsCheckBox);
             this.ldapServerGroupBox.Controls.Add(this.showPwCB);
             this.ldapServerGroupBox.Controls.Add(this.timeoutTextBox);
             this.ldapServerGroupBox.Controls.Add(this.timeoutLabel);
@@ -376,13 +376,9 @@
             this.ldapServerGroupBox.Controls.Add(this.ldapHostTextBox);
             this.ldapServerGroupBox.Controls.Add(this.ldapPortLabel);
             this.ldapServerGroupBox.Controls.Add(this.ldapHostDescriptionLabel);
-            this.ldapServerGroupBox.Controls.Add(this.groupMemberAttrTB);
-            this.ldapServerGroupBox.Controls.Add(this.groupDNPattern);
-            this.ldapServerGroupBox.Controls.Add(this.label5);
-            this.ldapServerGroupBox.Controls.Add(this.label4);
             this.ldapServerGroupBox.Location = new System.Drawing.Point(12, 12);
             this.ldapServerGroupBox.Name = "ldapServerGroupBox";
-            this.ldapServerGroupBox.Size = new System.Drawing.Size(676, 180);
+            this.ldapServerGroupBox.Size = new System.Drawing.Size(676, 151);
             this.ldapServerGroupBox.TabIndex = 3;
             this.ldapServerGroupBox.TabStop = false;
             this.ldapServerGroupBox.Text = "LDAP Server";
@@ -416,24 +412,6 @@
             this.sslCertFileBrowseButton.UseVisualStyleBackColor = true;
             this.sslCertFileBrowseButton.Click += new System.EventHandler(this.sslCertFileBrowseButton_Click);
             // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(442, 152);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(87, 13);
-            this.label5.TabIndex = 2;
-            this.label5.Text = "Member Attribute";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 152);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(92, 13);
-            this.label4.TabIndex = 0;
-            this.label4.Text = "Group DN Pattern";
-            // 
             // cancelButton
             // 
             this.cancelButton.Location = new System.Drawing.Point(524, 464);
@@ -450,10 +428,10 @@
             this.tabControl1.Controls.Add(this.authzTabPage);
             this.tabControl1.Controls.Add(this.gatewayTabPage);
             this.tabControl1.Controls.Add(this.tabPageChangePassword);
-            this.tabControl1.Location = new System.Drawing.Point(12, 198);
+            this.tabControl1.Location = new System.Drawing.Point(12, 169);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(670, 260);
+            this.tabControl1.Size = new System.Drawing.Size(670, 289);
             this.tabControl1.TabIndex = 6;
             // 
             // authTabPage
@@ -462,7 +440,7 @@
             this.authTabPage.Location = new System.Drawing.Point(4, 22);
             this.authTabPage.Name = "authTabPage";
             this.authTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.authTabPage.Size = new System.Drawing.Size(662, 234);
+            this.authTabPage.Size = new System.Drawing.Size(662, 263);
             this.authTabPage.TabIndex = 0;
             this.authTabPage.Text = "Authentication";
             this.authTabPage.UseVisualStyleBackColor = true;
@@ -474,7 +452,7 @@
             this.authtab.Location = new System.Drawing.Point(0, 0);
             this.authtab.Name = "authtab";
             this.authtab.SelectedIndex = 0;
-            this.authtab.Size = new System.Drawing.Size(666, 238);
+            this.authtab.Size = new System.Drawing.Size(666, 263);
             this.authtab.TabIndex = 16;
             // 
             // tabPage1
@@ -490,7 +468,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(658, 212);
+            this.tabPage1.Size = new System.Drawing.Size(658, 237);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Bind";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -501,7 +479,7 @@
             this.searchContextsTextBox.Multiline = true;
             this.searchContextsTextBox.Name = "searchContextsTextBox";
             this.searchContextsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.searchContextsTextBox.Size = new System.Drawing.Size(543, 115);
+            this.searchContextsTextBox.Size = new System.Drawing.Size(543, 140);
             this.searchContextsTextBox.TabIndex = 21;
             // 
             // searchFilterTextBox
@@ -517,7 +495,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(658, 212);
+            this.tabPage2.Size = new System.Drawing.Size(658, 237);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Attribute converter";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -530,7 +508,7 @@
             this.Column2});
             this.dataGridView1.Location = new System.Drawing.Point(6, 6);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(645, 200);
+            this.dataGridView1.Size = new System.Drawing.Size(645, 225);
             this.dataGridView1.TabIndex = 17;
             // 
             // Column1
@@ -551,6 +529,10 @@
             // 
             // authzTabPage
             // 
+            this.authzTabPage.Controls.Add(this.AuthPathLabel);
+            this.authzTabPage.Controls.Add(this.AuthFilterLabel);
+            this.authzTabPage.Controls.Add(this.authzRuleFilter);
+            this.authzTabPage.Controls.Add(this.authzRuleScope);
             this.authzTabPage.Controls.Add(this.authzAllowOnErrorCB);
             this.authzTabPage.Controls.Add(this.authzRequireAuthCB);
             this.authzTabPage.Controls.Add(this.authzRuleDeleteBtn);
@@ -562,20 +544,58 @@
             this.authzTabPage.Controls.Add(this.authzRuleAddButton);
             this.authzTabPage.Controls.Add(this.authzRulesListBox);
             this.authzTabPage.Controls.Add(this.authzRuleActionComboBox);
-            this.authzTabPage.Controls.Add(this.authzRuleGroupTB);
+            this.authzTabPage.Controls.Add(this.authzRulePathTB);
             this.authzTabPage.Controls.Add(this.authzRuleMemberComboBox);
             this.authzTabPage.Location = new System.Drawing.Point(4, 22);
             this.authzTabPage.Name = "authzTabPage";
             this.authzTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.authzTabPage.Size = new System.Drawing.Size(662, 234);
+            this.authzTabPage.Size = new System.Drawing.Size(662, 263);
             this.authzTabPage.TabIndex = 1;
             this.authzTabPage.Text = "Authorization";
             this.authzTabPage.UseVisualStyleBackColor = true;
             // 
+            // AuthPathLabel
+            // 
+            this.AuthPathLabel.AutoSize = true;
+            this.AuthPathLabel.Location = new System.Drawing.Point(158, 214);
+            this.AuthPathLabel.Name = "AuthPathLabel";
+            this.AuthPathLabel.Size = new System.Drawing.Size(29, 13);
+            this.AuthPathLabel.TabIndex = 24;
+            this.AuthPathLabel.Text = "Path:";
+            // 
+            // AuthFilterLabel
+            // 
+            this.AuthFilterLabel.AutoSize = true;
+            this.AuthFilterLabel.Location = new System.Drawing.Point(158, 239);
+            this.AuthFilterLabel.Name = "AuthFilterLabel";
+            this.AuthFilterLabel.Size = new System.Drawing.Size(32, 13);
+            this.AuthFilterLabel.TabIndex = 23;
+            this.AuthFilterLabel.Text = "Filter:";
+            // 
+            // authzRuleFilter
+            // 
+            this.authzRuleFilter.Location = new System.Drawing.Point(195, 236);
+            this.authzRuleFilter.Name = "authzRuleFilter";
+            this.authzRuleFilter.Size = new System.Drawing.Size(273, 20);
+            this.authzRuleFilter.TabIndex = 22;
+            // 
+            // authzRuleScope
+            // 
+            this.authzRuleScope.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.authzRuleScope.FormattingEnabled = true;
+            this.authzRuleScope.Items.AddRange(new object[] {
+            "Base",
+            "OneLevel",
+            "Subtree"});
+            this.authzRuleScope.Location = new System.Drawing.Point(77, 211);
+            this.authzRuleScope.Name = "authzRuleScope";
+            this.authzRuleScope.Size = new System.Drawing.Size(76, 21);
+            this.authzRuleScope.TabIndex = 21;
+            // 
             // authzRuleDeleteBtn
             // 
             this.authzRuleDeleteBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.delete;
-            this.authzRuleDeleteBtn.Location = new System.Drawing.Point(583, 82);
+            this.authzRuleDeleteBtn.Location = new System.Drawing.Point(622, 82);
             this.authzRuleDeleteBtn.Name = "authzRuleDeleteBtn";
             this.authzRuleDeleteBtn.Size = new System.Drawing.Size(32, 34);
             this.authzRuleDeleteBtn.TabIndex = 18;
@@ -585,7 +605,7 @@
             // authzRuleDownBtn
             // 
             this.authzRuleDownBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.DownArrowSolid;
-            this.authzRuleDownBtn.Location = new System.Drawing.Point(583, 123);
+            this.authzRuleDownBtn.Location = new System.Drawing.Point(622, 123);
             this.authzRuleDownBtn.Name = "authzRuleDownBtn";
             this.authzRuleDownBtn.Size = new System.Drawing.Size(32, 34);
             this.authzRuleDownBtn.TabIndex = 17;
@@ -595,7 +615,7 @@
             // authzRuleUpBtn
             // 
             this.authzRuleUpBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.UpArrowSolid;
-            this.authzRuleUpBtn.Location = new System.Drawing.Point(583, 42);
+            this.authzRuleUpBtn.Location = new System.Drawing.Point(622, 42);
             this.authzRuleUpBtn.Name = "authzRuleUpBtn";
             this.authzRuleUpBtn.Size = new System.Drawing.Size(32, 34);
             this.authzRuleUpBtn.TabIndex = 16;
@@ -635,7 +655,7 @@
             // 
             // authzRuleAddButton
             // 
-            this.authzRuleAddButton.Location = new System.Drawing.Point(503, 185);
+            this.authzRuleAddButton.Location = new System.Drawing.Point(545, 236);
             this.authzRuleAddButton.Name = "authzRuleAddButton";
             this.authzRuleAddButton.Size = new System.Drawing.Size(71, 23);
             this.authzRuleAddButton.TabIndex = 12;
@@ -648,7 +668,7 @@
             this.authzRulesListBox.FormattingEnabled = true;
             this.authzRulesListBox.Location = new System.Drawing.Point(6, 32);
             this.authzRulesListBox.Name = "authzRulesListBox";
-            this.authzRulesListBox.Size = new System.Drawing.Size(571, 147);
+            this.authzRulesListBox.Size = new System.Drawing.Size(610, 173);
             this.authzRulesListBox.TabIndex = 11;
             // 
             // authzRuleActionComboBox
@@ -658,72 +678,114 @@
             this.authzRuleActionComboBox.Items.AddRange(new object[] {
             "allow.",
             "deny."});
-            this.authzRuleActionComboBox.Location = new System.Drawing.Point(432, 185);
+            this.authzRuleActionComboBox.Location = new System.Drawing.Point(474, 236);
             this.authzRuleActionComboBox.Name = "authzRuleActionComboBox";
             this.authzRuleActionComboBox.Size = new System.Drawing.Size(65, 21);
             this.authzRuleActionComboBox.TabIndex = 6;
             // 
-            // authzRuleGroupTB
+            // authzRulePathTB
             // 
-            this.authzRuleGroupTB.Location = new System.Drawing.Point(194, 185);
-            this.authzRuleGroupTB.Name = "authzRuleGroupTB";
-            this.authzRuleGroupTB.Size = new System.Drawing.Size(232, 20);
-            this.authzRuleGroupTB.TabIndex = 5;
+            this.authzRulePathTB.Location = new System.Drawing.Point(195, 211);
+            this.authzRulePathTB.Name = "authzRulePathTB";
+            this.authzRulePathTB.Size = new System.Drawing.Size(421, 20);
+            this.authzRulePathTB.TabIndex = 5;
             // 
             // authzRuleMemberComboBox
             // 
             this.authzRuleMemberComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.authzRuleMemberComboBox.FormattingEnabled = true;
             this.authzRuleMemberComboBox.Items.AddRange(new object[] {
-            "If member of LDAP group:",
-            "If not member of LDAP group:"});
-            this.authzRuleMemberComboBox.Location = new System.Drawing.Point(11, 185);
+            "If:",
+            "If not:"});
+            this.authzRuleMemberComboBox.Location = new System.Drawing.Point(6, 211);
             this.authzRuleMemberComboBox.Name = "authzRuleMemberComboBox";
-            this.authzRuleMemberComboBox.Size = new System.Drawing.Size(177, 21);
+            this.authzRuleMemberComboBox.Size = new System.Drawing.Size(65, 21);
             this.authzRuleMemberComboBox.TabIndex = 4;
             // 
             // gatewayTabPage
             // 
-            this.gatewayTabPage.Controls.Add(this.gatwayRemoteGroupTB);
+            this.gatewayTabPage.Controls.Add(this.GatewayPathLabel);
+            this.gatewayTabPage.Controls.Add(this.GatewayFilterLabel);
+            this.gatewayTabPage.Controls.Add(this.gatewayRuleFilter);
+            this.gatewayTabPage.Controls.Add(this.gatewayRuleScope);
+            this.gatewayTabPage.Controls.Add(this.gatwayRulePathTB);
             this.gatewayTabPage.Controls.Add(this.gatewayRuleGroupMemberCB);
             this.gatewayTabPage.Controls.Add(this.gatewayRuleDeleteBtn);
             this.gatewayTabPage.Controls.Add(this.label6);
-            this.gatewayTabPage.Controls.Add(this.gatewayLocalGroupTB);
+            this.gatewayTabPage.Controls.Add(this.gatewayRuleLocalGroupTB);
             this.gatewayTabPage.Controls.Add(this.gatewayRulesListBox);
-            this.gatewayTabPage.Controls.Add(this.addGatewayGroupRuleButton);
+            this.gatewayTabPage.Controls.Add(this.gatewayRuleAddButton);
             this.gatewayTabPage.Location = new System.Drawing.Point(4, 22);
             this.gatewayTabPage.Name = "gatewayTabPage";
             this.gatewayTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.gatewayTabPage.Size = new System.Drawing.Size(662, 234);
+            this.gatewayTabPage.Size = new System.Drawing.Size(662, 263);
             this.gatewayTabPage.TabIndex = 2;
             this.gatewayTabPage.Text = "Gateway";
             this.gatewayTabPage.UseVisualStyleBackColor = true;
             // 
-            // gatwayRemoteGroupTB
+            // GatewayPathLabel
             // 
-            this.gatwayRemoteGroupTB.Location = new System.Drawing.Point(209, 207);
-            this.gatwayRemoteGroupTB.Name = "gatwayRemoteGroupTB";
-            this.gatwayRemoteGroupTB.Size = new System.Drawing.Size(131, 20);
-            this.gatwayRemoteGroupTB.TabIndex = 21;
+            this.GatewayPathLabel.AutoSize = true;
+            this.GatewayPathLabel.Location = new System.Drawing.Point(158, 214);
+            this.GatewayPathLabel.Name = "GatewayPathLabel";
+            this.GatewayPathLabel.Size = new System.Drawing.Size(29, 13);
+            this.GatewayPathLabel.TabIndex = 25;
+            this.GatewayPathLabel.Text = "Path:";
+            // 
+            // GatewayFilterLabel
+            // 
+            this.GatewayFilterLabel.AutoSize = true;
+            this.GatewayFilterLabel.Location = new System.Drawing.Point(6, 240);
+            this.GatewayFilterLabel.Name = "GatewayFilterLabel";
+            this.GatewayFilterLabel.Size = new System.Drawing.Size(32, 13);
+            this.GatewayFilterLabel.TabIndex = 24;
+            this.GatewayFilterLabel.Text = "Filter:";
+            // 
+            // gatewayRuleFilter
+            // 
+            this.gatewayRuleFilter.Location = new System.Drawing.Point(41, 236);
+            this.gatewayRuleFilter.Name = "gatewayRuleFilter";
+            this.gatewayRuleFilter.Size = new System.Drawing.Size(224, 20);
+            this.gatewayRuleFilter.TabIndex = 23;
+            // 
+            // gatewayRuleScope
+            // 
+            this.gatewayRuleScope.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.gatewayRuleScope.FormattingEnabled = true;
+            this.gatewayRuleScope.Items.AddRange(new object[] {
+            "Base",
+            "OneLevel",
+            "Subtree"});
+            this.gatewayRuleScope.Location = new System.Drawing.Point(77, 211);
+            this.gatewayRuleScope.Name = "gatewayRuleScope";
+            this.gatewayRuleScope.Size = new System.Drawing.Size(76, 21);
+            this.gatewayRuleScope.TabIndex = 22;
+            // 
+            // gatwayRulePathTB
+            // 
+            this.gatwayRulePathTB.Location = new System.Drawing.Point(195, 211);
+            this.gatwayRulePathTB.Name = "gatwayRulePathTB";
+            this.gatwayRulePathTB.Size = new System.Drawing.Size(421, 20);
+            this.gatwayRulePathTB.TabIndex = 21;
             // 
             // gatewayRuleGroupMemberCB
             // 
             this.gatewayRuleGroupMemberCB.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.gatewayRuleGroupMemberCB.FormattingEnabled = true;
             this.gatewayRuleGroupMemberCB.Items.AddRange(new object[] {
-            "If member of LDAP group:",
-            "If not member of LDAP group:",
+            "If:",
+            "If not:",
             "Always:"});
-            this.gatewayRuleGroupMemberCB.Location = new System.Drawing.Point(10, 207);
+            this.gatewayRuleGroupMemberCB.Location = new System.Drawing.Point(6, 211);
             this.gatewayRuleGroupMemberCB.Name = "gatewayRuleGroupMemberCB";
-            this.gatewayRuleGroupMemberCB.Size = new System.Drawing.Size(185, 21);
+            this.gatewayRuleGroupMemberCB.Size = new System.Drawing.Size(65, 21);
             this.gatewayRuleGroupMemberCB.TabIndex = 20;
             this.gatewayRuleGroupMemberCB.SelectedIndexChanged += new System.EventHandler(this.gatewayRuleGroupMemberCB_SelectedIndexChanged);
             // 
             // gatewayRuleDeleteBtn
             // 
             this.gatewayRuleDeleteBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.delete;
-            this.gatewayRuleDeleteBtn.Location = new System.Drawing.Point(622, 89);
+            this.gatewayRuleDeleteBtn.Location = new System.Drawing.Point(622, 82);
             this.gatewayRuleDeleteBtn.Name = "gatewayRuleDeleteBtn";
             this.gatewayRuleDeleteBtn.Size = new System.Drawing.Size(32, 34);
             this.gatewayRuleDeleteBtn.TabIndex = 19;
@@ -733,66 +795,55 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(346, 210);
+            this.label6.Location = new System.Drawing.Point(285, 240);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(95, 13);
             this.label6.TabIndex = 10;
             this.label6.Text = "add to local group:";
             // 
-            // gatewayLocalGroupTB
+            // gatewayRuleLocalGroupTB
             // 
-            this.gatewayLocalGroupTB.Location = new System.Drawing.Point(447, 207);
-            this.gatewayLocalGroupTB.Name = "gatewayLocalGroupTB";
-            this.gatewayLocalGroupTB.Size = new System.Drawing.Size(105, 20);
-            this.gatewayLocalGroupTB.TabIndex = 7;
+            this.gatewayRuleLocalGroupTB.Location = new System.Drawing.Point(386, 236);
+            this.gatewayRuleLocalGroupTB.Name = "gatewayRuleLocalGroupTB";
+            this.gatewayRuleLocalGroupTB.Size = new System.Drawing.Size(153, 20);
+            this.gatewayRuleLocalGroupTB.TabIndex = 7;
             // 
             // gatewayRulesListBox
             // 
             this.gatewayRulesListBox.FormattingEnabled = true;
             this.gatewayRulesListBox.Location = new System.Drawing.Point(6, 6);
             this.gatewayRulesListBox.Name = "gatewayRulesListBox";
-            this.gatewayRulesListBox.Size = new System.Drawing.Size(610, 186);
+            this.gatewayRulesListBox.Size = new System.Drawing.Size(610, 199);
             this.gatewayRulesListBox.TabIndex = 9;
             // 
-            // addGatewayGroupRuleButton
+            // gatewayRuleAddButton
             // 
-            this.addGatewayGroupRuleButton.Location = new System.Drawing.Point(558, 205);
-            this.addGatewayGroupRuleButton.Name = "addGatewayGroupRuleButton";
-            this.addGatewayGroupRuleButton.Size = new System.Drawing.Size(71, 23);
-            this.addGatewayGroupRuleButton.TabIndex = 8;
-            this.addGatewayGroupRuleButton.Text = "Add Rule";
-            this.addGatewayGroupRuleButton.UseVisualStyleBackColor = true;
-            this.addGatewayGroupRuleButton.Click += new System.EventHandler(this.addGatewayGroupRuleButton_Click);
+            this.gatewayRuleAddButton.Location = new System.Drawing.Point(545, 236);
+            this.gatewayRuleAddButton.Name = "gatewayRuleAddButton";
+            this.gatewayRuleAddButton.Size = new System.Drawing.Size(71, 23);
+            this.gatewayRuleAddButton.TabIndex = 8;
+            this.gatewayRuleAddButton.Text = "Add Rule";
+            this.gatewayRuleAddButton.UseVisualStyleBackColor = true;
+            this.gatewayRuleAddButton.Click += new System.EventHandler(this.gatewayRuleAddButton_Click);
             // 
             // tabPageChangePassword
             // 
-            this.tabPageChangePassword.Controls.Add(this.changePasswordDeleteAttribBtn);
             this.tabPageChangePassword.Controls.Add(this.label9);
             this.tabPageChangePassword.Controls.Add(this.passwordAttributesDGV);
             this.tabPageChangePassword.Location = new System.Drawing.Point(4, 22);
             this.tabPageChangePassword.Name = "tabPageChangePassword";
             this.tabPageChangePassword.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageChangePassword.Size = new System.Drawing.Size(662, 234);
+            this.tabPageChangePassword.Size = new System.Drawing.Size(662, 263);
             this.tabPageChangePassword.TabIndex = 3;
             this.tabPageChangePassword.Text = "Change Password";
             this.tabPageChangePassword.UseVisualStyleBackColor = true;
-            // 
-            // changePasswordDeleteAttribBtn
-            // 
-            this.changePasswordDeleteAttribBtn.Location = new System.Drawing.Point(577, 195);
-            this.changePasswordDeleteAttribBtn.Name = "changePasswordDeleteAttribBtn";
-            this.changePasswordDeleteAttribBtn.Size = new System.Drawing.Size(77, 27);
-            this.changePasswordDeleteAttribBtn.TabIndex = 2;
-            this.changePasswordDeleteAttribBtn.Text = "Remove";
-            this.changePasswordDeleteAttribBtn.UseVisualStyleBackColor = true;
-            this.changePasswordDeleteAttribBtn.Click += new System.EventHandler(this.changePasswordDeleteAttribBtn_Click);
             // 
             // label9
             // 
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(6, 3);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(103, 13);
+            this.label9.Size = new System.Drawing.Size(54, 13);
             this.label9.TabIndex = 1;
             this.label9.Text = "Attributes:";
             // 
@@ -801,7 +852,7 @@
             this.passwordAttributesDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.passwordAttributesDGV.Location = new System.Drawing.Point(6, 19);
             this.passwordAttributesDGV.Name = "passwordAttributesDGV";
-            this.passwordAttributesDGV.Size = new System.Drawing.Size(648, 170);
+            this.passwordAttributesDGV.Size = new System.Drawing.Size(648, 238);
             this.passwordAttributesDGV.TabIndex = 0;
             // 
             // Configuration
@@ -860,14 +911,10 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage authTabPage;
         private System.Windows.Forms.TabPage authzTabPage;
-        private System.Windows.Forms.TextBox groupDNPattern;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox authzRuleGroupTB;
+        private System.Windows.Forms.TextBox authzRulePathTB;
         private System.Windows.Forms.ComboBox authzRuleMemberComboBox;
-        private System.Windows.Forms.TextBox groupMemberAttrTB;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Button addGatewayGroupRuleButton;
-        private System.Windows.Forms.TextBox gatewayLocalGroupTB;
+        private System.Windows.Forms.Button gatewayRuleAddButton;
+        private System.Windows.Forms.TextBox gatewayRuleLocalGroupTB;
         private System.Windows.Forms.ComboBox authzRuleActionComboBox;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ListBox gatewayRulesListBox;
@@ -882,13 +929,12 @@
         private System.Windows.Forms.Button authzRuleDeleteBtn;
         private System.Windows.Forms.TabPage gatewayTabPage;
         private System.Windows.Forms.ComboBox gatewayRuleGroupMemberCB;
-        private System.Windows.Forms.TextBox gatwayRemoteGroupTB;
+        private System.Windows.Forms.TextBox gatwayRulePathTB;
         private System.Windows.Forms.CheckBox authzRequireAuthCB;
         private System.Windows.Forms.CheckBox authzAllowOnErrorCB;
         private System.Windows.Forms.TabPage tabPageChangePassword;
         private System.Windows.Forms.DataGridView passwordAttributesDGV;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Button changePasswordDeleteAttribBtn;
         private System.Windows.Forms.TabControl authtab;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TextBox searchContextsTextBox;
@@ -903,5 +949,14 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.DataGridViewComboBoxColumn Column1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
+        private System.Windows.Forms.ComboBox authzRuleScope;
+        private System.Windows.Forms.TextBox authzRuleFilter;
+        private System.Windows.Forms.ComboBox gatewayRuleScope;
+        private System.Windows.Forms.Label GatewayPathLabel;
+        private System.Windows.Forms.Label GatewayFilterLabel;
+        private System.Windows.Forms.TextBox gatewayRuleFilter;
+        private System.Windows.Forms.Label AuthPathLabel;
+        private System.Windows.Forms.Label AuthFilterLabel;
+        private System.Windows.Forms.CheckBox useTlsCheckBox;
     }
 }

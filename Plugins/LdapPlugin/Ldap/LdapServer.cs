@@ -60,6 +60,11 @@ namespace pGina.Plugin.Ldap
         private bool m_useSsl;
 
         /// <summary>
+        /// Whether or not to use SSL
+        /// </summary>
+        private bool m_useTls;
+
+        /// <summary>
         /// Whether or not to verify the SSL certificate
         /// </summary>
         private bool m_verifyCert;
@@ -80,9 +85,10 @@ namespace pGina.Plugin.Ldap
             m_cert = null;
             Timeout = Settings.Store.LdapTimeout;
             m_useSsl = Settings.Store.UseSsl;
+            m_useTls = Settings.Store.UseTls;
             m_verifyCert = Settings.Store.RequireCert;
             string certFile = Settings.Store.ServerCertFile;
-            if (m_useSsl && m_verifyCert)
+            if ((m_useSsl || m_useTls) && m_verifyCert)
             {
                 if ( !string.IsNullOrEmpty(certFile) && File.Exists(certFile))
                 {
@@ -96,8 +102,8 @@ namespace pGina.Plugin.Ldap
             int port = Settings.Store.LdapPort;
             m_serverIdentifier = new LdapDirectoryIdentifier(hosts, port, false, false);
 
-            m_logger.DebugFormat("Initializing LdapServer host(s): [{0}], port: {1}, useSSL = {2}, verifyCert = {3}",
-                string.Join(", ", hosts), port, m_useSsl, m_verifyCert);
+            m_logger.DebugFormat("Initializing LdapServer host(s): [{0}], port: {1}, useSSL = {2}, useTLS = {3}, verifyCert = {4}",
+                string.Join(", ", hosts), port, m_useSsl, m_useTls, m_verifyCert);
 
             this.Connect();
         }
@@ -114,8 +120,22 @@ namespace pGina.Plugin.Ldap
             m_conn.Timeout = new System.TimeSpan(0,0,Timeout);
             m_logger.DebugFormat("Timeout set to {0} seconds.", Timeout);
             m_conn.SessionOptions.ProtocolVersion = 3;
+            if (m_useTls)
+            {
+                try
+                {
+                    m_conn.SessionOptions.StartTransportLayerSecurity(null);
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("Start TLS failed with {0}", e.Message);
+                    m_useTls = false;
+                    m_useSsl = true;
+                    m_logger.ErrorFormat("fallback to SSL");
+                }
+            }
             m_conn.SessionOptions.SecureSocketLayer = m_useSsl;
-            if( m_useSsl )
+            if( m_useSsl || m_useTls )
                 m_conn.SessionOptions.VerifyServerCertificate = this.VerifyCert;
         }
 
@@ -200,6 +220,7 @@ namespace pGina.Plugin.Ldap
 
             m_conn.AuthType = AuthType.Anonymous;
             m_conn.Credential = null;
+
             try
             {
                 m_conn.Bind();
@@ -280,6 +301,8 @@ namespace pGina.Plugin.Ldap
             if (m_conn != null)
             {
                 m_logger.DebugFormat("Closing LDAP connection to {0}.", m_conn.SessionOptions.HostName);
+                if (m_useTls)
+                    m_conn.SessionOptions.StopTransportLayerSecurity();
                 m_conn.Dispose();
                 m_conn = null;
             }
@@ -422,7 +445,7 @@ namespace pGina.Plugin.Ldap
                     if (Convert_attribs.Count > 0)
                     {
                         // search all values at once
-                        Dictionary<string, List<string>> search = GetUserAttribValue(userDN, Convert_attribs.Values.ToArray());
+                        Dictionary<string, List<string>> search = GetUserAttribValue(userDN, "(objectClass=*)", SearchScope.Subtree, Convert_attribs.Values.ToArray());
                         if (search.Count > 0)
                         {
                             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
@@ -491,19 +514,25 @@ namespace pGina.Plugin.Ldap
         /// Will search an attribute and return the corresponding values
         /// <para>The DN where the search will start at</para>
         /// <para>string array of attributes to search at</para>
+        /// <para>Searchscope</para>
+        /// <para>Filter</para>
         /// </summary>
         /// <returns></returns>
-        public Dictionary<string, List<string>> GetUserAttribValue(string userDN, string[] Attrib)
+        public Dictionary<string, List<string>> GetUserAttribValue(string path, string filter, SearchScope scope, string[] Attrib)
         {
             Dictionary<string, List<string>> ret = new Dictionary<string, List<string>>();
 
             try
             {
-                SearchRequest req = new SearchRequest(userDN, "(objectClass=*)", SearchScope.Subtree, Attrib);
+                SearchRequest req = new SearchRequest(path, filter, scope, Attrib);
                 SearchResponse resp = (SearchResponse)m_conn.SendRequest(req);
 
                 foreach (SearchResultEntry entry in resp.Entries)
                 {
+                    if (Attrib.All(element => element.Equals("dn", StringComparison.CurrentCultureIgnoreCase)))
+                    {
+                        ret.Add("dn",new List<string>(new string[] {entry.DistinguishedName}));
+                    }
                     foreach (String name in entry.Attributes.AttributeNames)
                     {
                         List<string> values = new List<string>();
@@ -624,7 +653,7 @@ namespace pGina.Plugin.Ldap
 
             if (attribute.ToLower().Equals("sambapwdlastset"))
             {
-                Dictionary<string, List<string>> SearchResult = GetUserAttribValue(userDN, new string[] { "shadowMax", "sambaPwdMustChange" });
+                Dictionary<string, List<string>> SearchResult = GetUserAttribValue(userDN, "(objectClass=*)", SearchScope.Subtree, new string[] { "shadowMax", "sambaPwdMustChange" });
 
                 if (SearchResult.ContainsKey("shadowmax") && SearchResult.ContainsKey("sambapwdmustchange"))
                 {

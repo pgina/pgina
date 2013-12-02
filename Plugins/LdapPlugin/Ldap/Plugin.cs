@@ -222,7 +222,6 @@ namespace pGina.Plugin.Ldap
             try
             {
                 UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-                string user = userInfo.Username;
                 
                 // Bind for searching if we have rules to process.  If there's only one, it's the
                 // default rule which doesn't require searching the LDAP tree.
@@ -232,15 +231,10 @@ namespace pGina.Plugin.Ldap
                 foreach (GroupAuthzRule rule in rules)
                 {
                     bool inGroup = false;
-                    
-                    // Don't need to check membership if the condition is "always."  This is the
-                    // case for the default rule only. which is the last rule in the list.
-                    if (rule.RuleCondition != GroupRule.Condition.ALWAYS)
-                    {
-                        inGroup = serv.MemberOfGroup(user, rule.Group);
-                        m_logger.DebugFormat("User {0} {1} member of group {2}", user, inGroup ? "is" : "is not",
-                            rule.Group);
-                    }
+                    string path = rule.path.Replace("%u", userInfo.Username);
+                    string filter = rule.filter.Replace("%u", userInfo.Username);
+                    inGroup = serv.GetUserAttribValue(path, filter, rule.SearchScope, new string[] { "dn" }).Count > 0;
+                    m_logger.DebugFormat("User {0} {1} {2} {3}", userInfo.Username, inGroup ? "is" : "is not", filter, path);
 
                     if (rule.RuleMatch(inGroup))
                     {
@@ -259,9 +253,11 @@ namespace pGina.Plugin.Ldap
                     }
                 }
 
-                // We should never get this far because the last rule in the list should always be a match,
-                // but if for some reason we do, return success.
-                return new BooleanResult() { Success = true, Message = "" };
+                // If there is no matching rule use default. allow or deny
+                if ((bool)Settings.Store.AuthzDefault)
+                    return new BooleanResult() { Success = true, Message = "" };
+                else
+                    return new BooleanResult() { Success = false, Message = String.Format("You are not allowed to login!\n\nNo matching rule found!\nDefault rule:{0}", (bool)Settings.Store.AuthzDefault ? "Allow" : "Deny") };
             }
             catch (Exception e)
             {
@@ -320,7 +316,6 @@ namespace pGina.Plugin.Ldap
             try
             {
                 UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-                string user = userInfo.Username;
 
                 List<GroupGatewayRule> rules = GroupRuleLoader.GetGatewayRules();
                 bool boundToServ = false;
@@ -328,25 +323,22 @@ namespace pGina.Plugin.Ldap
                 {
                     bool inGroup = false;
 
-                    // Don't need to check for group membership if the rule is to be always applied.
-                    if (rule.RuleCondition != GroupRule.Condition.ALWAYS)
+                    // If we haven't bound to server yet, do so.
+                    if (!boundToServ)
                     {
-                        // If we haven't bound to server yet, do so.
-                        if (!boundToServ)
-                        {
-                            serv.BindForSearch();
-                            boundToServ = true;
-                        }
-
-                        inGroup = serv.MemberOfGroup(user, rule.Group);
-                        m_logger.DebugFormat("User {0} {1} member of group {2}", user, inGroup ? "is" : "is not",
-                            rule.Group);
+                        serv.BindForSearch();
+                        boundToServ = true;
                     }
+
+                    string path = rule.path.Replace("%u", userInfo.Username);
+                    string filter = rule.filter.Replace("%u", userInfo.Username);
+                    //inGroup = serv.MemberOfGroup(user, rule.Group);
+                    inGroup = serv.GetUserAttribValue(path, filter, rule.SearchScope, new string[] { "dn" }).Count > 0;
+                    m_logger.DebugFormat("User {0} {1} {2} {3}", userInfo.Username, filter, inGroup ? "is" : "is not", path);
 
                     if (rule.RuleMatch(inGroup))
                     {
-                        m_logger.InfoFormat("Adding user {0} to local group {1}, due to rule \"{2}\"", 
-                            user, rule.LocalGroup, rule.ToString());
+                        m_logger.InfoFormat("Adding user {0} to local group {1}, due to rule \"{2}\"", userInfo.Username, rule.LocalGroup, rule.ToString());
                         addedGroups.Add(rule.LocalGroup);
                         userInfo.AddGroup( new GroupInformation() { Name = rule.LocalGroup } );
                     }

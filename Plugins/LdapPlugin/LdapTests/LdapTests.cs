@@ -215,7 +215,7 @@ namespace pGina.Plugin.Ldap.Test
         {
             // Allow by default rule (not a member of "good")
             m_settings.GroupAuthzRules = new string[] {
-                new GroupAuthzRule("good", GroupRule.Condition.MEMBER_OF, true).ToRegString(),
+                new GroupAuthzRule("good", GroupRule.Condition.MEMBER_OF, true, "(&(objectclass=*))", SearchScope.Base).ToRegString(),
                 (new GroupAuthzRule(true)).ToRegString()
             };
 
@@ -231,7 +231,7 @@ namespace pGina.Plugin.Ldap.Test
         {
             // Allow because I'm not a member of group "good"
             m_settings.GroupAuthzRules = new string[] {
-                new GroupAuthzRule("good", GroupRule.Condition.NOT_MEMBER_OF, true).ToRegString(),
+                new GroupAuthzRule("good", GroupRule.Condition.NOT_MEMBER_OF, true, "(&(objectclass=*))", SearchScope.Base).ToRegString(),
                 (new GroupAuthzRule(true)).ToRegString()
             };
 
@@ -247,7 +247,7 @@ namespace pGina.Plugin.Ldap.Test
         {
             // Deny because I'm a member of group "bad"
             m_settings.GroupAuthzRules = new string[] {
-                new GroupAuthzRule("bad", GroupRule.Condition.MEMBER_OF, false).ToRegString(),
+                new GroupAuthzRule("bad", GroupRule.Condition.MEMBER_OF, false, "(&(objectclass=*))", SearchScope.Base).ToRegString(),
                 (new GroupAuthzRule(true)).ToRegString()
             };
 

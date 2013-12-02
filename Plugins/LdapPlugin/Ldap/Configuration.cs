@@ -34,6 +34,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.DirectoryServices.Protocols;
 
 using pGina.Shared.Settings;
 using pGina.Plugin.Ldap;
@@ -49,13 +50,11 @@ namespace pGina.Plugin.Ldap
         public Configuration()
         {
             InitializeComponent();
-            
+
             InitUI();
             LoadSettings();
             UpdateSslElements();
             UpdateAuthenticationElements();
-
-            this.gatewayRuleGroupMemberCB.SelectedIndex = 0;
         }
 
         private void InitUI()
@@ -116,6 +115,9 @@ namespace pGina.Plugin.Ldap
             bool useSsl = Settings.Store.UseSsl;
             useSslCheckBox.CheckState = useSsl ? CheckState.Checked : CheckState.Unchecked;
 
+            bool useTls = Settings.Store.UseTls;
+            useTlsCheckBox.CheckState = useTls ? CheckState.Checked : CheckState.Unchecked;
+
             bool reqCert = Settings.Store.RequireCert;
             validateServerCertCheckBox.CheckState = reqCert ? CheckState.Checked : CheckState.Unchecked;
 
@@ -127,12 +129,6 @@ namespace pGina.Plugin.Ldap
 
             string searchPw = Settings.Store.GetEncryptedSetting("SearchPW");
             searchPassTextBox.Text = searchPw;
-
-            string grpDnPattern = Settings.Store.GroupDnPattern;
-            this.groupDNPattern.Text = grpDnPattern;
-
-            string grpMemberAttrib = Settings.Store.GroupMemberAttrib;
-            this.groupMemberAttrTB.Text = grpMemberAttrib;
 
             // Authentication tab
             bool allowEmpty = Settings.Store.AllowEmptyPasswords;
@@ -191,36 +187,24 @@ namespace pGina.Plugin.Ldap
                     }
                 }
             }
-
+            
             /////////////// Authorization tab /////////////////
             this.authzRuleMemberComboBox.SelectedIndex = 0;
             this.authzRuleActionComboBox.SelectedIndex = 0;
-
+            this.authzRuleScope.SelectedIndex = 0;
+            this.authzDefaultAllowRB.Checked = Settings.Store.AuthzDefault;
+            this.authzDefaultDenyRB.Checked = !(bool)Settings.Store.AuthzDefault;
             this.authzRequireAuthCB.Checked = Settings.Store.AuthzRequireAuth;
             this.authzAllowOnErrorCB.Checked = Settings.Store.AuthzAllowOnError;
 
             List<GroupAuthzRule> lst = GroupRuleLoader.GetAuthzRules();
-            // The last one should be the default rule
-            if (lst.Count > 0 && 
-                lst[lst.Count-1].RuleCondition == GroupRule.Condition.ALWAYS)
-            {
-                GroupAuthzRule rule = lst[lst.Count - 1];
-                if (rule.AllowOnMatch)
-                    this.authzDefaultAllowRB.Checked = true;
-                else
-                    this.authzDefaultDenyRB.Checked = true;
-                lst.RemoveAt(lst.Count - 1);
-            }
-            else
-            {
-                // The list is empty or the last rule is not a default rule.
-                throw new Exception("Default rule not found in rule list.");
-            }
-            // The rest of the rules
             foreach (GroupAuthzRule rule in lst)
                 this.authzRulesListBox.Items.Add(rule);
 
             ///////////////// Gateway tab /////////////////
+            this.gatewayRuleGroupMemberCB.SelectedIndex = 0;
+            this.gatewayRuleScope.SelectedIndex = 0;
+
             List<GroupGatewayRule> gwLst = GroupRuleLoader.GetGatewayRules();
             foreach (GroupGatewayRule rule in gwLst)
                 this.gatewayRulesListBox.Items.Add(rule);
@@ -250,12 +234,21 @@ namespace pGina.Plugin.Ldap
 
         private void useSslCheckBox_CheckedChanged(object sender, EventArgs e)
         {
+            if (this.useSslCheckBox.Checked)
+                this.useTlsCheckBox.Checked = false;
+            UpdateSslElements();
+        }
+
+        private void useTlsCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.useTlsCheckBox.Checked)
+                this.useSslCheckBox.Checked = false;
             UpdateSslElements();
         }
 
         private void UpdateSslElements()
         {
-            if (validateServerCertCheckBox.CheckState == CheckState.Checked)
+            if (validateServerCertCheckBox.Checked)
             {
                 sslCertFileTextBox.Enabled = true;
                 sslCertFileBrowseButton.Enabled = true;
@@ -266,13 +259,13 @@ namespace pGina.Plugin.Ldap
                 sslCertFileBrowseButton.Enabled = false;
             }
 
-            if (useSslCheckBox.CheckState == CheckState.Unchecked)
+            if (!useSslCheckBox.Checked && !useTlsCheckBox.Checked)
             {
                 validateServerCertCheckBox.Enabled = false;
                 sslCertFileTextBox.Enabled = false;
                 sslCertFileBrowseButton.Enabled = false;
             }
-            else if (useSslCheckBox.CheckState == CheckState.Checked)
+            else
             {
                 validateServerCertCheckBox.Enabled = true;
             }
@@ -358,29 +351,6 @@ namespace pGina.Plugin.Ldap
                     + "Please select a valid certificate file.");
                 return false;
             }
-
-            if (searchForDnCheckBox.Checked &&
-                string.IsNullOrEmpty(searchFilterTextBox.Text.Trim()))
-            {
-                MessageBox.Show("Please provide a search filter when \"Search for DN\" is enabled.");
-                return false;
-            }
-
-            if (searchForDnCheckBox.Checked &&
-                string.IsNullOrEmpty(searchContextsTextBox.Text.Trim()))
-            {
-                MessageBox.Show("Please provide at least one search context when \"Search for DN\" is enabled.");
-                return false;
-            }
-
-            if ((authzRulesListBox.Items.Count > 0 ||
-                gatewayRulesListBox.Items.Count > 0) && (
-                string.IsNullOrEmpty(this.groupDNPattern.Text.Trim()) ||
-                string.IsNullOrEmpty(this.groupMemberAttrTB.Text.Trim())) )
-            {
-                MessageBox.Show("WARNING: You should provide a Group DN Pattern and Member Attribute when \n" +
-                    " using one or more group authorization or gateway rules.");
-            }
             // TODO: Make sure that other input is valid.
 
             return true;
@@ -392,12 +362,11 @@ namespace pGina.Plugin.Ldap
             Settings.Store.LdapPort = Convert.ToInt32(ldapPortTextBox.Text.Trim());
             Settings.Store.LdapTimeout = Convert.ToInt32(timeoutTextBox.Text.Trim());
             Settings.Store.UseSsl = (useSslCheckBox.CheckState == CheckState.Checked);
+            Settings.Store.UseTls = (useTlsCheckBox.CheckState == CheckState.Checked);
             Settings.Store.RequireCert = (validateServerCertCheckBox.CheckState == CheckState.Checked);
             Settings.Store.ServerCertFile = sslCertFileTextBox.Text.Trim();
             Settings.Store.SearchDN = searchDnTextBox.Text.Trim();
             Settings.Store.SetEncryptedSetting("SearchPW", searchPassTextBox.Text);
-            Settings.Store.GroupDnPattern = this.groupDNPattern.Text.Trim();
-            Settings.Store.GroupMemberAttrib = this.groupMemberAttrTB.Text.Trim();
             
             // Authentication
             Settings.Store.AllowEmptyPasswords = this.allowEmptyPwCB.Checked;
@@ -405,6 +374,7 @@ namespace pGina.Plugin.Ldap
             Settings.Store.DoSearch = (searchForDnCheckBox.CheckState == CheckState.Checked);
             Settings.Store.SearchFilter = searchFilterTextBox.Text.Trim();
             Settings.Store.SearchContexts = Regex.Split(searchContextsTextBox.Text.Trim(), @"\s*\r?\n\s*");
+            Settings.Store.AuthzDefault = this.authzDefaultAllowRB.Checked;
 
             List<string> AttribConv = new List<string>();
             foreach (DataGridViewRow row in dataGridView1.Rows)
@@ -422,15 +392,13 @@ namespace pGina.Plugin.Ldap
             // Authorization
             Settings.Store.AuthzRequireAuth = this.authzRequireAuthCB.Checked;
             Settings.Store.AuthzAllowOnError = this.authzAllowOnErrorCB.Checked;
+            Settings.Store.AuthzDefault = this.authzDefaultAllowRB.Checked;
             List<GroupAuthzRule> lst = new List<GroupAuthzRule>();
             foreach (Object item in this.authzRulesListBox.Items)
             {
                 lst.Add(item as GroupAuthzRule);
                 m_logger.DebugFormat("Saving rule: {0}", item);
             }
-            // Add the default as the last rule in the list
-            lst.Add(new GroupAuthzRule(this.authzDefaultAllowRB.Checked));
-
             GroupRuleLoader.SaveAuthzRules(lst);
 
             // Gateway
@@ -471,10 +439,10 @@ namespace pGina.Plugin.Ldap
 
         private void authzRuleAddButton_Click(object sender, EventArgs e)
         {
-            string grp = this.authzRuleGroupTB.Text.Trim();
-            if (string.IsNullOrEmpty(grp))
+            string path = this.authzRulePathTB.Text.Trim();
+            if (string.IsNullOrEmpty(path))
             {
-                MessageBox.Show("Please enter a group name.");
+                MessageBox.Show("Please enter a DN");
                 return;
             }
 
@@ -493,13 +461,21 @@ namespace pGina.Plugin.Ldap
             else
                 throw new Exception("Unrecognized action option in authzRuleAddButton_Click");
 
-            GroupAuthzRule rule = new GroupAuthzRule(grp, c, allow);
+            string filter = this.authzRuleFilter.Text.Trim();
+            if (string.IsNullOrEmpty(path))
+            {
+                MessageBox.Show("Please enter a search filter");
+                return;
+            }
+            SearchScope search = (SearchScope)this.authzRuleScope.SelectedIndex;
+
+            GroupAuthzRule rule = new GroupAuthzRule(path, c, allow, filter, search);
             this.authzRulesListBox.Items.Add(rule);
         }
 
-        private void addGatewayGroupRuleButton_Click(object sender, EventArgs e)
+        private void gatewayRuleAddButton_Click(object sender, EventArgs e)
         {
-            string localGrp = this.gatewayLocalGroupTB.Text.Trim();
+            string localGrp = this.gatewayRuleLocalGroupTB.Text.Trim();
             if (string.IsNullOrEmpty(localGrp))
             {
                 MessageBox.Show("Please enter a group name");
@@ -519,13 +495,21 @@ namespace pGina.Plugin.Ldap
             }
             else
             {
-                string remoteGroup = this.gatwayRemoteGroupTB.Text.Trim();
-                if (string.IsNullOrEmpty(remoteGroup))
+                string path = this.gatwayRulePathTB.Text.Trim();
+                if (string.IsNullOrEmpty(path))
                 {
-                    MessageBox.Show("Please enter a remote group name");
+                    MessageBox.Show("Please enter a DN");
                     return;
                 }
-                this.gatewayRulesListBox.Items.Add(new GroupGatewayRule(remoteGroup, c, localGrp));
+                string filter = this.gatewayRuleFilter.Text;
+                if (string.IsNullOrEmpty(filter))
+                {
+                    MessageBox.Show("Please enter a searh filter");
+                    return;
+                }
+                SearchScope scope = (SearchScope)this.gatewayRuleScope.SelectedIndex;
+
+                this.gatewayRulesListBox.Items.Add(new GroupGatewayRule(path, c, localGrp, filter, scope));
             }
         }
 
@@ -533,12 +517,18 @@ namespace pGina.Plugin.Ldap
         {
             if (this.gatewayRuleGroupMemberCB.SelectedIndex == 2)
             {
-                this.gatwayRemoteGroupTB.Enabled = false;
-                this.gatwayRemoteGroupTB.Text = "";
+                this.gatwayRulePathTB.Enabled = false;
+                this.gatwayRulePathTB.Text = "";
+                this.gatewayRuleFilter.Enabled = false;
+                this.gatewayRuleFilter.Text = "";
+                this.gatewayRuleScope.Enabled = false;
+                this.gatewayRuleScope.SelectedIndex = 0;
             }
             else
             {
-                this.gatwayRemoteGroupTB.Enabled = true;
+                this.gatwayRulePathTB.Enabled = true;
+                this.gatewayRuleFilter.Enabled = true;
+                this.gatewayRuleScope.Enabled = true;
             }
         }
 
@@ -577,14 +567,6 @@ namespace pGina.Plugin.Ldap
                 this.authzRulesListBox.Items.RemoveAt(idx);
                 this.authzRulesListBox.Items.Insert(idx + 1, item);
                 this.authzRulesListBox.SelectedIndex = idx + 1;
-            }
-        }
-
-        private void changePasswordDeleteAttribBtn_Click(object sender, EventArgs e)
-        {
-            if (this.passwordAttributesDGV.SelectedRows.Count > 0)
-            {
-                this.passwordAttributesDGV.Rows.Remove(this.passwordAttributesDGV.SelectedRows[0]);
             }
         }
     }
