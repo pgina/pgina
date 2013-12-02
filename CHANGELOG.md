@@ -1,3 +1,25 @@
+3.2.0.0 BETA (2013/12/02)
+---------------------------
+Global:
+ - reliable Logoff detection (e4d2a96484cdb060262c515d19e1a21dee4282e6)
+ - a profiles is not reloded during an unlock (#9)
+ - Accept credentials provided by RDP clients (weiss)
+ - UserInformation fix NullReferenceException (0ac6606b84e945e195fce0b96c5a4f58807dfa5f)
+ - add password change (daw42)
+ - password change plugin handling changed to abort as soon as a plugin returns an error
+LDAP plugin:
+ - attribute converter added
+ - TLS option added
+ - Authorization and Gateway search changed
+ - Authorization Default behavior changed (white- or blacklist)
+ - remove BouncyCastle crypto lib
+ - add ldap timestamp attributes
+LocalMachine plugin:
+ - added Roaming profile and Loginscript support (attribute converter)
+pgSMB plugin:
+ - can overwrite settings from ldap attributes (attribute converter)
+ - pgSMB quota GPO not set during first login (#10)
+
 3.1.6.2 BETA (2013/03/13)
 ---------------------------
  - bug fixing only

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("pGina Team")]
 [assembly: AssemblyProduct("MySQLAuth")]
-[assembly: AssemblyCopyright("Copyright © 2012 pGina Team")]
+[assembly: AssemblyCopyright("Copyright © 2014 pGina Team")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
