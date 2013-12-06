@@ -137,18 +137,23 @@ namespace pGina.Plugin.RADIUS
             return avp.getFirstRawAttribute(type); 
         }
 
-
-        public IEnumerable<string> getStringAttributes(AttributeType type)
+        public IEnumerable<byte[]> getByteArrayAttributes(AttributeType type, byte[] vsa = null)
         {
-            foreach (byte[] val in avp.getRawAttributes(type))
+            return avp.getByteArrayAttributes(type, vsa);
+        }
+
+        public IEnumerable<string> getStringAttributes(AttributeType type, byte[] vsa = null)
+        {
+            foreach (byte[] val in avp.getByteArrayAttributes(type, vsa))
             {
+                
                 yield return Encoding.UTF8.GetString(val);
             }
         }
 
-        public IEnumerable<int> getIntAttributes(AttributeType type)
+        public IEnumerable<int> getIntAttributes(AttributeType type, byte[] vsa = null)
         {
-            foreach(byte[] val in avp.getRawAttributes(type))
+            foreach(byte[] val in avp.getByteArrayAttributes(type, vsa))
             {
                 Array.Reverse(val); //Big endian to little endian
                 yield return BitConverter.ToInt32(val, 0);
@@ -200,7 +205,6 @@ namespace pGina.Plugin.RADIUS
             return convertToBytes();
         }
         
-
         //Returns a byte array representing this packet
         private byte[] convertToBytes()
         {
@@ -222,10 +226,6 @@ namespace pGina.Plugin.RADIUS
             return packetBytes;
         }
 
-
-
-
-
         //Compares two byte arrays for equality, true if equal
         private bool equalByteArrays(byte[] arr1, byte[] arr2)
         {
@@ -240,7 +240,6 @@ namespace pGina.Plugin.RADIUS
 
         public override string ToString()
         {
-
             string init = String.Format("Code: {0}\tID: {1}\tLength: {2}\nRequest Authenticator: {3}\n", code, identifier, length, authenticator);
             StringBuilder builder = new StringBuilder(init);
 
@@ -333,8 +332,6 @@ namespace pGina.Plugin.RADIUS
             return c;
         }
 
-
-
         public enum Code
         {
             Access_Request = (byte)1, Access_Accept, Access_Reject, Accounting_Request, Accounting_Response
@@ -361,7 +358,6 @@ namespace pGina.Plugin.RADIUS
         public enum Acct_Authentic { Not_Specified = 0, RADIUS, Local, Remote }
         public enum Acct_Status_Type { Start = 1, Stop, Interim_Update }
         public enum Acct_Terminate_Cause { User_Request = 1, Idle_Timeout = 4,  Session_Timeout = 5}
-
 
         private class AVP
         {
@@ -421,7 +417,7 @@ namespace pGina.Plugin.RADIUS
             }
 
             //Returns the string value of the specified AttributeType
-            public IEnumerable<byte[]> getRawAttributes(AttributeType type)
+            public IEnumerable<byte[]> getByteArrayAttributes(AttributeType type, byte[] vsa = null, byte vsaType = 0)
             {
                 /*foreach (byte[] val in lookup[type])
                 {
@@ -429,13 +425,14 @@ namespace pGina.Plugin.RADIUS
                 }*/
                 foreach (Tuple<AttributeType, byte[]> val in list)
                 {
-                    if (val.Item1 != type)
+                    if (val.Item1 != type)/* || 
+                        !(type == AttributeType.Vendor_Specific && val.Item2[0] ==  vsa[0] && 
+                          val.Item2[1] == vsa[1] && val.Item2[2] == vsa[2] && val.Item2[3] == vsaType))*/
                         continue;
                     yield return val.Item2;
                 }
 
             }
-
 
             //Returns a byte array representing the AVP
             public byte[] toByteArray()
@@ -467,8 +464,6 @@ namespace pGina.Plugin.RADIUS
                 this._bytes = bytes;
                 return bytes;
             }
-
-
 
             //Increases the attribute counter dictionary value by 1 (or sets it to 1 if not present)
             private void addTypeToDict(AttributeType type){

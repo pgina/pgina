@@ -228,7 +228,7 @@ namespace pGina.Plugin.RADIUS
             p.addAttribute(Packet.AttributeType.Acct_Session_Id, sessionId);
             p.addAttribute(Packet.AttributeType.Acct_Status_Type, (int)Packet.Acct_Status_Type.Interim_Update);
 
-            m_logger.DebugFormat("Attempting to send interim-update for user {1}", username);
+            m_logger.DebugFormat("Attempting to send interim-update for user {0}", username);
 
             for (int retryCt = 0; retryCt <= maxRetries; retryCt++)
             {

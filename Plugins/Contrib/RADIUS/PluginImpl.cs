@@ -156,7 +156,7 @@ namespace pGina.Plugin.RADIUS
                     if (p.containsAttribute(Packet.AttributeType.Idle_Timeout))
                     {
                         int seconds = client.lastReceievedPacket.getFirstIntAttribute(Packet.AttributeType.Idle_Timeout);
-                        m_logger.DebugFormat("idle timeout value: {0}", seconds);
+                        m_logger.DebugFormat("idle timeout value: {0:D}", seconds);
                     }
 
                     if (p.containsAttribute(Packet.AttributeType.Filter_Id))
@@ -168,9 +168,18 @@ namespace pGina.Plugin.RADIUS
                         }
                     }
 
+                    if(p.containsAttribute(Packet.AttributeType.Vendor_Specific)){
+                        m_logger.DebugFormat("Vendor-specific attributes found. List information for all of them.");
+                        foreach(byte[] val in p.getByteArrayAttributes(Packet.AttributeType.Vendor_Specific)){
+                            m_logger.DebugFormat("Vendor Code: {0:D}-{1:D}-{2:D}, Type: {3:D}, Value: {4}", val[0], val[1], val[2], val[3], UTF8Encoding.UTF8.GetString(val, 4, val.Length - 4));
+                        }
+
+                    }
+
                     if ((bool)Settings.Store.WisprSessionTerminate && p.containsAttribute(Packet.AttributeType.Vendor_Specific))
                     {
                         //TODO:Wispr-Terminate-Time is vendor specific, first 3 bytes are vendor, 4th byte should be 9, then the timestamp string.
+                        //No idea what the vendor specific code is
                                               
                         
                     }
@@ -191,7 +200,7 @@ namespace pGina.Plugin.RADIUS
                         if ((bool)Settings.Store.ForceInterimUpdates)
                         {
                             int forceTime = (int)Settings.Store.InterimUpdateTime;
-                            if (forceTime > 0 && forceTime < seconds)
+                            if (forceTime > 0)
                                 seconds = forceTime;
                         }
 
@@ -224,10 +233,20 @@ namespace pGina.Plugin.RADIUS
 
                 //Failure
                 string msg = "Unable to validate username or password.";
-                if (client.lastReceievedPacket != null
-                    && client.lastReceievedPacket.containsAttribute(Packet.AttributeType.Reply_Message))
+
+                if (client.lastReceievedPacket == null)
+                {
+                    msg = msg + " No response from server.";
+                }
+
+                else if (client.lastReceievedPacket.containsAttribute(Packet.AttributeType.Reply_Message))
                 {
                     msg = client.lastReceievedPacket.getFirstStringAttribute(Packet.AttributeType.Reply_Message);
+                }
+
+                else if (client.lastReceievedPacket.code == Packet.Code.Access_Reject)
+                {
+                    msg = msg + String.Format(" Access Rejected.");
                 }
 
                 return new BooleanResult() { Success = result, Message = msg };
@@ -247,7 +266,8 @@ namespace pGina.Plugin.RADIUS
         //Processes accounting on logon/logoff
         public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, pGina.Shared.Types.SessionProperties properties)
         {
-
+            m_logger.Debug("SessionChange() called...");
+            m_logger.DebugFormat("Change Reason: {0}", changeDescription.Reason);
             try
             {
                 if (changeDescription.Reason != System.ServiceProcess.SessionChangeReason.SessionLogon
@@ -258,7 +278,11 @@ namespace pGina.Plugin.RADIUS
                     return;
                 }
 
-                m_logger.DebugFormat("SessionChange({0})", properties.Id.ToString());
+                if (properties == null)
+                {
+                    m_logger.DebugFormat("No session properties available. This account does not appear to be managed by pGina. Exiting SessionChange()");
+                    return;
+                }
 
                 if (!(bool)Settings.Store.EnableAcct)
                 {
@@ -304,11 +328,12 @@ namespace pGina.Plugin.RADIUS
 
                             RADIUSClient client = GetClient();
                             session = new Session(properties.Id, username, client);
-
+                            m_sessionManager.Add(properties.Id, session);
+                            
                             //Check forced interim-update setting
-                            if (Settings.Store.SendInterimUpdates && (bool)Settings.Store.ForceInterimUpdates)
+                            if ((bool)Settings.Store.SendInterimUpdates && (bool)Settings.Store.ForceInterimUpdates)
                             {
-                                int interval = Settings.Store.InterimUpdateTime;
+                                int interval = (int)Settings.Store.InterimUpdateTime;
                                 session.SetInterimUpdate(interval, InterimUpdatesCallback);
                             }
                         }
@@ -369,7 +394,6 @@ namespace pGina.Plugin.RADIUS
                             session = m_sessionManager[properties.Id];
                         else
                         {
-                            m_logger.DebugFormat("Unable to find user info... next statement will cause crash... ?");
                             m_logger.DebugFormat("Users {0} is logging off, but no RADIUS session information is available for session ID {1}.", username, properties.Id);
                             return;
                         }
@@ -383,6 +407,7 @@ namespace pGina.Plugin.RADIUS
                         m_logger.Debug("Disabling call backs...");
                         //Disbale any active callbacks for this session
                         session.disableCallbacks();
+                        session.active = false;
 
                         //Assume normal logout if no other terminate reason is listed.
                         if (session.terminate_cause == null)
@@ -504,6 +529,7 @@ namespace pGina.Plugin.RADIUS
             return Tuple.Create(ipAddr, macAddr);
         }
 
+        //Gets invoked by timer callback after the session times out
         private void SessionTimeoutCallback(object state)
         {
             m_logger.DebugFormat("Session Timeout Callback called...");
@@ -526,9 +552,9 @@ namespace pGina.Plugin.RADIUS
             m_logger.DebugFormat("Log off {0}.", result ? "successful" : "failed");
         }
 
+        //Gets invoked if wispr session limit 
         private void SessionTerminateCallback(object state)
         {
-            //Lock session? Might cause issues when we call LogoffSession on user and trigger the SessionChange method?
             Session session = (Session)state;
             session.terminate_cause = Packet.Acct_Terminate_Cause.Session_Timeout;
 
@@ -550,13 +576,27 @@ namespace pGina.Plugin.RADIUS
             
         }
 
+        //Gets invoked when its time to send interim updates
         private void InterimUpdatesCallback(object state)
         {
             Session session = (Session)state;
             m_logger.DebugFormat("Sending interim-update for user {0}", session.username); 
             lock (session)
             {
-                session.client.interimUpdate(session.username);
+                try
+                {
+                    if (session.active)
+                        session.client.interimUpdate(session.username);
+                    else
+                    {
+                        m_logger.Debug("Interim update still running after session is no longer active... Disabling call backs.");
+                        session.disableCallbacks();
+                    }
+                }
+                catch (RADIUSException e)
+                {
+                    m_logger.DebugFormat("Unable to send interim-update: {0}", e.Message);
+                }
             }
         }
     }

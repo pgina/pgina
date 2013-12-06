@@ -341,9 +341,9 @@
             this.forceInterimUpdLbl.AutoSize = true;
             this.forceInterimUpdLbl.Location = new System.Drawing.Point(185, 45);
             this.forceInterimUpdLbl.Name = "forceInterimUpdLbl";
-            this.forceInterimUpdLbl.Size = new System.Drawing.Size(100, 13);
+            this.forceInterimUpdLbl.Size = new System.Drawing.Size(47, 13);
             this.forceInterimUpdLbl.TabIndex = 3;
-            this.forceInterimUpdLbl.Text = "seconds (or sooner)";
+            this.forceInterimUpdLbl.Text = "seconds";
             // 
             // forceInterimUpdTB
             // 

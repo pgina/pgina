@@ -37,6 +37,7 @@ namespace pGina.Plugin.RADIUS
         public string username { get; set; }
         public Guid id { get; set; } //guid.toString()
         public int? windowsSessionId { get; set; } //Windows session id
+        public bool active { get; set; }
 
         public RADIUSClient client { get; set; }
             
@@ -58,13 +59,14 @@ namespace pGina.Plugin.RADIUS
             this.id = Id;
             this.username = username;
             this.client = client;
+            active = true;
 
         }
 
         public void SetInterimUpdate(int frequency, TimerCallback tcb){
             this.interim_update = frequency;
 
-            this.interim_update_timer = new Timer(tcb, this, frequency * 1000, frequency);
+            this.interim_update_timer = new Timer(tcb, this, frequency * 1000, frequency * 1000);
         }
 
         public void SetSessionTimeout(int timeout, TimerCallback tcb)

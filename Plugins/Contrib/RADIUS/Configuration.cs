@@ -110,10 +110,10 @@ namespace pGina.Plugin.RADIUS
             enableAcctCB.Checked = (bool)Settings.Store.EnableAcct;
 
             serverTB.Text = Settings.Store.Server;
-            authPortTB.Text = String.Format("{0}", stoi(Settings.Store.AuthPort, 1812));
-            acctPortTB.Text = String.Format("{0}", stoi(Settings.Store.AcctPort, 1813));
+            authPortTB.Text = String.Format("{0}", (int)Settings.Store.AuthPort);
+            acctPortTB.Text = String.Format("{0}", (int)Settings.Store.AcctPort);
             secretTB.Text = Settings.Store.GetEncryptedSetting("SharedSecret") ;
-            timeoutTB.Text = String.Format("{0:0.00}", stoi(Settings.Store.Timeout, 2500) / 1000.0); //2500ms
+            timeoutTB.Text = String.Format("{0:0.00}", ((int)Settings.Store.Timeout) / 1000.0 ); //2500ms
             retryTB.Text = String.Format("{0}", (int)Settings.Store.Retry);
 
             sendNasIpAddrCB.Checked = (bool)Settings.Store.SendNASIPAddress;
@@ -124,7 +124,7 @@ namespace pGina.Plugin.RADIUS
 
             sendInterimUpdatesCB.Checked = (bool)Settings.Store.SendInterimUpdates;
             forceInterimUpdCB.Checked = (bool)Settings.Store.ForceInterimUpdates;
-            forceInterimUpdTB.Text = String.Format("{0}", stoi(Settings.Store.InterimUpdateTime, 900));
+            forceInterimUpdTB.Text = String.Format("{0}", (int)Settings.Store.InterimUpdateTime);
 
             sessionTimeoutCB.Checked = (bool)Settings.Store.AllowSessionTimeout;
             wisprTimeoutCB.Checked = (bool)Settings.Store.WisprSessionTerminate;
@@ -177,11 +177,12 @@ namespace pGina.Plugin.RADIUS
         }
 
         //Converts value to int, or returns default value. 
-        private int stoi(Object o, int def = 0)
+        /*private int stoi(Object o, int def = 0)
         {
-            try{ 
-                return (int)o; }
-            catch (InvalidCastException) { return def; }
-        }
+            try{ return (int)o; }
+            catch (InvalidCastException) { 
+               
+                return def; }
+        }*/
     }
 }
