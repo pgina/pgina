@@ -155,10 +155,6 @@ namespace pGina.Plugin.Ldap
 
             // Get the authz rules from registry
             List<GroupAuthzRule> rules = GroupRuleLoader.GetAuthzRules();
-            if (rules.Count == 0)
-            {
-                throw new Exception("No authorizaition rules found.");
-            }
             
             // Get the LDAP server object
             LdapServer serv = properties.GetTrackedSingle<LdapServer>();
@@ -225,7 +221,7 @@ namespace pGina.Plugin.Ldap
                 
                 // Bind for searching if we have rules to process.  If there's only one, it's the
                 // default rule which doesn't require searching the LDAP tree.
-                if (rules.Count > 1)
+                if (rules.Count > 0)
                     serv.BindForSearch();
 
                 foreach (GroupAuthzRule rule in rules)
