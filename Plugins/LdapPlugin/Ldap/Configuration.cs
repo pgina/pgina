@@ -85,7 +85,6 @@ namespace pGina.Plugin.Ldap
             this.passwordAttributesDGV.DefaultValuesNeeded += passwordAttributesDGV_DefaultValuesNeeded;
             combCol.Items.AddRange(AttribMethod.methods.Values.ToArray());
             combCol.Items.AddRange(TimeMethod.methods.Values.ToArray());
-            combCol.Items.AddRange(AttribConvert.Attribs.ToArray());
             this.passwordAttributesDGV.Columns.Add(combCol);
         }
 
