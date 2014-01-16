@@ -359,6 +359,8 @@ namespace pGina.Plugin.RADIUS
         public enum Acct_Status_Type { Start = 1, Stop, Interim_Update }
         public enum Acct_Terminate_Cause { User_Request = 1, Idle_Timeout = 4,  Session_Timeout = 5}
 
+        public enum VSA_WISPr { Vendor_ID = 14122, WISPr_Session_Terminate_Time = 9 }
+
         private class AVP
         {
             private List<Tuple<AttributeType, byte[]>> list;
@@ -473,5 +475,26 @@ namespace pGina.Plugin.RADIUS
                     attributeCounter[type] = 1;
             }
         }
+    
+        //Static methods for Vendor Specific Attribrutes
+        public static int VSA_vendorID(byte[] val)
+        {
+            //Need to take into account change in endianness
+            byte[] vid = new byte[4];
+            Array.Copy(val, vid, 4);
+            Array.Reverse(vid);
+            return BitConverter.ToInt32(vid, 0);
+        }
+
+        public static byte VSA_VendorType(byte[] val)
+        {
+            return val[4];
+        }
+
+        public static string VSA_valueAsString(byte[] val)
+        {
+            return Encoding.UTF8.GetString(val, 4, val.Length - 4);
+        }
+    
     }
 }

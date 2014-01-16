@@ -27,6 +27,7 @@ namespace pGina.Plugin.RADIUS
         public Packet lastReceievedPacket { get; private set; } //Last packet received from server
         public bool authenticated { get; private set; } //Whether username was successfully authenticated
 
+        private DateTime accountingStartTime { get; set; }
         
         public byte[] NAS_IP_Address { get; set; } 
         public string NAS_Identifier { get; set; }
@@ -202,6 +203,9 @@ namespace pGina.Plugin.RADIUS
 
                         m_logger.DebugFormat("Received accounting response: {0} for user {1}", responsePacket.code, username);
 
+                        if (responsePacket.code == Packet.Code.Accounting_Response)
+                            accountingStartTime = DateTime.Now;
+
                         return responsePacket.code == Packet.Code.Accounting_Response;
                     }
 
@@ -227,6 +231,14 @@ namespace pGina.Plugin.RADIUS
                 throw new RADIUSException("Session ID must be present for accounting.");
             p.addAttribute(Packet.AttributeType.Acct_Session_Id, sessionId);
             p.addAttribute(Packet.AttributeType.Acct_Status_Type, (int)Packet.Acct_Status_Type.Interim_Update);
+
+            p.addAttribute(Packet.AttributeType.Acct_Session_Time, (DateTime.Now - accountingStartTime).Seconds);
+
+            if (NAS_IP_Address != null)
+                p.addAttribute(Packet.AttributeType.NAS_IP_Address, NAS_IP_Address);
+            if (!String.IsNullOrEmpty(NAS_Identifier))
+                p.addAttribute(Packet.AttributeType.NAS_Identifier, NAS_Identifier);
+
 
             m_logger.DebugFormat("Attempting to send interim-update for user {0}", username);
 
@@ -284,6 +296,8 @@ namespace pGina.Plugin.RADIUS
             accountingRequest.addAttribute(Packet.AttributeType.Acct_Status_Type, (int)Packet.Acct_Status_Type.Stop);
             if(terminateCause != null)
                 accountingRequest.addAttribute(Packet.AttributeType.Acct_Terminate_Cause, (int) Packet.Acct_Terminate_Cause.User_Request);
+
+            accountingRequest.addAttribute(Packet.AttributeType.Acct_Session_Time, (DateTime.Now - accountingStartTime).Seconds);
 
             m_logger.DebugFormat("Attempting to send session-stop for user {0}", username);
 

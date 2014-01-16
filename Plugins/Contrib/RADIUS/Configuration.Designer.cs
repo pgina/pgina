@@ -66,6 +66,7 @@
             this.enableAuthCB = new System.Windows.Forms.CheckBox();
             this.enableAcctCB = new System.Windows.Forms.CheckBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.acctingForAllUsersCB = new System.Windows.Forms.CheckBox();
             this.authGB.SuspendLayout();
             this.acctGB.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -74,7 +75,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(296, 442);
+            this.btnOk.Location = new System.Drawing.Point(296, 471);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 22;
@@ -84,7 +85,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(377, 442);
+            this.btnCancel.Location = new System.Drawing.Point(377, 471);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 23;
@@ -220,7 +221,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(21, 416);
+            this.label9.Location = new System.Drawing.Point(21, 445);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(117, 13);
             this.label9.TabIndex = 19;
@@ -228,7 +229,7 @@
             // 
             // ipAddrSuggestionTB
             // 
-            this.ipAddrSuggestionTB.Location = new System.Drawing.Point(133, 413);
+            this.ipAddrSuggestionTB.Location = new System.Drawing.Point(133, 442);
             this.ipAddrSuggestionTB.Name = "ipAddrSuggestionTB";
             this.ipAddrSuggestionTB.Size = new System.Drawing.Size(98, 20);
             this.ipAddrSuggestionTB.TabIndex = 20;
@@ -236,7 +237,7 @@
             // useModifiedNameCB
             // 
             this.useModifiedNameCB.AutoSize = true;
-            this.useModifiedNameCB.Location = new System.Drawing.Point(24, 385);
+            this.useModifiedNameCB.Location = new System.Drawing.Point(24, 414);
             this.useModifiedNameCB.Name = "useModifiedNameCB";
             this.useModifiedNameCB.Size = new System.Drawing.Size(207, 17);
             this.useModifiedNameCB.TabIndex = 18;
@@ -325,13 +326,14 @@
             // 
             // acctGB
             // 
+            this.acctGB.Controls.Add(this.acctingForAllUsersCB);
             this.acctGB.Controls.Add(this.forceInterimUpdLbl);
             this.acctGB.Controls.Add(this.forceInterimUpdTB);
             this.acctGB.Controls.Add(this.forceInterimUpdCB);
             this.acctGB.Controls.Add(this.sendInterimUpdatesCB);
             this.acctGB.Location = new System.Drawing.Point(18, 311);
             this.acctGB.Name = "acctGB";
-            this.acctGB.Size = new System.Drawing.Size(434, 68);
+            this.acctGB.Size = new System.Drawing.Size(434, 97);
             this.acctGB.TabIndex = 16;
             this.acctGB.TabStop = false;
             this.acctGB.Text = "Accounting Options";
@@ -339,7 +341,7 @@
             // forceInterimUpdLbl
             // 
             this.forceInterimUpdLbl.AutoSize = true;
-            this.forceInterimUpdLbl.Location = new System.Drawing.Point(185, 45);
+            this.forceInterimUpdLbl.Location = new System.Drawing.Point(184, 65);
             this.forceInterimUpdLbl.Name = "forceInterimUpdLbl";
             this.forceInterimUpdLbl.Size = new System.Drawing.Size(47, 13);
             this.forceInterimUpdLbl.TabIndex = 3;
@@ -347,7 +349,7 @@
             // 
             // forceInterimUpdTB
             // 
-            this.forceInterimUpdTB.Location = new System.Drawing.Point(143, 42);
+            this.forceInterimUpdTB.Location = new System.Drawing.Point(142, 62);
             this.forceInterimUpdTB.Name = "forceInterimUpdTB";
             this.forceInterimUpdTB.Size = new System.Drawing.Size(36, 20);
             this.forceInterimUpdTB.TabIndex = 2;
@@ -355,7 +357,7 @@
             // forceInterimUpdCB
             // 
             this.forceInterimUpdCB.AutoSize = true;
-            this.forceInterimUpdCB.Location = new System.Drawing.Point(25, 44);
+            this.forceInterimUpdCB.Location = new System.Drawing.Point(24, 64);
             this.forceInterimUpdCB.Name = "forceInterimUpdCB";
             this.forceInterimUpdCB.Size = new System.Drawing.Size(116, 17);
             this.forceInterimUpdCB.TabIndex = 1;
@@ -365,7 +367,7 @@
             // sendInterimUpdatesCB
             // 
             this.sendInterimUpdatesCB.AutoSize = true;
-            this.sendInterimUpdatesCB.Location = new System.Drawing.Point(7, 20);
+            this.sendInterimUpdatesCB.Location = new System.Drawing.Point(6, 40);
             this.sendInterimUpdatesCB.Name = "sendInterimUpdatesCB";
             this.sendInterimUpdatesCB.Size = new System.Drawing.Size(128, 17);
             this.sendInterimUpdatesCB.TabIndex = 0;
@@ -375,7 +377,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(238, 416);
+            this.label10.Location = new System.Drawing.Point(238, 445);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(89, 13);
             this.label10.TabIndex = 21;
@@ -436,11 +438,21 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "RADIUS Features";
             // 
+            // acctingForAllUsersCB
+            // 
+            this.acctingForAllUsersCB.AutoSize = true;
+            this.acctingForAllUsersCB.Location = new System.Drawing.Point(7, 17);
+            this.acctingForAllUsersCB.Name = "acctingForAllUsersCB";
+            this.acctingForAllUsersCB.Size = new System.Drawing.Size(226, 17);
+            this.acctingForAllUsersCB.TabIndex = 4;
+            this.acctingForAllUsersCB.Text = "Perform accounting for non-RADIUS users";
+            this.acctingForAllUsersCB.UseVisualStyleBackColor = true;
+            // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(464, 473);
+            this.ClientSize = new System.Drawing.Size(464, 506);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label10);
@@ -510,5 +522,6 @@
         private System.Windows.Forms.Label forceInterimUpdLbl;
         private System.Windows.Forms.TextBox forceInterimUpdTB;
         private System.Windows.Forms.CheckBox forceInterimUpdCB;
+        private System.Windows.Forms.CheckBox acctingForAllUsersCB;
     }
 }

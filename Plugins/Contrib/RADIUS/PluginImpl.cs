@@ -45,33 +45,15 @@ using pGina.Shared.Settings;
 namespace pGina.Plugin.RADIUS
 {
 
-    //Done: 
-    //Keep track of sessionID, needs to be unique for each session, but be maintained through auth and accounting
-
-    //Caled-Station-ID - MAC Addr
-    //NAS-Identifier - Customizable
-
-    //Session-Timeout - done
-    //Return server response message - done
-
-
     //TODO:
     //Idle-Timeout - Unsure if possible / pgina's responsibility
-    //Acct-Interim-Interval - radius accting, sends accting updates every x seconds
     //WISPr-Session-Terminate-Time := "2014-03-11T23:59:59"
 
-   
-
-    //(6:02:09 AM) emias: Oooska: Acct-Status-Type isn't set to "Start" or "Stop", but to some invalid values.  (No idea? Works fine here)
-    //And the Acct-Unique-Session-Id isn't identical on login and logout. (Done)
-
-    //Select network adapter?
-
-    ////NAS-Port or NAS-Port-Type support? (accounting)
-
-    //Stop using dictionary for Packet.cs
-
-    //UI is till not quite 100% (force interim updates, timeout(def 2.50), ports)
+    /** accounting to radius is sent also when the login is local. Is this intended behaviour? Can this be disabled for local users? It also carries a little problem because it apparently never sends the accounting-stop packet.
+     
+     * 
+     * * for every login we found two accounting packets, one with "nas-ip-address" correct and the other one with Windows' local IP. Can you check this?
+     * */
 
     public class RADIUSPlugin : IPluginConfiguration, IPluginAuthentication, IPluginEventNotifications
     {
@@ -171,17 +153,28 @@ namespace pGina.Plugin.RADIUS
                     if(p.containsAttribute(Packet.AttributeType.Vendor_Specific)){
                         m_logger.DebugFormat("Vendor-specific attributes found. List information for all of them.");
                         foreach(byte[] val in p.getByteArrayAttributes(Packet.AttributeType.Vendor_Specific)){
-                            m_logger.DebugFormat("Vendor Code: {0:D}-{1:D}-{2:D}, Type: {3:D}, Value: {4}", val[0], val[1], val[2], val[3], UTF8Encoding.UTF8.GetString(val, 4, val.Length - 4));
+                            m_logger.DebugFormat("Vendor ID: {0:D}, Type: {1:D}, Value: {2}", Packet.VSA_vendorID(val), Packet.VSA_VendorType(val), Packet.VSA_valueAsString(val));
+
+                            if ((bool)Settings.Store.WisprSessionTerminate && Packet.VSA_vendorID(val) == (int)Packet.VSA_WISPr.Vendor_ID 
+                                && Packet.VSA_VendorType(val) == (int)Packet.VSA_WISPr.WISPr_Session_Terminate_Time)
+                            {
+                                //Value is in format "2014-03-11T23:59:59"
+                                try
+                                {
+                                    string sdt = Packet.VSA_valueAsString(val).Replace('T', ' ');
+                                    m_logger.DebugFormat("Date: {0}", sdt);
+                                    DateTime dt = DateTime.ParseExact(sdt, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+                                    m_logger.DebugFormat("Found Session Terminate Time value: {0}", dt);
+
+                                }
+                                catch (FormatException e)
+                                {
+                                    m_logger.DebugFormat("Unable to parse timestamp: {0}", Packet.VSA_valueAsString(val));
+                                    m_logger.DebugFormat("Message: {0}", e.Message);
+                                }
+                            }
                         }
 
-                    }
-
-                    if ((bool)Settings.Store.WisprSessionTerminate && p.containsAttribute(Packet.AttributeType.Vendor_Specific))
-                    {
-                        //TODO:Wispr-Terminate-Time is vendor specific, first 3 bytes are vendor, 4th byte should be 9, then the timestamp string.
-                        //No idea what the vendor specific code is
-                                              
-                        
                     }
 
                     //Check for interim-update
@@ -326,6 +319,11 @@ namespace pGina.Plugin.RADIUS
                             //No session info - must have authed with something other than RADIUS.
                             m_logger.DebugFormat("RADIUS Accounting Logon: Unable to find session for {0} with GUID {1}", username, properties.Id);
 
+                            if(!(bool)Settings.Store.AcctingForAllUsers){
+                                m_logger.Debug("Accounting for non-RADIUS users is disabled. Exiting.");
+                                return;
+                            }
+
                             RADIUSClient client = GetClient();
                             session = new Session(properties.Id, username, client);
                             m_sessionManager.Add(properties.Id, session);
@@ -455,17 +453,12 @@ namespace pGina.Plugin.RADIUS
         private RADIUSClient GetClient(string sessionId = null)
         {
             string[] servers = Regex.Split(Settings.Store.Server.Trim(), @"\s+");
-            m_logger.DebugFormat("Servers: {0}", servers);
             int authport = Settings.Store.AuthPort;
-            m_logger.DebugFormat("authport: {0}", authport);
+            m_logger.DebugFormat("Servers: {0}:{1}", servers, authport);
             int acctport = Settings.Store.AcctPort;
-            m_logger.DebugFormat("acctport: {0}", acctport);
             string sharedKey = Settings.Store.GetEncryptedSetting("SharedSecret");
-            m_logger.DebugFormat("ss: {0}", sharedKey);
             int timeout = Settings.Store.Timeout;
-            m_logger.DebugFormat("timeout: {0}", timeout);
             int retry = Settings.Store.Retry;
-            m_logger.DebugFormat("retry: {0}", retry);
 
 
             byte[] ipAddr = null;

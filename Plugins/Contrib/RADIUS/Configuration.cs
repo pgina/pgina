@@ -90,6 +90,7 @@ namespace pGina.Plugin.RADIUS
             Settings.Store.SendCalledStationID = sendCalledStationCB.Checked;
             Settings.Store.CalledStationID = sendCalledStationTB.Text.Trim();
 
+            Settings.Store.AcctingForAllUsers = acctingForAllUsersCB.Checked;
             Settings.Store.SendInterimUpdates = sendInterimUpdatesCB.Checked;
             Settings.Store.ForceInterimUpdates = forceInterimUpdCB.Checked;
             Settings.Store.InterimUpdateTime = interim_time;
@@ -122,6 +123,7 @@ namespace pGina.Plugin.RADIUS
             sendCalledStationCB.Checked = (bool)Settings.Store.SendCalledStationID;
             sendCalledStationTB.Text = Settings.Store.CalledStationID;
 
+            acctingForAllUsersCB.Checked = (bool)Settings.Store.AcctingForAllUsers;
             sendInterimUpdatesCB.Checked = (bool)Settings.Store.SendInterimUpdates;
             forceInterimUpdCB.Checked = (bool)Settings.Store.ForceInterimUpdates;
             forceInterimUpdTB.Text = String.Format("{0}", (int)Settings.Store.InterimUpdateTime);

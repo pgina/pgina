@@ -37,6 +37,7 @@ namespace pGina.Plugin.RADIUS
             m_settings.SetDefault("SendCalledStationID", false);
             m_settings.SetDefault("CalledStationID", "%macaddr");
 
+            m_settings.SetDefault("AcctingForAllUsers", false);
             m_settings.SetDefault("SendInterimUpdates", false);
             m_settings.SetDefault("ForceInterimUpdates", false);
             m_settings.SetDefault("InterimUpdateTime", 900); //900sec = 15 min
