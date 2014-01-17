@@ -81,7 +81,7 @@ namespace pGina.Plugin.RADIUS
         {
             this.session_terminate = time;
 
-            int ms = (time - DateTime.Now).Seconds;
+            int ms = (int)(time - DateTime.Now).TotalSeconds;
 
             this.session_terminate_timer = new Timer(tcb, this, ms * 1000, 30000);
             //Create timer

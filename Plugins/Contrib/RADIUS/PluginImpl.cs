@@ -415,6 +415,7 @@ namespace pGina.Plugin.RADIUS
 
                         try
                         {
+                            m_logger.DebugFormat("About to send accounting stop packet. Session has been active {0} seconds.", (DateTime.Now - session.client.accountingStartTime).TotalSeconds);
                             session.client.stopAccounting(session.username, session.terminate_cause);
                         }
                         catch (RADIUSException re)

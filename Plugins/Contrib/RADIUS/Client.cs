@@ -27,7 +27,7 @@ namespace pGina.Plugin.RADIUS
         public Packet lastReceievedPacket { get; private set; } //Last packet received from server
         public bool authenticated { get; private set; } //Whether username was successfully authenticated
 
-        private DateTime accountingStartTime { get; set; }
+        public DateTime accountingStartTime { get; set; }
         
         public byte[] NAS_IP_Address { get; set; } 
         public string NAS_Identifier { get; set; }
@@ -168,7 +168,8 @@ namespace pGina.Plugin.RADIUS
                 accountingRequest.addAttribute(Packet.AttributeType.NAS_IP_Address, NAS_IP_Address);
             if (!String.IsNullOrEmpty(NAS_Identifier))
                 accountingRequest.addAttribute(Packet.AttributeType.NAS_Identifier, NAS_Identifier);
-
+            if (!String.IsNullOrEmpty(called_station_id))
+                accountingRequest.addAttribute(Packet.AttributeType.Called_Station_Id, called_station_id);
 
             if (authType != Packet.Acct_Authentic.Not_Specified)
                 accountingRequest.addAttribute(Packet.AttributeType.Acct_Authentic, (int)authType);
@@ -232,12 +233,14 @@ namespace pGina.Plugin.RADIUS
             p.addAttribute(Packet.AttributeType.Acct_Session_Id, sessionId);
             p.addAttribute(Packet.AttributeType.Acct_Status_Type, (int)Packet.Acct_Status_Type.Interim_Update);
 
-            p.addAttribute(Packet.AttributeType.Acct_Session_Time, (DateTime.Now - accountingStartTime).Seconds);
+            p.addAttribute(Packet.AttributeType.Acct_Session_Time, (int)(DateTime.Now - accountingStartTime).TotalSeconds);
 
             if (NAS_IP_Address != null)
                 p.addAttribute(Packet.AttributeType.NAS_IP_Address, NAS_IP_Address);
             if (!String.IsNullOrEmpty(NAS_Identifier))
                 p.addAttribute(Packet.AttributeType.NAS_Identifier, NAS_Identifier);
+            if (!String.IsNullOrEmpty(called_station_id))
+                p.addAttribute(Packet.AttributeType.Called_Station_Id, called_station_id);
 
 
             m_logger.DebugFormat("Attempting to send interim-update for user {0}", username);
@@ -297,7 +300,14 @@ namespace pGina.Plugin.RADIUS
             if(terminateCause != null)
                 accountingRequest.addAttribute(Packet.AttributeType.Acct_Terminate_Cause, (int) Packet.Acct_Terminate_Cause.User_Request);
 
-            accountingRequest.addAttribute(Packet.AttributeType.Acct_Session_Time, (DateTime.Now - accountingStartTime).Seconds);
+            if (NAS_IP_Address != null)
+                accountingRequest.addAttribute(Packet.AttributeType.NAS_IP_Address, NAS_IP_Address);
+            if (!String.IsNullOrEmpty(NAS_Identifier))
+                accountingRequest.addAttribute(Packet.AttributeType.NAS_Identifier, NAS_Identifier);
+            if (!String.IsNullOrEmpty(called_station_id))
+                accountingRequest.addAttribute(Packet.AttributeType.Called_Station_Id, called_station_id);
+
+            accountingRequest.addAttribute(Packet.AttributeType.Acct_Session_Time, (int)(DateTime.Now - accountingStartTime).TotalSeconds);
 
             m_logger.DebugFormat("Attempting to send session-stop for user {0}", username);
 
