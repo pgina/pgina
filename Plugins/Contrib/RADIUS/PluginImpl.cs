@@ -47,13 +47,7 @@ namespace pGina.Plugin.RADIUS
 
     //TODO:
     //Idle-Timeout - Unsure if possible / pgina's responsibility
-    //WISPr-Session-Terminate-Time := "2014-03-11T23:59:59"
 
-    /** accounting to radius is sent also when the login is local. Is this intended behaviour? Can this be disabled for local users? It also carries a little problem because it apparently never sends the accounting-stop packet.
-     
-     * 
-     * * for every login we found two accounting packets, one with "nas-ip-address" correct and the other one with Windows' local IP. Can you check this?
-     * */
 
     public class RADIUSPlugin : IPluginConfiguration, IPluginAuthentication, IPluginEventNotifications
     {
@@ -132,45 +126,40 @@ namespace pGina.Plugin.RADIUS
                     {   
                         int seconds = client.lastReceievedPacket.getFirstIntAttribute(Packet.AttributeType.Session_Timeout);
                         session.SetSessionTimeout(seconds, SessionTimeoutCallback);
-                        m_logger.DebugFormat("Setting timeout for {0} to {1} seconds.", userInfo.Username, seconds);
+                        //m_logger.DebugFormat("Setting timeout for {0} to {1} seconds.", userInfo.Username, seconds);
                     }
 
                     if (p.containsAttribute(Packet.AttributeType.Idle_Timeout))
                     {
                         int seconds = client.lastReceievedPacket.getFirstIntAttribute(Packet.AttributeType.Idle_Timeout);
-                        m_logger.DebugFormat("idle timeout value: {0:D}", seconds);
-                    }
-
-                    if (p.containsAttribute(Packet.AttributeType.Filter_Id))
-                    {
-                        //Debug purposes only
-                        foreach (string val in p.getStringAttributes(Packet.AttributeType.Filter_Id))
-                        {
-                            m_logger.DebugFormat("Filter-Id: {0}", val);
-                        }
                     }
 
                     if(p.containsAttribute(Packet.AttributeType.Vendor_Specific)){
-                        m_logger.DebugFormat("Vendor-specific attributes found. List information for all of them.");
                         foreach(byte[] val in p.getByteArrayAttributes(Packet.AttributeType.Vendor_Specific)){
-                            m_logger.DebugFormat("Vendor ID: {0:D}, Type: {1:D}, Value: {2}", Packet.VSA_vendorID(val), Packet.VSA_VendorType(val), Packet.VSA_valueAsString(val));
+                            //m_logger.DebugFormat("Vendor ID: {0:D}, Type: {1:D}, Value: {2}", Packet.VSA_vendorID(val), Packet.VSA_VendorType(val), Packet.VSA_valueAsString(val));
 
                             if ((bool)Settings.Store.WisprSessionTerminate && Packet.VSA_vendorID(val) == (int)Packet.VSA_WISPr.Vendor_ID 
                                 && Packet.VSA_VendorType(val) == (int)Packet.VSA_WISPr.WISPr_Session_Terminate_Time)
                             {
-                                //Value is in format "2014-03-11T23:59:59"
+                                
                                 try
                                 {
-                                    string sdt = Packet.VSA_valueAsString(val).Replace('T', ' ');
-                                    m_logger.DebugFormat("Date: {0}", sdt);
-                                    DateTime dt = DateTime.ParseExact(sdt, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-                                    m_logger.DebugFormat("Found Session Terminate Time value: {0}", dt);
+                                    //Value is in format "2014-03-11T23:59:59"
+                                    string sdt = Packet.VSA_valueAsString(val);
+                                    DateTime dt = DateTime.ParseExact(sdt, "yyyy-MM-dd'T'HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+
+                                    if (dt > DateTime.Now)
+                                    {
+                                        session.Set_Session_Terminate(dt, SessionTerminateCallback);
+                                    }
+
+                                    else
+                                        m_logger.DebugFormat("The timestamp provided for WisperSessionTerminate time value has passed.");
 
                                 }
                                 catch (FormatException e)
                                 {
                                     m_logger.DebugFormat("Unable to parse timestamp: {0}", Packet.VSA_valueAsString(val));
-                                    m_logger.DebugFormat("Message: {0}", e.Message);
                                 }
                             }
                         }
@@ -185,8 +174,6 @@ namespace pGina.Plugin.RADIUS
                         if (p.containsAttribute(Packet.AttributeType.Acct_Interim_Interval))
                         {
                             seconds = client.lastReceievedPacket.getFirstIntAttribute(Packet.AttributeType.Acct_Interim_Interval);
-                            m_logger.DebugFormat("Interim update seconds from packets: {0}", seconds);
-                            
                         }
 
                         //Check to see if plugin is set to send interim updates more frequently
@@ -213,7 +200,7 @@ namespace pGina.Plugin.RADIUS
 
                     lock (m_sessionManager)
                     {
-                        m_logger.DebugFormat("Adding session to m_sessionManager. ID: {0}, session: {1}", session.id, session);
+                        //m_logger.DebugFormat("Adding session to m_sessionManager. ID: {0}, session: {1}", session.id, session);
                         m_sessionManager.Add(session.id, session);
                     }
 
@@ -259,181 +246,153 @@ namespace pGina.Plugin.RADIUS
         //Processes accounting on logon/logoff
         public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, pGina.Shared.Types.SessionProperties properties)
         {
-            m_logger.Debug("SessionChange() called...");
-            m_logger.DebugFormat("Change Reason: {0}", changeDescription.Reason);
-            try
+            if (changeDescription.Reason != System.ServiceProcess.SessionChangeReason.SessionLogon
+                && changeDescription.Reason != System.ServiceProcess.SessionChangeReason.SessionLogoff)
             {
-                if (changeDescription.Reason != System.ServiceProcess.SessionChangeReason.SessionLogon
-                    && changeDescription.Reason != System.ServiceProcess.SessionChangeReason.SessionLogoff)
-                {
-                    m_logger.DebugFormat("Not logging on or off for this session change call ({0})... exiting.", changeDescription.Reason);
+                //m_logger.DebugFormat("Not logging on or off for this session change call ({0})... exiting.", changeDescription.Reason);
+                return;
+            }
 
-                    return;
-                }
+            if (properties == null)
+            {
+                //m_logger.DebugFormat("No session properties available. This account does not appear to be managed by pGina. Exiting SessionChange()");
+                return;
+            }
 
-                if (properties == null)
-                {
-                    m_logger.DebugFormat("No session properties available. This account does not appear to be managed by pGina. Exiting SessionChange()");
-                    return;
-                }
+            if (!(bool)Settings.Store.EnableAcct)
+            {
+                m_logger.Debug("Session Change stage set on RADIUS plugin but accounting is not enabled in plugin settings.");
+                return;
+            }
 
-                if (!(bool)Settings.Store.EnableAcct)
-                {
-                    m_logger.Debug("Session Change stage set on RADIUS plugin but accounting is not enabled in plugin settings.");
-                    return;
-                }
+            //Determine username (may change depending on value of UseModifiedName setting)
+            string username = null;
+            UserInformation ui = properties.GetTrackedSingle<UserInformation>();
 
-                m_logger.DebugFormat("Checking username...");
-                m_logger.DebugFormat("properties != null == {0}", properties != null);
-                //Determine username (may change depending on value of UseModifiedName setting)
-                string username = null;
-                UserInformation ui = properties.GetTrackedSingle<UserInformation>();
-
-                if (ui == null)
-                {
-                    m_logger.DebugFormat("No userinformation for this session logoff... exiting... (local machine login only?)");
-                    return;
-                }
+            if (ui == null)
+            {
+                //m_logger.DebugFormat("No userinformation for this session logoff... exiting...");
+                return;
+            }
                     
 
-                if ((bool)Settings.Store.UseModifiedName)
-                    username = ui.Username;
-                else
-                    username = ui.OriginalUsername;
+            if ((bool)Settings.Store.UseModifiedName)
+                username = ui.Username;
+            else
+                username = ui.OriginalUsername;
 
+            Session session = null;
 
-                m_logger.DebugFormat("Session Change for user {0}", username);
-                m_logger.DebugFormat("properties.id: {0}", properties.Id);
-                m_logger.DebugFormat("m_sessionManager != null == {0}", m_sessionManager != null);
-
-                Session session = null;
-
-                //User is logging on
-                if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
+            //User is logging on
+            if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
+            {
+                lock (m_sessionManager)
                 {
-                    lock (m_sessionManager)
+                    //Check if session information is already available for this id
+                    if (!m_sessionManager.Keys.Contains(properties.Id))
                     {
-                        //Check if session information is already available for this id
-                        if (!m_sessionManager.Keys.Contains(properties.Id))
-                        {
-                            //No session info - must have authed with something other than RADIUS.
-                            m_logger.DebugFormat("RADIUS Accounting Logon: Unable to find session for {0} with GUID {1}", username, properties.Id);
+                        //No session info - must have authed with something other than RADIUS.
+                        //m_logger.DebugFormat("RADIUS Accounting Logon: Unable to find session for {0} with GUID {1}", username, properties.Id);
 
-                            if(!(bool)Settings.Store.AcctingForAllUsers){
-                                m_logger.Debug("Accounting for non-RADIUS users is disabled. Exiting.");
-                                return;
-                            }
-
-                            RADIUSClient client = GetClient();
-                            session = new Session(properties.Id, username, client);
-                            m_sessionManager.Add(properties.Id, session);
-                            
-                            //Check forced interim-update setting
-                            if ((bool)Settings.Store.SendInterimUpdates && (bool)Settings.Store.ForceInterimUpdates)
-                            {
-                                int interval = (int)Settings.Store.InterimUpdateTime;
-                                session.SetInterimUpdate(interval, InterimUpdatesCallback);
-                            }
-                        }
-
-                        else
-                            session = m_sessionManager[properties.Id];
-                    }
-
-
-                    //Determine which plugin authenticated the user (if any)
-                    PluginActivityInformation pai = properties.GetTrackedSingle<PluginActivityInformation>();
-                    Packet.Acct_Authentic authSource = Packet.Acct_Authentic.Not_Specified;
-                    IEnumerable<Guid> authPlugins = pai.GetAuthenticationPlugins();
-                    Guid LocalMachinePluginGuid = new Guid("{12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D}");
-                    foreach (Guid guid in authPlugins)
-                    {
-                        if (pai.GetAuthenticationResult(guid).Success)
-                        {
-                            if (guid == SimpleUuid)
-                                authSource = Packet.Acct_Authentic.RADIUS;
-                            else if (guid == LocalMachinePluginGuid)
-                                authSource = Packet.Acct_Authentic.Local;
-                            else //Not RADIUS, not Local, must be some other auth plugin
-                                authSource = Packet.Acct_Authentic.Remote;
-                            break;
-                        }
-                    }
-
-                    //We can finally start the accounting process
-                    try
-                    {
-                        lock (session)
-                        {
-                            session.windowsSessionId = changeDescription.SessionId; //Grab session ID now that we're authenticated
-                            session.username = username; //Accting username may have changed depending on 'Use Modified username for accounting option'
-                            session.client.startAccounting(username, authSource);
-
-                            m_logger.DebugFormat("Successfully completed accounting start process...");
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        m_logger.Error("Error occurred while starting accounting.", e);
-                    }
-
-                }
-
-                
-                //User is logging off
-                else if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
-                {
-
-                    m_logger.DebugFormat("RADIUS Session Change... logging off...");
-
-                    lock (m_sessionManager)
-                    {
-                        if (m_sessionManager.Keys.Contains(properties.Id))
-                            session = m_sessionManager[properties.Id];
-                        else
-                        {
-                            m_logger.DebugFormat("Users {0} is logging off, but no RADIUS session information is available for session ID {1}.", username, properties.Id);
+                        if(!(bool)Settings.Store.AcctingForAllUsers){
+                            //m_logger.Debug("Accounting for non-RADIUS users is disabled. Exiting.");
                             return;
                         }
 
-                        //Remove the session from the session manager
-                        m_sessionManager.Remove(properties.Id);
+                        RADIUSClient client = GetClient();
+                        session = new Session(properties.Id, username, client);
+                        m_sessionManager.Add(properties.Id, session);
+                            
+                        //Check forced interim-update setting
+                        if ((bool)Settings.Store.SendInterimUpdates && (bool)Settings.Store.ForceInterimUpdates)
+                        {
+                            int interval = (int)Settings.Store.InterimUpdateTime;
+                            session.SetInterimUpdate(interval, InterimUpdatesCallback);
+                        }
                     }
 
-                    lock (session)
+                    else
+                        session = m_sessionManager[properties.Id];
+                }
+
+
+                //Determine which plugin authenticated the user (if any)
+                PluginActivityInformation pai = properties.GetTrackedSingle<PluginActivityInformation>();
+                Packet.Acct_Authentic authSource = Packet.Acct_Authentic.Not_Specified;
+                IEnumerable<Guid> authPlugins = pai.GetAuthenticationPlugins();
+                Guid LocalMachinePluginGuid = new Guid("{12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D}");
+                foreach (Guid guid in authPlugins)
+                {
+                    if (pai.GetAuthenticationResult(guid).Success)
                     {
-                        m_logger.Debug("Disabling call backs...");
-                        //Disbale any active callbacks for this session
-                        session.disableCallbacks();
-                        session.active = false;
-
-                        //Assume normal logout if no other terminate reason is listed.
-                        if (session.terminate_cause == null)
-                            session.terminate_cause = Packet.Acct_Terminate_Cause.User_Request;
-
-                        m_logger.DebugFormat("Terminate cause: {0}", session.terminate_cause);
-
-                        try
-                        {
-                            m_logger.DebugFormat("About to send accounting stop packet. Session has been active {0} seconds.", (DateTime.Now - session.client.accountingStartTime).TotalSeconds);
-                            session.client.stopAccounting(session.username, session.terminate_cause);
-                        }
-                        catch (RADIUSException re)
-                        {
-                            m_logger.Debug("Error stopping accounting...");
-                            m_logger.DebugFormat("Unable to send accounting stop message for user {0} with ID {1}. Message: {2}", session.username, session.id, re.Message);
-                        }
+                        if (guid == SimpleUuid)
+                            authSource = Packet.Acct_Authentic.RADIUS;
+                        else if (guid == LocalMachinePluginGuid)
+                            authSource = Packet.Acct_Authentic.Local;
+                        else //Not RADIUS, not Local, must be some other auth plugin
+                            authSource = Packet.Acct_Authentic.Remote;
+                        break;
                     }
                 }
 
-                m_logger.DebugFormat("All done session change... without any exceptions...");
+                //We can finally start the accounting process
+                try
+                {
+                    lock (session)
+                    {
+                        session.windowsSessionId = changeDescription.SessionId; //Grab session ID now that we're authenticated
+                        session.username = username; //Accting username may have changed depending on 'Use Modified username for accounting option'
+                        session.client.startAccounting(username, authSource);
+                        //m_logger.DebugFormat("Successfully completed accounting start process...");
+                    }
+                }
+                catch (Exception e)
+                {
+                    m_logger.Error("Error occurred while starting accounting.", e);
+                }
+
             }
-            catch (System.NullReferenceException e)
+
+                
+            //User is logging off
+            else if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
             {
-                m_logger.DebugFormat("Caught nullreference exception. {0}", e.StackTrace);
-                m_logger.DebugFormat("ChangeDescription.Reason: {0}", changeDescription.Reason);
-                throw e;
+                lock (m_sessionManager)
+                {
+                    if (m_sessionManager.Keys.Contains(properties.Id))
+                        session = m_sessionManager[properties.Id];
+                    else
+                    {
+                        //m_logger.DebugFormat("Users {0} is logging off, but no RADIUS session information is available for session ID {1}.", username, properties.Id);
+                        return;
+                    }
+
+                    //Remove the session from the session manager
+                    m_sessionManager.Remove(properties.Id);
+                }
+
+                lock (session)
+                {
+                    //Disbale any active callbacks for this session
+                    session.disableCallbacks();
+                    session.active = false;
+
+                    //Assume normal logout if no other terminate reason is listed.
+                    if (session.terminate_cause == null)
+                        session.terminate_cause = Packet.Acct_Terminate_Cause.User_Request;
+
+                    try
+                    {
+                        //m_logger.DebugFormat("About to send accounting stop packet. Session has been active {0} seconds.", (DateTime.Now - session.client.accountingStartTime).TotalSeconds);
+                        session.client.stopAccounting(session.username, session.terminate_cause);
+                    }
+                    catch (RADIUSException re)
+                    {
+                        m_logger.DebugFormat("Unable to send accounting stop message for user {0} with ID {1}. Message: {2}", session.username, session.id, re.Message);
+                    }
+                }
             }
+            
         }
 
         public void Configure()
@@ -455,7 +414,6 @@ namespace pGina.Plugin.RADIUS
         {
             string[] servers = Regex.Split(Settings.Store.Server.Trim(), @"\s+");
             int authport = Settings.Store.AuthPort;
-            m_logger.DebugFormat("Servers: {0}:{1}", servers, authport);
             int acctport = Settings.Store.AcctPort;
             string sharedKey = Settings.Store.GetEncryptedSetting("SharedSecret");
             int timeout = Settings.Store.Timeout;
@@ -526,7 +484,6 @@ namespace pGina.Plugin.RADIUS
         //Gets invoked by timer callback after the session times out
         private void SessionTimeoutCallback(object state)
         {
-            m_logger.DebugFormat("Session Timeout Callback called...");
             Session session = (Session)state;
 
             //Lock session? Might cause issues when we call LogoffSession on user and trigger the SessionChange method?
@@ -541,9 +498,9 @@ namespace pGina.Plugin.RADIUS
             }
             session.terminate_cause = Packet.Acct_Terminate_Cause.Session_Timeout;
 
-            m_logger.DebugFormat("Logging off user {0} in session{1} due to timeout.", session.username, session.windowsSessionId);
+            m_logger.DebugFormat("Logging off user {0} in session{1} due to session timeout.", session.username, session.windowsSessionId);
             bool result = Abstractions.WindowsApi.pInvokes.LogoffSession(session.windowsSessionId.Value);
-            m_logger.DebugFormat("Log off {0}.", result ? "successful" : "failed");
+            //m_logger.DebugFormat("Log off {0}.", result ? "successful" : "failed");
         }
 
         //Gets invoked if wispr session limit 
@@ -564,9 +521,9 @@ namespace pGina.Plugin.RADIUS
             }
             session.terminate_cause = Packet.Acct_Terminate_Cause.Session_Timeout;
 
-            m_logger.DebugFormat("Logging off user {0} in session{1} due to timeout.", session.username, session.windowsSessionId);
+            m_logger.DebugFormat("Logging off user {0} in session{1} due to session-terminate-time.", session.username, session.windowsSessionId);
             bool result = Abstractions.WindowsApi.pInvokes.LogoffSession(session.windowsSessionId.Value);
-            m_logger.DebugFormat("Log off {0}.", result ? "successful" : "failed");
+            //m_logger.DebugFormat("Log off {0}.", result ? "successful" : "failed");
             
         }
 
@@ -574,7 +531,7 @@ namespace pGina.Plugin.RADIUS
         private void InterimUpdatesCallback(object state)
         {
             Session session = (Session)state;
-            m_logger.DebugFormat("Sending interim-update for user {0}", session.username); 
+            //m_logger.DebugFormat("Sending interim-update for user {0}", session.username); 
             lock (session)
             {
                 try
@@ -583,7 +540,6 @@ namespace pGina.Plugin.RADIUS
                         session.client.interimUpdate(session.username);
                     else
                     {
-                        m_logger.Debug("Interim update still running after session is no longer active... Disabling call backs.");
                         session.disableCallbacks();
                     }
                 }

@@ -174,7 +174,7 @@ namespace pGina.Plugin.RADIUS
             if (authType != Packet.Acct_Authentic.Not_Specified)
                 accountingRequest.addAttribute(Packet.AttributeType.Acct_Authentic, (int)authType);
 
-            m_logger.DebugFormat("Attempting to send {0} for user {1}", accountingRequest.code, username);
+            //m_logger.DebugFormat("Attempting to send {0} for user {1}", accountingRequest.code, username);
 
             for (int retryCt = 0; retryCt <= maxRetries; retryCt++)
             {

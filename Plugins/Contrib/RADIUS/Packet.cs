@@ -477,6 +477,10 @@ namespace pGina.Plugin.RADIUS
         }
     
         //Static methods for Vendor Specific Attribrutes
+        //Bytes 0-3 = vendor-id
+        //Byte 4 =  vendor-type
+        //Byte 5 = vendor-length
+        //Bytes 6+ = data
         public static int VSA_vendorID(byte[] val)
         {
             //Need to take into account change in endianness
@@ -493,7 +497,7 @@ namespace pGina.Plugin.RADIUS
 
         public static string VSA_valueAsString(byte[] val)
         {
-            return Encoding.UTF8.GetString(val, 4, val.Length - 4);
+            return Encoding.UTF8.GetString(val, 6, val.Length - 6);
         }
     
     }
