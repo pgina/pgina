@@ -272,6 +272,8 @@ namespace pGina.Service.Impl
                 
         private LoginResponseMessage HandleLoginRequest(LoginRequestMessage msg)
         {
+            if (String.IsNullOrEmpty(msg.Username))
+                return new LoginResponseMessage() { Result = false, Message = "No Username supplied" };
             try
             {
                 PluginDriver sessionDriver = new PluginDriver();
