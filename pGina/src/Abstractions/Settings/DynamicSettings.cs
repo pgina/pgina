@@ -125,9 +125,11 @@ namespace Abstractions.Settings
             return true;
         }
 
+        //still dangerous, Exception not catched by calling function
+        //FIXME: return null and handle that by calling functions instead of an exception
         private object GetSettingFromRegistry(string name)
         {
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_rootKey))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_rootKey, RegistryKeyPermissionCheck.ReadWriteSubTree, System.Security.AccessControl.RegistryRights.FullControl))
             {
                 if (key != null)
                 {
