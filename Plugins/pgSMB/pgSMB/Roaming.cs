@@ -848,15 +848,19 @@ namespace pGina.Plugin.pgSMB
                     return false;
                 }
 
-                server[0] += "\\"+username;
+                string dusername = server[0] + "\\" + username;
 
                 for (int x = 1; x <= retry; x++)
                 {
                     try
                     {
-                        m_logger.DebugFormat("{0}. try to connect to {1} as {2}", x, share, server[0]);
-                        if (!unc.connectToRemote(share, server[0], password))
+                        m_logger.DebugFormat("{0}. try to connect to {1} as {2}", x, share, dusername);
+                        if (!unc.connectToRemote(share, dusername, password))
+                        {
                             m_logger.ErrorFormat("Failed to connect to share {0}", share);
+                            Thread.Sleep(new TimeSpan(0, 1, 0));
+                            continue;
+                        }
                         if (Directory.Exists(share))
                             return true;
                     }
