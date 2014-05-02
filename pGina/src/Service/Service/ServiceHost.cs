@@ -99,13 +99,36 @@ namespace Service
         SERVICE_CONTROL_SHUTDOWN = 0x00000005,
         SERVICE_CONTROL_STOP = 0x00000001,
     }
+    public enum INFO_LEVEL : uint
+    {
+        SERVICE_CONFIG_DESCRIPTION = 0x00000001,
+        SERVICE_CONFIG_FAILURE_ACTIONS = 0x00000002,
+        SERVICE_CONFIG_DELAYED_AUTO_START_INFO = 0x00000003,
+        SERVICE_CONFIG_FAILURE_ACTIONS_FLAG = 0x00000004,
+        SERVICE_CONFIG_SERVICE_SID_INFO = 0x00000005,
+        SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO = 0x00000006,
+        SERVICE_CONFIG_PRESHUTDOWN_INFO = 0x00000007,
+        SERVICE_CONFIG_TRIGGER_INFO = 0x00000008,
+        SERVICE_CONFIG_PREFERRED_NODE = 0x00000009
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SERVICE_PRESHUTDOWN_INFO
+    {
+        public UInt32 dwPreshutdownTimeout;
+    }
     public partial class pGinaServiceHost : ServiceBase
     {
         private Thread m_serviceThread = null;
         private pGina.Service.Impl.ServiceThread m_serviceThreadObj = null;
+        const int SERVICE_ACCEPT_PRESHUTDOWN = 0x100;
+        const int SERVICE_CONTROL_PRESHUTDOWN = 0xf;
 
         [DllImport("advapi32.dll", SetLastError = true)]
         internal static extern bool SetServiceStatus(IntPtr hServiceStatus, ref SERVICE_STATUS lpServiceStatus);
+
+        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ChangeServiceConfig2(IntPtr hService, int dwInfoLevel, IntPtr lpInfo);
 
         private SERVICE_STATUS myServiceStatus;
 
@@ -118,12 +141,33 @@ namespace Service
             fi.SetValue(this, val);
 
             //prepare myServiceStatus for further use
-            ServiceController sc = new ServiceController(this.ServiceName);
-            myServiceStatus.serviceType = (int)sc.ServiceType;
-            myServiceStatus.controlsAccepted = val;
-            myServiceStatus.serviceSpecificExitCode = 0;
-            myServiceStatus.win32ExitCode = 0;
-            sc.Close();
+            using (ServiceController sc = new ServiceController(this.ServiceName))
+            {
+                myServiceStatus.serviceType = (int)sc.ServiceType;
+                myServiceStatus.controlsAccepted = val;
+                myServiceStatus.serviceSpecificExitCode = 0;
+                myServiceStatus.win32ExitCode = 0;
+
+                SERVICE_PRESHUTDOWN_INFO spi = new SERVICE_PRESHUTDOWN_INFO();
+                spi.dwPreshutdownTimeout = 3600 * 1000;
+                IntPtr lpInfo = Marshal.AllocHGlobal(Marshal.SizeOf(spi));
+                IntPtr sHandle = sc.ServiceHandle.DangerousGetHandle();
+                if (lpInfo == IntPtr.Zero)
+                {
+                    string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).ToString();
+                    EventLog.WriteEntry("pGina", String.Format("Unable to allocate memory for service action\nThe service will be forced to stop during a shutdown within 3 minutes\nerror:{0}", errorMessage), EventLogEntryType.Warning);
+                }
+                else
+                {
+                    Marshal.StructureToPtr(spi, lpInfo, false);
+                    if (!ChangeServiceConfig2(sHandle, (int)INFO_LEVEL.SERVICE_CONFIG_PRESHUTDOWN_INFO, lpInfo))
+                    {
+                        string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).ToString();
+                        EventLog.WriteEntry("pGina", String.Format("ChangeServiceConfig2\nThe service will be forced to stop during a shutdown within 3 minutes\nerror:{0}", errorMessage), EventLogEntryType.Warning);
+                    }
+                    Marshal.FreeHGlobal(lpInfo);
+                }
+            }
         }
 
         protected override void OnStart(string[] args)
@@ -167,12 +211,12 @@ namespace Service
             {
                 myServiceStatus.checkPoint++;
                 myServiceStatus.currentState = (int)State.SERVICE_STOP_PENDING;
-                myServiceStatus.waitHint = 1500;
+                myServiceStatus.waitHint = new TimeSpan(0,3,0).Milliseconds;
                 if (!SetServiceStatus(this.ServiceHandle, ref myServiceStatus))
                 {
                     int lastError = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
                 }
-                Thread.Sleep(500);
+                Thread.Sleep(1000);
             }
         }
 
