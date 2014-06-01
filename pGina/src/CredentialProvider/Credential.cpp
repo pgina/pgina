@@ -636,7 +636,7 @@ namespace pGina
 		IFACEMETHODIMP Credential::Connect( IQueryContinueWithStatus *pqcws )
 		{
 			pDEBUG(L"Credential::Connect()");
-			if( CPUS_CREDUI == m_usageScenario || CPUS_LOGON == m_usageScenario ) {
+			if( CPUS_CREDUI == m_usageScenario || CPUS_LOGON == m_usageScenario || CPUS_UNLOCK_WORKSTATION == m_usageScenario ) {
 				ProcessLoginAttempt(pqcws);
 			} else if( CPUS_CHANGE_PASSWORD == m_usageScenario ) {
 				ProcessChangePasswordAttempt();
