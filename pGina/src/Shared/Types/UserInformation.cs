@@ -49,6 +49,11 @@ namespace pGina.Shared.Types
         /// The username provided by the user.
         /// </summary>
         public string OriginalUsername { get; set; } 
+
+        /// <summary>
+        /// The password provided by the user.
+        /// </summary>
+        public string OriginalPassword { get; set; }
  
         /// <summary>
         /// The username

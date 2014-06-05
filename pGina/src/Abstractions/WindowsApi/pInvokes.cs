@@ -26,13 +26,9 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.Reflection;
 using System.Net;
-using System.Net.Security;
 using System.Security.Principal;
 using System.ComponentModel;
 
@@ -490,6 +486,12 @@ namespace Abstractions.WindowsApi
                 string lpszUsername, string domain, string password,
                 int dwLogonType, int dwLogonProvider,
                 out IntPtr phToken);
+
+            [DllImport("advapi32.dll", SetLastError=true)]
+            public static extern bool ImpersonateLoggedOnUser(IntPtr hToken);
+
+            [DllImport("advapi32.dll", SetLastError = true)]
+            public static extern bool RevertToSelf();
             #endregion
         }
 
@@ -732,13 +734,69 @@ namespace Abstractions.WindowsApi
         /// <param name="user">The username, null if you want the current user.</param>
         /// <param name="password">The password, null to use the default password.</param>
         /// <returns>The error code of the WNetAddConnection2 function.</returns>
-        public static int MapNetworkDrive(string unc, string drive, string user, string password)
+        public static void MapNetworkDrive(string unc, string drive, string user, string password)
         {
             SafeNativeMethods.NETRESOURCE myNetResource = new SafeNativeMethods.NETRESOURCE();
             myNetResource.lpLocalName = drive;
             myNetResource.lpRemoteName = unc;
+
+            // Attempt the drive map
             int result = SafeNativeMethods.WNetAddConnection2(myNetResource, password, user, 0);
-            return result;
+
+            // Check for errors
+            if (result != 0)
+            {
+                string message = string.Format("Failed to map drive {0}", unc);
+                if( result == 86 ||  // ERROR_INVALID_PASSWORD
+                    result == 2202 ||  // ERROR_BAD_USERNAME
+                    result == 1326 )  // ERROR_LOGON_FAILURE
+                {
+                    message += ": invalid username or password.";
+                }
+                else
+                {
+                    message += string.Format(": native error code = {0}", result);
+                }
+
+                throw new Win32Exception(result, message);
+            }
+        }
+
+        /// <summary>
+        /// Attempts to impersonate the logged in user in the session with ID sessionId, and
+        /// map a drive using provided credentials.  Since this method does user impersonation
+        /// it is recommended to call this from a separate thread, just in case something goes 
+        /// wrong.
+        /// </summary>
+        /// <param name="sessionId">The session ID to impersonate</param>
+        /// <param name="unc">The UNC for the drive to map</param>
+        /// <param name="drive">The local drive name (e.g. "X:", "H:", etc.)</param>
+        /// <param name="user">The user name to use when connecting to the share.</param>
+        /// <param name="password">The password to use when connecting to the share.</param>
+         public static void MapDriveInSession(int sessionId, string unc, string drive, string user, string password)
+        {
+            IntPtr userToken = IntPtr.Zero;
+
+            // Get the primary user token for the session
+            if (!SafeNativeMethods.WTSQueryUserToken(sessionId, out userToken))
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "WTSQueryUserToken");
+
+            try
+            {
+                // Impersonate the logon session
+                if (!SafeNativeMethods.ImpersonateLoggedOnUser(userToken))
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), "ImpersonateLoggedOnUser");
+
+                // Map the drive
+                MapNetworkDrive(unc, drive, user, password);
+            }
+            finally // Make sure we ALWAYS do this even if MapNetworkDrive throws.
+            {
+                // Revert back from the impersonated user
+                SafeNativeMethods.RevertToSelf();
+                // Close the user token
+                if (userToken != IntPtr.Zero) SafeNativeMethods.CloseHandle(userToken);
+            }
         }
 
         public static bool LogoffSession(int sessionId)
