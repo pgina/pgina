@@ -86,22 +86,18 @@ namespace pGina.Plugin.DriveMapper
             }
 
             // Set the credentials if necessary
-            if (map.Credentials == DriveMap.CredentialOption.Final ||
-                map.Credentials == DriveMap.CredentialOption.Original)
-            {   
-                if (map.Credentials == DriveMap.CredentialOption.Final)
-                {
-                    map.Username = userInfo.Username;
-                    map.Password = userInfo.Password;
-                } 
-                else if( map.Credentials == DriveMap.CredentialOption.Original )
-                {
-                    map.Username = userInfo.OriginalUsername;
-                    map.Password = userInfo.OriginalPassword;
-                }
+            if (map.Credentials == DriveMap.CredentialOption.Final)
+            {
+                map.Username = userInfo.Username;
+                map.Password = userInfo.Password;
+            } 
+            else if( map.Credentials == DriveMap.CredentialOption.Original )
+            {
+                map.Username = userInfo.OriginalUsername;
+                map.Password = userInfo.OriginalPassword;
             }
 
-            m_logger.InfoFormat("Mapping: {0} with username {1} to drive: {2}", 
+            m_logger.InfoFormat("Mapping '{0}' with username '{1}' to drive '{2}'", 
                 map.UncPath, map.Username, map.Drive);
 
             // Map the drive in another thread, because the thread will do user impersonation
