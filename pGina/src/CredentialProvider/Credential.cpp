@@ -416,8 +416,7 @@ namespace pGina
 		{
 			AddDllReference();
 
-			if( pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
-				pGina::Service::StateHelper::AddTarget(this);
+			pGina::Service::StateHelper::AddTarget(this);
 		}
 		
 		Credential::~Credential()
@@ -539,6 +538,17 @@ namespace pGina
 				else if( m_usageScenario == CPUS_LOGON )
 					m_fields->fields[CredProv::LUIFI_STATUS].fieldStatePair.fieldState = CPFS_HIDDEN;
 			}
+
+			// If the service is not available, we initially hide username/password
+			if (!pGina::Transactions::Service::Ping()) 
+			{
+				m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldState = CPFS_HIDDEN;
+				m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldState = CPFS_HIDDEN;
+			}
+			else // If the service is available, we don't show the status message.
+			{
+				m_fields->fields[m_fields->statusFieldIdx].fieldStatePair.fieldState = CPFS_HIDDEN;
+			}
 		}
 
 		void Credential::ClearZeroAndFreeAnyPasswordFields(bool updateUi)
@@ -625,10 +635,33 @@ namespace pGina
 
 		void Credential::ServiceStateChanged(bool newState)
 		{
-			if(m_logonUiCallback)
+			if (m_logonUiCallback)
 			{
-				std::wstring text = pGina::Service::StateHelper::GetStateText();
-				m_logonUiCallback->SetFieldString(this, FindStatusId(), text.c_str());
+				// Show/hide the username/password/status fields.
+				// 
+				// Note: the SetFieldState calls here are probably not necessary.  The Provider calls
+				// CredentialsChanged after this, which causes a full re-enumeration of all of
+				// the fields.  However, looking forward to v2 CredentialProviders, calling 
+				// SetFieldState seems to be the proper way to do this.
+				if (m_fields) {
+					if (newState) {
+						m_fields->fields[m_fields->statusFieldIdx].fieldStatePair.fieldState = CPFS_HIDDEN;
+						m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldState = CPFS_DISPLAY_IN_SELECTED_TILE;
+						m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldState = CPFS_DISPLAY_IN_SELECTED_TILE;
+						m_logonUiCallback->SetFieldState(this, m_fields->statusFieldIdx, CPFS_HIDDEN);
+						m_logonUiCallback->SetFieldState(this, m_fields->usernameFieldIdx, CPFS_DISPLAY_IN_SELECTED_TILE);
+						m_logonUiCallback->SetFieldState(this, m_fields->passwordFieldIdx, CPFS_DISPLAY_IN_SELECTED_TILE);
+					}
+					else 
+					{
+						m_fields->fields[m_fields->statusFieldIdx].fieldStatePair.fieldState = CPFS_DISPLAY_IN_BOTH;
+						m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldState = CPFS_HIDDEN;
+						m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldState = CPFS_HIDDEN;
+						m_logonUiCallback->SetFieldState(this, m_fields->statusFieldIdx, CPFS_DISPLAY_IN_BOTH);
+						m_logonUiCallback->SetFieldState(this, m_fields->usernameFieldIdx, CPFS_HIDDEN);
+						m_logonUiCallback->SetFieldState(this, m_fields->passwordFieldIdx, CPFS_HIDDEN);
+					}
+				}
 			}
 		}
 

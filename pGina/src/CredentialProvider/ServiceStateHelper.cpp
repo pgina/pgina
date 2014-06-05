@@ -58,7 +58,7 @@ namespace pGina
 			}
 			else
 			{
-				return L"Service Status: Disconnected";
+				return L"Waiting for pGina service...";
 			}
 		}			
 
