@@ -694,7 +694,7 @@ namespace pGina
 			PWSTR username = FindUsernameValue();			
 			PWSTR password = FindPasswordValue();
 			PWSTR domain = NULL;
-			
+
 			pGina::Protocol::LoginRequestMessage::LoginReason reason = pGina::Protocol::LoginRequestMessage::Login;
 			switch(m_usageScenario)
 			{
@@ -711,16 +711,16 @@ namespace pGina
 			pDEBUG(L"ProcessLoginAttempt: Processing login for %s", username);
 			
 			// Set the status message
-			if( pqcws )
+			if (pqcws && username)
 			{
 				std::wstring message = pGina::Registry::GetString(L"LogonProgressMessage", L"Logging on...");
 
 				// Replace occurences of %u with the username
 				std::wstring unameCopy = username;
 				std::wstring::size_type unameSize = unameCopy.size();
-				for( std::wstring::size_type pos = 0; 
+				for (std::wstring::size_type pos = 0;
 					(pos = message.find(L"%u", pos)) != std::wstring::npos;
-					pos += unameSize )
+					pos += unameSize)
 				{
 					message.replace(pos, unameSize, unameCopy);
 				}
