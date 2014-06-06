@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigurationUI));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
             this.groupBox17 = new System.Windows.Forms.GroupBox();
@@ -54,7 +54,6 @@
             this.serviceStatusTB = new System.Windows.Forms.TextBox();
             this.servStatusLabel = new System.Windows.Forms.Label();
             this.motdGB = new System.Windows.Forms.GroupBox();
-            this.enableMotdCB = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
             this.motdTB = new System.Windows.Forms.TextBox();
             this.motdLabel = new System.Windows.Forms.Label();
@@ -143,6 +142,10 @@
             this.radioShutdown = new System.Windows.Forms.RadioButton();
             this.chkSpecialButton = new System.Windows.Forms.CheckBox();
             this.cpOptions = new System.Windows.Forms.TabPage();
+            this.groupBox20 = new System.Windows.Forms.GroupBox();
+            this.label21 = new System.Windows.Forms.Label();
+            this.m_hidePasswordFieldCb = new System.Windows.Forms.CheckBox();
+            this.m_hideUsernameFieldCb = new System.Windows.Forms.CheckBox();
             this.groupBox18 = new System.Windows.Forms.GroupBox();
             this.defaultCPTileCB = new System.Windows.Forms.CheckBox();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
@@ -194,6 +197,7 @@
             this.groupBox16.SuspendLayout();
             this.groupBox15.SuspendLayout();
             this.cpOptions.SuspendLayout();
+            this.groupBox20.SuspendLayout();
             this.groupBox18.SuspendLayout();
             this.groupBox9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCredProvFilter)).BeginInit();
@@ -429,7 +433,6 @@
             // 
             this.motdGB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.motdGB.Controls.Add(this.enableMotdCB);
             this.motdGB.Controls.Add(this.label12);
             this.motdGB.Controls.Add(this.motdTB);
             this.motdGB.Controls.Add(this.motdLabel);
@@ -440,32 +443,23 @@
             this.motdGB.TabStop = false;
             this.motdGB.Text = "MOTD";
             // 
-            // enableMotdCB
-            // 
-            this.enableMotdCB.AutoSize = true;
-            this.enableMotdCB.Location = new System.Drawing.Point(11, 19);
-            this.enableMotdCB.Name = "enableMotdCB";
-            this.enableMotdCB.Size = new System.Drawing.Size(94, 17);
-            this.enableMotdCB.TabIndex = 3;
-            this.enableMotdCB.Text = "Enable MOTD";
-            this.enableMotdCB.UseVisualStyleBackColor = true;
-            this.enableMotdCB.CheckedChanged += new System.EventHandler(this.enableMotdCB_CheckedChanged);
-            // 
             // label12
             // 
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(53, 66);
+            this.label12.Location = new System.Drawing.Point(53, 59);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(532, 26);
             this.label12.TabIndex = 2;
-            this.label12.Text = resources.GetString("label12.Text");
+            this.label12.Text = "Message of the Day (MOTD).   Displayed in the logon UI.  \r\nValid substitutions:  " +
+    " %m - Machine name, %d - Today\'s date, %i - IP address, %n - DNS name, %v pGina " +
+    "version";
             // 
             // motdTB
             // 
             this.motdTB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.motdTB.Location = new System.Drawing.Point(54, 43);
+            this.motdTB.Location = new System.Drawing.Point(53, 24);
             this.motdTB.Name = "motdTB";
             this.motdTB.Size = new System.Drawing.Size(667, 20);
             this.motdTB.TabIndex = 1;
@@ -473,7 +467,7 @@
             // motdLabel
             // 
             this.motdLabel.AutoSize = true;
-            this.motdLabel.Location = new System.Drawing.Point(6, 46);
+            this.motdLabel.Location = new System.Drawing.Point(5, 27);
             this.motdLabel.Name = "motdLabel";
             this.motdLabel.Size = new System.Drawing.Size(42, 13);
             this.motdLabel.TabIndex = 0;
@@ -578,33 +572,33 @@
             this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.pluginsDG.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle2;
             this.pluginsDG.Location = new System.Drawing.Point(10, 19);
             this.pluginsDG.Name = "pluginsDG";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.pluginsDG.Size = new System.Drawing.Size(735, 253);
             this.pluginsDG.TabIndex = 10;
             this.pluginsDG.DoubleClick += new System.EventHandler(this.pluginsDG_DoubleClick);
@@ -1454,6 +1448,7 @@
             // 
             // cpOptions
             // 
+            this.cpOptions.Controls.Add(this.groupBox20);
             this.cpOptions.Controls.Add(this.groupBox18);
             this.cpOptions.Controls.Add(this.groupBox9);
             this.cpOptions.Location = new System.Drawing.Point(4, 22);
@@ -1463,6 +1458,48 @@
             this.cpOptions.TabIndex = 5;
             this.cpOptions.Text = "Credential Provider Options";
             this.cpOptions.UseVisualStyleBackColor = true;
+            // 
+            // groupBox20
+            // 
+            this.groupBox20.Controls.Add(this.label21);
+            this.groupBox20.Controls.Add(this.m_hidePasswordFieldCb);
+            this.groupBox20.Controls.Add(this.m_hideUsernameFieldCb);
+            this.groupBox20.Location = new System.Drawing.Point(17, 59);
+            this.groupBox20.Name = "groupBox20";
+            this.groupBox20.Size = new System.Drawing.Size(752, 66);
+            this.groupBox20.TabIndex = 2;
+            this.groupBox20.TabStop = false;
+            this.groupBox20.Text = "Alternate credentials";
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(222, 20);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(366, 26);
+            this.label21.TabIndex = 2;
+            this.label21.Text = "If either of these options are selected, plugins are responsible for determining\r" +
+    "\nthe username and/or password via alternate means.";
+            // 
+            // m_hidePasswordFieldCb
+            // 
+            this.m_hidePasswordFieldCb.AutoSize = true;
+            this.m_hidePasswordFieldCb.Location = new System.Drawing.Point(13, 43);
+            this.m_hidePasswordFieldCb.Name = "m_hidePasswordFieldCb";
+            this.m_hidePasswordFieldCb.Size = new System.Drawing.Size(121, 17);
+            this.m_hidePasswordFieldCb.TabIndex = 1;
+            this.m_hidePasswordFieldCb.Text = "Hide password field.";
+            this.m_hidePasswordFieldCb.UseVisualStyleBackColor = true;
+            // 
+            // m_hideUsernameFieldCb
+            // 
+            this.m_hideUsernameFieldCb.AutoSize = true;
+            this.m_hideUsernameFieldCb.Location = new System.Drawing.Point(13, 19);
+            this.m_hideUsernameFieldCb.Name = "m_hideUsernameFieldCb";
+            this.m_hideUsernameFieldCb.Size = new System.Drawing.Size(122, 17);
+            this.m_hideUsernameFieldCb.TabIndex = 0;
+            this.m_hideUsernameFieldCb.Text = "Hide username field.";
+            this.m_hideUsernameFieldCb.UseVisualStyleBackColor = true;
             // 
             // groupBox18
             // 
@@ -1495,9 +1532,9 @@
             this.groupBox9.Controls.Add(this.dgvCredProvFilter);
             this.groupBox9.Controls.Add(this.label17);
             this.groupBox9.Controls.Add(this.textBox1);
-            this.groupBox9.Location = new System.Drawing.Point(17, 58);
+            this.groupBox9.Location = new System.Drawing.Point(17, 131);
             this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(752, 473);
+            this.groupBox9.Size = new System.Drawing.Size(752, 400);
             this.groupBox9.TabIndex = 0;
             this.groupBox9.TabStop = false;
             this.groupBox9.Text = "Disable Credential Providers";
@@ -1506,7 +1543,7 @@
             // 
             this.label18.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(10, 406);
+            this.label18.Location = new System.Drawing.Point(10, 333);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(411, 13);
             this.label18.TabIndex = 6;
@@ -1521,7 +1558,7 @@
             this.dgvCredProvFilter.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvCredProvFilter.Location = new System.Drawing.Point(13, 38);
             this.dgvCredProvFilter.Name = "dgvCredProvFilter";
-            this.dgvCredProvFilter.Size = new System.Drawing.Size(721, 365);
+            this.dgvCredProvFilter.Size = new System.Drawing.Size(721, 292);
             this.dgvCredProvFilter.TabIndex = 5;
             // 
             // label17
@@ -1539,7 +1576,7 @@
             this.textBox1.BackColor = System.Drawing.Color.Yellow;
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(13, 422);
+            this.textBox1.Location = new System.Drawing.Point(13, 349);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
@@ -1657,6 +1694,8 @@
             this.groupBox15.ResumeLayout(false);
             this.groupBox15.PerformLayout();
             this.cpOptions.ResumeLayout(false);
+            this.groupBox20.ResumeLayout(false);
+            this.groupBox20.PerformLayout();
             this.groupBox18.ResumeLayout(false);
             this.groupBox18.PerformLayout();
             this.groupBox9.ResumeLayout(false);
@@ -1770,7 +1809,6 @@
         private System.Windows.Forms.PictureBox simFinalResultPB;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.TextBox simFinalResultMessageTB;
-        private System.Windows.Forms.CheckBox enableMotdCB;
         private System.Windows.Forms.CheckBox logonUiShowServiceStatusCB;
         private System.Windows.Forms.Button btnSaveAndClose;
         private System.Windows.Forms.TextBox simResultLocalGroupsTB;
@@ -1791,5 +1829,9 @@
         private System.Windows.Forms.Button changePasswordOrderBtnDown;
         private System.Windows.Forms.Button changePasswordOrderBtnUp;
         private System.Windows.Forms.DataGridView changePasswordOrderDGV;
+        private System.Windows.Forms.GroupBox groupBox20;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.CheckBox m_hidePasswordFieldCb;
+        private System.Windows.Forms.CheckBox m_hideUsernameFieldCb;
     }
 }

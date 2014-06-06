@@ -525,11 +525,6 @@ namespace pGina
 				SHStrDupW(password, &(m_fields->fields[m_fields->passwordFieldIdx].wstr));
 			}
 
-			// Hide MOTD field if not enabled
-			if( ! pGina::Registry::GetBool(L"EnableMotd", true) )
-				if( m_usageScenario == CPUS_LOGON )
-					m_fields->fields[CredProv::LUIFI_MOTD].fieldStatePair.fieldState = CPFS_HIDDEN;
-
 			// Hide service status if configured to do so
 			if( ! pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
 			{
@@ -554,6 +549,37 @@ namespace pGina
 			else // If the service is available, we don't show the status message.
 			{
 				m_fields->fields[m_fields->statusFieldIdx].fieldStatePair.fieldState = CPFS_HIDDEN;
+			}
+
+			// If the user has requested to hide the username and/or password fields.
+			bool hideUsername = pGina::Registry::GetBool(L"HideUsernameField", false);
+			bool hidePassword = pGina::Registry::GetBool(L"HidePasswordField", false);
+			if (hideUsername)
+				m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldState = CPFS_HIDDEN;
+			if (hidePassword) {
+				m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldState = CPFS_HIDDEN;
+				if (m_usageScenario == CPUS_CHANGE_PASSWORD) {
+					m_fields->fields[4].fieldStatePair.fieldState = CPFS_HIDDEN;
+					m_fields->fields[5].fieldStatePair.fieldState = CPFS_HIDDEN;
+				}
+
+				// Since we're hiding the password field, we need to put the submit button
+				// somewhere.  Here we figure out where to put it.  If the username field is 
+				// available, we can put it there, otherwise, we put it somewhere else.
+				if (hideUsername) {
+					if (m_usageScenario == CPUS_LOGON || m_usageScenario == CPUS_CREDUI || m_usageScenario == CPUS_CHANGE_PASSWORD) {
+						// Put the submit button next to the MOTD
+						m_fields->submitAdjacentTo = 1;   // MOTD
+					}
+					else if (m_usageScenario == CPUS_UNLOCK_WORKSTATION) {
+						// In the Unlock scenario, we just put it next to the "locked" label.
+						m_fields->submitAdjacentTo = CredProv::LOIFI_LOCKED;
+					}
+				}
+				else {
+					// The username field is available, so we put the submit button here.
+					m_fields->submitAdjacentTo = m_fields->usernameFieldIdx;
+				}
 			}
 		}
 
@@ -651,19 +677,26 @@ namespace pGina
 				// SetFieldState seems to be the proper way to do this.
 				if (m_fields) {
 					if (newState) {
+						bool hideUsername = pGina::Registry::GetBool(L"HideUsernameField", false);
+						bool hidePassword = pGina::Registry::GetBool(L"HidePasswordField", false);
+
 						m_fields->fields[m_fields->statusFieldIdx].fieldStatePair.fieldState = CPFS_HIDDEN;
-						m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldState = CPFS_DISPLAY_IN_SELECTED_TILE;
-						m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldState = CPFS_DISPLAY_IN_SELECTED_TILE;
-						m_logonUiCallback->SetFieldState(this, m_fields->statusFieldIdx, CPFS_HIDDEN);
-						m_logonUiCallback->SetFieldState(this, m_fields->usernameFieldIdx, CPFS_DISPLAY_IN_SELECTED_TILE);
-						m_logonUiCallback->SetFieldState(this, m_fields->passwordFieldIdx, CPFS_DISPLAY_IN_SELECTED_TILE);
-						// In change password scenario, also show new password and repeat new password fields
-						if (CPUS_CHANGE_PASSWORD == m_usageScenario) {
-							m_fields->fields[4].fieldStatePair.fieldState = CPFS_DISPLAY_IN_SELECTED_TILE;
-							m_fields->fields[5].fieldStatePair.fieldState = CPFS_DISPLAY_IN_SELECTED_TILE;
-							m_logonUiCallback->SetFieldState(this, 4, CPFS_DISPLAY_IN_SELECTED_TILE);
-							m_logonUiCallback->SetFieldState(this, 5, CPFS_DISPLAY_IN_SELECTED_TILE);
+						if (!hideUsername) {
+							m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldState = CPFS_DISPLAY_IN_SELECTED_TILE;
+							m_logonUiCallback->SetFieldState(this, m_fields->usernameFieldIdx, CPFS_DISPLAY_IN_SELECTED_TILE);
 						}
+						if (!hidePassword) {
+							m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldState = CPFS_DISPLAY_IN_SELECTED_TILE;
+							m_logonUiCallback->SetFieldState(this, m_fields->passwordFieldIdx, CPFS_DISPLAY_IN_SELECTED_TILE);
+							// In change password scenario, also show new password and repeat new password fields
+							if (CPUS_CHANGE_PASSWORD == m_usageScenario) {
+								m_fields->fields[4].fieldStatePair.fieldState = CPFS_DISPLAY_IN_SELECTED_TILE;
+								m_fields->fields[5].fieldStatePair.fieldState = CPFS_DISPLAY_IN_SELECTED_TILE;
+								m_logonUiCallback->SetFieldState(this, 4, CPFS_DISPLAY_IN_SELECTED_TILE);
+								m_logonUiCallback->SetFieldState(this, 5, CPFS_DISPLAY_IN_SELECTED_TILE);
+							}
+						}
+						m_logonUiCallback->SetFieldState(this, m_fields->statusFieldIdx, CPFS_HIDDEN);
 					}
 					else 
 					{

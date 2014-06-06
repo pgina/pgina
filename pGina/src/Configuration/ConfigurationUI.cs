@@ -157,6 +157,11 @@ namespace pGina.Configuration
             bool defaultTile = Settings.Get.CredentialProviderDefaultTile;
             this.defaultCPTileCB.Checked = defaultTile;
 
+            bool value = Settings.Get.HideUsernameField;
+            m_hideUsernameFieldCb.Checked = value;
+            value = Settings.Get.HidePasswordField;
+            m_hidePasswordFieldCb.Checked = value;
+
             dgvCredProvFilter.RowHeadersVisible = false;
             dgvCredProvFilter.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvCredProvFilter.MultiSelect = false;
@@ -246,9 +251,7 @@ namespace pGina.Configuration
             LoadTileImagePreview();
 
             // Load MOTD settings
-            this.enableMotdCB.Checked = Settings.Get.EnableMotd;
             this.motdTB.Text = Settings.Get.GetSetting("Motd");
-            this.motdTB.Enabled = this.enableMotdCB.Checked;
 
             // Service status checkbox
             this.logonUiShowServiceStatusCB.Checked = Settings.Get.ShowServiceStatusInLogonUi;
@@ -878,7 +881,6 @@ namespace pGina.Configuration
             this.LoadTileImagePreview();
 
             // MOTD stuff
-            Settings.Get.EnableMotd = this.enableMotdCB.Checked;
             Settings.Get.Motd = this.motdTB.Text.Trim();
 
             // Service status checkbox
@@ -1501,6 +1503,9 @@ namespace pGina.Configuration
         {
             Settings.Get.CredentialProviderDefaultTile = this.defaultCPTileCB.Checked;
 
+            Settings.Get.HideUsernameField = m_hideUsernameFieldCb.Checked;
+            Settings.Get.HidePasswordField = m_hidePasswordFieldCb.Checked;
+
             List<CredProv> credProvs = (List<CredProv>)dgvCredProvFilter.DataSource;
             CredProvFilterConfig.SaveFilterSettings(credProvs);
         }
@@ -1522,12 +1527,5 @@ namespace pGina.Configuration
         {
             this.logWindow.Visible = true;
         }
-
-        private void enableMotdCB_CheckedChanged(object sender, EventArgs e)
-        {
-            this.motdTB.Enabled = this.enableMotdCB.Checked;
-        }
-
-        
     }
 }
