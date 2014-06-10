@@ -278,6 +278,16 @@ namespace pGina
 				PWSTR newPassword = NULL;
 				PWSTR newPasswordConfirm = NULL;
 				
+				if ( !pGina::Service::StateHelper::GetState() )
+				{
+					pDEBUG(L"Credential::GetSerialization: pGina service is unavailable");
+					SHStrDupW(L"Your password change request failed, because the pGina service is not running!\n\nPlease contact your system administrator.\nReboot the machine to fix this issue.", ppwszOptionalStatusText);
+
+					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
+					*pcpsiOptionalStatusIcon = CPSI_ERROR;
+					return S_FALSE;
+				}
+				
 				if(m_fields)
 				{
 					newPassword = m_fields->fields[CredProv::CPUIFI_NEW_PASSWORD].wstr;
