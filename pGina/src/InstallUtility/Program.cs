@@ -112,31 +112,6 @@ namespace pGina.InstallUtil
             SetRegistryAcls();
             InstallAndStartService();
             RegisterAndEnableCredentialProvider();
-            UpdatePluginPath();
-        }
-
-        /// <summary>
-        /// If the current plugin path is the default for pGina 3.1.6 and earlier, 
-        /// update it for later versions.
-        /// </summary>
-        private static void UpdatePluginPath()
-        {
-            m_logger.Debug("Checking plugin path to see if it needs to be updated.");
-            string pluginsBaseDir = 
-                string.Format( @"{0}\Plugins",
-                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-
-            dynamic settings = new pGina.Shared.Settings.pGinaDynamicSettings();
-            string[] pluginDirs = settings.PluginDirectories;
-            if (pluginDirs.Length == 1 &&
-                pluginDirs[0].Equals(pluginsBaseDir, StringComparison.CurrentCultureIgnoreCase))
-            {
-                m_logger.Info("Updating plugin path for core/contrib subdirectories.");
-                settings.PluginDirectories = new string[] { 
-                    string.Format(@"{0}\Core", pluginsBaseDir),
-                    string.Format(@"{0}\Contrib", pluginsBaseDir)
-                };
-            }
         }
 
         private static void DoPostUninstall()
