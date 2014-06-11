@@ -26,7 +26,6 @@ OutFile "pGina-${VERSION}-setup.exe" ; Output file
 # Installer pages
 !define MUI_PAGE_HEADER_TEXT "Install pGina ${VERSION}"
 !define MUI_WELCOMEPAGE_TITLE "Install pGina ${VERSION}"
-!define MUI_WELCOMEPAGE_TEXT "Install pGina?  You bet!"
 !insertmacro MUI_PAGE_WELCOME 
 !insertmacro MUI_PAGE_LICENSE ..\..\LICENSE
 !insertmacro MUI_PAGE_DIRECTORY 
@@ -75,7 +74,9 @@ Section -Prerequisites
   !insertmacro CheckNetFramework 40Full
 SectionEnd
 
-Section "-pGina" 
+Section "pGina" InstallpGina 
+  SectionIn RO ; Make this option read-only
+
   SetOutPath $INSTDIR
   File "..\..\pGina\src\bin\*.exe"
   File "..\..\pGina\src\bin\*.dll"
@@ -172,11 +173,13 @@ SectionEnd
 #######################################
 # Descriptions
 #######################################
+LangString DESC_InstallpGina ${LANG_ENGLISH} "Install pGina (required)."
 LangString DESC_InstallCorePlugins ${LANG_ENGLISH} "Install pGina core plugins."
 LangString DESC_InstallContribPlugins ${LANG_ENGLISH} "Install community contributed plugins."
 LangString DESC_InstallVCRedist ${LANG_ENGLISH} "Visual C++ redistributable package is required. However, it may already be installed on your system."
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+  !insertmacro MUI_DESCRIPTION_TEXT ${InstallpGina} $(DESC_InstallpGina)
   !insertmacro MUI_DESCRIPTION_TEXT ${InstallCorePlugins} $(DESC_InstallCorePlugins)
   !insertmacro MUI_DESCRIPTION_TEXT ${InstallContribPlugins} $(DESC_InstallContribPlugins)
   !insertmacro MUI_DESCRIPTION_TEXT ${InstallVCRedist} $(DESC_InstallVCRedist)
