@@ -6,17 +6,44 @@
 !include WinVer.nsh
 !include x64.nsh
 !include DotNetChecker.nsh
+!include MUI2.nsh
 
 !define APPNAME "pGina"
 !define VERSION "3.2.1.1"
 
 RequestExecutionLevel admin  ; Require admin rights
-LicenseData "..\..\LICENSE"
 
-# Name in app title bar
-Name "${APPNAME} - ${VERSION}"
-Icon "..\..\pGina\src\Configuration\Resources\pginaicon_redcircle.ico"
-OutFile "pGina-${VERSION}-setup.exe"
+Name "${APPNAME} - ${VERSION}"   ; Name in title bar
+OutFile "pGina-${VERSION}-setup.exe" ; Output file
+
+# UI configuration
+!define MUI_ABORTWARNING
+!define MUI_ICON "..\..\pGina\src\Configuration\Resources\pginaicon_redcircle.ico"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "images\welcome-finish.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "images\welcome-finish.bmp"
+!define MUI_COMPONENTSPAGE_SMALLDESC
+
+# Installer pages
+!define MUI_PAGE_HEADER_TEXT "Install pGina ${VERSION}"
+!define MUI_WELCOMEPAGE_TITLE "Install pGina ${VERSION}"
+!define MUI_WELCOMEPAGE_TEXT "Install pGina?  You bet!"
+!insertmacro MUI_PAGE_WELCOME 
+!insertmacro MUI_PAGE_LICENSE ..\..\LICENSE
+!insertmacro MUI_PAGE_DIRECTORY 
+!insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+
+!insertmacro MUI_UNPAGE_WELCOME
+!insertmacro MUI_UNPAGE_COMPONENTS
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+
+# Custom function callbacks
+!define MUI_CUSTOMFUNCTION_GUIINIT GuiInit
+
+# Language files
+!insertmacro MUI_LANGUAGE "English"
 
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} Setup"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "pGina Team"
@@ -25,20 +52,27 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "2014 pGina Team"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" ${VERSION} 
 VIProductVersion ${VERSION}
 
-Page license
-Page directory findInstallDir
-Page components
-Page instfiles
+########################
+# Functions            #
+########################
+Function GuiInit
+  # Determine the installation directory.  If were 64 bit, use
+  # PROGRAMFILES64, otherwise, use PROGRAMFILES. 
+  ${If} ${RunningX64}
+    StrCpy $INSTDIR "$PROGRAMFILES64\pGina"
+    SetRegView 64
+  ${Else}
+    StrCpy $INSTDIR "$PROGRAMFILES\pGina"
+  ${EndIf}
+FunctionEnd
 
-UninstPage components
-UninstPage uninstConfirm
-UninstPage instfiles
+#############################################
+# Sections                                  #
+#############################################
 
 Section -Prerequisites
-
   # Check for and install .NET 4
   !insertmacro CheckNetFramework 40Full
-
 SectionEnd
 
 Section "-pGina" 
@@ -63,17 +97,17 @@ Section "-pGina"
    WriteUninstaller "$INSTDIR\pGina-Uninstall.exe"
 SectionEnd
 
-Section "Core plugins"
+Section "Core plugins" InstallCorePlugins
   SetOutPath $INSTDIR\Plugins\Core
   File "..\..\Plugins\Core\bin\*.dll"
 SectionEnd
 
-Section "Contributed plugins"
+Section "Contributed plugins" InstallContribPlugins
   SetOutPath $INSTDIR\Plugins\Contrib
   File "..\..\Plugins\Contrib\bin\*.dll"
 SectionEnd
 
-Section /o "Visual C++ redistributable package"
+Section /o "Visual C++ redistributable package" InstallVCRedist
   SetOutPath $INSTDIR 
   ${If} ${RunningX64}
      File "vcredist_x64.exe"
@@ -135,11 +169,17 @@ Section "un."
   RmDir $INSTDIR
 SectionEnd
 
-Function findInstallDir
-  ${If} ${RunningX64}
-    StrCpy $INSTDIR "$PROGRAMFILES64\pGina"
-    SetRegView 64
-  ${Else}
-    StrCpy $INSTDIR "$PROGRAMFILES\pGina"
-  ${EndIf}
-FunctionEnd
+#######################################
+# Descriptions
+#######################################
+LangString DESC_InstallCorePlugins ${LANG_ENGLISH} "Install pGina core plugins."
+LangString DESC_InstallContribPlugins ${LANG_ENGLISH} "Install community contributed plugins."
+LangString DESC_InstallVCRedist ${LANG_ENGLISH} "Visual C++ redistributable package is required. However, it may already be installed on your system."
+
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+  !insertmacro MUI_DESCRIPTION_TEXT ${InstallCorePlugins} $(DESC_InstallCorePlugins)
+  !insertmacro MUI_DESCRIPTION_TEXT ${InstallContribPlugins} $(DESC_InstallContribPlugins)
+  !insertmacro MUI_DESCRIPTION_TEXT ${InstallVCRedist} $(DESC_InstallVCRedist)
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+
