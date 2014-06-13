@@ -86,6 +86,10 @@ namespace pGina.Plugin.Ldap
             this.passwordAttributesDGV.DefaultValuesNeeded += passwordAttributesDGV_DefaultValuesNeeded;
             combCol.Items.AddRange(PasswordHashMethod.methods.Values.ToArray());
             this.passwordAttributesDGV.Columns.Add(combCol);
+
+            m_encryptionMethodCb.Items.Add("No Encryption");    // Settings.EncryptionMethod.NO_ENCRYPTION
+            m_encryptionMethodCb.Items.Add("SSL (ldaps://)");   // Settings.EncryptionMethod.TLS_SSL
+            m_encryptionMethodCb.Items.Add("StartTLS");         // Settings.EncryptionMethod.START_TLS
         }
 
         void passwordAttributesDGV_DefaultValuesNeeded(object sender, DataGridViewRowEventArgs e)
@@ -111,8 +115,8 @@ namespace pGina.Plugin.Ldap
             int timeout = Settings.Store.LdapTimeout;
             timeoutTextBox.Text = Convert.ToString(timeout);
 
-            bool useSsl = Settings.Store.UseSsl;
-            useSslCheckBox.CheckState = useSsl ? CheckState.Checked : CheckState.Unchecked;
+            int encryptionMethod = Settings.Store.EncryptionMethod;
+            m_encryptionMethodCb.SelectedIndex = encryptionMethod;
 
             bool reqCert = Settings.Store.RequireCert;
             validateServerCertCheckBox.CheckState = reqCert ? CheckState.Checked : CheckState.Unchecked;
@@ -214,11 +218,6 @@ namespace pGina.Plugin.Ldap
             }
         }
 
-        private void useSslCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateSslElements();
-        }
-
         private void UpdateSslElements()
         {
             if (validateServerCertCheckBox.CheckState == CheckState.Checked)
@@ -232,16 +231,22 @@ namespace pGina.Plugin.Ldap
                 sslCertFileBrowseButton.Enabled = false;
             }
 
-            if (useSslCheckBox.CheckState == CheckState.Unchecked)
+            if (GetEncryptionMethodSelection() == Settings.EncryptionMethod.NO_ENCRYPTION)
             {
                 validateServerCertCheckBox.Enabled = false;
                 sslCertFileTextBox.Enabled = false;
                 sslCertFileBrowseButton.Enabled = false;
             }
-            else if (useSslCheckBox.CheckState == CheckState.Checked)
+            else
             {
                 validateServerCertCheckBox.Enabled = true;
             }
+        }
+
+        private Settings.EncryptionMethod GetEncryptionMethodSelection()
+        {
+            int idx = m_encryptionMethodCb.SelectedIndex;
+            return (Settings.EncryptionMethod)Enum.ToObject(typeof(Settings.EncryptionMethod), idx);
         }
 
         private void UpdateAuthenticationElements()
@@ -357,7 +362,7 @@ namespace pGina.Plugin.Ldap
             Settings.Store.LdapHost = Regex.Split(ldapHostTextBox.Text.Trim(), @"\s+"); 
             Settings.Store.LdapPort = Convert.ToInt32(ldapPortTextBox.Text.Trim());
             Settings.Store.LdapTimeout = Convert.ToInt32(timeoutTextBox.Text.Trim());
-            Settings.Store.UseSsl = (useSslCheckBox.CheckState == CheckState.Checked);
+            Settings.Store.EncryptionMethod = (int)(GetEncryptionMethodSelection());
             Settings.Store.RequireCert = (validateServerCertCheckBox.CheckState == CheckState.Checked);
             Settings.Store.ServerCertFile = sslCertFileTextBox.Text.Trim();
             Settings.Store.SearchDN = searchDnTextBox.Text.Trim();
@@ -540,6 +545,11 @@ namespace pGina.Plugin.Ldap
             {
                 this.passwordAttributesDGV.Rows.Remove(this.passwordAttributesDGV.SelectedRows[0]);
             }
+        }
+
+        private void m_encryptionMethodCb_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateSslElements();
         }
     }
 }

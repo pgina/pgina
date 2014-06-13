@@ -55,9 +55,9 @@ namespace pGina.Plugin.Ldap
         private LdapDirectoryIdentifier m_serverIdentifier;
 
         /// <summary>
-        /// Whether or not to use SSL
+        /// Encryption method
         /// </summary>
-        private bool m_useSsl;
+        private Settings.EncryptionMethod m_encryptionMethod;
 
         /// <summary>
         /// Whether or not to verify the SSL certificate
@@ -79,25 +79,27 @@ namespace pGina.Plugin.Ldap
             m_conn = null;
             m_cert = null;
             Timeout = Settings.Store.LdapTimeout;
-            m_useSsl = Settings.Store.UseSsl;
+            int encMethod = Settings.Store.EncryptionMethod;
+            m_encryptionMethod = (Settings.EncryptionMethod)Enum.ToObject(typeof(Settings.EncryptionMethod), encMethod);
             m_verifyCert = Settings.Store.RequireCert;
             string certFile = Settings.Store.ServerCertFile;
-            if (m_useSsl && m_verifyCert)
+            if ((m_encryptionMethod == Settings.EncryptionMethod.START_TLS || m_encryptionMethod == Settings.EncryptionMethod.TLS_SSL) && m_verifyCert)
             {
+                m_logger.DebugFormat("Loading server certificate: {0}", certFile);
                 if ( !string.IsNullOrEmpty(certFile) && File.Exists(certFile))
                 {
-                    m_logger.DebugFormat("Loading server certificate: {0}", certFile);
                     m_cert = new X509Certificate2(certFile);
                 }
-                m_logger.DebugFormat("Certificate file not provided or not found, will validate against Windows store.", certFile);
+                else
+                    m_logger.DebugFormat("Certificate file not provided or not found, will validate against Windows store.", certFile);
             }
 
             string[] hosts = Settings.Store.LdapHost;
             int port = Settings.Store.LdapPort;
             m_serverIdentifier = new LdapDirectoryIdentifier(hosts, port, false, false);
 
-            m_logger.DebugFormat("Initializing LdapServer host(s): [{0}], port: {1}, useSSL = {2}, verifyCert = {3}",
-                string.Join(", ", hosts), port, m_useSsl, m_verifyCert);
+            m_logger.DebugFormat("Initializing LdapServer host(s): [{0}], port: {1}, encryption = {2}, verifyCert = {3}",
+                string.Join(", ", hosts), port, m_encryptionMethod.ToString(), m_verifyCert);
 
             this.Connect();
         }
@@ -110,13 +112,25 @@ namespace pGina.Plugin.Ldap
                 this.Close();
             }
 
-            m_conn = new LdapConnection(m_serverIdentifier);
-            m_conn.Timeout = new System.TimeSpan(0,0,Timeout);
+            m_conn = new LdapConnection(m_serverIdentifier)
+            {
+                Timeout = new System.TimeSpan(0, 0, this.Timeout)
+            };
             m_logger.DebugFormat("Timeout set to {0} seconds.", Timeout);
+
+            // Session options
             m_conn.SessionOptions.ProtocolVersion = 3;
-            m_conn.SessionOptions.SecureSocketLayer = m_useSsl;
-            if( m_useSsl )
-                m_conn.SessionOptions.VerifyServerCertificate = this.VerifyCert;
+            m_conn.SessionOptions.SecureSocketLayer = (m_encryptionMethod == Settings.EncryptionMethod.TLS_SSL);
+            
+            if( m_encryptionMethod == Settings.EncryptionMethod.TLS_SSL || m_encryptionMethod == Settings.EncryptionMethod.START_TLS )
+                m_conn.SessionOptions.VerifyServerCertificate += this.VerifyCert;
+
+            // If we're configured to do so, start the TLS
+            if( m_encryptionMethod == Settings.EncryptionMethod.START_TLS )
+            {
+                m_logger.DebugFormat("Starting TLS...");
+                m_conn.SessionOptions.StartTransportLayerSecurity(null);
+            }
         }
 
         /// <summary>
@@ -263,6 +277,11 @@ namespace pGina.Plugin.Ldap
             if (m_conn != null)
             {
                 m_logger.DebugFormat("Closing LDAP connection to {0}.", m_conn.SessionOptions.HostName);
+                if( m_encryptionMethod == Settings.EncryptionMethod.START_TLS )
+                {
+                    m_logger.DebugFormat("Stopping TLS");
+                    m_conn.SessionOptions.StopTransportLayerSecurity();
+                }
                 m_conn.Dispose();
                 m_conn = null;
             }
