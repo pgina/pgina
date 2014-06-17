@@ -1,3 +1,10 @@
+3.2.2.0 BETA (2014/06/17)
+---------------------------
+ - Bug fix for credential provider not properly revealing the un/password
+   fields on Windows 7 when the service becomes available. (#231)
+ - Add support for Start TLS in LDAP plugin.  (#214)
+ - Update installer to the more modern UI.
+
 3.2.1.0 BETA (2014/06/05)
 ---------------------------
  - New plugin: DriveMapper, maps drives after logon.
@@ -8,6 +15,7 @@
  - Fix issue with non GUID entries in CP list (#210)
  - Lots of updates to the RADIUS plugin (Oooska, #223)
  - Bug fix with unlock scenario not processing plugins (#227)
+ - New installer based on NullSoft NSIS.
 
 3.2.0.0 BETA (2013/10/17)
 ---------------------------
