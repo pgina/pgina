@@ -94,6 +94,10 @@
             this.label9 = new System.Windows.Forms.Label();
             this.passwordAttributesDGV = new System.Windows.Forms.DataGridView();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label12 = new System.Windows.Forms.Label();
             this.ldapServerGroupBox.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.authTabPage.SuspendLayout();
@@ -102,11 +106,14 @@
             this.tabPageChangePassword.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.passwordAttributesDGV)).BeginInit();
             this.groupBox1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // saveButton
             // 
-            this.saveButton.Location = new System.Drawing.Point(490, 547);
+            this.saveButton.Location = new System.Drawing.Point(490, 468);
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(108, 26);
             this.saveButton.TabIndex = 0;
@@ -130,14 +137,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ldapHostTextBox.Location = new System.Drawing.Point(110, 19);
             this.ldapHostTextBox.Name = "ldapHostTextBox";
-            this.ldapHostTextBox.Size = new System.Drawing.Size(462, 20);
+            this.ldapHostTextBox.Size = new System.Drawing.Size(446, 20);
             this.ldapHostTextBox.TabIndex = 2;
             this.descriptionToolTip.SetToolTip(this.ldapHostTextBox, "A whitespace separated list of hostnames or IP addresses.");
             // 
             // validateServerCertCheckBox
             // 
             this.validateServerCertCheckBox.AutoSize = true;
-            this.validateServerCertCheckBox.Location = new System.Drawing.Point(510, 46);
+            this.validateServerCertCheckBox.Location = new System.Drawing.Point(512, 49);
             this.validateServerCertCheckBox.Name = "validateServerCertCheckBox";
             this.validateServerCertCheckBox.Size = new System.Drawing.Size(148, 17);
             this.validateServerCertCheckBox.TabIndex = 6;
@@ -224,7 +231,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 27);
+            this.label2.Location = new System.Drawing.Point(5, 53);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(60, 13);
             this.label2.TabIndex = 8;
@@ -235,7 +242,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(7, 53);
+            this.label3.Location = new System.Drawing.Point(5, 79);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(90, 13);
             this.label3.TabIndex = 10;
@@ -264,7 +271,7 @@
             // 
             // searchDnTextBox
             // 
-            this.searchDnTextBox.Location = new System.Drawing.Point(111, 24);
+            this.searchDnTextBox.Location = new System.Drawing.Point(109, 50);
             this.searchDnTextBox.Name = "searchDnTextBox";
             this.searchDnTextBox.Size = new System.Drawing.Size(335, 20);
             this.searchDnTextBox.TabIndex = 9;
@@ -298,22 +305,22 @@
             // 
             this.sslCertFileTextBox.Location = new System.Drawing.Point(109, 71);
             this.sslCertFileTextBox.Name = "sslCertFileTextBox";
-            this.sslCertFileTextBox.Size = new System.Drawing.Size(463, 20);
+            this.sslCertFileTextBox.Size = new System.Drawing.Size(447, 20);
             this.sslCertFileTextBox.TabIndex = 8;
             this.descriptionToolTip.SetToolTip(this.sslCertFileTextBox, "Optional:  If left empty, the certificate will be validated\r\nagainst the Windows " +
         "certificate store.");
             // 
             // groupMemberAttrTB
             // 
-            this.groupMemberAttrTB.Location = new System.Drawing.Point(536, 76);
+            this.groupMemberAttrTB.Location = new System.Drawing.Point(534, 19);
             this.groupMemberAttrTB.Name = "groupMemberAttrTB";
-            this.groupMemberAttrTB.Size = new System.Drawing.Size(135, 20);
+            this.groupMemberAttrTB.Size = new System.Drawing.Size(118, 20);
             this.groupMemberAttrTB.TabIndex = 3;
             this.descriptionToolTip.SetToolTip(this.groupMemberAttrTB, "The attribute that stores the group\'s membership.");
             // 
             // groupDNPattern
             // 
-            this.groupDNPattern.Location = new System.Drawing.Point(111, 76);
+            this.groupDNPattern.Location = new System.Drawing.Point(109, 19);
             this.groupDNPattern.Name = "groupDNPattern";
             this.groupDNPattern.Size = new System.Drawing.Size(326, 20);
             this.groupDNPattern.TabIndex = 1;
@@ -345,8 +352,6 @@
             // 
             this.ldapServerGroupBox.Controls.Add(this.label10);
             this.ldapServerGroupBox.Controls.Add(this.m_encryptionMethodCb);
-            this.ldapServerGroupBox.Controls.Add(this.DereferenceComboBox);
-            this.ldapServerGroupBox.Controls.Add(this.label8);
             this.ldapServerGroupBox.Controls.Add(this.timeoutTextBox);
             this.ldapServerGroupBox.Controls.Add(this.timeoutLabel);
             this.ldapServerGroupBox.Controls.Add(this.sslCertFileBrowseButton);
@@ -357,9 +362,9 @@
             this.ldapServerGroupBox.Controls.Add(this.ldapHostTextBox);
             this.ldapServerGroupBox.Controls.Add(this.ldapPortLabel);
             this.ldapServerGroupBox.Controls.Add(this.ldapHostDescriptionLabel);
-            this.ldapServerGroupBox.Location = new System.Drawing.Point(12, 9);
+            this.ldapServerGroupBox.Location = new System.Drawing.Point(3, 6);
             this.ldapServerGroupBox.Name = "ldapServerGroupBox";
-            this.ldapServerGroupBox.Size = new System.Drawing.Size(676, 131);
+            this.ldapServerGroupBox.Size = new System.Drawing.Size(660, 106);
             this.ldapServerGroupBox.TabIndex = 3;
             this.ldapServerGroupBox.TabStop = false;
             this.ldapServerGroupBox.Text = "LDAP Server";
@@ -392,7 +397,7 @@
             "In searching",
             "When finding base object",
             "Always"});
-            this.DereferenceComboBox.Location = new System.Drawing.Point(116, 97);
+            this.DereferenceComboBox.Location = new System.Drawing.Point(116, 19);
             this.DereferenceComboBox.Name = "DereferenceComboBox";
             this.DereferenceComboBox.Size = new System.Drawing.Size(175, 21);
             this.DereferenceComboBox.TabIndex = 14;
@@ -400,7 +405,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(6, 100);
+            this.label8.Location = new System.Drawing.Point(6, 22);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(104, 13);
             this.label8.TabIndex = 13;
@@ -408,9 +413,9 @@
             // 
             // sslCertFileBrowseButton
             // 
-            this.sslCertFileBrowseButton.Location = new System.Drawing.Point(578, 71);
+            this.sslCertFileBrowseButton.Location = new System.Drawing.Point(562, 70);
             this.sslCertFileBrowseButton.Name = "sslCertFileBrowseButton";
-            this.sslCertFileBrowseButton.Size = new System.Drawing.Size(80, 20);
+            this.sslCertFileBrowseButton.Size = new System.Drawing.Size(80, 21);
             this.sslCertFileBrowseButton.TabIndex = 9;
             this.sslCertFileBrowseButton.Text = "Browse...";
             this.sslCertFileBrowseButton.UseVisualStyleBackColor = true;
@@ -419,7 +424,7 @@
             // showPwCB
             // 
             this.showPwCB.AutoSize = true;
-            this.showPwCB.Location = new System.Drawing.Point(452, 53);
+            this.showPwCB.Location = new System.Drawing.Point(450, 79);
             this.showPwCB.Name = "showPwCB";
             this.showPwCB.Size = new System.Drawing.Size(53, 17);
             this.showPwCB.TabIndex = 12;
@@ -429,7 +434,7 @@
             // 
             // searchPassTextBox
             // 
-            this.searchPassTextBox.Location = new System.Drawing.Point(111, 50);
+            this.searchPassTextBox.Location = new System.Drawing.Point(109, 76);
             this.searchPassTextBox.Name = "searchPassTextBox";
             this.searchPassTextBox.Size = new System.Drawing.Size(335, 20);
             this.searchPassTextBox.TabIndex = 11;
@@ -438,7 +443,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(443, 79);
+            this.label5.Location = new System.Drawing.Point(441, 22);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(87, 13);
             this.label5.TabIndex = 2;
@@ -447,7 +452,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(7, 79);
+            this.label4.Location = new System.Drawing.Point(5, 22);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(92, 13);
             this.label4.TabIndex = 0;
@@ -471,7 +476,7 @@
             // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(611, 547);
+            this.cancelButton.Location = new System.Drawing.Point(611, 468);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(76, 26);
             this.cancelButton.TabIndex = 5;
@@ -481,14 +486,15 @@
             // 
             // tabControl1
             // 
+            this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.authTabPage);
             this.tabControl1.Controls.Add(this.authzTabPage);
             this.tabControl1.Controls.Add(this.gatewayTabPage);
             this.tabControl1.Controls.Add(this.tabPageChangePassword);
-            this.tabControl1.Location = new System.Drawing.Point(22, 266);
+            this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(670, 260);
+            this.tabControl1.Size = new System.Drawing.Size(680, 450);
             this.tabControl1.TabIndex = 6;
             // 
             // authTabPage
@@ -504,7 +510,7 @@
             this.authTabPage.Location = new System.Drawing.Point(4, 22);
             this.authTabPage.Name = "authTabPage";
             this.authTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.authTabPage.Size = new System.Drawing.Size(662, 234);
+            this.authTabPage.Size = new System.Drawing.Size(672, 424);
             this.authTabPage.TabIndex = 0;
             this.authTabPage.Text = "Authentication";
             this.authTabPage.UseVisualStyleBackColor = true;
@@ -527,7 +533,7 @@
             this.authzTabPage.Location = new System.Drawing.Point(4, 22);
             this.authzTabPage.Name = "authzTabPage";
             this.authzTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.authzTabPage.Size = new System.Drawing.Size(662, 234);
+            this.authzTabPage.Size = new System.Drawing.Size(672, 424);
             this.authzTabPage.TabIndex = 1;
             this.authzTabPage.Text = "Authorization";
             this.authzTabPage.UseVisualStyleBackColor = true;
@@ -654,7 +660,7 @@
             this.gatewayTabPage.Location = new System.Drawing.Point(4, 22);
             this.gatewayTabPage.Name = "gatewayTabPage";
             this.gatewayTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.gatewayTabPage.Size = new System.Drawing.Size(662, 234);
+            this.gatewayTabPage.Size = new System.Drawing.Size(672, 424);
             this.gatewayTabPage.TabIndex = 2;
             this.gatewayTabPage.Text = "Gateway";
             this.gatewayTabPage.UseVisualStyleBackColor = true;
@@ -732,7 +738,7 @@
             this.tabPageChangePassword.Location = new System.Drawing.Point(4, 22);
             this.tabPageChangePassword.Name = "tabPageChangePassword";
             this.tabPageChangePassword.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageChangePassword.Size = new System.Drawing.Size(662, 234);
+            this.tabPageChangePassword.Size = new System.Drawing.Size(672, 424);
             this.tabPageChangePassword.TabIndex = 3;
             this.tabPageChangePassword.Text = "Change Password";
             this.tabPageChangePassword.UseVisualStyleBackColor = true;
@@ -766,31 +772,74 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.groupDNPattern);
-            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.label12);
             this.groupBox1.Controls.Add(this.showPwCB);
-            this.groupBox1.Controls.Add(this.label5);
-            this.groupBox1.Controls.Add(this.groupMemberAttrTB);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.searchPassTextBox);
             this.groupBox1.Controls.Add(this.searchDnTextBox);
             this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Location = new System.Drawing.Point(11, 146);
+            this.groupBox1.Location = new System.Drawing.Point(3, 175);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(676, 114);
+            this.groupBox1.Size = new System.Drawing.Size(660, 114);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Search";
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.groupBox4);
+            this.tabPage1.Controls.Add(this.groupBox3);
+            this.tabPage1.Controls.Add(this.groupBox1);
+            this.tabPage1.Controls.Add(this.ldapServerGroupBox);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(672, 424);
+            this.tabPage1.TabIndex = 4;
+            this.tabPage1.Text = "General";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.DereferenceComboBox);
+            this.groupBox3.Controls.Add(this.label8);
+            this.groupBox3.Location = new System.Drawing.Point(3, 118);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(660, 51);
+            this.groupBox3.TabIndex = 16;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Aliases";
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.groupDNPattern);
+            this.groupBox4.Controls.Add(this.label4);
+            this.groupBox4.Controls.Add(this.groupMemberAttrTB);
+            this.groupBox4.Controls.Add(this.label5);
+            this.groupBox4.Location = new System.Drawing.Point(6, 295);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(660, 54);
+            this.groupBox4.TabIndex = 17;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Groups";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(107, 16);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(357, 26);
+            this.label12.TabIndex = 13;
+            this.label12.Text = "Credentials to use when searching for users or groups.  Leave fields blank \r\nif u" +
+    "sing anonymous search.";
             // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(699, 585);
-            this.Controls.Add(this.groupBox1);
+            this.ClientSize = new System.Drawing.Size(699, 507);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.cancelButton);
-            this.Controls.Add(this.ldapServerGroupBox);
             this.Controls.Add(this.saveButton);
             this.Name = "Configuration";
             this.Text = "LDAP Plugin Settings";
@@ -808,6 +857,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.passwordAttributesDGV)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.tabPage1.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -878,5 +932,9 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.ComboBox m_encryptionMethodCb;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.Label label12;
     }
 }
