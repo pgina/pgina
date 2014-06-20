@@ -117,6 +117,8 @@ namespace pGina.Plugin.MySQLAuth
             foreach (GroupGatewayRule rule in gwLst)
                 this.gtwRulesListBox.Items.Add(rule);
             this.gtwRuleConditionCB.SelectedIndex = 0;
+
+            this.m_preventLogonWhenServerUnreachableCb.Checked = Settings.Store.PreventLogonOnServerError;
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -196,6 +198,8 @@ namespace pGina.Plugin.MySQLAuth
                 gwList.Add(item as GroupGatewayRule);
             }
             GroupRuleLoader.SaveGatewayRules(gwList);
+
+            Settings.Store.PreventLogonOnServerError = m_preventLogonWhenServerUnreachableCb.Checked;
 
             return true;
         }

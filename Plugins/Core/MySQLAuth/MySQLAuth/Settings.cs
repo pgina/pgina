@@ -74,6 +74,7 @@ namespace pGina.Plugin.MySQLAuth
 
             // Gateway settings
             m_settings.SetDefault("GroupGatewayRules", new string[] { });
+            m_settings.SetDefault("PreventLogonOnServerError", false);
         }
     }
 }

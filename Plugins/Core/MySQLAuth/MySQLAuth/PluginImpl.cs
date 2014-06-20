@@ -160,6 +160,26 @@ namespace pGina.Plugin.MySQLAuth
                     }
                 }
             }
+            catch(MySqlException e)
+            {
+                bool preventLogon = Settings.Store.PreventLogonOnServerError;
+                if( preventLogon )
+                {
+                    m_logger.DebugFormat("Encountered MySQL server error, and preventing logon: {0}", e.Message);
+                    return new BooleanResult {
+                        Success = false,
+                        Message = string.Format("Preventing logon due to server error: {0}", e.Message)
+                    };
+                } 
+                else 
+                {
+                    m_logger.DebugFormat("Encoutered MySQL server error, but returning success anyway.  Error: {0}", e.Message);
+                    return new BooleanResult {
+                        Success = true,
+                        Message = string.Format("Encountered server error: {0}", e.Message)
+                    };
+                }
+            }
             catch (Exception e)
             {
                 m_logger.ErrorFormat("Unexpected error: {0}", e);
