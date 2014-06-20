@@ -56,7 +56,7 @@ namespace pGina.Plugin.Ldap.Test
             Settings.Store.SetEncryptedSetting("SearchPW", searchPW);
             Settings.Store.GroupDnPattern = "cn=%g,ou=Group,dc=example,dc=com";
             Settings.Store.GroupMemberAttrib = "memberUid";
-            Settings.Store.UseAuthCredsForAuthzAndGateway = false;
+            Settings.Store.UseAuthBindForAuthzAndGateway = false;
 
             // Authentication
             Settings.Store.AllowEmptyPasswords = false;
@@ -258,14 +258,14 @@ namespace pGina.Plugin.Ldap.Test
         }
 
         [Test]
-        public void AuthzUseAuthCreds()
+        public void AuthzUseAuthBind()
         {
             // Allow because I'm not a member of group "good"
             Settings.Store.GroupAuthzRules = new string[] {
                 new GroupAuthzRule("good", GroupRule.Condition.NOT_MEMBER_OF, true).ToRegString(),
                 (new GroupAuthzRule(true)).ToRegString()
             };
-            Settings.Store.UseAuthCredsForAuthzAndGateway = true;
+            Settings.Store.UseAuthBindForAuthzAndGateway = true;
 
             m_plugin.BeginChain(m_props);
             BooleanResult authResult = m_plugin.AuthenticateUser(m_props);
@@ -277,14 +277,14 @@ namespace pGina.Plugin.Ldap.Test
         }
 
         [Test]
-        public void AuthzUseAuthCredsFail()
+        public void AuthzUseAuthBindFail()
         {
             // Allow because I'm not a member of group "good"
             Settings.Store.GroupAuthzRules = new string[] {
                 new GroupAuthzRule("good", GroupRule.Condition.NOT_MEMBER_OF, true).ToRegString(),
                 (new GroupAuthzRule(true)).ToRegString()
             };
-            Settings.Store.UseAuthCredsForAuthzAndGateway = true;
+            Settings.Store.UseAuthBindForAuthzAndGateway = true;
             UserInformation userInfo = m_props.GetTrackedSingle<UserInformation>();
             userInfo.Password = "WrongPassword";
 

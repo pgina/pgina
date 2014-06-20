@@ -152,8 +152,8 @@ namespace pGina.Plugin.Ldap
             string filter = Settings.Store.SearchFilter;
             searchFilterTextBox.Text = filter;
 
-            bool useAuth = Settings.Store.UseAuthCredsForAuthzAndGateway;
-            m_useAuthCredsForAuthzAndGatewayCb.Checked = useAuth;
+            bool useAuth = Settings.Store.UseAuthBindForAuthzAndGateway;
+            m_useAuthBindForAuthzAndGatewayCb.Checked = useAuth;
 
             string[] searchContexts = Settings.Store.SearchContexts;
             string ctxs = "";
@@ -373,7 +373,7 @@ namespace pGina.Plugin.Ldap
             Settings.Store.GroupDnPattern = this.groupDNPattern.Text.Trim();
             Settings.Store.GroupMemberAttrib = this.groupMemberAttrTB.Text.Trim();
             Settings.Store.Dereference = this.DereferenceComboBox.SelectedIndex;
-            Settings.Store.UseAuthCredsForAuthzAndGateway = this.m_useAuthCredsForAuthzAndGatewayCb.Checked;
+            Settings.Store.UseAuthBindForAuthzAndGateway = this.m_useAuthBindForAuthzAndGatewayCb.Checked;
 
             // Authentication
             Settings.Store.AllowEmptyPasswords = this.allowEmptyPwCB.Checked;

@@ -399,8 +399,8 @@ namespace pGina.Plugin.Ldap
             // If we're configured to use authorization credentials for searching, then
             // we don't need to bind to the server (it's already been done if auth was
             // successful).
-            bool useAuthCredsForSearch = Settings.Store.UseAuthCredsForAuthzAndGateway;
-            if (!useAuthCredsForSearch)
+            bool useAuthBindForSearch = Settings.Store.UseAuthBindForAuthzAndGateway;
+            if (!useAuthBindForSearch)
             {
                 serv.BindForSearch();
             }

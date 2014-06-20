@@ -63,7 +63,7 @@ namespace pGina.Plugin.Ldap
             m_settings.SetDefault("GroupDnPattern", "cn=%g,ou=Group,dc=example,dc=com");
             m_settings.SetDefault("GroupMemberAttrib", "memberUid");
             m_settings.SetDefault("Dereference", (int)System.DirectoryServices.Protocols.DereferenceAlias.Never);
-            m_settings.SetDefault("UseAuthCredsForAuthzAndGateway", false);
+            m_settings.SetDefault("UseAuthBindForAuthzAndGateway", false);
 
             // Authentication
             m_settings.SetDefault("AllowEmptyPasswords", false);

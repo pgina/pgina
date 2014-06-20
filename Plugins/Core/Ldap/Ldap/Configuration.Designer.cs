@@ -72,6 +72,7 @@
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.m_useAuthBindForAuthzAndGatewayCb = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
             this.authTabPage = new System.Windows.Forms.TabPage();
             this.authzTabPage = new System.Windows.Forms.TabPage();
@@ -98,7 +99,6 @@
             this.changePasswordDeleteAttribBtn = new System.Windows.Forms.Button();
             this.label9 = new System.Windows.Forms.Label();
             this.passwordAttributesDGV = new System.Windows.Forms.DataGridView();
-            this.m_useAuthCredsForAuthzAndGatewayCb = new System.Windows.Forms.CheckBox();
             this.ldapServerGroupBox.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -538,7 +538,7 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.m_useAuthCredsForAuthzAndGatewayCb);
+            this.groupBox1.Controls.Add(this.m_useAuthBindForAuthzAndGatewayCb);
             this.groupBox1.Controls.Add(this.label12);
             this.groupBox1.Controls.Add(this.showPwCB);
             this.groupBox1.Controls.Add(this.label2);
@@ -551,6 +551,16 @@
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Search";
+            // 
+            // m_useAuthBindForAuthzAndGatewayCb
+            // 
+            this.m_useAuthBindForAuthzAndGatewayCb.AutoSize = true;
+            this.m_useAuthBindForAuthzAndGatewayCb.Location = new System.Drawing.Point(109, 84);
+            this.m_useAuthBindForAuthzAndGatewayCb.Name = "m_useAuthBindForAuthzAndGatewayCb";
+            this.m_useAuthBindForAuthzAndGatewayCb.Size = new System.Drawing.Size(329, 17);
+            this.m_useAuthBindForAuthzAndGatewayCb.TabIndex = 14;
+            this.m_useAuthBindForAuthzAndGatewayCb.Text = "Use authentication bind for authorization and gateway searches.";
+            this.m_useAuthBindForAuthzAndGatewayCb.UseVisualStyleBackColor = true;
             // 
             // label12
             // 
@@ -835,16 +845,6 @@
             this.passwordAttributesDGV.Size = new System.Drawing.Size(648, 170);
             this.passwordAttributesDGV.TabIndex = 0;
             // 
-            // m_useAuthCredsForAuthzAndGatewayCb
-            // 
-            this.m_useAuthCredsForAuthzAndGatewayCb.AutoSize = true;
-            this.m_useAuthCredsForAuthzAndGatewayCb.Location = new System.Drawing.Point(109, 84);
-            this.m_useAuthCredsForAuthzAndGatewayCb.Name = "m_useAuthCredsForAuthzAndGatewayCb";
-            this.m_useAuthCredsForAuthzAndGatewayCb.Size = new System.Drawing.Size(360, 17);
-            this.m_useAuthCredsForAuthzAndGatewayCb.TabIndex = 14;
-            this.m_useAuthCredsForAuthzAndGatewayCb.Text = "Use authentication credentials for authorization and gateway searches.";
-            this.m_useAuthCredsForAuthzAndGatewayCb.UseVisualStyleBackColor = true;
-            // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -948,6 +948,6 @@
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.CheckBox m_useAuthCredsForAuthzAndGatewayCb;
+        private System.Windows.Forms.CheckBox m_useAuthBindForAuthzAndGatewayCb;
     }
 }
