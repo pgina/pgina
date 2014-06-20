@@ -120,9 +120,6 @@
   <metadata name="descriptionToolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <metadata name="descriptionToolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
   <data name="authzRequireAuthCB.ToolTip" xml:space="preserve">
     <value>If the LDAP plugin fails to authenticate the user in the authentication
 stage, then always fail authorization.  This denies any login even when

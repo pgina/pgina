@@ -13,11 +13,9 @@ namespace pGina.Plugin.Ldap.Test
     [TestFixture]
     public class LdapTests
     {
-        static dynamic m_settings;
-
-        static readonly string[] host = { "192.168.56.101" };
+        static readonly string[] host = { "192.168.59.1" };
         static readonly int port = 389;
-        static readonly bool useSsl = false;
+        static readonly Settings.EncryptionMethod encMethod = Settings.EncryptionMethod.NO_ENCRYPTION;
         static readonly bool validateCert = false;
         static readonly string searchDN = "";   // anonymous bind
         static readonly string searchPW = "";
@@ -32,7 +30,7 @@ namespace pGina.Plugin.Ldap.Test
         {
             pGina.Shared.Logging.Logging.Init();
 
-            m_settings = new pGina.Shared.Settings.pGinaDynamicSettings(Ldap.LdapPlugin.LdapUuid);
+           // m_settings = new pGina.Shared.Settings.pGinaDynamicSettings(Ldap.LdapPlugin.LdapUuid);
 
             m_plugin = new LdapPlugin();
             m_plugin.Starting();
@@ -49,30 +47,31 @@ namespace pGina.Plugin.Ldap.Test
         {
             // Default test settings, reset for each test
 
-            m_settings.LdapHost = host;
-            m_settings.LdapPort = port;
-            m_settings.LdapTimeout = 10;
-            m_settings.UseSsl = useSsl;
-            m_settings.RequireCert = validateCert;
-            m_settings.SearchDN = searchDN;
-            m_settings.SetEncryptedSetting("SearchPW", searchPW);
-            m_settings.GroupDnPattern = "cn=%g,ou=Group,dc=example,dc=com";
-            m_settings.GroupMemberAttrib = "memberUid";
+            Settings.Store.LdapHost = host;
+            Settings.Store.LdapPort = port;
+            Settings.Store.LdapTimeout = 10;
+            Settings.Store.EncryptionMethod = (int)encMethod;
+            Settings.Store.RequireCert = validateCert;
+            Settings.Store.SearchDN = searchDN;
+            Settings.Store.SetEncryptedSetting("SearchPW", searchPW);
+            Settings.Store.GroupDnPattern = "cn=%g,ou=Group,dc=example,dc=com";
+            Settings.Store.GroupMemberAttrib = "memberUid";
+            Settings.Store.UseAuthCredsForAuthzAndGateway = false;
 
             // Authentication
-            m_settings.AllowEmptyPasswords = false;
-            m_settings.DnPattern = "uid=%u,ou=People,dc=example,dc=com";
-            m_settings.DoSearch = false;
-            m_settings.SearchFilter = "";
-            m_settings.SearchContexts = new string[] { };
+            Settings.Store.AllowEmptyPasswords = false;
+            Settings.Store.DnPattern = "uid=%u,ou=People,dc=example,dc=com";
+            Settings.Store.DoSearch = false;
+            Settings.Store.SearchFilter = "";
+            Settings.Store.SearchContexts = new string[] { };
 
             // Authorization
-            m_settings.GroupAuthzRules = new string[] { (new GroupAuthzRule(true)).ToRegString() };
-            m_settings.AuthzRequireAuth = false;
-            m_settings.AuthzAllowOnError = true;
+            Settings.Store.GroupAuthzRules = new string[] { (new GroupAuthzRule(true)).ToRegString() };
+            Settings.Store.AuthzRequireAuth = false;
+            Settings.Store.AuthzAllowOnError = true;
 
             // Gateway
-            m_settings.GroupGatewayRules = new string[] { };
+            Settings.Store.GroupGatewayRules = new string[] { };
 
             // Set up session props
             m_props = new SessionProperties(BogusSessionId);
@@ -134,9 +133,9 @@ namespace pGina.Plugin.Ldap.Test
         [Test]
         public void AuthSearch()
         {
-            m_settings.DoSearch = true;
-            m_settings.SearchFilter = "(uid=%u)";
-            m_settings.SearchContexts = new string[] { "ou=People,dc=example,dc=com" };
+            Settings.Store.DoSearch = true;
+            Settings.Store.SearchFilter = "(uid=%u)";
+            Settings.Store.SearchContexts = new string[] { "ou=People,dc=example,dc=com" };
 
             m_plugin.BeginChain(m_props);
             BooleanResult result = m_plugin.AuthenticateUser(m_props);
@@ -153,9 +152,9 @@ namespace pGina.Plugin.Ldap.Test
             UserInformation userInfo = m_props.GetTrackedSingle<UserInformation>();
             userInfo.Password = "Wrong password";
 
-            m_settings.DoSearch = true;
-            m_settings.SearchFilter = "(uid=%u)";
-            m_settings.SearchContexts = new string[] { "ou=People,dc=example,dc=com" };
+            Settings.Store.DoSearch = true;
+            Settings.Store.SearchFilter = "(uid=%u)";
+            Settings.Store.SearchContexts = new string[] { "ou=People,dc=example,dc=com" };
 
             m_plugin.BeginChain(m_props);
             BooleanResult result = m_plugin.AuthenticateUser(m_props);
@@ -168,9 +167,9 @@ namespace pGina.Plugin.Ldap.Test
         [Test]
         public void AuthSearchFailDnSearch()
         {
-            m_settings.DoSearch = true;
-            m_settings.SearchFilter = "(uid=%u)";
-            m_settings.SearchContexts = new string[] { "ou=Group,dc=example,dc=com" };
+            Settings.Store.DoSearch = true;
+            Settings.Store.SearchFilter = "(uid=%u)";
+            Settings.Store.SearchContexts = new string[] { "ou=Group,dc=example,dc=com" };
 
             m_plugin.BeginChain(m_props);
             BooleanResult result = m_plugin.AuthenticateUser(m_props);
@@ -184,7 +183,7 @@ namespace pGina.Plugin.Ldap.Test
         [Test]
         public void AuthzDenyAuth()
         {
-            m_settings.AuthzRequireAuth = true;
+            Settings.Store.AuthzRequireAuth = true;
 
             m_plugin.BeginChain(m_props);
             PluginActivityInformation actInfo = m_props.GetTrackedSingle<PluginActivityInformation>();
@@ -193,28 +192,28 @@ namespace pGina.Plugin.Ldap.Test
             m_plugin.EndChain(m_props);
 
             Assert.That(!result.Success, result.Message);
-            Assert.That(result.Message, Is.EqualTo("Deny because LDAP authentication failed."));
+            Assert.That(result.Message, Is.EqualTo("Deny because LDAP authentication failed, or did not execute."));
         }
 
         // Deny when LDAP auth doesn't execute
         [Test]
         public void AuthzDenyAuthNoExecute()
         {
-            m_settings.AuthzRequireAuth = true;
+            Settings.Store.AuthzRequireAuth = true;
 
             m_plugin.BeginChain(m_props);
             BooleanResult result = m_plugin.AuthorizeUser(m_props);
             m_plugin.EndChain(m_props);
 
             Assert.That(!result.Success, result.Message);
-            Assert.That(result.Message, Is.EqualTo("Deny because LDAP auth did not execute, and configured to require LDAP auth."));
+            Assert.That(result.Message, Is.EqualTo("Deny because LDAP authentication failed, or did not execute."));
         }
 
         [Test]
         public void AuthzAllowGroup()
         {
             // Allow by default rule (not a member of "good")
-            m_settings.GroupAuthzRules = new string[] {
+            Settings.Store.GroupAuthzRules = new string[] {
                 new GroupAuthzRule("good", GroupRule.Condition.MEMBER_OF, true).ToRegString(),
                 (new GroupAuthzRule(true)).ToRegString()
             };
@@ -230,7 +229,7 @@ namespace pGina.Plugin.Ldap.Test
         public void AuthzAllowGroup01()
         {
             // Allow because I'm not a member of group "good"
-            m_settings.GroupAuthzRules = new string[] {
+            Settings.Store.GroupAuthzRules = new string[] {
                 new GroupAuthzRule("good", GroupRule.Condition.NOT_MEMBER_OF, true).ToRegString(),
                 (new GroupAuthzRule(true)).ToRegString()
             };
@@ -246,7 +245,7 @@ namespace pGina.Plugin.Ldap.Test
         public void AuthzDenyGroup()
         {
             // Deny because I'm a member of group "bad"
-            m_settings.GroupAuthzRules = new string[] {
+            Settings.Store.GroupAuthzRules = new string[] {
                 new GroupAuthzRule("bad", GroupRule.Condition.MEMBER_OF, false).ToRegString(),
                 (new GroupAuthzRule(true)).ToRegString()
             };
@@ -256,6 +255,46 @@ namespace pGina.Plugin.Ldap.Test
             m_plugin.EndChain(m_props);
 
             Assert.That(!result.Success, result.Message);
+        }
+
+        [Test]
+        public void AuthzUseAuthCreds()
+        {
+            // Allow because I'm not a member of group "good"
+            Settings.Store.GroupAuthzRules = new string[] {
+                new GroupAuthzRule("good", GroupRule.Condition.NOT_MEMBER_OF, true).ToRegString(),
+                (new GroupAuthzRule(true)).ToRegString()
+            };
+            Settings.Store.UseAuthCredsForAuthzAndGateway = true;
+
+            m_plugin.BeginChain(m_props);
+            BooleanResult authResult = m_plugin.AuthenticateUser(m_props);
+            Assert.That(authResult.Success);
+            BooleanResult authzResult = m_plugin.AuthorizeUser(m_props);
+            m_plugin.EndChain(m_props);
+
+            Assert.That(authzResult.Success, authzResult.Message);
+        }
+
+        [Test]
+        public void AuthzUseAuthCredsFail()
+        {
+            // Allow because I'm not a member of group "good"
+            Settings.Store.GroupAuthzRules = new string[] {
+                new GroupAuthzRule("good", GroupRule.Condition.NOT_MEMBER_OF, true).ToRegString(),
+                (new GroupAuthzRule(true)).ToRegString()
+            };
+            Settings.Store.UseAuthCredsForAuthzAndGateway = true;
+            UserInformation userInfo = m_props.GetTrackedSingle<UserInformation>();
+            userInfo.Password = "WrongPassword";
+
+            m_plugin.BeginChain(m_props);
+            BooleanResult authResult = m_plugin.AuthenticateUser(m_props);
+            Assert.That(!authResult.Success);
+            BooleanResult authzResult = m_plugin.AuthorizeUser(m_props);
+            m_plugin.EndChain(m_props);
+
+            Assert.That(!authzResult.Success, authzResult.Message);
         }
     }
 }
