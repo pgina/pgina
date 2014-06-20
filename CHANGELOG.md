@@ -1,3 +1,10 @@
+3.2.3.0-beta (2014/06/20)
+---------------------------
+ - LDAP plugin feature: option to use authentication bind when searching 
+   in authorization and gateway stages. (#224)
+ - MySQL plugin: add option to prevent (or not) logon in gateway if 
+   server error occurs.  (#213)
+
 3.2.2.0 BETA (2014/06/17)
 ---------------------------
  - Bug fix for credential provider not properly revealing the un/password
