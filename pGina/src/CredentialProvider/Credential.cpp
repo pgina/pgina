@@ -528,10 +528,7 @@ namespace pGina
 			// Hide service status if configured to do so
 			if( ! pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
 			{
-				if( m_usageScenario == CPUS_UNLOCK_WORKSTATION )
-					m_fields->fields[CredProv::LOIFI_STATUS].fieldStatePair.fieldState = CPFS_HIDDEN;
-				else if( m_usageScenario == CPUS_LOGON )
-					m_fields->fields[CredProv::LUIFI_STATUS].fieldStatePair.fieldState = CPFS_HIDDEN;
+				m_fields->fields[m_fields->statusFieldIdx].fieldStatePair.fieldState = CPFS_HIDDEN;
 			}
 
 			// If the service is not available, we initially hide username/password
@@ -667,6 +664,7 @@ namespace pGina
 
 		void Credential::ServiceStateChanged(bool newState)
 		{
+			pDEBUG(L"Credential::ServiceStateChanged");
 			// Show/hide the username/password/status fields.
 			// 
 			// Note: the SetFieldState calls here are probably not necessary.  The Provider calls
@@ -675,6 +673,7 @@ namespace pGina
 			// SetFieldState seems to be the proper way to do this.
 			if (m_fields) {
 				if (newState) {
+					pDEBUG(L"Service is now available, revealing fields");
 					bool hideUsername = pGina::Registry::GetBool(L"HideUsernameField", false);
 					bool hidePassword = pGina::Registry::GetBool(L"HidePasswordField", false);
 
