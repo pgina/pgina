@@ -46,6 +46,8 @@ namespace pGina.Plugin.LocalMachine
         private static ILog m_logger = null; 
         private static DirectoryEntry m_sam = new DirectoryEntry("WinNT://" + Environment.MachineName + ",computer");
         private static PrincipalContext m_machinePrincipal = new PrincipalContext(ContextType.Machine);
+
+        private static Random randGen = new Random();
         
         public class GroupSyncException : Exception 
         {
@@ -171,10 +173,67 @@ namespace pGina.Plugin.LocalMachine
         {
             using (DirectoryEntry userDe = GetUserDirectoryEntry(username))
             {
-                userDe.Invoke("SetPassword", new object[] { Guid.NewGuid().ToString().Replace("-", "").Replace("{", "").Replace("}", "") });
+                userDe.Invoke("SetPassword", GenerateRandomPassword(30));
                 userDe.CommitChanges();
             }
         } 
+
+        /// <summary>
+        /// Generates a random password that meets most of the requriements of Windows 
+        /// Server when password policy complexity requirements are in effect.  
+        /// 
+        /// http://technet.microsoft.com/en-us/library/cc786468%28v=ws.10%29.aspx
+        /// 
+        /// This generates a string with at least two of each of the following character
+        /// classes: uppercase letters, lowercase letters, and digits.
+        /// 
+        /// However, this method does not check for the existence of the username or 
+        /// display name within the
+        /// generated password.  The probability of that occurring is somewhat remote,
+        /// but could happen.  If that is a concern, this method could be called repeatedly
+        /// until a string is returned that does not contain the username or display name.
+        /// </summary>
+        /// <param name="length">Password length, must be at least 6.</param>
+        /// <returns>The generated password</returns>
+        public static string GenerateRandomPassword(int length)
+        {
+            if (length < 6) throw new ArgumentException("length must be at least 6.");
+
+            StringBuilder pass = new StringBuilder();
+
+            // Temporary array containing our character set: 
+            // uppercase letters, lowercase letters, and digits
+            char[] charSet = new char[62];
+            for( int i = 0; i < 26; i++) charSet[i] = (char)('A' + i);  // Uppercase letters
+            for( int i = 26; i < 52; i++) charSet[i] = (char)('a' + i - 26); // Lowercase letters
+            for( int i = 52; i < 62; i++) charSet[i] = (char)('0' + i - 52); // Digits
+
+            // We generate two of each character class.
+            pass.Append(charSet[randGen.Next(0,26)]);    // uppercase
+            pass.Append(charSet[randGen.Next(0, 26)]);   // uppercase
+            pass.Append(charSet[randGen.Next(26, 52)]);  // lowercase
+            pass.Append(charSet[randGen.Next(26, 52)]);  // lowercase
+            pass.Append(charSet[randGen.Next(52,62)]);   // digit
+            pass.Append(charSet[randGen.Next(52,62)]);   // digit
+
+            // The rest of the password is randomly generated from the full character set
+            for (int i = pass.Length; i < length; i++ )
+            {
+                pass.Append(charSet[randGen.Next(0, charSet.Length)]);
+            }
+
+            // Shuffle the password using the Fisher-Yates random permutation technique
+            for (int i = 0; i < pass.Length; i++ )
+            {
+                int j = randGen.Next(i, pass.Length);
+                // Swap i and j
+                char tmp = pass[i];
+                pass[i] = pass[j];
+                pass[j] = tmp;
+            }
+
+            return pass.ToString();
+        }
         
         // Non recursive group check (immediate membership only currently)
         private bool IsUserInGroup(string username, string groupname)
