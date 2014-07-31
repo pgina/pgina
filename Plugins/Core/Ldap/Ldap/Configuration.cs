@@ -171,6 +171,7 @@ namespace pGina.Plugin.Ldap
 
             this.authzRequireAuthCB.Checked = Settings.Store.AuthzRequireAuth;
             this.authzAllowOnErrorCB.Checked = Settings.Store.AuthzAllowOnError;
+            this.authzApplyToAllUsersCB.Checked = Settings.Store.AuthzApplyToAllUsers;
 
             List<GroupAuthzRule> lst = GroupRuleLoader.GetAuthzRules();
             // The last one should be the default rule
@@ -385,6 +386,7 @@ namespace pGina.Plugin.Ldap
             // Authorization
             Settings.Store.AuthzRequireAuth = this.authzRequireAuthCB.Checked;
             Settings.Store.AuthzAllowOnError = this.authzAllowOnErrorCB.Checked;
+            Settings.Store.AuthzApplyToAllUsers = this.authzApplyToAllUsersCB.Checked;
             List<GroupAuthzRule> lst = new List<GroupAuthzRule>();
             foreach (Object item in this.authzRulesListBox.Items)
             {

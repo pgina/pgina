@@ -151,128 +151,146 @@ namespace pGina.Plugin.Ldap
         {
             m_logger.Debug("LDAP Plugin Authorization");
 
-            bool requireAuth = Settings.Store.AuthzRequireAuth;
-
-            // Get the authz rules from registry
-            List<GroupAuthzRule> rules = GroupRuleLoader.GetAuthzRules();
-            if (rules.Count == 0)
+            // Do we need to do authorization?
+            if (DoesAuthzApply(properties))
             {
-                throw new Exception("No authorizaition rules found.");
-            }
-            
-            // Get the LDAP server object
-            LdapServer serv = properties.GetTrackedSingle<LdapServer>();
+                bool requireAuth = Settings.Store.AuthzRequireAuth;
 
-            // If LDAP server object is not found, then something went wrong in authentication.
-            // We allow or deny based on setting
-            if (serv == null)
-            {
-                m_logger.ErrorFormat("AuthorizeUser: Internal error, LdapServer object not available.");
-
-                // LdapServer is not available, allow or deny based on settings.
-                return new BooleanResult() 
+                // Get the authz rules from registry
+                List<GroupAuthzRule> rules = GroupRuleLoader.GetAuthzRules();
+                if (rules.Count == 0)
                 {
-                    Success = Settings.Store.AuthzAllowOnError, 
-                    Message = "LDAP server unavailable." 
-                };
-            }
-
-            // If we require authentication, and we failed to auth this user, then we
-            // fail authorization.  Note that we do this AFTER checking the LDAP server object
-            // because we may want to succeed if the authentication failed due to server
-            // being unavailable.
-            PluginActivityInformation actInfo = properties.GetTrackedSingle<PluginActivityInformation>();
-            if (requireAuth && !WeAuthedThisUser(actInfo) )
-            {
-                m_logger.InfoFormat("Deny because LDAP auth failed, and configured to require LDAP auth.");
-                return new BooleanResult()
-                {
-                    Success = false,
-                    Message = "Deny because LDAP authentication failed, or did not execute."
-                };
-            }
-            
-            // Apply the authorization rules
-            try
-            {
-                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-                string user = userInfo.Username;
-                
-                // Bind for searching if we have rules to process.  If there's only one, it's the
-                // default rule which doesn't require searching the LDAP tree.
-                if (rules.Count > 1)
-                {
-                    this.BindForAuthzOrGatewaySearch(serv);
+                    throw new Exception("No authorizaition rules found.");
                 }
-                    
-                foreach (GroupAuthzRule rule in rules)
+
+                // Get the LDAP server object
+                LdapServer serv = properties.GetTrackedSingle<LdapServer>();
+
+                // If LDAP server object is not found, then something went wrong in authentication.
+                // We allow or deny based on setting
+                if (serv == null)
                 {
-                    bool inGroup = false;
-                    
-                    // Don't need to check membership if the condition is "always."  This is the
-                    // case for the default rule only. which is the last rule in the list.
-                    if (rule.RuleCondition != GroupRule.Condition.ALWAYS)
+                    m_logger.ErrorFormat("AuthorizeUser: Internal error, LdapServer object not available.");
+
+                    // LdapServer is not available, allow or deny based on settings.
+                    return new BooleanResult()
                     {
-                        inGroup = serv.MemberOfGroup(user, rule.Group);
-                        m_logger.DebugFormat("User {0} {1} member of group {2}", user, inGroup ? "is" : "is not",
-                            rule.Group);
+                        Success = Settings.Store.AuthzAllowOnError,
+                        Message = "LDAP server unavailable."
+                    };
+                }
+
+                // If we require authentication, and we failed to auth this user, then we
+                // fail authorization.  Note that we do this AFTER checking the LDAP server object
+                // because we may want to succeed if the authentication failed due to server
+                // being unavailable.
+                if (requireAuth && !WeAuthedThisUser(properties))
+                {
+                    m_logger.InfoFormat("Deny because LDAP auth failed, and configured to require LDAP auth.");
+                    return new BooleanResult()
+                    {
+                        Success = false,
+                        Message = "Deny because LDAP authentication failed, or did not execute."
+                    };
+                }
+
+                // Apply the authorization rules
+                try
+                {
+                    UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+                    string user = userInfo.Username;
+
+                    // Bind for searching if we have rules to process.  If there's only one, it's the
+                    // default rule which doesn't require searching the LDAP tree.
+                    if (rules.Count > 1)
+                    {
+                        this.BindForAuthzOrGatewaySearch(serv);
                     }
 
-                    if (rule.RuleMatch(inGroup))
+                    foreach (GroupAuthzRule rule in rules)
                     {
-                        if (rule.AllowOnMatch)
-                            return new BooleanResult()
+                        bool inGroup = false;
+
+                        // Don't need to check membership if the condition is "always."  This is the
+                        // case for the default rule only. which is the last rule in the list.
+                        if (rule.RuleCondition != GroupRule.Condition.ALWAYS)
+                        {
+                            inGroup = serv.MemberOfGroup(user, rule.Group);
+                            m_logger.DebugFormat("User {0} {1} member of group {2}", user, inGroup ? "is" : "is not",
+                                rule.Group);
+                        }
+
+                        if (rule.RuleMatch(inGroup))
+                        {
+                            if (rule.AllowOnMatch)
+                                return new BooleanResult()
+                                {
+                                    Success = true,
+                                    Message = string.Format("Allow via rule: \"{0}\"", rule.ToString())
+                                };
+                            else
+                                return new BooleanResult()
+                                {
+                                    Success = false,
+                                    Message = string.Format("Deny via rule: \"{0}\"", rule.ToString())
+                                };
+                        }
+                    }
+
+                    // We should never get this far because the last rule in the list should always be a match,
+                    // but if for some reason we do, return success.
+                    return new BooleanResult() { Success = true, Message = "" };
+                }
+                catch (Exception e)
+                {
+                    if (e is LdapException)
+                    {
+                        LdapException ldapEx = (e as LdapException);
+
+                        if (ldapEx.ErrorCode == 81)
+                        {
+                            // Server can't be contacted, set server object to null
+                            m_logger.ErrorFormat("Server unavailable: {0}, {1}", ldapEx.ServerErrorMessage, e.Message);
+                            serv.Close();
+                            properties.AddTrackedSingle<LdapServer>(null);
+                            return new BooleanResult
                             {
-                                Success = true,
-                                Message = string.Format("Allow via rule: \"{0}\"", rule.ToString())
+                                Success = Settings.Store.AuthzAllowOnError,
+                                Message = "Failed to contact LDAP server."
                             };
-                        else
-                            return new BooleanResult()
+                        }
+                        else if (ldapEx.ErrorCode == 49)
+                        {
+                            // This is invalid credentials, return false, but server object should remain connected
+                            m_logger.ErrorFormat("LDAP bind failed: invalid credentials.");
+                            return new BooleanResult
                             {
                                 Success = false,
-                                Message = string.Format("Deny via rule: \"{0}\"", rule.ToString())
+                                Message = "Authorization via LDAP failed. Invalid credentials."
                             };
+                        }
                     }
-                }
 
-                // We should never get this far because the last rule in the list should always be a match,
-                // but if for some reason we do, return success.
-                return new BooleanResult() { Success = true, Message = "" };
+                    // Unexpected error, let the PluginDriver catch
+                    m_logger.ErrorFormat("Error during authorization: {0}", e);
+                    throw;
+                }
             }
-            catch (Exception e)
+            else
             {
-                if (e is LdapException)
-                {
-                    LdapException ldapEx = (e as LdapException);
-
-                    if (ldapEx.ErrorCode == 81)
-                    {
-                        // Server can't be contacted, set server object to null
-                        m_logger.ErrorFormat("Server unavailable: {0}, {1}", ldapEx.ServerErrorMessage, e.Message);
-                        serv.Close();
-                        properties.AddTrackedSingle<LdapServer>(null);
-                        return new BooleanResult 
-                        { 
-                            Success = Settings.Store.AuthzAllowOnError, 
-                            Message = "Failed to contact LDAP server." 
-                        };
-                    }
-                    else if (ldapEx.ErrorCode == 49)
-                    {
-                        // This is invalid credentials, return false, but server object should remain connected
-                        m_logger.ErrorFormat("LDAP bind failed: invalid credentials.");
-                        return new BooleanResult 
-                        { 
-                            Success = false, 
-                            Message = "Authorization via LDAP failed. Invalid credentials." 
-                        };
-                    }
-                }
-
-                // Unexpected error, let the PluginDriver catch
-                m_logger.ErrorFormat("Error during authorization: {0}", e);
-                throw;
+                // We elect to not do any authorization, let the user pass for us
+                return new BooleanResult() { Success = true };
             }
+        }
+
+        private bool DoesAuthzApply(SessionProperties properties)
+        {
+            // Do we authorize all users?
+            bool authzAllUsers = Settings.Store.AuthzApplyToAllUsers;
+            if (authzAllUsers) return true;
+
+            // Did we auth this user?
+            return WeAuthedThisUser(properties);
         }
 
         public BooleanResult AuthenticatedUserGateway(SessionProperties properties)
@@ -380,8 +398,9 @@ namespace pGina.Plugin.Ldap
 
         }
 
-        private bool WeAuthedThisUser( PluginActivityInformation actInfo )
+        private bool WeAuthedThisUser(SessionProperties properties)
         {
+            PluginActivityInformation actInfo = properties.GetTrackedSingle<PluginActivityInformation>();
             try
             {
                 BooleanResult ldapResult = actInfo.GetAuthenticationResult(this.Uuid);
