@@ -161,7 +161,7 @@ namespace Abstractions.Pipes
                 catch (Exception e)
                 {
                     LibraryLogging.Error("Error while trying to open pipe server: {0}", e);
-                    Thread.Sleep(500);
+                    //Thread.Sleep(500);
                 }
             }
         }

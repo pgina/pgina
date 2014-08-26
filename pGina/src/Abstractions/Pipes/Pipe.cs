@@ -118,6 +118,10 @@ namespace Abstractions.Pipes
                 //  it is done and its time to closeup and look for another client.
                 while (StreamAction(reader, writer)) { }
             }
+            catch (IOException)
+            {
+                throw;
+            }
             catch(Exception e)
             {
                 LibraryLogging.Error("Error while using pipe connection: {0}", e);

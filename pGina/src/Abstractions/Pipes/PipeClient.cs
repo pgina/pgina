@@ -86,20 +86,35 @@ namespace Abstractions.Pipes
 
             using (NamedPipeClientStream pipeClient = new NamedPipeClientStream(".", Name, PipeDirection.InOut,
                 PipeOptions.WriteThrough, TokenImpersonationLevel.None, HandleInheritability.None))
-            {                
-                try
+            {
+                for (int x = 1; x <= 5; x++)
                 {
-                    pipeClient.Connect(timeout);
-                }
-                catch(Exception e)
-                {
-                    LibraryLogging.Error("Error connecting PipeClient: {0}", e);
-                    return;
+                    try
+                    {
+                        pipeClient.Connect(timeout);
+                    }
+                    catch (Exception e)
+                    {
+                        if (x == 5)
+                        {
+                            LibraryLogging.Error("Error connecting PipeClient: {0}", e);
+                            return;
+                        }
+                        Thread.Sleep(250);
+                    }
                 }
 
                 // Write the initial message to get the pumps running,
-                //  not in a try/catch so that errors bubble up
-                HandlePipeConnection(pipeClient, initialMessage);                
+                //  error handling to prevent a pipe error exception
+                try
+                {
+                    HandlePipeConnection(pipeClient, initialMessage);
+                }
+                catch (IOException)
+                {
+                    LibraryLogging.Error("Error broken pipe connection");
+                    Start(action, initialMessage, timeout);
+                }
             }                         
         }        
     }
