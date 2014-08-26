@@ -123,6 +123,8 @@ namespace Service
         const int SERVICE_ACCEPT_PRESHUTDOWN = 0x100;
         const int SERVICE_CONTROL_PRESHUTDOWN = 0xf;
 
+        private ILog m_logger = LogManager.GetLogger("Pgina Service");
+
         [DllImport("advapi32.dll", SetLastError = true)]
         internal static extern bool SetServiceStatus(IntPtr hServiceStatus, ref SERVICE_STATUS lpServiceStatus);
 
@@ -155,7 +157,8 @@ namespace Service
                 if (lpInfo == IntPtr.Zero)
                 {
                     string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).ToString();
-                    EventLog.WriteEntry("pGina", String.Format("Unable to allocate memory for service action\nThe service will be forced to stop during a shutdown within 3 minutes\nerror:{0}", errorMessage), EventLogEntryType.Warning);
+                    m_logger.ErrorFormat("Unable to allocate memory for service action, error: {0}", errorMessage);
+                    EventLog.WriteEntry("pGina", String.Format("Unable to allocate memory for service action\nerror:{0}", errorMessage), EventLogEntryType.Warning);
                 }
                 else
                 {
@@ -163,6 +166,7 @@ namespace Service
                     if (!ChangeServiceConfig2(sHandle, (int)INFO_LEVEL.SERVICE_CONFIG_PRESHUTDOWN_INFO, lpInfo))
                     {
                         string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).ToString();
+                        m_logger.ErrorFormat("ChangeServiceConfig2 error: {0}", errorMessage);
                         EventLog.WriteEntry("pGina", String.Format("ChangeServiceConfig2\nThe service will be forced to stop during a shutdown within 3 minutes\nerror:{0}", errorMessage), EventLogEntryType.Warning);
                     }
                     Marshal.FreeHGlobal(lpInfo);
@@ -207,6 +211,7 @@ namespace Service
         }
         private void SignalShutdownPending()
         {
+            m_logger.Info("Preshutdown Event received");
             while (m_serviceThreadObj.OnCustomCommand())
             {
                 myServiceStatus.checkPoint++;
@@ -214,10 +219,16 @@ namespace Service
                 myServiceStatus.waitHint = new TimeSpan(0,3,0).Milliseconds;
                 if (!SetServiceStatus(this.ServiceHandle, ref myServiceStatus))
                 {
-                    int lastError = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
+                    string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).ToString();
+                    m_logger.ErrorFormat("RequestAdditionalTime failed with {0}", errorMessage);
+                }
+                else
+                {
+                    //m_logger.Info("RequestAdditionalTime suceeded");
                 }
                 Thread.Sleep(1000);
             }
+            m_logger.Info("RequestAdditionalTime finished");
         }
 
         protected override void OnSessionChange(SessionChangeDescription changeDescription)
