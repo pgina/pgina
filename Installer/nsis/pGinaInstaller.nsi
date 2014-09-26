@@ -9,7 +9,7 @@
 !include MUI2.nsh
 
 !define APPNAME "pGina"
-!define VERSION "3.2.4.0"
+!define VERSION "3.2.4.1"
 
 RequestExecutionLevel admin  ; Require admin rights
 

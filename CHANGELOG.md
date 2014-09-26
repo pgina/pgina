@@ -1,3 +1,8 @@
+3.2.4.1-beta (2014/09/26)
+---------------------------
+ - Single user plugin denys logon when single user account already
+   has active session.
+
 3.2.4.0-beta (2014/06/30)
 ---------------------------
  - Fix issue with fields not appearing when service status is hidden.  (#231)
