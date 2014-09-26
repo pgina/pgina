@@ -69,8 +69,14 @@ namespace pGina.Core
             pluginInfo.LoadedAuthenticationPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthentication>();
             pluginInfo.LoadedAuthorizationPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthorization>();
             m_properties.AddTrackedSingle<PluginActivityInformation>(pluginInfo);
+            m_properties.AddTrackedSingle<LogonInformation>(new LogonInformation());
 
             m_logger.DebugFormat("New PluginDriver created");
+        }
+
+        public LogonInformation LogonInformation
+        {
+            get { return m_properties.GetTrackedSingle<LogonInformation>(); }
         }
 
         public UserInformation UserInformation

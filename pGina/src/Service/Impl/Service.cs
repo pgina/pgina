@@ -264,6 +264,7 @@ namespace pGina.Service.Impl
                     sessionDriver.UserInformation.Username = msg.Username.Trim();
 
                 sessionDriver.UserInformation.Password = msg.Password;
+                sessionDriver.LogonInformation.Reason = msg.Reason.ToString();
 
                 m_logger.DebugFormat("Processing LoginRequest for: {0} in session: {1} reason: {2}", 
                     sessionDriver.UserInformation.Username, msg.Session, msg.Reason);

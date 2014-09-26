@@ -35,6 +35,7 @@ using log4net;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using pGina.Shared.Settings;
+using Abstractions;
 
 namespace pGina.Plugin.SingleUser
 {
@@ -136,12 +137,48 @@ namespace pGina.Plugin.SingleUser
                         return new BooleanResult() { Success = true }; //Silent bypass
                 }
             }
+            LogonInformation logonInfo = properties.GetTrackedSingle<LogonInformation>();
+            m_logger.DebugFormat("Reason: {0}", logonInfo.Reason);
+            if (logonInfo.Reason == "Login")
+            {
+                List<string> loggedOnUsers = Abstractions.WindowsApi.pInvokes.GetInteractiveUserList();
+                m_logger.DebugFormat("Users: {0}", string.Join(", ", loggedOnUsers));
+
+                bool loggedOn = loggedOnUsers.Exists(entry =>
+                {
+                    string un = "";
+                    if (entry.Contains('\\'))
+                    {
+                        string[] parts = entry.Split(new string[] { "\\" }, StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length > 1)
+                            un = parts[1];
+                    }
+                    else
+                    {
+                        un = entry;
+                    }
+                    if (string.IsNullOrEmpty(un)) return false;
+                    return string.Equals(un, username, StringComparison.CurrentCultureIgnoreCase);
+                });
+
+                if (loggedOn)
+                {
+                    m_logger.InfoFormat("Denying logon because single user is already logged in.");
+
+                    return new BooleanResult
+                    {
+                        Success = false,
+                        Message = "Logon failed because there is currently another user logged on to this computer.  Have the other user log off, or reboot the machine."
+                    };
+                }
+            }
 
             // Substitute
             m_logger.DebugFormat("Re-writing user information to login with {0}\\{1}", domain, username);
             properties.GetTrackedSingle<UserInformation>().Username = username;
             properties.GetTrackedSingle<UserInformation>().Domain = domain;
             properties.GetTrackedSingle<UserInformation>().Password = password;
+
             return new BooleanResult() { Success = true };
         }
 

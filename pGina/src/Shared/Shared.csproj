@@ -61,6 +61,7 @@
     <Compile Include="Interfaces\IPlugin.cs" />
     <Compile Include="Logging\Logging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Types\LogonInformation.cs" />
     <Compile Include="Types\PluginActivityInformation.cs" />
     <Compile Include="Types\SessionProperties.cs" />
     <Compile Include="Types\UserInformation.cs" />
