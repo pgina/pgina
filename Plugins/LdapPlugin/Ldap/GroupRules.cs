@@ -203,11 +203,6 @@ namespace pGina.Plugin.Ldap
             if (m_allowOnMatch) str += " allow.";
             else str += " deny.";
 
-            if (str.Length > 110)
-            {
-                int strip = str.Length - 113;
-                str = str.Replace(m_path, m_path.Remove(m_path.Length - strip) + "...");
-            }
             return str;
         }
     }
@@ -280,11 +275,6 @@ namespace pGina.Plugin.Ldap
             }
             str += string.Format(" add to \"{0}\"", m_localGroup);
 
-            if (str.Length > 110)
-            {
-                int strip = str.Length - 113;
-                str = str.Replace(m_path, m_path.Remove(m_path.Length - strip) + "...");
-            }
             return str;
         }
     }

@@ -670,6 +670,7 @@
             this.authzRulesListBox.Name = "authzRulesListBox";
             this.authzRulesListBox.Size = new System.Drawing.Size(610, 173);
             this.authzRulesListBox.TabIndex = 11;
+            this.authzRulesListBox.HorizontalScrollbar = true;
             // 
             // authzRuleActionComboBox
             // 
@@ -815,6 +816,7 @@
             this.gatewayRulesListBox.Name = "gatewayRulesListBox";
             this.gatewayRulesListBox.Size = new System.Drawing.Size(610, 199);
             this.gatewayRulesListBox.TabIndex = 9;
+            this.gatewayRulesListBox.HorizontalScrollbar = true;
             // 
             // gatewayRuleAddButton
             // 
