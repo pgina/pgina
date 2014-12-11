@@ -594,6 +594,7 @@
             // 
             // authzRuleDeleteBtn
             // 
+            this.authzRuleDeleteBtn.Enabled = false;
             this.authzRuleDeleteBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.delete;
             this.authzRuleDeleteBtn.Location = new System.Drawing.Point(622, 82);
             this.authzRuleDeleteBtn.Name = "authzRuleDeleteBtn";
@@ -671,6 +672,7 @@
             this.authzRulesListBox.Size = new System.Drawing.Size(610, 173);
             this.authzRulesListBox.TabIndex = 11;
             this.authzRulesListBox.HorizontalScrollbar = true;
+            this.authzRulesListBox.SelectedIndexChanged += new System.EventHandler(this.authzRulesListBox_SelectedIndexChanged);
             // 
             // authzRuleActionComboBox
             // 
@@ -785,6 +787,7 @@
             // 
             // gatewayRuleDeleteBtn
             // 
+            this.gatewayRuleDeleteBtn.Enabled = false;
             this.gatewayRuleDeleteBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.delete;
             this.gatewayRuleDeleteBtn.Location = new System.Drawing.Point(622, 82);
             this.gatewayRuleDeleteBtn.Name = "gatewayRuleDeleteBtn";
@@ -817,6 +820,7 @@
             this.gatewayRulesListBox.Size = new System.Drawing.Size(610, 199);
             this.gatewayRulesListBox.TabIndex = 9;
             this.gatewayRulesListBox.HorizontalScrollbar = true;
+            this.gatewayRulesListBox.SelectedIndexChanged += new System.EventHandler(this.gatewayRulesListBox_SelectedIndexChanged);
             // 
             // gatewayRuleAddButton
             // 

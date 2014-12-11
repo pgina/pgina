@@ -85,7 +85,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\delete.png" />
+    <Content Include="Resources\delete.gif" />
     <Content Include="Resources\DownArrowSolid.png" />
     <Content Include="Resources\UpArrowSolid.png" />
   </ItemGroup>

@@ -568,5 +568,29 @@ namespace pGina.Plugin.Ldap
                 this.authzRulesListBox.SelectedIndex = idx + 1;
             }
         }
+
+        private void gatewayRulesListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.gatewayRulesListBox.SelectedItems.Count == 0)
+            {
+                this.gatewayRuleDeleteBtn.Enabled = false;
+            }
+            else
+            {
+                this.gatewayRuleDeleteBtn.Enabled = true;
+            }
+        }
+
+        private void authzRulesListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.authzRulesListBox.SelectedItems.Count == 0)
+            {
+                this.authzRuleDeleteBtn.Enabled = false;
+            }
+            else
+            {
+                this.authzRuleDeleteBtn.Enabled = true;
+            }
+        }
     }
 }
