@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2014, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -85,11 +85,40 @@ namespace pGina.Plugin.MySQLAuth
             this.userGroupUserFKColTB.Text = Settings.Store.UserForeignKeyColumn;
             this.userGroupGroupFKColTB.Text = Settings.Store.GroupForeignKeyColumn;
 
-            // Gateway rules
+            /////////////// Authorization tab /////////////////
+            this.cbAuthzMySqlGroupMemberOrNot.SelectedIndex = 0;
+            this.cbAuthzGroupRuleAllowOrDeny.SelectedIndex = 0;
+
+            this.ckDenyWhenMySqlAuthFails.Checked = Settings.Store.AuthzRequireMySqlAuth;
+
+            List<GroupAuthzRule> lst = GroupRuleLoader.GetAuthzRules();
+            // The last one should be the default rule
+            if (lst.Count > 0 &&
+                lst[lst.Count - 1].RuleCondition == GroupRule.Condition.ALWAYS)
+            {
+                GroupAuthzRule rule = lst[lst.Count - 1];
+                if (rule.AllowOnMatch)
+                    this.rbDefaultAllow.Checked = true;
+                else
+                    this.rbDefaultDeny.Checked = true;
+                lst.RemoveAt(lst.Count - 1);
+            }
+            else
+            {
+                // The list is empty or the last rule is not a default rule.
+                throw new Exception("Default rule not found in rule list.");
+            }
+            // The rest of the rules
+            foreach (GroupAuthzRule rule in lst)
+                this.listBoxAuthzRules.Items.Add(rule);
+
+            ///////////////// Gateway tab ///////////////
             List<GroupGatewayRule> gwLst = GroupRuleLoader.GetGatewayRules();
             foreach (GroupGatewayRule rule in gwLst)
                 this.gtwRulesListBox.Items.Add(rule);
             this.gtwRuleConditionCB.SelectedIndex = 0;
+
+            this.m_preventLogonWhenServerUnreachableCb.Checked = Settings.Store.PreventLogonOnServerError;
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -149,6 +178,19 @@ namespace pGina.Plugin.MySQLAuth
             Settings.Store.UserForeignKeyColumn = this.userGroupUserFKColTB.Text.Trim();
             Settings.Store.GroupForeignKeyColumn = this.userGroupGroupFKColTB.Text.Trim();
 
+            ////////// Authorization Tab ////////////
+            Settings.Store.AuthzRequireMySqlAuth = this.ckDenyWhenMySqlAuthFails.Checked;
+            List<GroupAuthzRule> lst = new List<GroupAuthzRule>();
+            foreach (Object item in this.listBoxAuthzRules.Items)
+            {
+                lst.Add(item as GroupAuthzRule);
+                m_logger.DebugFormat("Saving rule: {0}", item);
+            }
+            // Add the default as the last rule in the list
+            lst.Add(new GroupAuthzRule(this.rbDefaultAllow.Checked));
+
+            GroupRuleLoader.SaveAuthzRules(lst);
+
             // Gateway rules
             List<GroupGatewayRule> gwList = new List<GroupGatewayRule>();
             foreach (Object item in this.gtwRulesListBox.Items)
@@ -156,6 +198,8 @@ namespace pGina.Plugin.MySQLAuth
                 gwList.Add(item as GroupGatewayRule);
             }
             GroupRuleLoader.SaveGatewayRules(gwList);
+
+            Settings.Store.PreventLogonOnServerError = m_preventLogonWhenServerUnreachableCb.Checked;
 
             return true;
         }
@@ -543,6 +587,65 @@ namespace pGina.Plugin.MySQLAuth
             int idx = this.gtwRulesListBox.SelectedIndex;
             if (idx >= 0 && idx < this.gtwRulesListBox.Items.Count)
                 this.gtwRulesListBox.Items.RemoveAt(idx);
+        }
+
+        private void btnAuthzGroupRuleAdd_Click(object sender, EventArgs e)
+        {
+            string grp = this.tbAuthzRuleGroup.Text.Trim();
+            if (string.IsNullOrEmpty(grp))
+            {
+                MessageBox.Show("Please enter a group name.");
+                return;
+            }
+
+            int idx = this.cbAuthzMySqlGroupMemberOrNot.SelectedIndex;
+            GroupRule.Condition c;
+            if (idx == 0) c = GroupRule.Condition.MEMBER_OF;
+            else if (idx == 1) c = GroupRule.Condition.NOT_MEMBER_OF;
+            else
+                throw new Exception("Unrecognized option in authzRuleAddButton_Click");
+
+
+            idx = this.cbAuthzGroupRuleAllowOrDeny.SelectedIndex;
+            bool allow;
+            if (idx == 0) allow = true;          // allow
+            else if (idx == 1) allow = false;    // deny
+            else
+                throw new Exception("Unrecognized action option in authzRuleAddButton_Click");
+
+            GroupAuthzRule rule = new GroupAuthzRule(grp, c, allow);
+            this.listBoxAuthzRules.Items.Add(rule);
+        }
+
+        private void btnAuthzGroupRuleUp_Click(object sender, EventArgs e)
+        {
+            int idx = this.listBoxAuthzRules.SelectedIndex;
+            if (idx > 0 && idx < this.listBoxAuthzRules.Items.Count)
+            {
+                object item = this.listBoxAuthzRules.Items[idx];
+                this.listBoxAuthzRules.Items.RemoveAt(idx);
+                this.listBoxAuthzRules.Items.Insert(idx - 1, item);
+                this.listBoxAuthzRules.SelectedIndex = idx - 1;
+            }
+        }
+
+        private void btnAuthzGroupRuleDelete_Click(object sender, EventArgs e)
+        {
+            int idx = this.listBoxAuthzRules.SelectedIndex;
+            if (idx >= 0 && idx < this.listBoxAuthzRules.Items.Count)
+                this.listBoxAuthzRules.Items.RemoveAt(idx);
+        }
+
+        private void btnAuthzGroupRuleDown_Click(object sender, EventArgs e)
+        {
+            int idx = this.listBoxAuthzRules.SelectedIndex;
+            if (idx >= 0 && idx < this.listBoxAuthzRules.Items.Count - 1)
+            {
+                object item = this.listBoxAuthzRules.Items[idx];
+                this.listBoxAuthzRules.Items.RemoveAt(idx);
+                this.listBoxAuthzRules.Items.Insert(idx + 1, item);
+                this.listBoxAuthzRules.SelectedIndex = idx + 1;
+            }
         }
     }
 }

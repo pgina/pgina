@@ -79,6 +79,20 @@
             this.testBtn = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.tabAuthz = new System.Windows.Forms.TabPage();
+            this.label20 = new System.Windows.Forms.Label();
+            this.btnAuthzGroupRuleDown = new System.Windows.Forms.Button();
+            this.btnAuthzGroupRuleDelete = new System.Windows.Forms.Button();
+            this.btnAuthzGroupRuleUp = new System.Windows.Forms.Button();
+            this.btnAuthzGroupRuleAdd = new System.Windows.Forms.Button();
+            this.cbAuthzGroupRuleAllowOrDeny = new System.Windows.Forms.ComboBox();
+            this.tbAuthzRuleGroup = new System.Windows.Forms.TextBox();
+            this.cbAuthzMySqlGroupMemberOrNot = new System.Windows.Forms.ComboBox();
+            this.ckDenyWhenMySqlAuthFails = new System.Windows.Forms.CheckBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.rbDefaultDeny = new System.Windows.Forms.RadioButton();
+            this.rbDefaultAllow = new System.Windows.Forms.RadioButton();
+            this.listBoxAuthzRules = new System.Windows.Forms.ListBox();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.gtwRuleDeleteBtn = new System.Windows.Forms.Button();
             this.label18 = new System.Windows.Forms.Label();
@@ -88,6 +102,8 @@
             this.label17 = new System.Windows.Forms.Label();
             this.gtwRuleMysqlGroupTB = new System.Windows.Forms.TextBox();
             this.gtwRuleConditionCB = new System.Windows.Forms.ComboBox();
+            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.m_preventLogonWhenServerUnreachableCb = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.tabControlDBSchema.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -98,12 +114,14 @@
             this.groupBox5.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage4.SuspendLayout();
+            this.tabAuthz.SuspendLayout();
             this.tabPage5.SuspendLayout();
+            this.tabPage6.SuspendLayout();
             this.SuspendLayout();
             // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(390, 453);
+            this.cancelButton.Location = new System.Drawing.Point(481, 317);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(81, 25);
             this.cancelButton.TabIndex = 0;
@@ -113,11 +131,11 @@
             // 
             // saveButton
             // 
-            this.saveButton.Location = new System.Drawing.Point(300, 453);
+            this.saveButton.Location = new System.Drawing.Point(375, 317);
             this.saveButton.Name = "saveButton";
-            this.saveButton.Size = new System.Drawing.Size(82, 25);
+            this.saveButton.Size = new System.Drawing.Size(98, 25);
             this.saveButton.TabIndex = 1;
-            this.saveButton.Text = "Save";
+            this.saveButton.Text = "Save and Close";
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
@@ -221,9 +239,9 @@
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.hostTB);
             this.groupBox1.Controls.Add(this.hostLabel);
-            this.groupBox1.Location = new System.Drawing.Point(12, 12);
+            this.groupBox1.Location = new System.Drawing.Point(6, 6);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(457, 152);
+            this.groupBox1.Size = new System.Drawing.Size(530, 152);
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "MySQL Server";
@@ -252,7 +270,7 @@
             this.tabControlDBSchema.Location = new System.Drawing.Point(6, 6);
             this.tabControlDBSchema.Name = "tabControlDBSchema";
             this.tabControlDBSchema.SelectedIndex = 0;
-            this.tabControlDBSchema.Size = new System.Drawing.Size(441, 228);
+            this.tabControlDBSchema.Size = new System.Drawing.Size(530, 261);
             this.tabControlDBSchema.TabIndex = 16;
             // 
             // tabPage1
@@ -266,7 +284,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(433, 202);
+            this.tabPage1.Size = new System.Drawing.Size(522, 235);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "User Table";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -306,7 +324,7 @@
             this.groupBox3.Controls.Add(this.label7);
             this.groupBox3.Location = new System.Drawing.Point(3, 40);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(434, 132);
+            this.groupBox3.Size = new System.Drawing.Size(513, 132);
             this.groupBox3.TabIndex = 8;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Column Names";
@@ -316,7 +334,7 @@
             // 
             this.userPrimaryKeyColTB.Location = new System.Drawing.Point(89, 98);
             this.userPrimaryKeyColTB.Name = "userPrimaryKeyColTB";
-            this.userPrimaryKeyColTB.Size = new System.Drawing.Size(334, 20);
+            this.userPrimaryKeyColTB.Size = new System.Drawing.Size(412, 20);
             this.userPrimaryKeyColTB.TabIndex = 14;
             // 
             // label10
@@ -341,14 +359,14 @@
             // 
             this.passwdColTB.Location = new System.Drawing.Point(89, 72);
             this.passwdColTB.Name = "passwdColTB";
-            this.passwdColTB.Size = new System.Drawing.Size(334, 20);
+            this.passwdColTB.Size = new System.Drawing.Size(412, 20);
             this.passwdColTB.TabIndex = 11;
             // 
             // hashMethodColTB
             // 
             this.hashMethodColTB.Location = new System.Drawing.Point(88, 46);
             this.hashMethodColTB.Name = "hashMethodColTB";
-            this.hashMethodColTB.Size = new System.Drawing.Size(335, 20);
+            this.hashMethodColTB.Size = new System.Drawing.Size(413, 20);
             this.hashMethodColTB.TabIndex = 10;
             // 
             // label8
@@ -364,7 +382,7 @@
             // 
             this.unameColTB.Location = new System.Drawing.Point(88, 20);
             this.unameColTB.Name = "unameColTB";
-            this.unameColTB.Size = new System.Drawing.Size(335, 20);
+            this.unameColTB.Size = new System.Drawing.Size(413, 20);
             this.unameColTB.TabIndex = 8;
             // 
             // label7
@@ -389,7 +407,7 @@
             // 
             this.userTableTB.Location = new System.Drawing.Point(91, 14);
             this.userTableTB.Name = "userTableTB";
-            this.userTableTB.Size = new System.Drawing.Size(335, 20);
+            this.userTableTB.Size = new System.Drawing.Size(413, 20);
             this.userTableTB.TabIndex = 3;
             // 
             // label5
@@ -409,7 +427,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(433, 202);
+            this.tabPage2.Size = new System.Drawing.Size(522, 235);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Group Table";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -422,7 +440,7 @@
             this.groupBox4.Controls.Add(this.label12);
             this.groupBox4.Location = new System.Drawing.Point(3, 34);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(424, 81);
+            this.groupBox4.Size = new System.Drawing.Size(513, 81);
             this.groupBox4.TabIndex = 2;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Column Names";
@@ -431,7 +449,7 @@
             // 
             this.groupTablePrimaryKeyColTB.Location = new System.Drawing.Point(83, 50);
             this.groupTablePrimaryKeyColTB.Name = "groupTablePrimaryKeyColTB";
-            this.groupTablePrimaryKeyColTB.Size = new System.Drawing.Size(329, 20);
+            this.groupTablePrimaryKeyColTB.Size = new System.Drawing.Size(414, 20);
             this.groupTablePrimaryKeyColTB.TabIndex = 3;
             // 
             // label13
@@ -447,7 +465,7 @@
             // 
             this.groupNameColTB.Location = new System.Drawing.Point(83, 21);
             this.groupNameColTB.Name = "groupNameColTB";
-            this.groupNameColTB.Size = new System.Drawing.Size(329, 20);
+            this.groupNameColTB.Size = new System.Drawing.Size(414, 20);
             this.groupNameColTB.TabIndex = 1;
             // 
             // label12
@@ -463,7 +481,7 @@
             // 
             this.groupTableNameTB.Location = new System.Drawing.Point(86, 8);
             this.groupTableNameTB.Name = "groupTableNameTB";
-            this.groupTableNameTB.Size = new System.Drawing.Size(330, 20);
+            this.groupTableNameTB.Size = new System.Drawing.Size(415, 20);
             this.groupTableNameTB.TabIndex = 1;
             // 
             // label11
@@ -482,7 +500,7 @@
             this.tabPage3.Controls.Add(this.label14);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(433, 202);
+            this.tabPage3.Size = new System.Drawing.Size(522, 235);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "User-Group Table";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -495,7 +513,7 @@
             this.groupBox5.Controls.Add(this.label15);
             this.groupBox5.Location = new System.Drawing.Point(3, 37);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(427, 76);
+            this.groupBox5.Size = new System.Drawing.Size(516, 76);
             this.groupBox5.TabIndex = 2;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Column Names";
@@ -504,7 +522,7 @@
             // 
             this.userGroupGroupFKColTB.Location = new System.Drawing.Point(110, 42);
             this.userGroupGroupFKColTB.Name = "userGroupGroupFKColTB";
-            this.userGroupGroupFKColTB.Size = new System.Drawing.Size(306, 20);
+            this.userGroupGroupFKColTB.Size = new System.Drawing.Size(395, 20);
             this.userGroupGroupFKColTB.TabIndex = 3;
             // 
             // label16
@@ -520,7 +538,7 @@
             // 
             this.userGroupUserFKColTB.Location = new System.Drawing.Point(110, 16);
             this.userGroupUserFKColTB.Name = "userGroupUserFKColTB";
-            this.userGroupUserFKColTB.Size = new System.Drawing.Size(306, 20);
+            this.userGroupUserFKColTB.Size = new System.Drawing.Size(395, 20);
             this.userGroupUserFKColTB.TabIndex = 1;
             // 
             // label15
@@ -536,7 +554,7 @@
             // 
             this.userGroupTableNameTB.Location = new System.Drawing.Point(113, 11);
             this.userGroupTableNameTB.Name = "userGroupTableNameTB";
-            this.userGroupTableNameTB.Size = new System.Drawing.Size(306, 20);
+            this.userGroupTableNameTB.Size = new System.Drawing.Size(395, 20);
             this.userGroupTableNameTB.TabIndex = 1;
             // 
             // label14
@@ -550,7 +568,7 @@
             // 
             // createTableBtn
             // 
-            this.createTableBtn.Location = new System.Drawing.Point(90, 450);
+            this.createTableBtn.Location = new System.Drawing.Point(90, 314);
             this.createTableBtn.Name = "createTableBtn";
             this.createTableBtn.Size = new System.Drawing.Size(100, 24);
             this.createTableBtn.TabIndex = 14;
@@ -560,7 +578,7 @@
             // 
             // testBtn
             // 
-            this.testBtn.Location = new System.Drawing.Point(8, 450);
+            this.testBtn.Location = new System.Drawing.Point(8, 314);
             this.testBtn.Name = "testBtn";
             this.testBtn.Size = new System.Drawing.Size(76, 24);
             this.testBtn.TabIndex = 15;
@@ -570,12 +588,14 @@
             // 
             // tabControl1
             // 
+            this.tabControl1.Controls.Add(this.tabPage6);
             this.tabControl1.Controls.Add(this.tabPage4);
+            this.tabControl1.Controls.Add(this.tabAuthz);
             this.tabControl1.Controls.Add(this.tabPage5);
-            this.tabControl1.Location = new System.Drawing.Point(12, 170);
+            this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(461, 273);
+            this.tabControl1.Size = new System.Drawing.Size(550, 299);
             this.tabControl1.TabIndex = 16;
             // 
             // tabPage4
@@ -584,13 +604,166 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(453, 247);
+            this.tabPage4.Size = new System.Drawing.Size(542, 273);
             this.tabPage4.TabIndex = 0;
             this.tabPage4.Text = "Database Schema";
             this.tabPage4.UseVisualStyleBackColor = true;
             // 
+            // tabAuthz
+            // 
+            this.tabAuthz.Controls.Add(this.label20);
+            this.tabAuthz.Controls.Add(this.btnAuthzGroupRuleDown);
+            this.tabAuthz.Controls.Add(this.btnAuthzGroupRuleDelete);
+            this.tabAuthz.Controls.Add(this.btnAuthzGroupRuleUp);
+            this.tabAuthz.Controls.Add(this.btnAuthzGroupRuleAdd);
+            this.tabAuthz.Controls.Add(this.cbAuthzGroupRuleAllowOrDeny);
+            this.tabAuthz.Controls.Add(this.tbAuthzRuleGroup);
+            this.tabAuthz.Controls.Add(this.cbAuthzMySqlGroupMemberOrNot);
+            this.tabAuthz.Controls.Add(this.ckDenyWhenMySqlAuthFails);
+            this.tabAuthz.Controls.Add(this.label19);
+            this.tabAuthz.Controls.Add(this.rbDefaultDeny);
+            this.tabAuthz.Controls.Add(this.rbDefaultAllow);
+            this.tabAuthz.Controls.Add(this.listBoxAuthzRules);
+            this.tabAuthz.Location = new System.Drawing.Point(4, 22);
+            this.tabAuthz.Name = "tabAuthz";
+            this.tabAuthz.Padding = new System.Windows.Forms.Padding(3);
+            this.tabAuthz.Size = new System.Drawing.Size(542, 273);
+            this.tabAuthz.TabIndex = 2;
+            this.tabAuthz.Text = "Authorization";
+            this.tabAuthz.UseVisualStyleBackColor = true;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(6, 35);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(96, 13);
+            this.label20.TabIndex = 12;
+            this.label20.Text = "Authorization rules:";
+            // 
+            // btnAuthzGroupRuleDown
+            // 
+            this.btnAuthzGroupRuleDown.Image = global::pGina.Plugin.MySQLAuth.Properties.Resources.DownArrowSolid;
+            this.btnAuthzGroupRuleDown.Location = new System.Drawing.Point(508, 169);
+            this.btnAuthzGroupRuleDown.Name = "btnAuthzGroupRuleDown";
+            this.btnAuthzGroupRuleDown.Size = new System.Drawing.Size(29, 30);
+            this.btnAuthzGroupRuleDown.TabIndex = 11;
+            this.btnAuthzGroupRuleDown.UseVisualStyleBackColor = true;
+            this.btnAuthzGroupRuleDown.Click += new System.EventHandler(this.btnAuthzGroupRuleDown_Click);
+            // 
+            // btnAuthzGroupRuleDelete
+            // 
+            this.btnAuthzGroupRuleDelete.Image = global::pGina.Plugin.MySQLAuth.Properties.Resources.delete;
+            this.btnAuthzGroupRuleDelete.Location = new System.Drawing.Point(508, 119);
+            this.btnAuthzGroupRuleDelete.Name = "btnAuthzGroupRuleDelete";
+            this.btnAuthzGroupRuleDelete.Size = new System.Drawing.Size(29, 30);
+            this.btnAuthzGroupRuleDelete.TabIndex = 10;
+            this.btnAuthzGroupRuleDelete.UseVisualStyleBackColor = true;
+            this.btnAuthzGroupRuleDelete.Click += new System.EventHandler(this.btnAuthzGroupRuleDelete_Click);
+            // 
+            // btnAuthzGroupRuleUp
+            // 
+            this.btnAuthzGroupRuleUp.Image = global::pGina.Plugin.MySQLAuth.Properties.Resources.UpArrowSolid;
+            this.btnAuthzGroupRuleUp.Location = new System.Drawing.Point(507, 69);
+            this.btnAuthzGroupRuleUp.Name = "btnAuthzGroupRuleUp";
+            this.btnAuthzGroupRuleUp.Size = new System.Drawing.Size(29, 30);
+            this.btnAuthzGroupRuleUp.TabIndex = 9;
+            this.btnAuthzGroupRuleUp.UseVisualStyleBackColor = true;
+            this.btnAuthzGroupRuleUp.Click += new System.EventHandler(this.btnAuthzGroupRuleUp_Click);
+            // 
+            // btnAuthzGroupRuleAdd
+            // 
+            this.btnAuthzGroupRuleAdd.Location = new System.Drawing.Point(447, 218);
+            this.btnAuthzGroupRuleAdd.Name = "btnAuthzGroupRuleAdd";
+            this.btnAuthzGroupRuleAdd.Size = new System.Drawing.Size(54, 23);
+            this.btnAuthzGroupRuleAdd.TabIndex = 8;
+            this.btnAuthzGroupRuleAdd.Text = "Add";
+            this.btnAuthzGroupRuleAdd.UseVisualStyleBackColor = true;
+            this.btnAuthzGroupRuleAdd.Click += new System.EventHandler(this.btnAuthzGroupRuleAdd_Click);
+            // 
+            // cbAuthzGroupRuleAllowOrDeny
+            // 
+            this.cbAuthzGroupRuleAllowOrDeny.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbAuthzGroupRuleAllowOrDeny.FormattingEnabled = true;
+            this.cbAuthzGroupRuleAllowOrDeny.Items.AddRange(new object[] {
+            "allow.",
+            "deny."});
+            this.cbAuthzGroupRuleAllowOrDeny.Location = new System.Drawing.Point(374, 220);
+            this.cbAuthzGroupRuleAllowOrDeny.Name = "cbAuthzGroupRuleAllowOrDeny";
+            this.cbAuthzGroupRuleAllowOrDeny.Size = new System.Drawing.Size(62, 21);
+            this.cbAuthzGroupRuleAllowOrDeny.TabIndex = 7;
+            // 
+            // tbAuthzRuleGroup
+            // 
+            this.tbAuthzRuleGroup.Location = new System.Drawing.Point(217, 220);
+            this.tbAuthzRuleGroup.Name = "tbAuthzRuleGroup";
+            this.tbAuthzRuleGroup.Size = new System.Drawing.Size(149, 20);
+            this.tbAuthzRuleGroup.TabIndex = 6;
+            // 
+            // cbAuthzMySqlGroupMemberOrNot
+            // 
+            this.cbAuthzMySqlGroupMemberOrNot.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbAuthzMySqlGroupMemberOrNot.FormattingEnabled = true;
+            this.cbAuthzMySqlGroupMemberOrNot.Items.AddRange(new object[] {
+            "If member of MySQL group:",
+            "If not member of MySQL group:"});
+            this.cbAuthzMySqlGroupMemberOrNot.Location = new System.Drawing.Point(9, 220);
+            this.cbAuthzMySqlGroupMemberOrNot.Name = "cbAuthzMySqlGroupMemberOrNot";
+            this.cbAuthzMySqlGroupMemberOrNot.Size = new System.Drawing.Size(200, 21);
+            this.cbAuthzMySqlGroupMemberOrNot.TabIndex = 5;
+            // 
+            // ckDenyWhenMySqlAuthFails
+            // 
+            this.ckDenyWhenMySqlAuthFails.AutoSize = true;
+            this.ckDenyWhenMySqlAuthFails.Location = new System.Drawing.Point(180, 7);
+            this.ckDenyWhenMySqlAuthFails.Name = "ckDenyWhenMySqlAuthFails";
+            this.ckDenyWhenMySqlAuthFails.Size = new System.Drawing.Size(212, 17);
+            this.ckDenyWhenMySqlAuthFails.TabIndex = 4;
+            this.ckDenyWhenMySqlAuthFails.Text = "Deny when MySQL authentication fails.";
+            this.ckDenyWhenMySqlAuthFails.UseVisualStyleBackColor = true;
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(6, 8);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(44, 13);
+            this.label19.TabIndex = 3;
+            this.label19.Text = "Default:";
+            // 
+            // rbDefaultDeny
+            // 
+            this.rbDefaultDeny.AutoSize = true;
+            this.rbDefaultDeny.Location = new System.Drawing.Point(112, 6);
+            this.rbDefaultDeny.Name = "rbDefaultDeny";
+            this.rbDefaultDeny.Size = new System.Drawing.Size(50, 17);
+            this.rbDefaultDeny.TabIndex = 2;
+            this.rbDefaultDeny.TabStop = true;
+            this.rbDefaultDeny.Text = "Deny";
+            this.rbDefaultDeny.UseVisualStyleBackColor = true;
+            // 
+            // rbDefaultAllow
+            // 
+            this.rbDefaultAllow.AutoSize = true;
+            this.rbDefaultAllow.Location = new System.Drawing.Point(56, 6);
+            this.rbDefaultAllow.Name = "rbDefaultAllow";
+            this.rbDefaultAllow.Size = new System.Drawing.Size(50, 17);
+            this.rbDefaultAllow.TabIndex = 1;
+            this.rbDefaultAllow.TabStop = true;
+            this.rbDefaultAllow.Text = "Allow";
+            this.rbDefaultAllow.UseVisualStyleBackColor = true;
+            // 
+            // listBoxAuthzRules
+            // 
+            this.listBoxAuthzRules.FormattingEnabled = true;
+            this.listBoxAuthzRules.Location = new System.Drawing.Point(9, 51);
+            this.listBoxAuthzRules.Name = "listBoxAuthzRules";
+            this.listBoxAuthzRules.Size = new System.Drawing.Size(492, 160);
+            this.listBoxAuthzRules.TabIndex = 0;
+            // 
             // tabPage5
             // 
+            this.tabPage5.Controls.Add(this.m_preventLogonWhenServerUnreachableCb);
             this.tabPage5.Controls.Add(this.gtwRuleDeleteBtn);
             this.tabPage5.Controls.Add(this.label18);
             this.tabPage5.Controls.Add(this.gtwRulesListBox);
@@ -602,7 +775,7 @@
             this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(453, 247);
+            this.tabPage5.Size = new System.Drawing.Size(542, 273);
             this.tabPage5.TabIndex = 1;
             this.tabPage5.Text = "Gateway";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -610,7 +783,7 @@
             // gtwRuleDeleteBtn
             // 
             this.gtwRuleDeleteBtn.Image = global::pGina.Plugin.MySQLAuth.Properties.Resources.delete;
-            this.gtwRuleDeleteBtn.Location = new System.Drawing.Point(411, 90);
+            this.gtwRuleDeleteBtn.Location = new System.Drawing.Point(505, 93);
             this.gtwRuleDeleteBtn.Name = "gtwRuleDeleteBtn";
             this.gtwRuleDeleteBtn.Size = new System.Drawing.Size(31, 33);
             this.gtwRuleDeleteBtn.TabIndex = 7;
@@ -620,7 +793,7 @@
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(6, 13);
+            this.label18.Location = new System.Drawing.Point(6, 39);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(77, 13);
             this.label18.TabIndex = 6;
@@ -629,14 +802,14 @@
             // gtwRulesListBox
             // 
             this.gtwRulesListBox.FormattingEnabled = true;
-            this.gtwRulesListBox.Location = new System.Drawing.Point(9, 29);
+            this.gtwRulesListBox.Location = new System.Drawing.Point(9, 55);
             this.gtwRulesListBox.Name = "gtwRulesListBox";
-            this.gtwRulesListBox.Size = new System.Drawing.Size(396, 147);
+            this.gtwRulesListBox.Size = new System.Drawing.Size(490, 121);
             this.gtwRulesListBox.TabIndex = 5;
             // 
             // gtwRuleAddBtn
             // 
-            this.gtwRuleAddBtn.Location = new System.Drawing.Point(374, 216);
+            this.gtwRuleAddBtn.Location = new System.Drawing.Point(433, 215);
             this.gtwRuleAddBtn.Name = "gtwRuleAddBtn";
             this.gtwRuleAddBtn.Size = new System.Drawing.Size(66, 22);
             this.gtwRuleAddBtn.TabIndex = 4;
@@ -648,7 +821,7 @@
             // 
             this.gtwRuleLocalGroupTB.Location = new System.Drawing.Point(194, 217);
             this.gtwRuleLocalGroupTB.Name = "gtwRuleLocalGroupTB";
-            this.gtwRuleLocalGroupTB.Size = new System.Drawing.Size(171, 20);
+            this.gtwRuleLocalGroupTB.Size = new System.Drawing.Size(233, 20);
             this.gtwRuleLocalGroupTB.TabIndex = 3;
             // 
             // label17
@@ -664,7 +837,7 @@
             // 
             this.gtwRuleMysqlGroupTB.Location = new System.Drawing.Point(194, 191);
             this.gtwRuleMysqlGroupTB.Name = "gtwRuleMysqlGroupTB";
-            this.gtwRuleMysqlGroupTB.Size = new System.Drawing.Size(172, 20);
+            this.gtwRuleMysqlGroupTB.Size = new System.Drawing.Size(233, 20);
             this.gtwRuleMysqlGroupTB.TabIndex = 1;
             // 
             // gtwRuleConditionCB
@@ -680,19 +853,39 @@
             this.gtwRuleConditionCB.TabIndex = 0;
             this.gtwRuleConditionCB.SelectedIndexChanged += new System.EventHandler(this.gtwRuleConditionCB_SelectedIndexChanged);
             // 
+            // tabPage6
+            // 
+            this.tabPage6.Controls.Add(this.groupBox1);
+            this.tabPage6.Location = new System.Drawing.Point(4, 22);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage6.Size = new System.Drawing.Size(542, 273);
+            this.tabPage6.TabIndex = 3;
+            this.tabPage6.Text = "Server";
+            this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // m_preventLogonWhenServerUnreachableCb
+            // 
+            this.m_preventLogonWhenServerUnreachableCb.AutoSize = true;
+            this.m_preventLogonWhenServerUnreachableCb.Location = new System.Drawing.Point(9, 6);
+            this.m_preventLogonWhenServerUnreachableCb.Name = "m_preventLogonWhenServerUnreachableCb";
+            this.m_preventLogonWhenServerUnreachableCb.Size = new System.Drawing.Size(166, 17);
+            this.m_preventLogonWhenServerUnreachableCb.TabIndex = 8;
+            this.m_preventLogonWhenServerUnreachableCb.Text = "Prevent logon on server error.";
+            this.m_preventLogonWhenServerUnreachableCb.UseVisualStyleBackColor = true;
+            // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(482, 490);
+            this.ClientSize = new System.Drawing.Size(574, 352);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.testBtn);
             this.Controls.Add(this.createTableBtn);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.cancelButton);
             this.Name = "Configuration";
-            this.Text = "MySQL Authentication Plugin Configuration";
+            this.Text = "MySQL Plugin Configuration";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.tabControlDBSchema.ResumeLayout(false);
@@ -710,8 +903,11 @@
             this.groupBox5.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.tabPage4.ResumeLayout(false);
+            this.tabAuthz.ResumeLayout(false);
+            this.tabAuthz.PerformLayout();
             this.tabPage5.ResumeLayout(false);
             this.tabPage5.PerformLayout();
+            this.tabPage6.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -778,5 +974,21 @@
         private System.Windows.Forms.Button gtwRuleDeleteBtn;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.ListBox gtwRulesListBox;
+        private System.Windows.Forms.TabPage tabAuthz;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.RadioButton rbDefaultDeny;
+        private System.Windows.Forms.RadioButton rbDefaultAllow;
+        private System.Windows.Forms.ListBox listBoxAuthzRules;
+        private System.Windows.Forms.Button btnAuthzGroupRuleAdd;
+        private System.Windows.Forms.ComboBox cbAuthzGroupRuleAllowOrDeny;
+        private System.Windows.Forms.TextBox tbAuthzRuleGroup;
+        private System.Windows.Forms.ComboBox cbAuthzMySqlGroupMemberOrNot;
+        private System.Windows.Forms.CheckBox ckDenyWhenMySqlAuthFails;
+        private System.Windows.Forms.Button btnAuthzGroupRuleUp;
+        private System.Windows.Forms.Button btnAuthzGroupRuleDown;
+        private System.Windows.Forms.Button btnAuthzGroupRuleDelete;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.TabPage tabPage6;
+        private System.Windows.Forms.CheckBox m_preventLogonWhenServerUnreachableCb;
     }
 }

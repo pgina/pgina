@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2014, pGina Team
+	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -68,8 +68,13 @@ namespace pGina.Plugin.MySQLAuth
             m_settings.SetDefault("UserForeignKeyColumn", "user_id");
             m_settings.SetDefault("GroupForeignKeyColumn", "group_id");
 
+            // Authz Settings
+            m_settings.SetDefault("GroupAuthzRules", new string[] { (new GroupAuthzRule(true)).ToRegString() } );
+            m_settings.SetDefault("AuthzRequireMySqlAuth", false);
+
             // Gateway settings
             m_settings.SetDefault("GroupGatewayRules", new string[] { });
+            m_settings.SetDefault("PreventLogonOnServerError", false);
         }
     }
 }
