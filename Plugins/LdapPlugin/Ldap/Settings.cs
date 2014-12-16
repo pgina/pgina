@@ -54,6 +54,7 @@ namespace pGina.Plugin.Ldap
             m_settings.SetDefault("UseTls", false);
             m_settings.SetDefault("RequireCert", false);
             m_settings.SetDefault("ServerCertFile", "");            
+            m_settings.SetDefault("UseAuthBindForAuthzAndGateway", false);
             m_settings.SetDefault("SearchDN", "");
             m_settings.SetDefaultEncryptedSetting("SearchPW", "");
             //m_settings.SetDefault("GroupDnPattern", "cn=%g,ou=Group,dc=example,dc=com");

@@ -141,6 +141,9 @@ namespace pGina.Plugin.Ldap
 
             string filter = Settings.Store.SearchFilter;
             searchFilterTextBox.Text = filter;
+            
+            bool useAuth = Settings.Store.UseAuthBindForAuthzAndGateway;
+            useAuthBindForAuthzAndGatewayCb.Checked = useAuth;
 
             string[] searchContexts = Settings.Store.SearchContexts;
             string ctxs = "";
@@ -364,6 +367,7 @@ namespace pGina.Plugin.Ldap
             Settings.Store.UseTls = (useTlsCheckBox.CheckState == CheckState.Checked);
             Settings.Store.RequireCert = (validateServerCertCheckBox.CheckState == CheckState.Checked);
             Settings.Store.ServerCertFile = sslCertFileTextBox.Text.Trim();
+            Settings.Store.UseAuthBindForAuthzAndGateway = (useAuthBindForAuthzAndGatewayCb.CheckState == CheckState.Checked);
             Settings.Store.SearchDN = searchDnTextBox.Text.Trim();
             Settings.Store.SetEncryptedSetting("SearchPW", searchPassTextBox.Text);
             
@@ -590,6 +594,20 @@ namespace pGina.Plugin.Ldap
             else
             {
                 this.authzRuleDeleteBtn.Enabled = true;
+            }
+        }
+
+        private void useAuthBindForAuthzAndGatewayCb_CheckedChanged(object sender, EventArgs e)
+        {
+            if (useAuthBindForAuthzAndGatewayCb.Checked)
+            {
+                searchDnTextBox.Enabled = false;
+                searchPassTextBox.Enabled = false;
+            }
+            else
+            {
+                searchDnTextBox.Enabled = true;
+                searchPassTextBox.Enabled = true;
             }
         }
     }

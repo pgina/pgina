@@ -55,6 +55,7 @@
             this.searchForDnCheckBox = new System.Windows.Forms.CheckBox();
             this.useTlsCheckBox = new System.Windows.Forms.CheckBox();
             this.ldapServerGroupBox = new System.Windows.Forms.GroupBox();
+            this.useAuthBindForAuthzAndGatewayCb = new System.Windows.Forms.CheckBox();
             this.showPwCB = new System.Windows.Forms.CheckBox();
             this.searchPassTextBox = new System.Windows.Forms.TextBox();
             this.sslCertFileBrowseButton = new System.Windows.Forms.Button();
@@ -242,7 +243,7 @@
             // 
             this.searchDnTextBox.Location = new System.Drawing.Point(110, 97);
             this.searchDnTextBox.Name = "searchDnTextBox";
-            this.searchDnTextBox.Size = new System.Drawing.Size(335, 20);
+            this.searchDnTextBox.Size = new System.Drawing.Size(296, 20);
             this.searchDnTextBox.TabIndex = 9;
             this.descriptionToolTip.SetToolTip(this.searchDnTextBox, "Optional.  Used when searching for group \r\nmembership and other search operations" +
                     "\r\n");
@@ -359,6 +360,7 @@
             // 
             // ldapServerGroupBox
             // 
+            this.ldapServerGroupBox.Controls.Add(this.useAuthBindForAuthzAndGatewayCb);
             this.ldapServerGroupBox.Controls.Add(this.useTlsCheckBox);
             this.ldapServerGroupBox.Controls.Add(this.showPwCB);
             this.ldapServerGroupBox.Controls.Add(this.timeoutTextBox);
@@ -383,10 +385,21 @@
             this.ldapServerGroupBox.TabStop = false;
             this.ldapServerGroupBox.Text = "LDAP Server";
             // 
+            // useAuthBindForAuthzAndGatewayCb
+            // 
+            this.useAuthBindForAuthzAndGatewayCb.AutoSize = true;
+            this.useAuthBindForAuthzAndGatewayCb.Location = new System.Drawing.Point(412, 100);
+            this.useAuthBindForAuthzAndGatewayCb.Name = "useAuthBindForAuthzAndGatewayCb";
+            this.useAuthBindForAuthzAndGatewayCb.Size = new System.Drawing.Size(258, 17);
+            this.useAuthBindForAuthzAndGatewayCb.TabIndex = 14;
+            this.useAuthBindForAuthzAndGatewayCb.Text = "bind with user credentials instead of anonymously";
+            this.useAuthBindForAuthzAndGatewayCb.UseVisualStyleBackColor = true;
+            this.useAuthBindForAuthzAndGatewayCb.CheckedChanged += new System.EventHandler(this.useAuthBindForAuthzAndGatewayCb_CheckedChanged);
+            // 
             // showPwCB
             // 
             this.showPwCB.AutoSize = true;
-            this.showPwCB.Location = new System.Drawing.Point(451, 126);
+            this.showPwCB.Location = new System.Drawing.Point(412, 126);
             this.showPwCB.Name = "showPwCB";
             this.showPwCB.Size = new System.Drawing.Size(77, 17);
             this.showPwCB.TabIndex = 12;
@@ -398,7 +411,7 @@
             // 
             this.searchPassTextBox.Location = new System.Drawing.Point(110, 123);
             this.searchPassTextBox.Name = "searchPassTextBox";
-            this.searchPassTextBox.Size = new System.Drawing.Size(335, 20);
+            this.searchPassTextBox.Size = new System.Drawing.Size(296, 20);
             this.searchPassTextBox.TabIndex = 11;
             this.searchPassTextBox.UseSystemPasswordChar = true;
             // 
@@ -964,5 +977,6 @@
         private System.Windows.Forms.Label AuthPathLabel;
         private System.Windows.Forms.Label AuthFilterLabel;
         private System.Windows.Forms.CheckBox useTlsCheckBox;
+        private System.Windows.Forms.CheckBox useAuthBindForAuthzAndGatewayCb;
     }
 }

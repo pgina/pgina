@@ -177,41 +177,15 @@ namespace pGina.Plugin.Ldap
             // fail authorization.  Note that we do this AFTER checking the LDAP server object
             // because we may want to succeed if the authentication failed due to server
             // being unavailable.
-            if (requireAuth)
+            PluginActivityInformation actInfo = properties.GetTrackedSingle<PluginActivityInformation>();
+            if (requireAuth && !WeAuthedThisUser(actInfo) )
             {
-                PluginActivityInformation actInfo = properties.GetTrackedSingle<PluginActivityInformation>();
-                try
+                m_logger.InfoFormat("Deny because LDAP auth failed, and configured to require LDAP auth.");
+                return new BooleanResult()
                 {
-                    BooleanResult ldapResult = actInfo.GetAuthenticationResult(this.Uuid);
-                    if (!ldapResult.Success)
-                    {
-                        m_logger.InfoFormat("Deny because LDAP auth failed, and configured to require LDAP auth.");
-                        return new BooleanResult()
-                        {
-                            Success = false,
-                            Message = "Deny because LDAP authentication failed."
-                        };
-                    }
-                }
-                catch (KeyNotFoundException)
-                {
-                    // The plugin is not enabled for authentication
-                    m_logger.ErrorFormat("LDAP is not enabled for authentication, and authz is configured to require authentication.");
-                    return new BooleanResult
-                    {
-                        Success = false,
-                        Message = "Deny because LDAP auth did not execute, and configured to require LDAP auth."
-                    };
-                }
-                catch (Exception e)
-                {
-                    m_logger.ErrorFormat("LDAP auth failed {0}", e.Message);
-                    return new BooleanResult
-                    {
-                        Success = false,
-                        Message = String.Format("Deny because LDAP auth failed\n{0}",e.Message)
-                    };
-                }
+                    Success = false,
+                    Message = "Deny because LDAP authentication failed, or did not execute."
+                };
             }
 
             // Apply the authorization rules
@@ -222,7 +196,9 @@ namespace pGina.Plugin.Ldap
                 // Bind for searching if we have rules to process.  If there's only one, it's the
                 // default rule which doesn't require searching the LDAP tree.
                 if (rules.Count > 0)
-                    serv.BindForSearch();
+                {
+                    this.BindForAuthzOrGatewaySearch(serv);
+                }
 
                 foreach (GroupAuthzRule rule in rules)
                 {
@@ -322,7 +298,7 @@ namespace pGina.Plugin.Ldap
                     // If we haven't bound to server yet, do so.
                     if (!boundToServ)
                     {
-                        serv.BindForSearch();
+                        this.BindForAuthzOrGatewaySearch(serv);
                         boundToServ = true;
                     }
 
@@ -402,6 +378,36 @@ namespace pGina.Plugin.Ldap
                     m_logger.ErrorFormat("Exception in ChangePassword: {0}", e);
                     return new BooleanResult() { Success = false, Message = "Error in LDAP plugin." };
                 }
+            }
+        }
+
+        private bool WeAuthedThisUser( PluginActivityInformation actInfo )
+        {
+            try
+            {
+                BooleanResult ldapResult = actInfo.GetAuthenticationResult(this.Uuid);
+                return ldapResult.Success;
+            }
+            catch (KeyNotFoundException)
+            {
+                // The plugin is not enabled for authentication
+                return false;
+            }
+        }
+
+        private void BindForAuthzOrGatewaySearch(LdapServer serv)
+        {
+            // If we're configured to use authorization credentials for searching, then
+            // we don't need to bind to the server (it's already been done if auth was
+            // successful).
+            bool useAuthBindForSearch = Settings.Store.UseAuthBindForAuthzAndGateway;
+            if (!useAuthBindForSearch)
+            {
+                serv.BindForSearch();
+            }
+            else
+            {
+                m_logger.DebugFormat("Using authentication credentials for LDAP search.");
             }
         }
     }
