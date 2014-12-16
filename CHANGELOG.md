@@ -3,13 +3,17 @@
 Global:
  - Pgina service bugfixes
  - Pgina service extend max shutdowntime to 1h
+
 LDAP plugin:
  - a view bugfixes
  - option to use authentication bind when searching in authorization and gateway stages.
+
 pgSMB plugin:
  - add 1 minute timeout if an SMB connection fails
+
 Radius plugin:
  - Lots of updates to the RADIUS plugin from Oooska
+
 MySQL plugin:
  - add option to prevent (or not) logon in gateway if server error occurs
 
