@@ -84,10 +84,10 @@ namespace pGina.Plugin.pgSMB
         #endregion
 
         #region Mpr.dll
-        [DllImport("Mpr.dll")]
+        [DllImport("Mpr.dll", SetLastError=true)]
         private static extern int WNetUseConnection(IntPtr hwndOwner, NETRESOURCE lpNetResource, string lpPassword, string lpUserID, int dwFlags, string lpAccessName, string lpBufferSize, string lpResult);
 
-        [DllImport("Mpr.dll")]
+        [DllImport("Mpr.dll", SetLastError=true)]
         private static extern int WNetCancelConnection2(string lpName, int dwFlags, bool fForce);
         #endregion
 
