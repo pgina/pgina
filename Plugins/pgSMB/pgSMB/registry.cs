@@ -286,7 +286,10 @@ namespace pGina.Plugin.pgSMB
             {
                 using (RegistryKey key = GetRegistryLocation(where).OpenSubKey(name + @"\Software\Microsoft\Windows\CurrentVersion\Policies\System"))
                 {
-                    key.GetValue("EnableProfileQuota");
+                    if (key.GetValue("EnableProfileQuota") == null)
+                    {
+                        return false;
+                    }
                 }
             }
             catch (Exception ex)
