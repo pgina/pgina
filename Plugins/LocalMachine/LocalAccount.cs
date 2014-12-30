@@ -559,19 +559,40 @@ namespace pGina.Plugin.LocalMachine
                 }
 
                 m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\SessionData\" + sessionID.ToString() + "'");
-                Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\SessionData\" + sessionID.ToString(), false);
+                try
+                {
+                    Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\SessionData\" + sessionID.ToString(), false);
+                } catch { }
                 m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\NetCache\PurgeAtNextLogoff\" + userPrincipal.Sid + "'");
-                Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\NetCache\PurgeAtNextLogoff\", true).DeleteValue(userPrincipal.Sid.ToString(), false);
+                try
+                {
+                    Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\NetCache\PurgeAtNextLogoff\", true).DeleteValue(userPrincipal.Sid.ToString(), false);
+                } catch { }
                 m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\Status\" + userPrincipal.Sid + "'");
-                Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\Status\" + userPrincipal.Sid, false);
+                try
+                {
+                    Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\Status\" + userPrincipal.Sid, false);
+                } catch { }
                 m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\" + userPrincipal.Sid + "'");
-                Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\" + userPrincipal.Sid, false);
+                try
+                {
+                    Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\" + userPrincipal.Sid, false);
+                } catch { }
                 m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\" + userPrincipal.Sid + "'");
-                Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\" + userPrincipal.Sid, false);
+                try
+                {
+                    Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\" + userPrincipal.Sid, false);
+                } catch { }
                 m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\" + userPrincipal.Sid + "'");
-                Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\" + userPrincipal.Sid, false);
+                try
+                {
+                    Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\" + userPrincipal.Sid, false);
+                } catch { }
                 m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\IdentityStore\Cache\" + userPrincipal.Sid + "'");
-                Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\IdentityStore\Cache\" + userPrincipal.Sid, false);
+                try
+                {
+                    Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\IdentityStore\Cache\" + userPrincipal.Sid, false);
+                } catch { }
 
                 try
                 {
