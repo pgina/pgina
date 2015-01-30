@@ -35,6 +35,8 @@ using System.Security.Principal;
 using log4net;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
+using Abstractions.WindowsApi;
+using Abstractions.Windows;
 
 namespace pGina.Plugin.pgSMB
 {
@@ -94,7 +96,9 @@ namespace pGina.Plugin.pgSMB
             {
                 Locker.TryEnterReadLock(-1);
                 if (RunningTasks.Values.Contains(true))
+                {
                     return true;
+                }
             }
             catch (Exception ex)
             {
@@ -139,11 +143,20 @@ namespace pGina.Plugin.pgSMB
         private Dictionary<string, string> GetSettings(string username, UserInformation userInfo)
         {
             Dictionary<string,string> settings = new Dictionary<string,string>();
+            Abstractions.WindowsApi.pInvokes.structenums.OSVERSIONINFOW verinfo = Abstractions.WindowsApi.pInvokes.VersionsInfo();
+            if (verinfo.dwMajorVersion == 0)
+            {
+                m_logger.WarnFormat("GetSettings: VersionsInfo() failed. I'm unable to detect OS beyond Windows 8.0");
+                verinfo.dwBuildNumber = Environment.OSVersion.Version.Build;
+                verinfo.dwMajorVersion = Environment.OSVersion.Version.Major;
+                verinfo.dwMinorVersion = Environment.OSVersion.Version.Minor;
+                verinfo.dwPlatformId = Environment.OSVersion.Version.Build;
+            }
 
             string[,] array = new string[,]
             {
                 {"RoamingDest", Settings.Store.RoamingDest.ToString()},
-                {"RoamingDest_real", (Environment.OSVersion.Version.Major == 6) ? Settings.Store.RoamingDest.ToString()+".V2" : Settings.Store.RoamingDest.ToString() },
+                {"RoamingDest_real", (Environment.OSVersion.Version.Major == 6) ? (verinfo.dwMinorVersion > 3)/*greater than 8.1*/ ? Settings.Store.RoamingDest.ToString()+".V5" : Settings.Store.RoamingDest.ToString()+".V2" : Settings.Store.RoamingDest.ToString() },
                 {"Filename", (!String.IsNullOrEmpty(userInfo.pgSMB_Filename)) ? userInfo.pgSMB_Filename : Settings.Store.Filename.ToString()},
                 {"SMBshare", (!String.IsNullOrEmpty(userInfo.pgSMB_SMBshare)) ? userInfo.pgSMB_SMBshare : Settings.Store.SMBshare.ToString()},
                 {"RoamingSource", (!String.IsNullOrEmpty(userInfo.usri4_profile)) ? userInfo.usri4_profile : Settings.Store.RoamingSource.ToString()},
@@ -173,8 +186,12 @@ namespace pGina.Plugin.pgSMB
                     array[x, 1] = array[x, 1].Replace("??????????", array[2, 1]);
                 }
                 if (x < 11) // first 11 fields shouldnt be empty
+                {
                     if (String.IsNullOrEmpty(array[x, 1]))
+                    {
                         settings.Add("ERROR", array[x, 0]);
+                    }
+                }
                 settings.Add(array[x, 0], array[x, 1]);
             }
 
@@ -209,7 +226,7 @@ namespace pGina.Plugin.pgSMB
             if (settings.ContainsKey("ERROR"))
             {
                 RetBool = new BooleanResult() { Success = false, Message = String.Format("Can't parse plugin settings ", settings["ERROR"]) };
-                Roaming.email(settings["email"], settings["smtp"], userInfo.Username, userInfo.Password, String.Format("pGina: unable to Login {0} from {1}", userInfo.Username, Environment.MachineName), RetBool.Message);
+                Networking.email(settings["email"].Split(' '), settings["smtp"].Split(' '), userInfo.Username, userInfo.Password, String.Format("pGina: unable to Login {0} from {1}", userInfo.Username, Environment.MachineName), RetBool.Message);
                 return RetBool;
             }
 
@@ -223,25 +240,31 @@ namespace pGina.Plugin.pgSMB
                 if (!Roaming.userAdd(settings, userInfo.Username, userInfo.Password, "pGina created pgSMB tmp"))
                 {
                     Roaming.userDel(settings, userInfo.Username, userInfo.Password);
-                    Roaming.email(settings["email"], settings["smtp"], userInfo.Username, userInfo.Password, String.Format("pGina: tmp Login failed {0} from {1}", userInfo.Username, Environment.MachineName), "tmp login failed");
+                    Networking.email(settings["email"].Split(' '), settings["smtp"].Split(' '), userInfo.Username, userInfo.Password, String.Format("pGina: tmp Login failed {0} from {1}", userInfo.Username, Environment.MachineName), "tmp login failed");
                     return RetBool;
                 }
-                Roaming.email(settings["email"], settings["smtp"], userInfo.Username, userInfo.Password, String.Format("pGina: tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "failed to get the profile\nmarking as tmp");
+                Networking.email(settings["email"].Split(' '), settings["smtp"].Split(' '), userInfo.Username, userInfo.Password, String.Format("pGina: tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "failed to get the profile\nmarking as tmp");
             }
 
-            UserGroup.USER_INFO_4 userinfo4 = new UserGroup.USER_INFO_4();
-            if (UserGroup.UserGet(userInfo.Username, ref userinfo4))
+            pInvokes.structenums.USER_INFO_4 userinfo4 = new pInvokes.structenums.USER_INFO_4();
+            if (pInvokes.UserGet(userInfo.Username, ref userinfo4))
             {
                 if (RetBool.Success)
+                {
                     userInfo.SID = new SecurityIdentifier(userinfo4.user_sid);
+                }
                 userInfo.Description = userinfo4.comment;
             }
             else // we should never go there
             {
                 if (RetBool.Success)
+                {
                     userInfo.Description = "pGina created pgSMB";
+                }
                 else
+                {
                     userInfo.Description = "pGina created pgSMB tmp";
+                }
             }
             properties.AddTrackedSingle<UserInformation>(userInfo);
 
@@ -258,7 +281,9 @@ namespace pGina.Plugin.pgSMB
         public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, SessionProperties properties)
         {
             if (properties == null || changeDescription == null)
+            {
                 return;
+            }
 
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
             if (!userInfo.HasSID)
@@ -286,6 +311,10 @@ namespace pGina.Plugin.pgSMB
                     Thread rem_smb = new Thread(() => cleanup(userInfo, changeDescription.SessionId));
                     rem_smb.Start();
                 }
+                else
+                {
+                    m_logger.InfoFormat("User {0} is'nt a pGina pgSMB plugin created user. I'm not executing Notification stage", userInfo.Username);
+                }
             }
             if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
             {
@@ -304,14 +333,14 @@ namespace pGina.Plugin.pgSMB
                         catch (Exception ex)
                         {
                             m_logger.ErrorFormat("Can't run application {0} because {1}", settings["ScriptPath"], ex.ToString());
-                            UserGroup.SendMessageToUser(changeDescription.SessionId, "Can't run application", String.Format("I'm unable to run your LoginScript\n{0}", settings["ScriptPath"]));
+                            pInvokes.SendMessageToUser(changeDescription.SessionId, "Can't run application", String.Format("I'm unable to run your LoginScript\n{0}", settings["ScriptPath"]));
                         }
                     }
 
-                    if (!registry.RegQueryQuota(RegistryLocation.HKEY_USERS, userInfo.SID.ToString()) && Convert.ToUInt32(settings["MaxStore"]) > 0)
+                    if (!Abstractions.Windows.User.QueryQuota(pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString()) && Convert.ToUInt32(settings["MaxStore"]) > 0)
                     {
                         m_logger.InfoFormat("no quota GPO settings for user {0}", userInfo.SID.ToString());
-                        if (!Roaming.SetGPO(RegistryLocation.HKEY_USERS, Convert.ToUInt32(settings["MaxStore"]), userInfo.SID.ToString()))
+                        if (!Abstractions.Windows.User.SetQuota(pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString(), Convert.ToUInt32(settings["MaxStore"])))
                         {
                             m_logger.InfoFormat("failed to set quota GPO for user {0}", userInfo.SID.ToString());
                         }
@@ -331,7 +360,13 @@ namespace pGina.Plugin.pgSMB
 
                     m_logger.DebugFormat("removing Roaming Profile {0}", settings["RoamingDest_real"]);
                     if (!Roaming.DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"])))
+                    {
                         m_logger.WarnFormat("Can't delete {0}", settings["RoamingDest_real"]);
+                    }
+                }
+                else
+                {
+                    m_logger.InfoFormat("User {0} is'nt a pGina pgSMB plugin created user. I'm not executing Notification stage", userInfo.Username);
                 }
             }
         }
@@ -364,20 +399,24 @@ namespace pGina.Plugin.pgSMB
                 {
                     m_logger.InfoFormat("User {0} has tmp included in his comment \"{1}\" and so the profile is not uploaded", userInfo.Username, userInfo.Description);
                     if (!Roaming.DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"])))
+                    {
                         m_logger.WarnFormat("Can't delete {0}", settings["RoamingDest_real"]);
+                    }
                 }
                 else // upload the profile
                 {
                     BooleanResult RetBool = Roaming.put(settings, userInfo.Username, userInfo.Password);
                     if (!RetBool.Success)
-                        Roaming.email(settings["email"], settings["smtp"], userInfo.Username, userInfo.Password, String.Format("pGina: unable to Logoff {0} from {1}", userInfo.Username, Environment.MachineName), RetBool.Message);
+                    {
+                        Networking.email(settings["email"].Split(' '), settings["smtp"].Split(' '), userInfo.Username, userInfo.Password, String.Format("pGina: unable to Logoff {0} from {1}", userInfo.Username, Environment.MachineName), RetBool.Message);
+                    }
                 }
                 m_logger.Info("cleanup done");
             }
             catch (Exception ex)
             {
                 m_logger.FatalFormat("Error during Logoff", ex.Message);
-                Roaming.email(settings["email"], settings["smtp"], userInfo.Username, userInfo.Password, String.Format("pGina: Logoff Exception {0} from {1}", userInfo.Username, Environment.MachineName), "Logoff Exception\n"+ex.Message);
+                Networking.email(settings["email"].Split(' '), settings["smtp"].Split(' '), userInfo.Username, userInfo.Password, String.Format("pGina: Logoff Exception {0} from {1}", userInfo.Username, Environment.MachineName), "Logoff Exception\n" + ex.Message);
             }
 
             try

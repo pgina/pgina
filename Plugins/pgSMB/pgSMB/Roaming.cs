@@ -30,21 +30,15 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Security.AccessControl;
-using System.Security;
 using System.Security.Principal;
 using Microsoft.Win32;
-using System.DirectoryServices;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Threading;
-using System.Net.Mail;
 using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 
+using Abstractions;
 using pGina.Shared.Types;
 using log4net;
-using log4net.Appender;
 
 namespace pGina.Plugin.pgSMB
 {
@@ -54,7 +48,7 @@ namespace pGina.Plugin.pgSMB
 
         public static BooleanResult get(Dictionary<string,string> settings, string username, string password)
         {
-            if (userAdd(settings, username, password, null))
+            if (!UserCanBeUsed(username))
             {
                 // user exists and was not created by pgina
                 m_logger.InfoFormat("user {0} does already exist on this system and does not contain a comment of \"pGina created pgSMB\"", username);
@@ -94,24 +88,23 @@ namespace pGina.Plugin.pgSMB
                     }
 
                     // is there a local roaming profile (there shouldnt be any)
-                    if (File.Exists(settings["RoamingDest_real"] + "\\ntuser.dat"))
+                    string ProfDir = GetExistingUserProfile(username, password);
+                    if (File.Exists(ProfDir + "\\ntuser.dat")) //worst case "\\ntuser.dat"
                     {
                         // there is a local profile of this user
                         // we need to compare the write date between the profile and the compressed remote roaming profile
                         // to be sure that we dont overwrite a newer profile with an old one
                         // possibly reason is a BSOD/hard reset ...
-                        m_logger.Debug("User " + username + " still own a lokal profile UTCdate:" + File.GetLastWriteTimeUtc(settings["RoamingDest_real"] + "\\ntuser.dat"));
+                        m_logger.Debug("User " + username + " still own a lokal profile UTCdate:" + File.GetLastWriteTimeUtc(ProfDir + "\\ntuser.dat"));
                         m_logger.Debug("User " + username + " compressed remote profile UTCdate:" + File.GetLastWriteTimeUtc(remote_file));
-                        if (DateTime.Compare(File.GetLastWriteTimeUtc(settings["RoamingDest_real"] + "\\ntuser.dat"), File.GetLastWriteTimeUtc(remote_file)) >= 0)
+                        if (DateTime.Compare(File.GetLastWriteTimeUtc(ProfDir + "\\ntuser.dat"), File.GetLastWriteTimeUtc(remote_file)) >= 0)
                         {
-                            m_logger.Debug("the local profile is newer/equal than the remote one, im not downloading the remote one");
+                            m_logger.DebugFormat("the local profile ('{0}') is newer/equal than the remote one, im not downloading the remote one", ProfDir);
                             loadprofile = false;
                         }
                         else
                         {
-                            m_logger.Debug("the local profile is older than the remote one, im removing the local one");
-                            if (!DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"])))
-                                m_logger.WarnFormat("Can't delete {0}", settings["RoamingDest_real"]);
+                            m_logger.Debug("the local profile is older than the remote one");
                         }
                     }
                     if (!userAdd(settings, username, password, "pGina created pgSMB"))
@@ -122,12 +115,16 @@ namespace pGina.Plugin.pgSMB
                     if (loadprofile)
                     {
                         if (!GetProfile(settings, username, password))
+                        {
                             return new BooleanResult() { Success = false, Message = string.Format("Unable to get the Profile {0} from {1}", settings["Filename"], settings["RoamingSource"]) };
+                        }
 
                         if (!Connect2share(settings["SMBshare"], null, null, 0, true))
+                        {
                             m_logger.WarnFormat("unable to disconnect from {0}", settings["RoamingSource"]);
+                        }
 
-                        if (!SetACL(settings, username, password))
+                        if (!SetACL(settings["RoamingDest_real"], username, password, Convert.ToUInt32(settings["MaxStore"]), Convert.ToUInt32(settings["ConnectRetry"])))
                         {
                             userDel(settings, username, password);
                             return new BooleanResult() { Success = false, Message = string.Format("Unable to set ACL for user {0}", username) };
@@ -136,7 +133,7 @@ namespace pGina.Plugin.pgSMB
                 }
                 else
                 {
-                    m_logger.Debug("there is no " + settings["RoamingSource"] + "\\" + settings["Filename"] + " or " + settings["RoamingSource"] + "\\" + settings["Filename"] + ".bak");
+                    m_logger.DebugFormat("there is no {0}\\{1} or {2}\\{3}{4}", settings["RoamingSource"], settings["Filename"], settings["RoamingSource"], settings["Filename"], ".bak");
 
                     if (!userAdd(settings, username, password, "pGina created pgSMB"))
                     {
@@ -144,8 +141,10 @@ namespace pGina.Plugin.pgSMB
                         return new BooleanResult() { Success = false, Message = string.Format("Unable to add user {0}", username) };
                     }
                     if (Directory.Exists(settings["RoamingDest_real"]))
+                    {
                         DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"]));
-                    if (!Roaming.CreateRoamingFolder(settings, username))
+                    }
+                    if (!Roaming.CreateRoamingFolder(settings["RoamingDest_real"], username))
                     {
                         return new BooleanResult() { Success = false, Message = string.Format("Unable to create the Roaming folder {0}", settings["RoamingDest_real"]) };
                     }
@@ -158,7 +157,9 @@ namespace pGina.Plugin.pgSMB
             finally
             {
                 if (!Connect2share(settings["SMBshare"], null, null, 0, true))
+                {
                     m_logger.WarnFormat("unable to disconnect from {0}", settings["RoamingSource"]);
+                }
             }
 
 
@@ -170,7 +171,9 @@ namespace pGina.Plugin.pgSMB
             try
             {
                 if (!PutProfile(settings, username, password))
+                {
                     return new BooleanResult() { Success = false, Message = string.Format("Unable to upload the profile") };
+                }
             }
             catch (Exception ex)
             {
@@ -193,11 +196,13 @@ namespace pGina.Plugin.pgSMB
             {
                 server = SMBserver(settings["SMBshare"], true);
                 if (!String.IsNullOrEmpty(server[0]) && !String.IsNullOrEmpty(server[1]))
+                {
                     break;
+                }
             }
             if (String.IsNullOrEmpty(server[0]) || String.IsNullOrEmpty(server[1]))
             {
-                m_logger.InfoFormat("can't resolve IP or FQDN from {0} I will try to continue but the upload my fail with System Error 1219", settings["SMBshare"]);
+                m_logger.InfoFormat("can't resolve IP or FQDN from {0} I will try to continue, but the upload my fail with System Error 1219", settings["SMBshare"]);
             }
             else
             {
@@ -241,13 +246,18 @@ namespace pGina.Plugin.pgSMB
                     m_logger.Debug("Exitcode:" + p.ExitCode.ToString());
                     cmd = p.ExitCode;
                     if (cmd == 0)
+                    {
                         break;
+                    }
+                    Thread.Sleep(new TimeSpan(0, 0, 30));
                 }
             }
 
             // delete the profile
             if (!DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"])))
+            {
                 m_logger.WarnFormat("Can't delete {0}", settings["RoamingDest_real"]);
+            }
 
             //where is the compressed profile now?
             string ThereIsTheProfile = null;
@@ -260,9 +270,9 @@ namespace pGina.Plugin.pgSMB
                     m_logger.InfoFormat("The file is stored at {0}", ThereIsTheProfile);
                 }
             }
-            if (ThereIsTheProfile == null)
+            if (String.IsNullOrEmpty(ThereIsTheProfile))
             {
-                m_logger.ErrorFormat("Unable to find the file \"{0}\" from your compress command {1}", settings["Filename"], settings["CompressCLI"]);
+                m_logger.ErrorFormat("Unable to find the file \"{0}\" in your compress command {1}", settings["Filename"], settings["CompressCLI"]);
                 return false;
             }
 
@@ -277,7 +287,9 @@ namespace pGina.Plugin.pgSMB
                 {
                     m_logger.ErrorFormat("Can't find {0}", settings["RoamingSource"]);
                     if (!Connect2share(settings["SMBshare"], null, null, 0, true))
+                    {
                         m_logger.WarnFormat("unable to disconnect from {0}", settings["RoamingSource"]);
+                    }
                     return false;
                 }
 
@@ -297,7 +309,7 @@ namespace pGina.Plugin.pgSMB
                         catch (Exception ex)
                         {
                             m_logger.Debug(ex.Message);
-                            Thread.Sleep(1000);
+                            Thread.Sleep(new TimeSpan(0, 0, 1));
                         }
                     }
                 }
@@ -316,7 +328,7 @@ namespace pGina.Plugin.pgSMB
                         catch (Exception ex)
                         {
                             m_logger.Debug(ex.Message);
-                            Thread.Sleep(1000);
+                            Thread.Sleep(new TimeSpan(0, 0, 1));
                         }
                     }
                 }
@@ -331,12 +343,12 @@ namespace pGina.Plugin.pgSMB
                 }
                 FileInfo fwim = new FileInfo(ThereIsTheProfile);
                 wim_size = fwim.Length;
-                long freespace = unc.GetFreeShareSpace(settings["SMBshare"]);
-                if (freespace > -1)
+                long[] freespace = Abstractions.WindowsApi.pInvokes.GetFreeShareSpace(settings["SMBshare"]);
+                if (freespace[0] > -1)
                 {
-                    if (wim_size > freespace)
+                    if (wim_size > freespace[0])
                     {
-                        if ((wim_size - wimbak_size) < freespace)
+                        if ((wim_size - wimbak_size) < freespace[0])
                         {
                             m_logger.InfoFormat("I'll store the bak file at {0} instead of {1}, because there is not enough space on {2} {3} bytes", ThereIsTheProfile + ".bak", remoteFileBAK, settings["SMBshare"], freespace);
                             try
@@ -345,7 +357,7 @@ namespace pGina.Plugin.pgSMB
                                 File.Copy(remoteFileBAK, ThereIsTheProfile + ".bak", true);
                                 m_logger.InfoFormat("File.Delete {0}", remoteFileBAK);
                                 File.Delete(remoteFileBAK);
-                                ReplaceFileSecurity(ThereIsTheProfile + ".bak", new IdentityReference[] { new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null) }, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.None, PropagationFlags.None);
+                                Abstractions.Windows.Security.ReplaceFileSecurity(ThereIsTheProfile + ".bak", new IdentityReference[] { new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null) }, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.None, PropagationFlags.None);
                             }
                             catch (Exception ex)
                             {
@@ -376,20 +388,26 @@ namespace pGina.Plugin.pgSMB
                     if (x == Convert.ToUInt32(settings["ConnectRetry"]) - 1)
                     {
                         if (!Connect2share(settings["SMBshare"], null, null, 0, true))
+                        {
                             m_logger.WarnFormat("unable to disconnect from {0}", settings["RoamingSource"]);
-                        ReplaceFileSecurity(ThereIsTheProfile, new IdentityReference[] { new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null) }, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.None, PropagationFlags.None);
+                        }
+                        Abstractions.Windows.Security.ReplaceFileSecurity(ThereIsTheProfile, new IdentityReference[] { new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null) }, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.None, PropagationFlags.None);
                         return false;
                     }
                     else
                     {
-                        Thread.Sleep(1000);
+                        Thread.Sleep(new TimeSpan(0, 0, 1));
                     }
                 }
                 try
                 {
                     // make a timestamp with the current ntp time
                     // a different computer can have a different time/date and so its better to use ntp time
-                    File.SetLastWriteTimeUtc(remoteFile, ntp.GetNetworkTime(settings["ntp"]));
+                    DateTime ntpTime = Abstractions.Windows.Networking.GetNetworkTime(settings["ntp"].Split(' '));
+                    if (ntpTime != DateTime.MinValue)
+                    {
+                        File.SetLastWriteTimeUtc(remoteFile, ntpTime);
+                    }
                     // cleanup local user
                     m_logger.DebugFormat("File.Delete {0}", ThereIsTheProfile);
                     File.Delete(ThereIsTheProfile);
@@ -401,7 +419,9 @@ namespace pGina.Plugin.pgSMB
                 finally
                 {
                     if (!Connect2share(settings["SMBshare"], null, null, 0, true))
+                    {
                         m_logger.WarnFormat("unable to disconnect from {0}", settings["RoamingSource"]);
+                    }
                 }
 
                 return true;
@@ -415,9 +435,13 @@ namespace pGina.Plugin.pgSMB
             m_logger.DebugFormat("User {0} owns a remote profile", username);
 
             if (Directory.Exists(settings["RoamingDest_real"]))
-                DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"]));
-            if (!CreateRoamingFolder(settings, username))
             {
+                DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"]));
+            }
+
+            if (!CreateRoamingFolder(settings["RoamingDest_real"], username))
+            {
+                m_logger.ErrorFormat("failed to create the roaming directory {0}", settings["RoamingDest_real"]);
                 return false;
             }
 
@@ -427,9 +451,13 @@ namespace pGina.Plugin.pgSMB
                 // run imagex in apply mode
                 startInfo.FileName = settings["Compressor"];
                 if (settings.ContainsKey("Filename_real"))
+                {
                     startInfo.Arguments = settings["UncompressCLI"].Replace(settings["Filename"], settings["Filename_real"]);
+                }
                 else
+                {
                     startInfo.Arguments = settings["UncompressCLI"];
+                }
                 m_logger.DebugFormat("Run \"{0}\" \"{1}\"", startInfo.FileName.ToString(), startInfo.Arguments.ToString());
                 using (Process p = Process.Start(startInfo))
                 {
@@ -437,9 +465,13 @@ namespace pGina.Plugin.pgSMB
                     m_logger.Debug("Exitcode:" + p.ExitCode.ToString());
                     cmd = p.ExitCode;
                     if (cmd == 0)
+                    {
                         break;
+                    }
+                    Thread.Sleep(new TimeSpan(0, 0, 30));
                 }
             }
+
             if (cmd != 0)
             {
                 // Uncompessing failed, clean and disconnect
@@ -447,17 +479,35 @@ namespace pGina.Plugin.pgSMB
                 DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"]));
                 return false;
             }
+
             return true;
+        }
+
+        private static string GetExistingUserProfile(string username, string password)
+        {
+            Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
+            if (!Abstractions.WindowsApi.pInvokes.UserGet(username, ref userinfo4))
+            {
+                m_logger.DebugFormat("Can't get userinfo for user {0}", username);
+                return "";
+            }
+            string userSID = new SecurityIdentifier(userinfo4.user_sid).Value;
+            if (!Abstractions.Windows.User.FixProfileList(userSID))
+            {
+                m_logger.DebugFormat("Error in FixProfileList {0}", userSID);
+            }
+
+            return Abstractions.Windows.User.GetProfileDir(username, password);
         }
 
         public static Boolean userAdd(Dictionary<string,string> settings, string username, string password, string comment)
         {
-            UserGroup.USER_INFO_4 userinfo4 = new UserGroup.USER_INFO_4();
+            Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
 
             //create user
-            if (!UserGroup.UserExists(username))
+            if (!Abstractions.WindowsApi.pInvokes.UserExists(username))
             {
-                if (!UserGroup.UserADD(username, password))
+                if (!Abstractions.WindowsApi.pInvokes.UserADD(username, password, comment))
                 {
                     m_logger.DebugFormat("Can't add user {0}", username);
                     return false;
@@ -465,19 +515,11 @@ namespace pGina.Plugin.pgSMB
             }
 
             //get userinfo
-            if (!UserGroup.UserGet(username, ref userinfo4))
+            if (!Abstractions.WindowsApi.pInvokes.UserGet(username, ref userinfo4))
             {
                 m_logger.DebugFormat("Can't get userinfo for user {0}", username);
                 return false;
             }
-
-            //check if this is a pgina user
-            //UserGroup.UserADD will always create a "pGina created pgSMB" comment
-            if (comment == null)
-                if (!userinfo4.comment.Contains("pGina created pgSMB"))
-                    return true;
-                else
-                    return false;
 
             //fill userinfo
             if (!String.IsNullOrEmpty(settings["RoamingDest"]))
@@ -494,26 +536,49 @@ namespace pGina.Plugin.pgSMB
             else
                 userinfo4.max_storage = -1;*/
             userinfo4.password = password;
-            if (!String.IsNullOrEmpty(comment))
-                userinfo4.comment = comment;
-            userinfo4.flags |= UserGroup.UserFlags.UF_NORMAL_ACCOUNT;
+            userinfo4.comment = comment;
+            userinfo4.flags |= Abstractions.WindowsApi.pInvokes.structenums.UserFlags.UF_NORMAL_ACCOUNT;
             userinfo4.acct_expires = -1;
             userinfo4.logon_hours = IntPtr.Zero;
 
             //apply userinfo
-            if (!UserGroup.UserMod(username, userinfo4))
+            if (!Abstractions.WindowsApi.pInvokes.UserMod(username, userinfo4))
             {
                 m_logger.DebugFormat("Can't modify user {0}", username);
                 return false;
             }
             m_logger.InfoFormat("user {0} created", username);
+
             return true;
+        }
+
+        public static Boolean UserCanBeUsed(string username)
+        {
+            Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
+
+            //get userinfo
+            if (!Abstractions.WindowsApi.pInvokes.UserGet(username, ref userinfo4))
+            {
+                return true;
+            }
+
+            //check if this is a pgina user
+            if (userinfo4.comment.Contains("pGina created pgSMB"))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public static Boolean userDel(Dictionary<string, string> settings, string username, string password)
         {
-            if (!UserGroup.UserDel(username))
+            if (!Abstractions.WindowsApi.pInvokes.UserDel(username))
+            {
                 m_logger.WarnFormat("Can't delete userAccount {0}", username);
+            }
             if (Directory.Exists(settings["RoamingDest_real"]))
             {
                 DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"]));
@@ -524,7 +589,7 @@ namespace pGina.Plugin.pgSMB
 
         public static Boolean DirectoryDel(string path, uint retry)
         {
-            for (uint x = 0; x < retry; x++)
+            for (uint x = 1; x <= retry; x++)
             {
                 if (Directory.Exists(path))
                 {
@@ -535,14 +600,36 @@ namespace pGina.Plugin.pgSMB
                     }
                     catch (Exception ex)
                     {
-                        m_logger.WarnFormat("unable to delete {0} error {1}", path, ex.Message);
-                        if (!ReplaceDirectorySecurity(path, new IdentityReference[] { new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null) }, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None))
-                            m_logger.DebugFormat("failed to set DirectorySecurity for {0} at {1}", WindowsIdentity.GetCurrent().Name, path);
+                        if (x == retry)
+                        {
+                            m_logger.WarnFormat("unable to delete {0} error {1}", path, ex.Message);
+                        }
+                        if (!Abstractions.Windows.Security.SetDirOwner(path, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null).Translate(typeof(NTAccount))))
+                        {
+                            if (x == retry)
+                            {
+                                m_logger.DebugFormat("failed to set directory owner for {0} at {1}", WindowsIdentity.GetCurrent().Name, path);
+                            }
+                        }
+                        if (!Abstractions.Windows.Security.ReplaceDirectorySecurity(path, new IdentityReference[] { new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null) }, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None))
+                        {
+                            if (x == retry)
+                            {
+                                m_logger.DebugFormat("failed to set DirectorySecurity for {0} at {1}", WindowsIdentity.GetCurrent().Name, path);
+                            }
+                        }
                         else
-                            if (!SetAttrib(new DirectoryInfo(path)))
-                                m_logger.DebugFormat("failed to set Attributes at {0}", path);
+                        {
+                            if (!Abstractions.Windows.Security.SetRecDirAttrib(new DirectoryInfo(path), FileAttributes.Normal))
+                            {
+                                if (x == retry)
+                                {
+                                    m_logger.DebugFormat("failed to set Attributes at {0}", path);
+                                }
+                            }
+                        }
                     }
-                    if (x == retry - 1)
+                    if (x == retry)
                     {
                         try
                         {//do better
@@ -563,224 +650,89 @@ namespace pGina.Plugin.pgSMB
             return false;
         }
 
-        public static Boolean SetGPO(RegistryLocation regkey, UInt32 maxStore, string username)
+        private static Boolean SetACL(string dir, string username, string password, uint maxstore, uint retry)
         {
-            if (!registry.RegQuota(regkey, username, maxStore))
-            {
-                return false;
-            }
-            return true;
-        }
-
-        private static Boolean SetACL(Dictionary<string, string> settings, string username, string password)
-        {
-            UserGroup.USER_INFO_4 userinfo4 = new UserGroup.USER_INFO_4();
-            if (!UserGroup.UserGet(username, ref userinfo4))
+            Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
+            if (!Abstractions.WindowsApi.pInvokes.UserGet(username, ref userinfo4))
             {
                 m_logger.DebugFormat("Can't get userinfo for user {0}", username);
                 return false;
             }
-            SecurityIdentifier sid = new SecurityIdentifier(userinfo4.user_sid);
-            if (!ReplaceDirectorySecurity(settings["RoamingDest_real"], new IdentityReference[] {new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null), new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), sid}, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None))
+
+            IdentityReference userIref = new SecurityIdentifier(userinfo4.user_sid).Translate(typeof(NTAccount));
+            if (!Abstractions.Windows.Security.SetDirOwner(dir, new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null).Translate(typeof(NTAccount))))
             {
-                m_logger.WarnFormat("Can't set ACL for Directory {0}", settings["RoamingDest_real"]);
-                return false;
-            }
-            if (!registry.RegistryLoad("HKEY_LOCAL_MACHINE", username, settings["RoamingDest_real"] + "\\NTUSER.DAT"))
-            {
-                m_logger.WarnFormat("Can't load regfile {0}", settings["RoamingDest_real"] + "\\NTUSER.DAT");
-                return false;
-            }
-            if (!SetGPO(RegistryLocation.HKEY_LOCAL_MACHINE, Convert.ToUInt32(settings["MaxStore"]), username))
-            {
-                m_logger.WarnFormat("Can't set quota. Thats not terrible");
-            }
-            if (!registry.RegSec(RegistryLocation.HKEY_LOCAL_MACHINE, username))
-            {
-                m_logger.WarnFormat("Can't set ACL for regkey {0}\\{1}", RegistryLocation.HKEY_LOCAL_MACHINE.ToString(), username);
-                return false;
-            }
-            if (!registry.RegistryUnLoad("HKEY_LOCAL_MACHINE", username))
-            {
-                m_logger.WarnFormat("Can't unload regkey {0}\\{1}", settings["RoamingDest_real"], "NTUSER.DAT");
+                m_logger.WarnFormat("Can't set owner for Directory {0}", dir);
                 return false;
             }
 
-            return true;
-        }
-
-        private static Boolean SetAttrib(DirectoryInfo dir)
-        {
-            try
+            if (!Abstractions.Windows.Security.ReplaceDirectorySecurity(dir, new IdentityReference[] { new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null), new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), userIref }, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None))
             {
-                foreach (DirectoryInfo subDirPath in dir.GetDirectories())
+                m_logger.WarnFormat("Can't set ACL for Directory {0}", dir);
+                return false;
+            }
+
+            if (!Abstractions.Windows.Security.RemoveAccRuleFromUnknownUser(dir))
+            {
+                m_logger.InfoFormat("Can't remove unknown users from {0} ACL", dir);
+                //not critical
+            }
+
+            bool work = false;
+            for (int x = 1; x <= retry; x++)
+            {
+                if (!Abstractions.WindowsApi.pInvokes.RegistryLoad(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username, dir + "\\NTUSER.DAT"))
                 {
-                    subDirPath.Attributes = FileAttributes.Normal;
-                    SetAttrib(subDirPath);
+                    m_logger.WarnFormat("Can't load regfile {0}\\{1}", dir, "NTUSER.DAT");
+                    Thread.Sleep(new TimeSpan(0, 0, 10));
+                    work = false;
+                    continue;
                 }
-                foreach (FileInfo filePath in dir.GetFiles())
-                    filePath.Attributes = FileAttributes.Normal;
-            }
-            catch (Exception ex)
-            {
-                m_logger.ErrorFormat("Cant't set Attrib normal on {0} Error:{1}", dir, ex.Message );
-                return false;
-            }
-
-            return true;
-        }
-
-        private static Boolean AddDirectorySecurityRecursive(string dir, string Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
-        {
-            List<string> dr = new List<string>();
-            dr.Add(dir);
-            string[] fr = null;
-
-            try
-            {
-                string[] d = Directory.GetDirectories(dir, "*", SearchOption.AllDirectories);
-                dr.InsertRange(1, d);
-                fr = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
-            }
-            catch (Exception ex)
-            {
-                m_logger.DebugFormat("can't enumerate dir/file under {0} {1}", dir, ex.ToString());
-                return false;
-            }
-            foreach (string s in dr)
-            {
-                m_logger.InfoFormat("dir: {0}",s);
-                if (!AddDirectorySecurity(s, Account, Rights, ControlType, Inherit, Propagation))
-                    return false;
-            }
-            foreach (string s in fr)
-            {
-                m_logger.InfoFormat("file: {0}",s);
-                AddFileSecurity(s, Account, Rights, ControlType, Inherit, Propagation);
-            }
-
-            return true;
-        }
-
-        private static Boolean AddDirectorySecurity(string Directory, string Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
-        {
-            DirectoryInfo dInfo = new DirectoryInfo(Directory);
-            DirectorySecurity dSecurity = dInfo.GetAccessControl();
-
-            try
-            {
-                foreach (FileSystemAccessRule user in dSecurity.GetAccessRules(true, true, typeof(System.Security.Principal.NTAccount)))
+                else
                 {
-                    m_logger.Debug("ACL user:" + user.IdentityReference.Value);
-                    if (user.IdentityReference.Value.StartsWith("S-1-5-21-"))
-                    {
-                        m_logger.Debug("delete unknown user:" + user.IdentityReference.Value);
-                        dSecurity.RemoveAccessRule(user);
-                    }
+                    work = true;
                 }
+
+                break;
             }
-            catch (Exception ex)
+            if (!work)
             {
-                m_logger.ErrorFormat("Unable to GetAccessRules for {0} error {1}", Directory, ex.Message);
                 return false;
             }
 
-            dSecurity.AddAccessRule(new FileSystemAccessRule(Account, Rights, Inherit, Propagation, ControlType));
-            try
+            if (!Abstractions.Windows.User.SetQuota(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username, maxstore))
             {
-                dSecurity.SetOwner(new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null));
-                dInfo.SetAccessControl(dSecurity);
+                m_logger.WarnFormat("Can't set quota");
+                //not critical
             }
-            catch (Exception ex)
+
+            if (!Abstractions.Windows.Security.RegSec(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username))
             {
-                m_logger.ErrorFormat("Unable to SetAccessControl for {0} error {1}", Directory, ex.Message);
+                m_logger.WarnFormat("Can't set ACL for regkey {0}\\{1}", Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE.ToString(), username);
                 return false;
             }
-            return true;
-        }
 
-        private static Boolean AddFileSecurity(string File, string Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
-        {
-            FileInfo fInfo = new FileInfo(File);
-            FileSecurity fSecurity = fInfo.GetAccessControl();
-
-            try
+            for (int x = 1; x <= retry; x++)
             {
-                foreach (FileSystemAccessRule user in fSecurity.GetAccessRules(true, true, typeof(System.Security.Principal.NTAccount)))
+                if (!Abstractions.WindowsApi.pInvokes.RegistryUnLoad(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username))
                 {
-                    m_logger.Debug("ACL user:" + user.IdentityReference.Value);
-                    if (user.IdentityReference.Value.StartsWith("S-1-5-21-"))
-                    {
-                        m_logger.Debug("delete unknown user:" + user.IdentityReference.Value);
-                        fSecurity.RemoveAccessRule(user);
-                    }
+                    m_logger.WarnFormat("Can't unload regkey {0}\\{1}", dir, "NTUSER.DAT");
+                    Thread.Sleep(new TimeSpan(0, 0, 10));
+                    work = false;
+                    continue;
                 }
-            }
-            catch (Exception ex)
-            {
-                m_logger.ErrorFormat("Unable to GetAccessRules for {0} error {1}", File, ex.Message);
-                return false;
-            }
-
-            fSecurity.AddAccessRule(new FileSystemAccessRule(Account, Rights, Inherit, Propagation, ControlType));
-            try
-            {
-                fSecurity.SetOwner(new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null));
-                fInfo.SetAccessControl(fSecurity);
-            }
-            catch (Exception ex)
-            {
-                m_logger.ErrorFormat("Unable to SetAccessControl for {0} error {1}", File, ex.Message);
-                return false;
-            }
-
-            return true;
-        }
-
-        private static Boolean ReplaceDirectorySecurity(string dir, IdentityReference[] Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
-        {
-            DirectoryInfo dInfo = new DirectoryInfo(dir);
-            //DirectorySecurity dSecurity = dInfo.GetAccessControl();
-            DirectorySecurity dSecurity = new DirectorySecurity();
-
-            try
-            {
-                dSecurity.SetOwner(new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null));
-                dInfo.SetAccessControl(dSecurity);
-                dSecurity.SetAccessRuleProtection(true, false);
-                foreach (IdentityReference account in Account)
+                else
                 {
-                    dSecurity.ResetAccessRule(new FileSystemAccessRule(account, Rights, Inherit, Propagation, ControlType));
+                    work = true;
                 }
-                dInfo.SetAccessControl(dSecurity);
+
+                break;
             }
-            catch (Exception ex)
+            if (!work)
             {
-                m_logger.ErrorFormat("Unable to SetAccessControl for {0} error {1}", dir, ex.Message);
                 return false;
             }
-            return true;
-        }
 
-        private static Boolean ReplaceFileSecurity(string File, IdentityReference[] Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
-        {
-            FileInfo fInfo = new FileInfo(File);
-            FileSecurity fSecurity = fInfo.GetAccessControl();
-
-            try
-            {
-                fSecurity.SetAccessRuleProtection(true, false);
-                foreach (IdentityReference account in Account)
-                {
-                    fSecurity.ResetAccessRule(new FileSystemAccessRule(account, Rights, Inherit, Propagation, ControlType));
-                }
-                fInfo.SetAccessControl(fSecurity);
-            }
-            catch (Exception ex)
-            {
-                m_logger.ErrorFormat("Unable to SetAccessControl for {0} error {1}", File, ex.Message);
-                return false;
-            }
             return true;
         }
 
@@ -803,7 +755,9 @@ namespace pGina.Plugin.pgSMB
                 ret[0] = server[0];
                 ret[1] = server[0];
                 if (!visversa)
+                {
                     return ret;
+                }
                 try
                 {
                     IPHostEntry hostFQDN = Dns.GetHostEntry(server[0]);
@@ -824,7 +778,9 @@ namespace pGina.Plugin.pgSMB
                 }
             }
             else
+            {
                 m_logger.DebugFormat("first token of servername {0} is null", share);
+            }
 
             return ret;
         }
@@ -833,9 +789,11 @@ namespace pGina.Plugin.pgSMB
         {
             if (DISconnect)
             {
-                m_logger.DebugFormat("Disconnect from {0}", share);
-                if (!unc.disconnectRemote(share))
+                m_logger.DebugFormat("disconnecting from {0}", share);
+                if (!Abstractions.WindowsApi.pInvokes.DisconnectNetworkDrive(share))
+                {
                     m_logger.WarnFormat("unable to disconnect from {0}", share);
+                }
 
                 return true;
             }
@@ -855,7 +813,7 @@ namespace pGina.Plugin.pgSMB
                     try
                     {
                         m_logger.DebugFormat("{0}. try to connect to {1} as {2}", x, share, dusername);
-                        if (!unc.connectToRemote(share, dusername, password))
+                        if (!Abstractions.WindowsApi.pInvokes.MapNetworkDrive(share, dusername, password))
                         {
                             m_logger.ErrorFormat("Failed to connect to share {0}", share);
                             Thread.Sleep(new TimeSpan(0, 1, 0));
@@ -874,120 +832,42 @@ namespace pGina.Plugin.pgSMB
             }
         }
 
-        public static Boolean CreateRoamingFolder(Dictionary<string, string> settings, string username)
+        private static Boolean CreateRoamingFolder(string dir, string username)
         {
-            if (!Directory.Exists(settings["RoamingDest_real"]))
+            if (!Directory.Exists(dir))
             {
                 try
                 {
-                    Directory.CreateDirectory(settings["RoamingDest_real"]);
+                    Directory.CreateDirectory(dir);
                 }
                 catch
                 {
-                    m_logger.WarnFormat("Can't create Directory {0}", settings["RoamingDest_real"]);
+                    m_logger.WarnFormat("Can't create Directory {0}", dir);
                     return false;
                 }
             }
-            if (!AddDirectorySecurity(settings["RoamingDest_real"], username, FileSystemRights.Write | FileSystemRights.ReadAndExecute, AccessControlType.Allow, InheritanceFlags.None, PropagationFlags.None))
+
+            Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
+            if (!Abstractions.WindowsApi.pInvokes.UserGet(username, ref userinfo4))
             {
-                m_logger.WarnFormat("Can't set ACL for Directory {0}", settings["RoamingDest_real"]);
+                m_logger.WarnFormat("Can't get userinfo4 from {0}", username);
+                return false;
+            }
+
+            IdentityReference userIref = new SecurityIdentifier(userinfo4.user_sid).Translate(typeof(NTAccount));
+            if (!Abstractions.Windows.Security.SetDirOwner(dir, new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null).Translate(typeof(NTAccount))))
+            {
+                m_logger.WarnFormat("Can't set owner {0} for Directory {1}", username, dir);
+                return false;
+            }
+
+            if (!Abstractions.Windows.Security.SetDirectorySecurity(dir, new IdentityReference[] { userIref }, FileSystemRights.Write | FileSystemRights.ReadAndExecute, AccessControlType.Allow, InheritanceFlags.None, PropagationFlags.None))
+            {
+                m_logger.WarnFormat("Can't set ACL for Directory {0}", dir);
                 return false;
             }
 
             return true;
-        }
-
-        public static Boolean email(string mailAddress, string smtpAddress, string username, string password, string subject, string body)
-        {
-            Boolean ret = true;
-
-            if (String.IsNullOrEmpty(mailAddress))
-                return false;
-            if (String.IsNullOrEmpty(smtpAddress))
-                return false;
-
-            try
-            {
-                using (EventLog systemLog = new EventLog("System"))
-                {
-                    body += "\n\n====================Eventlog System====================\n";
-                    for (int x = systemLog.Entries.Count - 60; x < systemLog.Entries.Count; x++)
-                    {
-                        body += String.Format("{0:yyyy-MM-dd HH:mm:ss} {1} {2} {3}\n", systemLog.Entries[x].TimeGenerated, systemLog.Entries[x].EntryType, (UInt16)systemLog.Entries[x].InstanceId, systemLog.Entries[x].Message);
-                    }
-                }
-                using (EventLog application = new EventLog("Application"))
-                {
-                    body += "\n\n====================Eventlog Application===============\n";
-                    for (int x = application.Entries.Count - 60; x < application.Entries.Count; x++)
-                    {
-                        body += String.Format("{0:yyyy-MM-dd HH:mm:ss} {1} {2} {3}\n", application.Entries[x].TimeGenerated, application.Entries[x].EntryType, (UInt16)application.Entries[x].InstanceId, application.Entries[x].Message);
-                    }
-                }
-            }
-            catch { }
-
-            string[] mails = mailAddress.Split(' ');
-            string[] smtps = smtpAddress.Split(' ');
-            ServicePointManager.ServerCertificateValidationCallback = delegate(object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
-
-            for (uint x = 0; x < smtps.Length; x++)
-            {
-                using (SmtpClient client = new SmtpClient(smtps[x]))
-                {
-                    client.EnableSsl = true;
-                    client.Credentials = new NetworkCredential(username, password);
-
-                    for (uint y = 0; y < mails.Length; y++)
-                    {
-                        if (mails[y] == null)
-                            continue;
-                        try
-                        {
-                            // get the logfile
-                            string logfile = null;
-                            logfile = LogManager.GetRepository().GetAppenders().OfType<FileAppender>().Where(fa => fa.Name == "bigfile").Single().File;
-                            if (!String.IsNullOrEmpty(logfile))
-                            {
-                                using (StreamReader log = new StreamReader(logfile, true))
-                                {
-                                    // read the last 50kbytes of the log
-                                    if (log.BaseStream.Length > 50 * 1024) //50kbytes
-                                        log.BaseStream.Seek(50 * 1024 * -1, SeekOrigin.End);
-
-                                    string[] lastlines = log.ReadToEnd().Split('\n');
-                                    int line_count = 0;
-                                    if (lastlines.Length > 175)
-                                        line_count = lastlines.Length - 176;
-                                    body += "\n\n====================Pgina log==========================\n";
-                                    for (; line_count < lastlines.Length; line_count++)
-                                    {
-                                        body += lastlines[line_count] + '\n';
-                                    }
-                                }
-                            }
-
-                            MailMessage message = new MailMessage(mails[y], mails[y], subject, body);
-
-                            client.Send(message);
-                            mails[y] = null;
-                        }
-                        catch (Exception ex)
-                        {
-                            m_logger.WarnFormat("Failed to send message \"{0}\" to {1} Error:{2}", subject, mails[y], ex.Message);
-                            ret = false;
-                        }
-                    }
-                }
-
-                if (mails.All(k => string.IsNullOrEmpty(k)))
-                {
-                    ret = true;
-                    break;
-                }
-            }
-
-            return ret;
         }
     }
 }
