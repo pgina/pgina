@@ -29,8 +29,14 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\bin\Abstractions.XML</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\external\lib\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Security" />
@@ -55,6 +61,7 @@
     <Compile Include="Settings\DynamicSetting.cs" />
     <Compile Include="Settings\DynamicSettings.cs" />
     <Compile Include="WindowsApi\pInvokes.cs" />
+    <Compile Include="Windows\Networking.cs" />
     <Compile Include="Windows\OsInfo.cs" />
     <Compile Include="Windows\Security.cs" />
     <Compile Include="Windows\User.cs" />

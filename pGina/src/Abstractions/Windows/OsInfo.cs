@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -29,10 +29,11 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Abstractions.WindowsApi;
 
 namespace Abstractions.Windows
 {
-    public class OsInfo
+    public static class OsInfo
     {
         public static bool IsVistaOrLater()
         {
@@ -68,6 +69,66 @@ namespace Abstractions.Windows
         {
             return string.Format("OS: {0} Runtime: {1} Culture: {2}", System.Environment.OSVersion.VersionString, System.Environment.Version, CultureInfo.InstalledUICulture.EnglishName);
 
+        }
+
+        public static bool Is7OrLater()
+        {
+            pInvokes.structenums.OSVERSIONINFOW ver = pInvokes.VersionsInfo();
+            if (ver.dwMajorVersion == 6 && ver.dwMinorVersion >= 1)
+            {
+                return true;
+            }
+            if (ver.dwMajorVersion > 6)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool Is8OrLater()
+        {
+            pInvokes.structenums.OSVERSIONINFOW ver = pInvokes.VersionsInfo();
+            if (ver.dwMajorVersion == 6 && ver.dwMinorVersion >= 2)
+            {
+                return true;
+            }
+            if (ver.dwMajorVersion > 6)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool Is8oneOrLater()
+        {
+            pInvokes.structenums.OSVERSIONINFOW ver = pInvokes.VersionsInfo();
+            if (ver.dwMajorVersion == 6 && ver.dwMinorVersion >= 3)
+            {
+                return true;
+            }
+            if (ver.dwMajorVersion > 6)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool Is10OrLater()
+        {
+            pInvokes.structenums.OSVERSIONINFOW ver = pInvokes.VersionsInfo();
+            if (ver.dwMajorVersion == 6 && ver.dwMinorVersion >= 4)
+            {
+                return true;
+            }
+            if (ver.dwMajorVersion > 6)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

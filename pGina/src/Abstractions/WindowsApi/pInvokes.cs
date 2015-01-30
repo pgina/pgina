@@ -35,10 +35,14 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Principal;
 using System.ComponentModel;
+using Microsoft.Win32;
+using System.Security.AccessControl;
+
+using Abstractions.Logging;
 
 namespace Abstractions.WindowsApi
 {
-    public class pInvokes
+    public static class pInvokes
     {
         internal class SafeNativeMethods
         {
@@ -495,6 +499,273 @@ namespace Abstractions.WindowsApi
                 int dwLogonType, int dwLogonProvider,
                 out IntPtr phToken);
             #endregion
+
+            #region ntdll.dll
+            [DllImport("ntdll.dll", SetLastError = true)]
+            internal static extern int RtlGetVersion(ref structenums.OSVERSIONINFOW version);
+            #endregion
+
+            #region Netapi32.dll
+            [DllImport("Netapi32.dll", SetLastError = true)]
+            internal static extern int NetUserAdd([MarshalAs(UnmanagedType.LPWStr)]string servername, UInt32 level, ref SafeNativeMethods.USER_INFO_1 buf, out Int32 parm_err);
+
+            [DllImport("Netapi32.dll", SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = true)]
+            internal extern static int NetUserGetInfo([MarshalAs(UnmanagedType.LPWStr)] string ServerName, [MarshalAs(UnmanagedType.LPWStr)] string UserName, int level, out IntPtr BufPtr);
+
+            [DllImport("netapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int NetUserSetInfo([MarshalAs(UnmanagedType.LPWStr)] string servername, string username, int level, ref structenums.USER_INFO_4 buf, out Int32 parm_err);
+
+            [DllImport("Netapi32.dll", SetLastError = true)]
+            internal static extern int NetApiBufferFree(IntPtr Buffer);
+
+            [DllImport("Netapi32.dll", SetLastError = true)]
+            internal static extern int NetUserDel([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string username);
+
+            [DllImport("Netapi32.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+            internal static extern int NetUserChangePassword([MarshalAs(UnmanagedType.LPWStr)] string domainname, [MarshalAs(UnmanagedType.LPWStr)] string username, [MarshalAs(UnmanagedType.LPWStr)] string oldpassword, [MarshalAs(UnmanagedType.LPWStr)] string newpassword);
+            #endregion
+
+            #region wtsapi32.dll
+            [DllImport("wtsapi32.dll", SetLastError = true)]
+            internal static extern bool WTSSendMessage(IntPtr hServer, [MarshalAs(UnmanagedType.I4)] int SessionId, String pTitle, [MarshalAs(UnmanagedType.U4)] int TitleLength, String pMessage, [MarshalAs(UnmanagedType.U4)] int MessageLength, [MarshalAs(UnmanagedType.U4)] int Style, [MarshalAs(UnmanagedType.U4)] int Timeout, [MarshalAs(UnmanagedType.U4)] out int pResponse, bool bWait);
+            #endregion
+
+            [DllImport("Mpr.dll", SetLastError = true)]
+            internal static extern int WNetUseConnection(IntPtr hwndOwner, NETRESOURCE lpNetResource, string lpPassword, string lpUserID, int dwFlags, string lpAccessName, string lpBufferSize, string lpResult);
+
+            #region kernel32.dll
+            [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            internal static extern bool GetDiskFreeSpaceEx(string drive, out long freeBytesForUser, out long totalBytes, out long freeBytes);
+            #endregion
+
+            #region kernel32.dll
+            [DllImport("kernel32.dll", SetLastError = true)]
+            internal static extern IntPtr GetCurrentProcess();
+            #endregion
+
+            #region advapi32.dll
+            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool LookupPrivilegeValue(string lpSystemName, string lpName, out LUID lpLuid);
+
+            [DllImport("advapi32.dll", ExactSpelling = true, SetLastError = true)]
+            internal static extern bool AdjustTokenPrivileges(IntPtr htok, bool disableAllPrivileges, ref TokPriv1Luid newState, int len, IntPtr prev, IntPtr relen);
+
+            [DllImport("advapi32.dll", SetLastError = true)]
+            internal static extern int RegLoadKey(UInt32 hKey, String lpSubKey, String lpFile);
+
+            [DllImport("advapi32.dll", SetLastError = true)]
+            internal static extern int RegUnLoadKey(UInt32 hKey, string lpSubKey);
+
+            [DllImport("userenv.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            internal static extern uint CreateProfile([MarshalAs(UnmanagedType.LPWStr)] String pszUserSid, [MarshalAs(UnmanagedType.LPWStr)] String pszUserName, [Out, MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder pszProfilePath, uint cchProfilePath);
+
+            [DllImport("userenv.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+            internal static extern bool GetUserProfileDirectory(IntPtr hToken, StringBuilder lpProfileDir, [MarshalAs(UnmanagedType.U4)] ref uint lpcchSize);
+
+            [DllImport("shell32.dll", SetLastError = true)]
+            internal static extern int SHGetFolderPath(IntPtr hwndOwner, int nFolder, IntPtr hToken, uint dwFlags, [Out] StringBuilder pszPath);
+
+            [DllImport("Advapi32.dll", SetLastError = true)]
+            internal static extern int RegCopyTree(UIntPtr hsKey, string lpSubKey, UIntPtr hdKey);
+
+            [DllImport("Advapi32.dll", SetLastError = true)]
+            internal static extern int RegCloseKey(UIntPtr hKey);
+
+            [DllImport("Advapi32.dll", SetLastError = true)]
+            internal static extern int RegCreateKey(structenums.baseKey hKey, [MarshalAs(UnmanagedType.LPStr)]string subKey, ref UIntPtr phkResult);
+
+            [DllImport("Advapi32.dll", SetLastError = true)]
+            internal static extern int RegOpenKey(structenums.baseKey hKey, [MarshalAs(UnmanagedType.LPStr)]string subKey, ref UIntPtr phkResult);
+
+            [DllImport("Advapi32.dll", SetLastError = true)]
+            internal static extern int RegDeleteTree(structenums.baseKey hKey, [MarshalAs(UnmanagedType.LPStr)]string subKey);
+            #endregion
+
+            [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+            internal struct USER_INFO_1052
+            {
+                internal IntPtr profile;
+            }
+
+            [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+            internal struct USER_INFO_1
+            {
+                internal string usri1_name;
+                internal string usri1_password;
+                internal int usri1_password_age;
+                internal pInvokes.structenums.UserPrivileges usri1_priv;
+                internal string usri1_home_dir;
+                internal string comment;
+                internal int usri1_flags;
+                internal string usri1_script_path;
+            }
+
+            internal struct Connect
+            {
+                internal const int CONNECT_INTERACTIVE = 0x00000008;
+                internal const int CONNECT_PROMPT = 0x00000010;
+                internal const int CONNECT_REDIRECT = 0x00000080;
+                internal const int CONNECT_UPDATE_PROFILE = 0x00000001;
+                internal const int CONNECT_COMMANDLINE = 0x00000800;
+                internal const int CONNECT_CMD_SAVECRED = 0x00001000;
+                internal const int CONNECT_LOCALDRIVE = 0x00000100;
+            }
+
+            internal struct TokenAccessRights
+            {
+                internal const string SE_RESTORE_NAME = "SeRestorePrivilege";
+                internal const string SE_BACKUP_NAME = "SeBackupPrivilege";
+                internal const UInt32 SE_PRIVILEGE_ENABLED = 0x00000002;
+                internal const UInt32 STANDARD_RIGHTS_REQUIRED = 0x000F0000;
+                internal const UInt32 STANDARD_RIGHTS_READ = 0x00020000;
+                internal const UInt32 TOKEN_ASSIGN_PRIMARY = 0x0001;
+                internal const UInt32 TOKEN_DUPLICATE = 0x0002;
+                internal const UInt32 TOKEN_IMPERSONATE = 0x0004;
+                internal const UInt32 TOKEN_QUERY = 0x0008;
+                internal const UInt32 TOKEN_QUERY_SOURCE = 0x0010;
+                internal const UInt32 TOKEN_ADJUST_PRIVILEGES = 0x0020;
+                internal const UInt32 TOKEN_ADJUST_GROUPS = 0x0040;
+                internal const UInt32 TOKEN_ADJUST_DEFAULT = 0x0080;
+                internal const UInt32 TOKEN_ADJUST_SESSIONID = 0x0100;
+                internal const UInt32 TOKEN_READ = (STANDARD_RIGHTS_READ | TOKEN_QUERY);
+                internal const UInt32 TOKEN_ALL_ACCESS = (STANDARD_RIGHTS_REQUIRED | TOKEN_ASSIGN_PRIMARY |
+                    TOKEN_DUPLICATE | TOKEN_IMPERSONATE | TOKEN_QUERY | TOKEN_QUERY_SOURCE |
+                    TOKEN_ADJUST_PRIVILEGES | TOKEN_ADJUST_GROUPS | TOKEN_ADJUST_DEFAULT |
+                    TOKEN_ADJUST_SESSIONID);
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            internal struct LUID
+            {
+                internal uint LowPart;
+                internal int HighPart;
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            internal struct LUID_AND_ATTRIBUTES
+            {
+                internal LUID pLuid;
+                internal UInt32 Attributes;
+            }
+
+            [StructLayout(LayoutKind.Sequential, Pack = 1)]
+            internal struct TokPriv1Luid
+            {
+                internal int Count;
+                internal LUID Luid;
+                internal UInt32 Attr;
+            }
+
+            internal static Boolean RegistryLoadPrivilegeSet = false;
+        }
+
+        public class structenums
+        {
+            [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
+            public struct OSVERSIONINFOW
+            {
+                [MarshalAs(UnmanagedType.U4)]
+                internal int dwOSVersionInfoSize;
+                [MarshalAs(UnmanagedType.U4)]
+                public int dwMajorVersion;
+                [MarshalAs(UnmanagedType.U4)]
+                public int dwMinorVersion;
+                [MarshalAs(UnmanagedType.U4)]
+                public int dwBuildNumber;
+                [MarshalAs(UnmanagedType.U4)]
+                public int dwPlatformId;
+                [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
+                public char[] szCSDVersion;
+            }
+
+            [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+            public struct USER_INFO_4
+            {
+                public string name;
+                public string password;
+                public int password_age;
+                public UserPrivileges priv;
+                public string home_dir;
+                public string comment;
+                public UserFlags flags;
+                public string script_path;
+                public AuthFlags auth_flags;
+                public string full_name;
+                public string usr_comment;
+                public string parms;
+                public string workstations;
+                public int last_logon;
+                public int last_logoff;
+                public int acct_expires;
+                public int max_storage;
+                public int units_per_week;
+                public IntPtr logon_hours;    // This is a PBYTE
+                public int bad_pw_count;
+                public int num_logons;
+                public string logon_server;
+                public int country_code;
+                public int code_page;
+                public IntPtr user_sid;     // This is a PSID
+                public int primary_group_id;
+                public string profile;
+                public string home_dir_drive;
+                public int password_expired;
+            }
+            public enum UserPrivileges
+            {
+                USER_PRIV_GUEST = 0x0,
+                USER_PRIV_USER = 0x1,
+                USER_PRIV_ADMIN = 0x2,
+            }
+            public enum UserFlags
+            {
+                UF_SCRIPT = 0x0001,
+                UF_ACCOUNTDISABLE = 0x0002,
+                UF_HOMEDIR_REQUIRED = 0x0008,
+                UF_PASSWD_NOTREQD = 0x0020,
+                UF_PASSWD_CANT_CHANGE = 0x0040,
+                UF_LOCKOUT = 0x0010,
+                UF_DONT_EXPIRE_PASSWD = 0x10000,
+                UF_ENCRYPTED_TEXT_PASSWORD_ALLOWED = 0x0080,
+                UF_NOT_DELEGATED = 0x100000,
+                UF_SMARTCARD_REQUIRED = 0x40000,
+                UF_USE_DES_KEY_ONLY = 0x200000,
+                UF_DONT_REQUIRE_PREAUTH = 0x400000,
+                UF_TRUSTED_FOR_DELEGATION = 0x80000,
+                UF_PASSWORD_EXPIRED = 0x800000,
+                UF_TRUSTED_TO_AUTHENTICATE_FOR_DELEGATION = 0x1000000,
+                UF_NORMAL_ACCOUNT = 0x0200,
+                UF_TEMP_DUPLICATE_ACCOUNT = 0x0100,
+                UF_WORKSTATION_TRUST_ACCOUNT = 0x1000,
+                UF_SERVER_TRUST_ACCOUNT = 0x2000,
+                UF_INTERDOMAIN_TRUST_ACCOUNT = 0x0800,
+            }
+            public enum AuthFlags
+            {
+                AF_OP_PRINT = 0x1,
+                AF_OP_COMM = 0x2,
+                AF_OP_SERVER = 0x4,
+                AF_OP_ACCOUNTS = 0x8,
+            }
+
+            public enum RegistryLocation
+            {
+                HKEY_CLASSES_ROOT,
+                HKEY_CURRENT_USER,
+                HKEY_LOCAL_MACHINE,
+                HKEY_USERS,
+                HKEY_CURRENT_CONFIG
+            }
+
+            public enum baseKey : uint
+            {
+                HKEY_CLASSES_ROOT = 0x80000000,
+                HKEY_CURRENT_USER = 0x80000001,
+                HKEY_LOCAL_MACHINE = 0x80000002,
+                HKEY_USERS = 0x80000003,
+                HKEY_CURRENT_CONFIG = 0x80000005
+            }
         }
 
         public static int GetSessionId()
@@ -850,6 +1121,611 @@ namespace Abstractions.WindowsApi
             if (hToken != IntPtr.Zero) CloseHandle(hToken);
 
             return result;
+        }
+
+        /// <summary>
+        /// Create a handle to the user token
+        /// make sure to close the handle!!!
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="domain"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static IntPtr GetUserToken(string username, string domain, string password)
+        {
+            IntPtr hToken = IntPtr.Zero;
+            bool result = SafeNativeMethods.LogonUser(username, domain, password,
+                (int)SafeNativeMethods.LogonType.LOGON32_LOGON_NETWORK,
+                (int)SafeNativeMethods.LogonProvider.LOGON32_PROVIDER_DEFAULT,
+                out hToken);
+            if (!result)
+            {
+                LibraryLogging.Error("LogonUser error:{0}", LastError());
+            }
+
+            return hToken;
+        }
+
+        /// <summary>
+        /// calls API CreateProfile
+        /// an empty string on error
+        /// a null string on already exists
+        /// a string on success
+        /// </summary>
+        /// <param name="hToken"></param>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        public static string CreateUserProfileDir(IntPtr hToken, string username)
+        {
+            StringBuilder path = new StringBuilder(260);
+            uint size = Convert.ToUInt32(path.Capacity);
+            uint hResult = 0;
+
+            using (System.Security.Principal.WindowsIdentity i = new System.Security.Principal.WindowsIdentity(hToken))
+            {
+                hResult = SafeNativeMethods.CreateProfile(i.Owner.Value, username, path, size);
+            }
+            if (hResult == 2147942583)
+            {
+                LibraryLogging.Error("CreateProfile already exists:{0}", LastError());
+                return null;
+            }
+            else if (hResult == 0)
+            {
+                return path.ToString();
+            }
+            else
+            {
+                LibraryLogging.Error("CreateProfile error:{0} {1}", hResult, LastError());
+            }
+
+            return "";
+        }
+
+        /// <summary>
+        /// get or create user profile directory
+        /// only if the ProfileList regkey is not of SID.bak (Abstractions.User.FixProfileList)
+        /// an empty or null string means error
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="domain"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static string GetOrSetUserProfileDir(string username, string domain, string password)
+        {
+            string ret = "";
+            StringBuilder path = new StringBuilder(260);
+            uint path_size = Convert.ToUInt32(path.Capacity);
+
+            IntPtr hToken = GetUserToken(username, domain, password);
+            if (hToken == IntPtr.Zero)
+            {
+                LibraryLogging.Error("GetUserProfileDir can't get userToken");
+                return "";
+            }
+
+            ret = GetUserProfileDir(hToken);
+            if (String.IsNullOrEmpty(ret))
+            {
+                ret = CreateUserProfileDir(hToken, username);
+                if (String.IsNullOrEmpty(ret))
+                {
+                    LibraryLogging.Error("GetOrSetUserProfileDir failed to get and create profile error:{0}", LastError());
+                }
+            }
+            SafeNativeMethods.CloseHandle(hToken);
+
+            return ret;
+        }
+
+        /// <summary>
+        /// returns userprofile based on GetUserProfileDirectory
+        /// only if the ProfileList regkey is not of SID.bak (Abstractions.User.FixProfileList)
+        /// empty string means error
+        /// </summary>
+        /// <param name="hToken"></param>
+        /// <returns></returns>
+        public static string GetUserProfileDir(IntPtr hToken)
+        {
+            string ret = "";
+            StringBuilder path = new StringBuilder(260);
+            uint path_size = Convert.ToUInt32(path.Capacity);
+
+            if (SafeNativeMethods.GetUserProfileDirectory(hToken, path, ref path_size))
+            {
+                ret = path.ToString();
+            }
+            else
+            {
+                LibraryLogging.Error("GetUserProfileDirectory error:{0}", LastError());
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// returns userprofile based on SHGetFolderPath
+        /// only if the profile realy exists and the ProfileList regkey is not of SID.bak (Abstractions.User.FixProfileList)
+        /// empty string means error
+        /// </summary>
+        /// <param name="hToken"></param>
+        /// <returns></returns>
+        public static string GetUserProfilePath(IntPtr hToken)
+        {
+            const int MaxPath = 260;
+            StringBuilder sb = new StringBuilder(MaxPath);
+
+            int hResult = SafeNativeMethods.SHGetFolderPath(IntPtr.Zero, 0x0028/*CSIDL_PROFILE*/, hToken, 0x0000, sb);
+            if (hResult != 0)
+            {
+                LibraryLogging.Error("SHGetFolderPath error:{0}", LastError());
+                return "";
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// get the real windows version
+        /// http://www.codeproject.com/Articles/678606/Part-Overcoming-Windows-s-deprecation-of-GetVe
+        /// </summary>
+        /// <returns></returns>
+        public static structenums.OSVERSIONINFOW VersionsInfo()
+        {
+            structenums.OSVERSIONINFOW ret = new structenums.OSVERSIONINFOW();
+            ret.dwOSVersionInfoSize = Marshal.SizeOf(ret);
+
+            if (SafeNativeMethods.RtlGetVersion(ref ret) != 0)
+            {
+                LibraryLogging.Error("VersionsInfo error:{0}", LastError());
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// return true if a local user exists
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        public static Boolean UserExists(string username)
+        {
+            structenums.USER_INFO_4 userinfo4 = new structenums.USER_INFO_4();
+            if (UserGet(username, ref userinfo4))
+            {
+                return true;
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// add user to the local system
+        /// based on http://social.msdn.microsoft.com/forums/en-us/csharpgeneral/thread/B70B79D9-971F-4D6F-8462-97FC126DE0AD
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <param name="comment"></param>
+        /// <returns></returns>
+        public static Boolean UserADD(string username, string password, string comment)
+        {
+            SafeNativeMethods.USER_INFO_1 NewUser = new SafeNativeMethods.USER_INFO_1();
+
+            NewUser.usri1_name = username; // Allocates the username
+            NewUser.usri1_password = password; // allocates the password
+            NewUser.usri1_priv = structenums.UserPrivileges.USER_PRIV_USER; // Sets the account type to USER_PRIV_USER
+            NewUser.usri1_home_dir = null; // We didn't supply a Home Directory
+            NewUser.comment = comment;// "pGina created pgSMB"; // Comment on the User
+            NewUser.usri1_script_path = null; // We didn't supply a Logon Script Path
+
+            Int32 ret;
+            SafeNativeMethods.NetUserAdd(Environment.MachineName, 1, ref NewUser, out ret);
+            //2224 The user account already exists. NERR_UserExists
+            if ((ret != 0) && (ret != 2224)) // If the call fails we get a non-zero value
+            {
+                LibraryLogging.Error("NetUserAdd error:{0} {1}", ret, LastError());
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// modify local user settings based on a USER_INFO_4 struct
+        /// based on http://social.msdn.microsoft.com/forums/en-us/csharpgeneral/thread/B70B79D9-971F-4D6F-8462-97FC126DE0AD
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="userInfo4"></param>
+        /// <returns></returns>
+        public static Boolean UserMod(string username, structenums.USER_INFO_4 userInfo4)
+        {
+            Int32 ret = 1;
+
+            SafeNativeMethods.NetUserSetInfo(null, username, 4, ref userInfo4, out ret);
+            if (ret != 0) // If the call fails we get a non-zero value
+            {
+                LibraryLogging.Error("NetUserSetInfo error:{0} {1}", ret, LastError());
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// returns local user settings as a ref of an USER_INFO_4 struct
+        /// based on http://social.msdn.microsoft.com/forums/en-us/csharpgeneral/thread/B70B79D9-971F-4D6F-8462-97FC126DE0AD
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="userinfo4">a ref of an USER_INFO_4 struct</param>
+        /// <returns>bool true 4 success</returns>
+        public static Boolean UserGet(string username, ref structenums.USER_INFO_4 userinfo4)
+        {
+            IntPtr bufPtr;
+
+            int lngReturn = SafeNativeMethods.NetUserGetInfo(null, username, 4, out bufPtr);
+            if (lngReturn == 0)
+            {
+                userinfo4 = (structenums.USER_INFO_4)Marshal.PtrToStructure(bufPtr, typeof(structenums.USER_INFO_4));
+            }
+            else if (lngReturn == 2221)
+            {
+                // user does not exist
+            }
+            else
+            {
+                string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).ToString();
+                LibraryLogging.Error("NetUserGetInfo error:{0} {1}", lngReturn, errorMessage);
+            }
+
+            SafeNativeMethods.NetApiBufferFree(bufPtr);
+
+            if (lngReturn == 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// delete a local user
+        /// based on http://social.msdn.microsoft.com/forums/en-us/csharpgeneral/thread/B70B79D9-971F-4D6F-8462-97FC126DE0AD
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        public static Boolean UserDel(string username)
+        {
+            Int32 ret;
+
+            ret = SafeNativeMethods.NetUserDel(null, username);
+            if ((ret != 0) && (ret != 2221)) // If the call fails we get a non-zero value
+            {
+                LibraryLogging.Error("NetUserDel error:{0} {1}", ret, LastError());
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// send a messagebox to a session
+        /// </summary>
+        /// <param name="sessionID"></param>
+        /// <param name="title"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static Boolean SendMessageToUser(int sessionID, string title, string message)
+        {
+            int resp = 0;
+            bool result = SafeNativeMethods.WTSSendMessage(IntPtr.Zero, sessionID, title, title.Length, message, message.Length, 0, 0, out resp, false);
+            if (!result)
+            {
+                LibraryLogging.Error("WTSSendMessage error:{0} {1}", result, LastError());
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// connect to a remote computer
+        /// based on http://social.msdn.microsoft.com/Forums/et-EE/netfxbcl/thread/58159e0e-aa45-4d46-a128-596c3d23ff5c
+        /// </summary>
+        /// <param name="remoteUNC"></param>
+        /// <param name="username">better use the domainname\username format</param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static Boolean MapNetworkDrive(string remoteUNC, string username, string password)
+        {
+            return MapNetworkDrive(remoteUNC, username, password, false);
+        }
+
+        /// <summary>
+        /// connect to a remote computer
+        /// based on http://social.msdn.microsoft.com/Forums/et-EE/netfxbcl/thread/58159e0e-aa45-4d46-a128-596c3d23ff5c
+        /// </summary>
+        /// <param name="remoteUNC"></param>
+        /// <param name="username">better use the domainname\username format</param>
+        /// <param name="password"></param>
+        /// <param name="promptUser">true to for a promt, if needed</param>
+        /// <returns></returns>
+        public static Boolean MapNetworkDrive(string remoteUNC, string username, string password, bool promptUser)
+        {
+            SafeNativeMethods.NETRESOURCE nr = new SafeNativeMethods.NETRESOURCE();
+            nr.dwType = SafeNativeMethods.ResourceType.RESOURCETYPE_DISK;
+            nr.lpRemoteName = remoteUNC;
+            // nr.lpLocalName = "F:";
+
+            int ret;
+            if (promptUser)
+            {
+                ret = SafeNativeMethods.WNetUseConnection(IntPtr.Zero, nr, "", "", SafeNativeMethods.Connect.CONNECT_INTERACTIVE | SafeNativeMethods.Connect.CONNECT_PROMPT, null, null, null);
+            }
+            else
+            {
+                ret = SafeNativeMethods.WNetUseConnection(IntPtr.Zero, nr, password, username, 0, null, null, null);
+            }
+
+            if (ret != 0)
+            {
+                LibraryLogging.Error("Unable to connect to {0} as {1} Error:{2} {3}", remoteUNC, username, ret, LastError());
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// disconnecting an UNC share
+        /// </summary>
+        /// <param name="remoteUNC"></param>
+        /// <returns></returns>
+        public static Boolean DisconnectNetworkDrive(string remoteUNC)
+        {
+            int ret = SafeNativeMethods.WNetCancelConnection2(remoteUNC, SafeNativeMethods.Connect.CONNECT_UPDATE_PROFILE, false);
+            if ((ret != 0) && (ret != 2250/*This network connection does not exist*/))
+            {
+                LibraryLogging.Error("Unable to disConnect from {0} Error:{1} {2}", remoteUNC, ret, LastError());
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Retrieves information about the amount of space that is available on a disk volume, which is the total amount of space, the total amount of free space, and the total amount of free space available to the user that is associated with the calling thread.
+        /// based on http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
+        /// </summary>
+        /// <param name="share"></param>
+        /// <returns>An array[freeBytesForUser,totalBytes,freeBytes]. On error all values are -1</returns>
+        public static long[] GetFreeShareSpace(string share)
+        {
+            long freeBytesForUser = -1, totalBytes = -1, freeBytes = -1;
+
+            if (!SafeNativeMethods.GetDiskFreeSpaceEx(share, out freeBytesForUser, out totalBytes, out freeBytes))
+            {
+                LibraryLogging.Error("Unable to enumerate free space on {0} Error:{1}", share, LastError());
+                return new long[] { -1, -1, -1 };
+            }
+
+            return new long[] { freeBytesForUser, totalBytes, freeBytes };
+        }
+
+        /// <summary>
+        /// get RegistryKey from structenums.RegistryLocation
+        /// </summary>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        public static RegistryKey GetRegistryLocation(structenums.RegistryLocation location)
+        {
+            switch (location)
+            {
+                case structenums.RegistryLocation.HKEY_CLASSES_ROOT:
+                    return Registry.ClassesRoot;
+
+                case structenums.RegistryLocation.HKEY_CURRENT_USER:
+                    return Registry.CurrentUser;
+
+                case structenums.RegistryLocation.HKEY_LOCAL_MACHINE:
+                    return Registry.LocalMachine;
+
+                case structenums.RegistryLocation.HKEY_USERS:
+                    return Registry.Users;
+
+                case structenums.RegistryLocation.HKEY_CURRENT_CONFIG:
+                    return Registry.CurrentConfig;
+
+                default:
+                    return null;
+            }
+        }
+
+        // based on http://stackoverflow.com/questions/7894909/load-registry-hive-from-c-sharp-fails
+        internal static Boolean RegistryLoadSetPrivilege()
+        {
+            IntPtr _myToken;
+            SafeNativeMethods.TokPriv1Luid _tokenPrivileges = new SafeNativeMethods.TokPriv1Luid();
+            SafeNativeMethods.TokPriv1Luid _tokenPrivileges2 = new SafeNativeMethods.TokPriv1Luid();
+            SafeNativeMethods.LUID _restoreLuid;
+            SafeNativeMethods.LUID _backupLuid;
+
+            if (!SafeNativeMethods.OpenProcessToken(SafeNativeMethods.GetCurrentProcess(), SafeNativeMethods.TokenAccessRights.TOKEN_ADJUST_PRIVILEGES | SafeNativeMethods.TokenAccessRights.TOKEN_QUERY, out _myToken))
+            {
+                LibraryLogging.Error("SetPrivilege() OpenProcess Error: {0}", LastError());
+                return false;
+            }
+
+            if (!SafeNativeMethods.LookupPrivilegeValue(null, SafeNativeMethods.TokenAccessRights.SE_RESTORE_NAME, out _restoreLuid))
+            {
+                LibraryLogging.Error("SetPrivilege() LookupPrivilegeValue Error: {0}", LastError());
+                return false;
+            }
+
+            if (!SafeNativeMethods.LookupPrivilegeValue(null, SafeNativeMethods.TokenAccessRights.SE_BACKUP_NAME, out _backupLuid))
+            {
+                LibraryLogging.Error("SetPrivilege() LookupPrivilegeValue Error: {0}", LastError());
+                return false;
+            }
+
+            _tokenPrivileges.Attr = SafeNativeMethods.TokenAccessRights.SE_PRIVILEGE_ENABLED;
+            _tokenPrivileges.Luid = _restoreLuid;
+            _tokenPrivileges.Count = 1;
+
+            _tokenPrivileges2.Attr = SafeNativeMethods.TokenAccessRights.SE_PRIVILEGE_ENABLED;
+            _tokenPrivileges2.Luid = _backupLuid;
+            _tokenPrivileges2.Count = 1;
+
+            if (!SafeNativeMethods.AdjustTokenPrivileges(_myToken, false, ref _tokenPrivileges, 0, IntPtr.Zero, IntPtr.Zero))
+            {
+                LibraryLogging.Error("SetPrivilege() AdjustTokenPrivileges Error: {0}", LastError());
+                return false;
+            }
+
+            if (!SafeNativeMethods.AdjustTokenPrivileges(_myToken, false, ref _tokenPrivileges2, 0, IntPtr.Zero, IntPtr.Zero))
+            {
+                LibraryLogging.Error("SetPrivilege() AdjustTokenPrivileges Error: {0}", LastError());
+                return false;
+            }
+
+            if (!CloseHandle(_myToken))
+            {
+                LibraryLogging.Warn("Can't close handle _myToken");
+            }
+
+            SafeNativeMethods.RegistryLoadPrivilegeSet = true;
+            return true;
+        }
+
+        /// <summary>
+        /// load a regfile at hklm or hku
+        /// </summary>
+        /// <param name="where">hklm or hku</param>
+        /// <param name="name">The name of the key to be created under hKey. This subkey is where the registration information from the file will be loaded</param>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static Boolean RegistryLoad(structenums.RegistryLocation where, string name, string file)
+        {
+            if (where != structenums.RegistryLocation.HKEY_LOCAL_MACHINE && where != structenums.RegistryLocation.HKEY_USERS)
+            {
+                LibraryLogging.Error("unable to load regfile at {0}", where);
+                return false;
+            }
+
+            if (!SafeNativeMethods.RegistryLoadPrivilegeSet)
+            {
+                if (!RegistryLoadSetPrivilege())
+                    return false;
+            }
+
+            int ret = SafeNativeMethods.RegLoadKey((uint)Enum.Parse(typeof(structenums.baseKey), where.ToString()), name, file);
+            if (ret != 0)
+            {
+                LibraryLogging.Error("Unable to load regfile {0} error:{1} {2}", file, ret, LastError(ret));
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// unload regfile from regkey
+        /// </summary>
+        /// <param name="where">hklm or hku</param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static Boolean RegistryUnLoad(structenums.RegistryLocation where, string name)
+        {
+            if (!SafeNativeMethods.RegistryLoadPrivilegeSet)
+            {
+                if (!RegistryLoadSetPrivilege())
+                    return false;
+            }
+
+            int ret = SafeNativeMethods.RegUnLoadKey((uint)Enum.Parse(typeof(structenums.baseKey), where.ToString()), name);
+            if (ret != 0)
+            {
+                LibraryLogging.Error("Unable to unload regkey {0} error:{1} {2}", name, ret, LastError(ret));
+                return false;
+            }
+            return true;
+        }
+
+        public static UIntPtr RegistryCreateKey(structenums.baseKey RootKey, string SubKey)
+        {
+            UIntPtr hKey = UIntPtr.Zero;
+            int Result = SafeNativeMethods.RegCreateKey(RootKey, SubKey, ref hKey);
+            if (Result != 0)
+            {
+                Console.WriteLine("RegCreateKey error:{0}", LastError(Result));
+            }
+
+            return hKey;
+        }
+
+        public static UIntPtr RegistryOpenKey(structenums.baseKey RootKey, string SubKey)
+        {
+            UIntPtr hKey = UIntPtr.Zero;
+            int Result = SafeNativeMethods.RegOpenKey(RootKey, SubKey, ref hKey);
+            if (Result != 0)
+            {
+                Console.WriteLine("RegOpenKey error:{0}", LastError(Result));
+            }
+
+            return hKey;
+        }
+
+        public static Boolean RegistryCloseKey(UIntPtr hKey)
+        {
+            int Result = SafeNativeMethods.RegCloseKey(hKey);
+            if (Result != 0)
+            {
+                Console.WriteLine("RegCloseKey error:{0}", LastError(Result));
+                return false;
+            }
+
+            return true;
+        }
+
+        public static Boolean RegistryCopyKey(UIntPtr hKey_src, string SubKey, UIntPtr hKey_dst)
+        {
+            int Result = SafeNativeMethods.RegCopyTree(hKey_src, SubKey, hKey_dst);
+            if (Result != 0)
+            {
+                Console.WriteLine("CopyKey error:{0}", LastError(Result));
+                return false;
+            }
+
+            return true;
+        }
+
+        public static Boolean RegistryDeleteTree(structenums.baseKey RootKey, string SubKey)
+        {
+            int Result = SafeNativeMethods.RegDeleteTree(RootKey, SubKey);
+            if (Result != 0)
+            {
+                Console.WriteLine("CopyKey error:{0}", LastError(Result));
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// returns GetLastWin32Error as string
+        /// </summary>
+        /// <returns></returns>
+        internal static string LastError(int error)
+        {
+            return new Win32Exception(error).Message;
+
+        }
+
+        /// <summary>
+        /// returns GetLastWin32Error as string
+        /// </summary>
+        /// <returns></returns>
+        internal static string LastError()
+        {
+            return new Win32Exception(Marshal.GetLastWin32Error()).Message;
         }
     }
 }

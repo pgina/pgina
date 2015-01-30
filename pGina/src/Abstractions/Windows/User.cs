@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -30,12 +30,20 @@ using System.Linq;
 using System.Text;
 using System.Security.Principal;
 using Microsoft.Win32;
+using Abstractions.WindowsApi;
+using Abstractions.Logging;
 
 namespace Abstractions.Windows
 {
-    public class User
+    public static class User
     {
         const string ROOT_PROFILE_KEY = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList";
+
+        /// <summary>
+        /// returns profiledir based on regkey
+        /// </summary>
+        /// <param name="sid"></param>
+        /// <returns></returns>
         public static string GetProfileDir(SecurityIdentifier sid)
         {
             //"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\S-1-5-21-534125731-1308685933-1530606844-1000}"
@@ -52,7 +60,7 @@ namespace Abstractions.Windows
                                 return (string) subKey.GetValue("ProfileImagePath", null, RegistryValueOptions.None);
                             }
                         }
-                    }                    
+                    }
 
                     throw new KeyNotFoundException(string.Format("Unable to find value for: {0}", sid));
                 }
@@ -60,7 +68,148 @@ namespace Abstractions.Windows
                 {
                     throw new KeyNotFoundException(string.Format("Unable to open registry key"));
                 }
-            }            
+            }
+        }
+
+        /// <summary>
+        /// if a user receives a temp profile of whatever reason
+        /// MS is renaming the SID key under ProfileList to SID.bak
+        /// if so winapi calls will fail and not returning anything
+        /// </summary>
+        /// <param name="userSID"></param>
+        /// <returns></returns>
+        public static Boolean FixProfileList(string userSID)
+        {
+            string regkey = ROOT_PROFILE_KEY + "\\" + userSID;
+            UIntPtr key = UIntPtr.Zero;
+            UIntPtr key_bak = UIntPtr.Zero;
+            Boolean ret = false;
+
+            key = Abstractions.WindowsApi.pInvokes.RegistryOpenKey(Abstractions.WindowsApi.pInvokes.structenums.baseKey.HKEY_LOCAL_MACHINE, regkey);
+            if (key == UIntPtr.Zero)
+            {
+                key_bak = Abstractions.WindowsApi.pInvokes.RegistryOpenKey(Abstractions.WindowsApi.pInvokes.structenums.baseKey.HKEY_LOCAL_MACHINE, regkey + ".bak");
+                if (key_bak != UIntPtr.Zero)
+                {
+                    key = Abstractions.WindowsApi.pInvokes.RegistryCreateKey(Abstractions.WindowsApi.pInvokes.structenums.baseKey.HKEY_LOCAL_MACHINE, regkey);
+                    if (key != UIntPtr.Zero)
+                    {
+                        ret = Abstractions.WindowsApi.pInvokes.RegistryCopyKey(key_bak, null, key);
+                        if (ret)
+                        {
+                            if (Abstractions.WindowsApi.pInvokes.RegistryCloseKey(key_bak))
+                            {
+                                Abstractions.WindowsApi.pInvokes.RegistryDeleteTree(Abstractions.WindowsApi.pInvokes.structenums.baseKey.HKEY_LOCAL_MACHINE, regkey + ".bak");
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    ret = true;
+                }
+            }
+            else
+            {
+                ret = true;
+            }
+            if (key_bak != UIntPtr.Zero)
+            {
+                Abstractions.WindowsApi.pInvokes.RegistryCloseKey(key_bak);
+            }
+            if (key != UIntPtr.Zero)
+            {
+                Abstractions.WindowsApi.pInvokes.RegistryCloseKey(key);
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// returns user profile direrctory
+        /// empty string on error
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static string GetProfileDir(string username, string password)
+        {
+            IntPtr hToken = Abstractions.WindowsApi.pInvokes.GetUserToken(username, "", password);
+            string ret = Abstractions.WindowsApi.pInvokes.GetUserProfileDir(hToken);
+            Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
+
+            return ret;
+        }
+
+        /// <summary>
+        /// sets user profile quota
+        /// </summary>
+        /// <param name="where">ROOTKEY hklm or hku</param>
+        /// <param name="name">SubKey name</param>
+        /// <param name="quota">if 0 means the profile quota GPO it will be deleted</param>
+        /// <returns>false on error</returns>
+        public static Boolean SetQuota(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation where, string name, uint quota)
+        {
+            LibraryLogging.Info("set Quota for {0}", name);
+            try
+            {
+                using (RegistryKey key = Abstractions.WindowsApi.pInvokes.GetRegistryLocation(where).CreateSubKey(name + @"\Software\Microsoft\Windows\CurrentVersion\Policies\System"))
+                {
+                    if (quota > 0)
+                    {
+                        key.SetValue("EnableProfileQuota", 1, RegistryValueKind.DWord);
+                        key.SetValue("ProfileQuotaMessage", "\"You have exceeded your profile storage space. Before you can log off, you need to move some items from your profile to network or local storage.\"", RegistryValueKind.String);
+                        key.SetValue("MaxProfileSize", quota, RegistryValueKind.DWord);
+                        key.SetValue("IncludeRegInProQuota", 1, RegistryValueKind.DWord);
+                        key.SetValue("WarnUser", 1, RegistryValueKind.DWord);
+                        key.SetValue("WarnUserTimeout", 5, RegistryValueKind.DWord);
+                    }
+                    else
+                    {
+                        key.DeleteValue("EnableProfileQuota", false);
+                        key.DeleteValue("ProfileQuotaMessage", false);
+                        key.DeleteValue("MaxProfileSize", false);
+                        key.DeleteValue("IncludeRegInProQuota", false);
+                        key.DeleteValue("WarnUser", false);
+                        key.DeleteValue("WarnUserTimeout", false);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Error("Can't set profile quota for {0} Error:{1}", name, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// query for already set user profile quota
+        /// </summary>
+        /// <param name="where"></param>
+        /// <param name="name"></param>
+        /// <returns>true on already set</returns>
+        public static Boolean QueryQuota(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation where, string name)
+        {
+            LibraryLogging.Info("query Quota for {0}", name);
+            try
+            {
+                using (RegistryKey key = Abstractions.WindowsApi.pInvokes.GetRegistryLocation(where).OpenSubKey(name + @"\Software\Microsoft\Windows\CurrentVersion\Policies\System"))
+                {
+                    if (key.GetValue("EnableProfileQuota") == null)
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Error("Can't get profile quota for {0} Error:{1}", name, ex.Message);
+                return false;
+            }
+
+            return true;
         }
     }
 }

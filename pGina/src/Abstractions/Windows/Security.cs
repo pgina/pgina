@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -30,9 +30,15 @@ using System.Linq;
 using System.Text;
 using System.Security.Principal;
 
+using Abstractions.Logging;
+using Abstractions.WindowsApi;
+using System.Security.AccessControl;
+using Microsoft.Win32;
+using System.IO;
+
 namespace Abstractions.Windows
 {
-    public class Security
+    public static class Security
     {
         public static SecurityIdentifier GetWellknownSID(WellKnownSidType type)
         {
@@ -54,6 +60,298 @@ namespace Abstractions.Windows
         {
             NTAccount ntAccount = new NTAccount(name);
             return (SecurityIdentifier)ntAccount.Translate(typeof(SecurityIdentifier));
+        }
+
+        /// <summary>
+        /// apply registry security settings to user profiles
+        /// </summary>
+        /// <param name="where"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static Boolean RegSec(pInvokes.structenums.RegistryLocation where, string name)
+        {
+            try
+            {
+                bool result = false;
+                RegistryAccessRule accessRule = new RegistryAccessRule(name, RegistryRights.FullControl, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow);
+
+                using (RegistryKey key = pInvokes.GetRegistryLocation(where).OpenSubKey(name, true))
+                {
+                    RegistrySecurity keySecurity = key.GetAccessControl(AccessControlSections.Access);
+
+                    // delete unknown users
+                    try
+                    {
+                        foreach (RegistryAccessRule user in keySecurity.GetAccessRules(true, true, typeof(System.Security.Principal.NTAccount)))
+                        {
+                            //LibraryLogging.Debug("registry ACE user: {0}", user.IdentityReference.Value);
+                            if (user.IdentityReference.Value.StartsWith("S-1-5-21-"))
+                            {
+                                LibraryLogging.Debug("delete registry ACE from unknown user: {0}", user.IdentityReference.Value);
+                                keySecurity.RemoveAccessRule(user);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LibraryLogging.Error("delete registry ACE from unknown user error: {0}", ex.Message);
+                    }
+
+                    //add the user
+                    keySecurity.ModifyAccessRule(AccessControlModification.Add, accessRule, out result);
+                    if (result)
+                    {
+                        key.SetAccessControl(keySecurity);
+                    }
+                    else
+                    {
+                        LibraryLogging.Error("unable to add User {0} registry ACE {1} {2}", name, result, pInvokes.LastError());
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Error("RegSec error {0}", ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// apply recursive attribute to directories and files
+        /// </summary>
+        /// <param name="dir"></param>
+        /// <param name="attrib"></param>
+        /// <returns></returns>
+        public static Boolean SetRecDirAttrib(DirectoryInfo dir, FileAttributes attrib)
+        {
+            try
+            {
+                foreach (DirectoryInfo subDirPath in dir.GetDirectories())
+                {
+                    subDirPath.Attributes = attrib;
+                    SetRecDirAttrib(subDirPath, attrib);
+                }
+                foreach (FileInfo filePath in dir.GetFiles())
+                {
+                    filePath.Attributes = attrib;
+                }
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Error("Cant't set attrib {0} on {1} Error:{2}", attrib, dir, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// remove users who are unknown to the system from the directory acl
+        /// </summary>
+        /// <param name="dir"></param>
+        /// <returns></returns>
+        public static Boolean RemoveAccRuleFromUnknownUser(string dir)
+        {
+            DirectoryInfo dInfo = new DirectoryInfo(dir);
+            DirectorySecurity dSecurity = dInfo.GetAccessControl();
+
+            try
+            {
+                foreach (FileSystemAccessRule user in dSecurity.GetAccessRules(true, true, typeof(System.Security.Principal.NTAccount)))
+                {
+                    //LibraryLogging.Debug("directory ACE user: {0}", user.IdentityReference.Value);
+                    if (user.IdentityReference.Value.StartsWith("S-1-5-21-"))
+                    {
+                        LibraryLogging.Debug("delete unknown directory ACE from {0} in {1}", user.IdentityReference.Value, dir);
+                        dSecurity.RemoveAccessRule(user);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Error("unable to RemoveAccRuleFromUnknownUser for {0} error {1}", dir, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        public static Boolean SetDirectorySecurity(string dir, IdentityReference[] Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
+        {
+            DirectoryInfo dInfo = new DirectoryInfo(dir);
+            DirectorySecurity dSecurity = dInfo.GetAccessControl();
+
+            try
+            {
+                foreach (IdentityReference account in Account)
+                {
+                    dSecurity.AddAccessRule(new FileSystemAccessRule(account, Rights, Inherit, Propagation, ControlType));
+                }
+                dInfo.SetAccessControl(dSecurity);
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Error("unable to SetDirectorySecurity for {0} error {1}", dir, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        public static Boolean SetDirectorySecurity(string dir, string[] Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
+        {
+            DirectoryInfo dInfo = new DirectoryInfo(dir);
+            DirectorySecurity dSecurity = dInfo.GetAccessControl();
+
+            try
+            {
+                foreach (string account in Account)
+                {
+                    dSecurity.AddAccessRule(new FileSystemAccessRule(account, Rights, Inherit, Propagation, ControlType));
+                }
+                dInfo.SetAccessControl(dSecurity);
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Error("unable to SetDirectorySecurity for {0} error {1}", dir, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        public static Boolean ReplaceDirectorySecurity(string dir, IdentityReference[] Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
+        {
+            DirectoryInfo dInfo = new DirectoryInfo(dir);
+            DirectorySecurity dSecurity = new DirectorySecurity();
+
+            try
+            {
+                dSecurity.SetAccessRuleProtection(true, false);
+                foreach (IdentityReference account in Account)
+                {
+                    dSecurity.ResetAccessRule(new FileSystemAccessRule(account, Rights, Inherit, Propagation, ControlType));
+                }
+                dInfo.SetAccessControl(dSecurity);
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Error("unable to ReplaceDirectorySecurity for {0} error {1}", dir, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        public static Boolean ReplaceDirectorySecurity(string dir, string[] Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
+        {
+            DirectoryInfo dInfo = new DirectoryInfo(dir);
+            DirectorySecurity dSecurity = new DirectorySecurity();
+
+            try
+            {
+                dSecurity.SetAccessRuleProtection(true, false);
+                foreach (string account in Account)
+                {
+                    dSecurity.ResetAccessRule(new FileSystemAccessRule(account, Rights, Inherit, Propagation, ControlType));
+                }
+                dInfo.SetAccessControl(dSecurity);
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Error("unable to ReplaceDirectorySecurity for {0} error {1}", dir, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        public static Boolean ReplaceFileSecurity(string File, IdentityReference[] Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
+        {
+            FileInfo fInfo = new FileInfo(File);
+            FileSecurity fSecurity = fInfo.GetAccessControl();
+
+            try
+            {
+                fSecurity.SetAccessRuleProtection(true, false);
+                foreach (IdentityReference account in Account)
+                {
+                    fSecurity.ResetAccessRule(new FileSystemAccessRule(account, Rights, Inherit, Propagation, ControlType));
+                }
+                fInfo.SetAccessControl(fSecurity);
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Error("unable to ReplaceFileSecurity for {0} error {1}", File, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        public static Boolean ReplaceFileSecurity(string File, string[] Account, FileSystemRights Rights, AccessControlType ControlType, InheritanceFlags Inherit, PropagationFlags Propagation)
+        {
+            FileInfo fInfo = new FileInfo(File);
+            FileSecurity fSecurity = fInfo.GetAccessControl();
+
+            try
+            {
+                fSecurity.SetAccessRuleProtection(true, false);
+                foreach (string account in Account)
+                {
+                    fSecurity.ResetAccessRule(new FileSystemAccessRule(account, Rights, Inherit, Propagation, ControlType));
+                }
+                fInfo.SetAccessControl(fSecurity);
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Error("unable to ReplaceFileSecurity for {0} error {1}", File, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        public static Boolean SetDirOwner(string dir, IdentityReference Account)
+        {
+            DirectoryInfo dInfo = new DirectoryInfo(dir);
+            DirectorySecurity dSecurity = dInfo.GetAccessControl();
+
+            try
+            {
+                dSecurity.SetOwner(Account);
+                dInfo.SetAccessControl(dSecurity);
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Error("SetDirOwner unable to SetOwner for {0} error {1}", dir, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        public static Boolean SetDirOwner(string dir, string Account)
+        {
+            DirectoryInfo dInfo = new DirectoryInfo(dir);
+            DirectorySecurity dSecurity = dInfo.GetAccessControl();
+            IdentityReference User = new NTAccount(String.Format("{0}\\{1}",Environment.MachineName, Account));
+
+            try
+            {
+                dSecurity.SetOwner(User);
+                dInfo.SetAccessControl(dSecurity);
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Error("SetDirOwner unable to SetOwner for {0} error {1}", dir, ex.Message);
+                return false;
+            }
+
+            return true;
         }
     }
 }
