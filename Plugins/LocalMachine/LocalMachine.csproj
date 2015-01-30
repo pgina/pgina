@@ -64,9 +64,7 @@
     <Compile Include="LocalAccount.cs" />
     <Compile Include="PluginImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="registry.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="unc.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Configuration.resx">

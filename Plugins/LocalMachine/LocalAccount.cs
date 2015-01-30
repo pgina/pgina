@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -41,17 +41,18 @@ using System.Threading;
 using System.Net;
 
 using pGina.Shared.Types;
+using Abstractions;
 
 namespace pGina.Plugin.LocalMachine
 {
     public class LocalAccount
     {
-        private static ILog m_logger = null; 
+        private static ILog m_logger = null;
         private static DirectoryEntry m_sam = new DirectoryEntry("WinNT://" + Environment.MachineName + ",computer");
         private static PrincipalContext m_machinePrincipal = new PrincipalContext(ContextType.Machine);
         private static Random randGen = new Random();
 
-        public class GroupSyncException : Exception 
+        public class GroupSyncException : Exception
         {
             public GroupSyncException(Exception e)
             {
@@ -62,7 +63,7 @@ namespace pGina.Plugin.LocalMachine
         };
 
         private UserInformation m_userInfo = null;
-        public UserInformation UserInfo 
+        public UserInformation UserInfo
         {
             get { return m_userInfo; }
             set
@@ -71,7 +72,7 @@ namespace pGina.Plugin.LocalMachine
                 m_logger = LogManager.GetLogger(string.Format("LocalAccount[{0}]", m_userInfo.Username));
             }
         }
-        
+
         static LocalAccount()
         {
             m_logger = LogManager.GetLogger("LocalAccount");
@@ -79,8 +80,8 @@ namespace pGina.Plugin.LocalMachine
 
         public LocalAccount(UserInformation userInfo)
         {
-            UserInfo = userInfo;            
-        }        
+            UserInfo = userInfo;
+        }
 
         /// <summary>
         /// Finds and returns the UserPrincipal object if it exists, if not, returns null.
@@ -93,7 +94,7 @@ namespace pGina.Plugin.LocalMachine
         {
             if (string.IsNullOrEmpty(username)) return null;
 
-            // Since PrincipalSearcher is case sensitive, and we want a case insensitive 
+            // Since PrincipalSearcher is case sensitive, and we want a case insensitive
             // search, we get a list of all users and compare the names "manually."
             using (PrincipalSearcher searcher = new PrincipalSearcher(new UserPrincipal(m_machinePrincipal)))
             {
@@ -132,7 +133,7 @@ namespace pGina.Plugin.LocalMachine
 
             // In order to do a case insensitive search, we need to scan all
             // groups "manually."
-            using(PrincipalSearcher searcher = new PrincipalSearcher(new GroupPrincipal(m_machinePrincipal))) 
+            using(PrincipalSearcher searcher = new PrincipalSearcher(new GroupPrincipal(m_machinePrincipal)))
             {
                 PrincipalSearchResult<Principal> sr = searcher.FindAll();
                 foreach (Principal p in sr)
@@ -178,18 +179,18 @@ namespace pGina.Plugin.LocalMachine
                 userDe.Invoke("SetPassword", GenerateRandomPassword(30));
                 userDe.CommitChanges();
             }
-        } 
+        }
 
         /// <summary>
-        /// Generates a random password that meets most of the requriements of Windows 
-        /// Server when password policy complexity requirements are in effect.  
-        /// 
+        /// Generates a random password that meets most of the requriements of Windows
+        /// Server when password policy complexity requirements are in effect.
+        ///
         /// http://technet.microsoft.com/en-us/library/cc786468%28v=ws.10%29.aspx
-        /// 
+        ///
         /// This generates a string with at least two of each of the following character
         /// classes: uppercase letters, lowercase letters, and digits.
-        /// 
-        /// However, this method does not check for the existence of the username or 
+        ///
+        /// However, this method does not check for the existence of the username or
         /// display name within the
         /// generated password.  The probability of that occurring is somewhat remote,
         /// but could happen.  If that is a concern, this method could be called repeatedly
@@ -203,7 +204,7 @@ namespace pGina.Plugin.LocalMachine
 
             StringBuilder pass = new StringBuilder();
 
-            // Temporary array containing our character set: 
+            // Temporary array containing our character set:
             // uppercase letters, lowercase letters, and digits
             char[] charSet = new char[62];
             for( int i = 0; i < 26; i++) charSet[i] = (char)('A' + i);  // Uppercase letters
@@ -249,8 +250,8 @@ namespace pGina.Plugin.LocalMachine
                     if (user == null) return false;
 
                     return IsUserInGroup(user, group);
-                }                
-            }            
+                }
+            }
         }
 
         // Non recursive group check (immediate membership only currently)
@@ -258,8 +259,8 @@ namespace pGina.Plugin.LocalMachine
         {
             if (user == null || group == null) return false;
 
-            // This may seem a convoluted and strange way to check group membership.  
-            // Especially because I could just call user.IsMemberOf(group).  
+            // This may seem a convoluted and strange way to check group membership.
+            // Especially because I could just call user.IsMemberOf(group).
             // The reason for all of this is that IsMemberOf will throw an exception
             // if there is an unresolvable SID in the list of group members.  Unfortunately,
             // even looping over the members with a standard foreach loop doesn't allow
@@ -289,15 +290,15 @@ namespace pGina.Plugin.LocalMachine
 
                     // Sanity check to avoid infinite loops
                     errorCount++;
-                    if (errorCount > 1000) return false;  
-                    
+                    if (errorCount > 1000) return false;
+
                     continue;
                 }
-                
+
                 if (ok)
                 {
                     Principal principal = membersEnum.Current;
-                    
+
                     if (principal is UserPrincipal && principal.Sid == user.Sid)
                         return true;
                 }
@@ -320,11 +321,11 @@ namespace pGina.Plugin.LocalMachine
 
             // If we have a SID, use that, otherwise name
             group = GetGroupPrincipal(groupInfo.Name);
-          
+
             if (group == null)
             {
                 // We create the GroupPrincipal, but https://connect.microsoft.com/VisualStudio/feedback/details/525688/invalidoperationexception-with-groupprincipal-and-sam-principalcontext-for-setting-any-property-always
-                // prevents us from then setting stuff on it.. so we then have to locate its relative DE 
+                // prevents us from then setting stuff on it.. so we then have to locate its relative DE
                 // and modify *that* instead.  Oi.
                 using (group = new GroupPrincipal(m_machinePrincipal))
                 {
@@ -337,14 +338,14 @@ namespace pGina.Plugin.LocalMachine
                         {
                             newGroupDe.Properties["Description"].Value = groupInfo.Description;
                             newGroupDe.CommitChanges();
-                        }                        
+                        }
                     }
 
                     // We have to re-fetch to get changes made via underlying DE
                     return GetGroupPrincipal(group.Name);
                 }
             }
-            
+
             return group;
         }
 
@@ -364,7 +365,7 @@ namespace pGina.Plugin.LocalMachine
 
                     // Sync via DE
                     SyncUserPrincipalInfo(userInfo);
-                    
+
                     // We have to re-fetch to get changes made via underlying DE
                     return GetUserPrincipal(user.Name);
                 }
@@ -388,7 +389,7 @@ namespace pGina.Plugin.LocalMachine
                 if (!info.Description.Contains("pgSMB"))
                     if (!string.IsNullOrEmpty(info.usri4_profile)) userDe.Properties["Profile"].Value = info.usri4_profile;
                 userDe.Invoke("SetPassword", new object[] { info.Password });
-                userDe.CommitChanges();                
+                userDe.CommitChanges();
             }
         }
 
@@ -417,9 +418,9 @@ namespace pGina.Plugin.LocalMachine
                 {
                     List<SecurityIdentifier> ignoredSids = new List<SecurityIdentifier>(new SecurityIdentifier[] {
                         new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null),    // "Authenticated Users"
-                        new SecurityIdentifier("S-1-1-0"),                                      // "Everyone"                        
+                        new SecurityIdentifier("S-1-1-0"),                                      // "Everyone"
                     });
-                    
+
                     // First remove from any local groups they aren't supposed to be in
                     m_logger.Debug("Checking for groups to remove.");
                     List<GroupPrincipal> localGroups = LocalAccount.GetGroups(user);
@@ -463,12 +464,27 @@ namespace pGina.Plugin.LocalMachine
             //set ntuser.dat permissions
             if (!String.IsNullOrEmpty(UserInfo.usri4_profile) && !UserInfo.Description.Contains("pgSMB"))
             {
-                if (Connect2share(UserInfo.usri4_profile + ((Environment.OSVersion.Version.Major == 6) ? ".V2" : ""), UserInfo.Username, UserInfo.Password, 3, false))
+                Abstractions.WindowsApi.pInvokes.structenums.OSVERSIONINFOW verinfo = Abstractions.WindowsApi.pInvokes.VersionsInfo();
+                if (verinfo.dwMajorVersion == 0)
                 {
-                    if (File.Exists(UserInfo.usri4_profile + ((Environment.OSVersion.Version.Major == 6) ? ".V2" : "") + "\\NTUSER.DAT"))
+                    m_logger.WarnFormat("SyncToLocalUser: VersionsInfo() failed. I'm unable to detect OS beyond Windows 8.0");
+                    verinfo.dwBuildNumber = Environment.OSVersion.Version.Build;
+                    verinfo.dwMajorVersion = Environment.OSVersion.Version.Major;
+                    verinfo.dwMinorVersion = Environment.OSVersion.Version.Minor;
+                    verinfo.dwPlatformId = Environment.OSVersion.Version.Build;
+                }
+                string ProfileExtension = (Environment.OSVersion.Version.Major == 6) ? (verinfo.dwMinorVersion > 3)/*greater than 8.1*/ ? ".V5" : ".V2" : "";
+
+                if (Connect2share(UserInfo.usri4_profile + ProfileExtension, UserInfo.Username, UserInfo.Password, 3, false))
+                {
+                    if (File.Exists(UserInfo.usri4_profile + ProfileExtension + "\\NTUSER.DAT"))
                     {
-                        SetACL(UserInfo);
-                        Connect2share(UserInfo.usri4_profile + ((Environment.OSVersion.Version.Major == 6) ? ".V2" : ""), null, null, 0, true);
+                        SetACL(UserInfo, ProfileExtension);
+                        Connect2share(UserInfo.usri4_profile + ProfileExtension, null, null, 0, true);
+                    }
+                    else
+                    {
+                        Connect2share(UserInfo.usri4_profile + ProfileExtension, null, null, 0, true);
                     }
                 }
             }
@@ -481,7 +497,7 @@ namespace pGina.Plugin.LocalMachine
             LocalAccount la = new LocalAccount(userInfo);
             la.SyncToLocalUser();
         }
-                                
+
         // Load userInfo.Username's group list and populate userInfo.Groups accordingly
         public static void SyncLocalGroupsToUserInfo(UserInformation userInfo)
         {
@@ -592,7 +608,8 @@ namespace pGina.Plugin.LocalMachine
                 try
                 {
                     Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\IdentityStore\Cache\" + userPrincipal.Sid, false);
-                } catch { }
+                }
+                catch { }
 
                 try
                 {
@@ -669,8 +686,10 @@ namespace pGina.Plugin.LocalMachine
             if (DISconnect)
             {
                 m_logger.DebugFormat("Disconnect from {0}", share);
-                if (!unc.disconnectRemote(share))
+                if (!Abstractions.WindowsApi.pInvokes.DisconnectNetworkDrive(share))
+                {
                     m_logger.WarnFormat("unable to disconnect from {0}", share);
+                }
 
                 return true;
             }
@@ -690,10 +709,15 @@ namespace pGina.Plugin.LocalMachine
                     try
                     {
                         m_logger.DebugFormat("{0}. try to connect to {1} as {2}", x, share, server[0]);
-                        if (!unc.connectToRemote(share, server[0], password))
+                        if (!Abstractions.WindowsApi.pInvokes.MapNetworkDrive(share, server[0], password))
+                        {
                             m_logger.ErrorFormat("Failed to connect to share {0}", share);
+                        }
                         if (Directory.Exists(share))
+                        {
                             return true;
+                        }
+                        Thread.Sleep(new TimeSpan(0, 0, 30));
                     }
                     catch (Exception ex)
                     {
@@ -705,21 +729,21 @@ namespace pGina.Plugin.LocalMachine
             }
         }
 
-        private static Boolean SetACL(UserInformation userInfo)
+        private static Boolean SetACL(UserInformation userInfo, string ProfileExtension)
         {
-            if (!registry.RegistryLoad("HKEY_LOCAL_MACHINE", userInfo.Username, userInfo.usri4_profile + ((Environment.OSVersion.Version.Major == 6) ? ".V2" : "") + "\\NTUSER.DAT"))
+            if (!Abstractions.WindowsApi.pInvokes.RegistryLoad(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, userInfo.Username, userInfo.usri4_profile + ProfileExtension/*.V2|.V5*/ + "\\NTUSER.DAT"))
             {
-                m_logger.WarnFormat("Can't load regfile {0}", userInfo.usri4_profile + ((Environment.OSVersion.Version.Major == 6) ? ".V2" : "") + "\\NTUSER.DAT");
+                m_logger.WarnFormat("Can't load regfile {0}", userInfo.usri4_profile + ProfileExtension/*.V2|.V5*/ + "\\NTUSER.DAT");
                 return false;
             }
-            if (!registry.RegSec(RegistryLocation.HKEY_LOCAL_MACHINE, userInfo.Username))
+            if (!Abstractions.Windows.Security.RegSec(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, userInfo.Username))
             {
-                m_logger.WarnFormat("Can't set ACL for regkey {0}\\{1}", RegistryLocation.HKEY_LOCAL_MACHINE.ToString(), userInfo.Username);
+                m_logger.WarnFormat("Can't set ACL for regkey {0}\\{1}", Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE.ToString(), userInfo.Username);
                 return false;
             }
-            if (!registry.RegistryUnLoad("HKEY_LOCAL_MACHINE", userInfo.Username))
+            if (!Abstractions.WindowsApi.pInvokes.RegistryUnLoad(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, userInfo.Username))
             {
-                m_logger.WarnFormat("Can't unload regkey {0}\\{1}", userInfo.usri4_profile + ((Environment.OSVersion.Version.Major == 6) ? ".V2" : ""), "NTUSER.DAT");
+                m_logger.WarnFormat("Can't unload regkey {0}\\{1}", userInfo.usri4_profile + ProfileExtension/*.V2|.V5*/, "NTUSER.DAT");
                 return false;
             }
 
@@ -774,7 +798,7 @@ namespace pGina.Plugin.LocalMachine
         /// <summary>
         /// This is a faster technique for determining whether or not a user exists on the local
         /// machine.  UserPrincipal.FindByIdentity tends to be quite slow in general, so if
-        /// you only need to know whether or not the account exists, this method is much 
+        /// you only need to know whether or not the account exists, this method is much
         /// faster.
         /// </summary>
         /// <param name="strUserName">The user name</param>
@@ -805,7 +829,7 @@ namespace pGina.Plugin.LocalMachine
         {
             List<GroupPrincipal> result = new List<GroupPrincipal>();
 
-            // Get all groups using a PrincipalSearcher and 
+            // Get all groups using a PrincipalSearcher and
             GroupPrincipal filter = new GroupPrincipal(m_machinePrincipal);
             using (PrincipalSearcher searcher = new PrincipalSearcher(filter))
             {
@@ -828,6 +852,6 @@ namespace pGina.Plugin.LocalMachine
             }
             return result;
         }
-        
+
     }
 }

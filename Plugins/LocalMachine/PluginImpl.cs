@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -39,6 +39,7 @@ using log4net;
 
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
+using Abstractions;
 
 namespace pGina.Plugin.LocalMachine
 {
@@ -57,7 +58,7 @@ namespace pGina.Plugin.LocalMachine
         {
             get { return new Guid("{12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D}"); }
         }
-        
+
         public PluginImpl()
         {
             using(Process me = Process.GetCurrentProcess())
@@ -65,7 +66,7 @@ namespace pGina.Plugin.LocalMachine
                 m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
             }
         }
- 
+
         public string Name
         {
             get { return "Local Machine"; }
@@ -193,7 +194,7 @@ namespace pGina.Plugin.LocalMachine
             //  1. Has a local account
             //  2. That account's password is set to the one they used to authenticate
             //  3. That account is a member of all groups listed, and not a member of any others
-            
+
             // Is failure at #3 a total fail?
             bool failIfGroupSyncFails = Settings.Store.GroupCreateFailIsFail;
 
@@ -202,6 +203,13 @@ namespace pGina.Plugin.LocalMachine
 
             // user info
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+
+            // is this a pgina user?
+            if (!userInfo.Description.Contains("pGina created"))
+            {
+                m_logger.InfoFormat("User {0} is'nt a pGina created user. I'm not executing Gateway stage", userInfo.Username);
+                return new BooleanResult() { Success = true };
+            }
 
             // Add user to all mandatory groups
             if (MandatoryGroups.Length > 0)
@@ -282,15 +290,15 @@ namespace pGina.Plugin.LocalMachine
         {
             try
             {
-                bool alwaysAuth = Settings.Store.AlwaysAuthenticate; 
-                
+                bool alwaysAuth = Settings.Store.AlwaysAuthenticate;
+
                 m_logger.DebugFormat("AuthenticateUser({0})", properties.Id.ToString());
 
                 // Get user info
-                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();                
-                m_logger.DebugFormat("Found username: {0}", userInfo.Username);                               
+                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+                m_logger.DebugFormat("Found username: {0}", userInfo.Username);
 
-                // Should we authenticate? Only if user has not yet authenticated, or we are not in fallback mode                
+                // Should we authenticate? Only if user has not yet authenticated, or we are not in fallback mode
                 if (alwaysAuth || !HasUserAuthenticatedYet(properties))
                 {
                     if (LocalAccount.UserExists(userInfo.Username))
@@ -313,12 +321,12 @@ namespace pGina.Plugin.LocalMachine
                     {
                         m_logger.InfoFormat("User {0} does not exist on this machine.", userInfo.Username);
                     }
-                }        
+                }
 
                 m_logger.ErrorFormat("Failed to authenticate user: {0}", userInfo.Username);
                 // Note that we don't include a message.  We are a last chance auth, and want previous/failed plugins
                 //  to have the honor of explaining why.
-                return new BooleanResult() { Success = false, Message = null }; 
+                return new BooleanResult() { Success = false, Message = null };
             }
             catch (Exception e)
             {
@@ -363,14 +371,14 @@ namespace pGina.Plugin.LocalMachine
                     };
                 }
 
-                // The user must have the local administrator group in his group list, and 
+                // The user must have the local administrator group in his group list, and
                 //  we must be in the Gateway list of plugins (as we'll be the ones ensuring
                 //  this group membership is enforced).
                 if (limitToLocalAdmins)
                 {
                     SecurityIdentifier adminSid = Abstractions.Windows.Security.GetWellknownSID(WellKnownSidType.BuiltinAdministratorsSid);
-                    string adminName = Abstractions.Windows.Security.GetNameFromSID(adminSid);                    
-                   
+                    string adminName = Abstractions.Windows.Security.GetNameFromSID(adminSid);
+
                     if(!ListedInGroup(adminName, adminSid, properties))
                     {
                         return new BooleanResult()
@@ -410,7 +418,7 @@ namespace pGina.Plugin.LocalMachine
                 // We elect to not do any authorization, let the user pass for us
                 return new BooleanResult() { Success = true };
             }
-        }        
+        }
 
         public void Configure()
         {
@@ -435,7 +443,7 @@ namespace pGina.Plugin.LocalMachine
             // Do we authorize all users?
             bool authzAllUsers = Settings.Store.AuthzApplyToAllUsers;
             if (authzAllUsers) return true;
-            
+
             // Did we auth this user?
             return DidWeAuthThisUser(properties, false);
         }
@@ -499,12 +507,16 @@ namespace pGina.Plugin.LocalMachine
                     Thread rem_local = new Thread(() => cleanup(userInfo, changeDescription.SessionId));
                     rem_local.Start();
                 }
+                else
+                {
+                    m_logger.InfoFormat("User {0} is'nt a pGina created user. I'm not executing Notification stage", userInfo.Username);
+                }
             }
             if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
             {
                 m_logger.DebugFormat("SessionChange SessionLogon for ID:{0} as user:{1}", changeDescription.SessionId, userInfo.Username);
 
-                if (!userInfo.Description.Contains("pgSMB"))
+                if (userInfo.Description.Contains("pGina created") && !userInfo.Description.Contains("pgSMB"))
                 {
                     if (!String.IsNullOrEmpty(userInfo.LoginScript))
                     {
@@ -518,10 +530,10 @@ namespace pGina.Plugin.LocalMachine
                         }
                     }
 
-                    if (!registry.RegQueryQuota(RegistryLocation.HKEY_USERS, userInfo.SID.ToString()) && Convert.ToUInt32(userInfo.usri4_max_storage) > 0)
+                    if (!Abstractions.Windows.User.QueryQuota(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString()) && Convert.ToUInt32(userInfo.usri4_max_storage) > 0)
                     {
                         m_logger.InfoFormat("no quota GPO settings for user {0}", userInfo.SID.ToString());
-                        if (!registry.RegQuota(RegistryLocation.HKEY_USERS, userInfo.SID.ToString(), Convert.ToUInt32(userInfo.usri4_max_storage)))
+                        if (!Abstractions.Windows.User.SetQuota(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString(), Convert.ToUInt32(userInfo.usri4_max_storage)))
                         {
                             m_logger.InfoFormat("failed to set quota GPO for user {0}", userInfo.SID.ToString());
                         }
@@ -538,6 +550,10 @@ namespace pGina.Plugin.LocalMachine
                             }
                         }
                     }
+                }
+                else
+                {
+                    m_logger.InfoFormat("User {0} is'nt a pGina created user. I'm not executing Notification stage", userInfo.Username);
                 }
             }
         }
