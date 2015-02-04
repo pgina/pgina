@@ -95,7 +95,10 @@ namespace pGina.Plugin.Ldap
                     m_logger.DebugFormat("Loading server certificate: {0}", certFile);
                     m_cert = new X509Certificate2(certFile);
                 }
-                m_logger.DebugFormat("Certificate file not provided or not found, will validate against Windows store.", certFile);
+                else
+                {
+                    m_logger.DebugFormat("Certificate file not provided or not found, will validate against Windows store.", certFile);
+                }
             }
 
             string[] hosts = Settings.Store.LdapHost;
@@ -120,11 +123,19 @@ namespace pGina.Plugin.Ldap
             m_conn.Timeout = new System.TimeSpan(0,0,Timeout);
             m_logger.DebugFormat("Timeout set to {0} seconds.", Timeout);
             m_conn.SessionOptions.ProtocolVersion = 3;
+            if ((m_useSsl || m_useTls) && m_verifyCert)
+            {
+                m_conn.SessionOptions.VerifyServerCertificate = this.VerifyCert;
+            }
+            else
+            {
+                m_conn.SessionOptions.VerifyServerCertificate = new VerifyServerCertificateCallback((conn, cert) => true);
+            }
             if (m_useTls)
             {
                 try
                 {
-                    m_conn.SessionOptions.StartTransportLayerSecurity(null);
+                    m_conn.SessionOptions.StartTransportLayerSecurity(new DirectoryControlCollection());
                 }
                 catch (Exception e)
                 {
@@ -134,9 +145,10 @@ namespace pGina.Plugin.Ldap
                     m_logger.ErrorFormat("fallback to SSL");
                 }
             }
-            m_conn.SessionOptions.SecureSocketLayer = m_useSsl;
-            if( m_useSsl || m_useTls )
-                m_conn.SessionOptions.VerifyServerCertificate = this.VerifyCert;
+            if (m_useSsl)
+            {
+                m_conn.SessionOptions.SecureSocketLayer = m_useSsl;
+            }
         }
 
         /// <summary>
