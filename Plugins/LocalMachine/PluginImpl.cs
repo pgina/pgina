@@ -205,7 +205,7 @@ namespace pGina.Plugin.LocalMachine
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
 
             // is this a pgina user?
-            if (!userInfo.Description.Contains("pGina created"))
+            if (LocalAccount.UserExists(userInfo.Username) && !userInfo.Description.Contains("pGina created"))
             {
                 m_logger.InfoFormat("User {0} is'nt a pGina created user. I'm not executing Gateway stage", userInfo.Username);
                 return new BooleanResult() { Success = true };
