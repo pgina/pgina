@@ -205,10 +205,14 @@ namespace pGina.Plugin.LocalMachine
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
 
             // is this a pgina user?
-            if (LocalAccount.UserExists(userInfo.Username) && !userInfo.Description.Contains("pGina created"))
+            Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
+            if (Abstractions.WindowsApi.pInvokes.UserGet(userInfo.Username, ref userinfo4)) //true if user exists
             {
-                m_logger.InfoFormat("User {0} is'nt a pGina created user. I'm not executing Gateway stage", userInfo.Username);
-                return new BooleanResult() { Success = true };
+                if (!userinfo4.comment.Contains("pGina created"))
+                {
+                    m_logger.InfoFormat("User {0} is'nt a pGina created user. I'm not executing Gateway stage", userInfo.Username);
+                    return new BooleanResult() { Success = true };
+                }
             }
 
             // Add user to all mandatory groups
