@@ -163,7 +163,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(102, 13);
             this.label1.TabIndex = 7;
-            this.label1.Text = "SSL/TLS Certificate";
+            this.label1.Text = "Certificate";
             this.descriptionToolTip.SetToolTip(this.label1, "File containing the LDAP server\'s public certificate.  If this is left blank (and" +
                     " \"Validate\" is checked) the server\'s\r\ncertificate is verified against the Window" +
                     "s certificate store.");
@@ -353,8 +353,8 @@
             this.useTlsCheckBox.Name = "useTlsCheckBox";
             this.useTlsCheckBox.Size = new System.Drawing.Size(68, 17);
             this.useTlsCheckBox.TabIndex = 13;
-            this.useTlsCheckBox.Text = "Use TLS";
-            this.descriptionToolTip.SetToolTip(this.useTlsCheckBox, "Whether or not to use TLS encryption.");
+            this.useTlsCheckBox.Text = "StartTLS";
+            this.descriptionToolTip.SetToolTip(this.useTlsCheckBox, "Use StartTLS if your LDAP server is not using an alternative (636) port for encryption\nYou can run encryption and clear text over 389");
             this.useTlsCheckBox.UseVisualStyleBackColor = true;
             this.useTlsCheckBox.CheckedChanged += new System.EventHandler(this.useTlsCheckBox_CheckedChanged);
             // 
