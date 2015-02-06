@@ -226,6 +226,9 @@ namespace pGina.Core
             
             m_logger.DebugFormat("Authorizing user {0}, {1} plugins available", m_properties.GetTrackedSingle<UserInformation>().Username, plugins.Count);
 
+            // At least one must succeed
+            BooleanResult finalResult = new BooleanResult() { Success = false };
+
             foreach (IPluginAuthorization plugin in plugins)
             {
                 m_logger.DebugFormat("Calling {0}", plugin.Uuid);
@@ -237,11 +240,22 @@ namespace pGina.Core
                     pluginResult = plugin.AuthorizeUser(m_properties);
                     pluginInfo.AddAuthorizationResult(plugin.Uuid, pluginResult);
 
-                    // All must succeed, fail = total fail
-                    if (!pluginResult.Success)
+                    if (pluginResult.Success)
                     {
-                        m_logger.ErrorFormat("{0} Failed to authorize {1} message: {2}", plugin.Uuid, m_properties.GetTrackedSingle<UserInformation>().Username, pluginResult.Message);
-                        return pluginResult;
+                        m_logger.DebugFormat("{0} Succeeded", plugin.Uuid);
+                        finalResult.Success = true;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(pluginResult.Message))
+                        {
+                            m_logger.WarnFormat("{0} Failed with Message: {1}", plugin.Uuid, pluginResult.Message);
+                            finalResult.Message = pluginResult.Message;
+                        }
+                        else
+                        {
+                            m_logger.WarnFormat("{0} Failed without a message", plugin.Uuid);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -251,8 +265,18 @@ namespace pGina.Core
                 }
             }
 
-            m_logger.InfoFormat("Successfully authorized {0}", m_properties.GetTrackedSingle<UserInformation>().Username);
-            return new BooleanResult() { Success = true };
+            if (finalResult.Success)
+            {
+                // Clear any errors from plugins if we did succeed
+                finalResult.Message = null;
+                m_logger.InfoFormat("Successfully authorized {0}", m_properties.GetTrackedSingle<UserInformation>().Username);
+            }
+            else
+            {
+                m_logger.ErrorFormat("Failed to authorized {0}, Message: {1}", m_properties.GetTrackedSingle<UserInformation>().Username, finalResult.Message);
+            }
+
+            return finalResult;
         }
 
         public BooleanResult GatewayProcess()
