@@ -125,7 +125,7 @@ namespace pGina.Plugin.Ldap
             m_conn.SessionOptions.ProtocolVersion = 3;
             if ((m_useSsl || m_useTls) && m_verifyCert)
             {
-                m_conn.SessionOptions.VerifyServerCertificate = this.VerifyCert;
+                m_conn.SessionOptions.VerifyServerCertificate = new VerifyServerCertificateCallback(VerifyCert);
             }
             else
             {
@@ -187,7 +187,7 @@ namespace pGina.Plugin.Ldap
                 };
                 
                 // Create a validator using the policy
-                X509CertificateValidator validator = X509CertificateValidator.CreatePeerOrChainTrustValidator(false,policy);
+                X509CertificateValidator validator = X509CertificateValidator.CreatePeerOrChainTrustValidator(true, policy);
                 try
                 {
                     validator.Validate(serverCert);
