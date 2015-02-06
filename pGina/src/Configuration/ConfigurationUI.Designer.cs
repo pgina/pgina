@@ -197,7 +197,7 @@
             this.m_tabs.Controls.Add(this.m_generalConfigTab);
             this.m_tabs.Controls.Add(this.m_pluginConfigTab);
             this.m_tabs.Controls.Add(this.m_pluginOrderTab);
-            this.m_tabs.Controls.Add(this.m_simTab);
+            //this.m_tabs.Controls.Add(this.m_simTab);
             this.m_tabs.Controls.Add(this.ginaOptions);
             this.m_tabs.Controls.Add(this.cpOptions);
             this.m_tabs.Location = new System.Drawing.Point(12, 12);
