@@ -1387,7 +1387,14 @@ namespace pGina.Configuration
                 // Disable this right away, otherwise it isn't disabled until the
                 // service controller shows it as "Start pending"
                 serviceStartBtn.Enabled = false;
-                m_pGinaServiceController.Start();
+                try
+                {
+                    m_pGinaServiceController.Start();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(String.Format("{0}\nA dependent service is disabled?", ex.Message), "Can't start pGina service", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 UpdateServiceStatus();
             }
         }
@@ -1399,7 +1406,14 @@ namespace pGina.Configuration
                 // Disable this right away, otherwise it isn't disabled until the
                 // service controller shows it as "Stop pending"
                 serviceStopBtn.Enabled = false;
-                m_pGinaServiceController.Stop();
+                try
+                {
+                    m_pGinaServiceController.Stop();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(String.Format("{0}", ex.Message), "Can't stop pGina service", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 UpdateServiceStatus();
             }
         }
