@@ -363,6 +363,22 @@ namespace pGina.Plugin.pgSMB
                     {
                         m_logger.WarnFormat("Can't delete {0}", settings["RoamingDest_real"]);
                     }
+
+                    IntPtr hToken = Abstractions.WindowsApi.pInvokes.GetUserToken(userInfo.Username, null, userInfo.Password);
+                    if (hToken != IntPtr.Zero)
+                    {
+                        string uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfilePath(hToken);
+                        if (String.IsNullOrEmpty(uprofile))
+                        {
+                            uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfileDir(hToken);
+                        }
+                        Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
+
+                        if (uprofile.Contains(@"\TEMP"))
+                        {
+                            Networking.email(settings["email"].Split(' '), settings["smtp"].Split(' '), userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows can't load the users profile");
+                        }
+                    }
                 }
                 else
                 {
