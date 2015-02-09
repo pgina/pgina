@@ -186,7 +186,7 @@ namespace pGina.Plugin.pgSMB
 
         private static Boolean PutProfile(Dictionary<string, string> settings, string username, string password)
         {
-            Int32 cmd = 1;
+            int ret_code = -1;
 
             //crappy windows cant open 2 connection to the same server
             //we need to fool win to think the server is a different one
@@ -233,24 +233,19 @@ namespace pGina.Plugin.pgSMB
                 return false;
             }
 
-            ProcessStartInfo startInfo = new ProcessStartInfo();
             for (uint x = 0; x < Convert.ToUInt32(settings["ConnectRetry"]); x++)
             {
-                // run imagex in apply mode
-                startInfo.FileName = settings["Compressor"];
-                startInfo.Arguments = settings["CompressCLI"];
-                m_logger.DebugFormat("Run \"{0}\" \"{1}\"", startInfo.FileName.ToString(), startInfo.Arguments.ToString());
-                using (Process p = Process.Start(startInfo))
+                // run imagex in capture mode
+                string stdmerge = "";
+
+                m_logger.DebugFormat("Run \"{0}\" \"{1}\"", settings["Compressor"], settings["CompressCLI"]);
+                ret_code = RunWait(settings["Compressor"], settings["CompressCLI"], out stdmerge);
+                if (ret_code == 0)
                 {
-                    p.WaitForExit();
-                    m_logger.Debug("Exitcode:" + p.ExitCode.ToString());
-                    cmd = p.ExitCode;
-                    if (cmd == 0)
-                    {
-                        break;
-                    }
-                    Thread.Sleep(new TimeSpan(0, 0, 30));
+                    break;
                 }
+                m_logger.DebugFormat("Exitcode:{0}\n{1}", ret_code, stdmerge);
+                Thread.Sleep(new TimeSpan(0, 0, 30));
             }
 
             // delete the profile
@@ -276,7 +271,7 @@ namespace pGina.Plugin.pgSMB
                 return false;
             }
 
-            if (cmd == 0)
+            if (ret_code == 0)
             {
                 if (!Connect2share(settings["SMBshare"], username, password, Convert.ToUInt32(settings["ConnectRetry"]), false))
                 {
@@ -431,7 +426,7 @@ namespace pGina.Plugin.pgSMB
 
         private static Boolean GetProfile(Dictionary<string,string> settings, string username, string password)
         {
-            Int32 cmd = 1;
+            int ret_code = -1;
             m_logger.DebugFormat("User {0} owns a remote profile", username);
 
             if (Directory.Exists(settings["RoamingDest_real"]))
@@ -445,34 +440,32 @@ namespace pGina.Plugin.pgSMB
                 return false;
             }
 
-            ProcessStartInfo startInfo = new ProcessStartInfo();
             for (uint x = 0; x < Convert.ToUInt32(settings["ConnectRetry"]); x++)
             {
                 // run imagex in apply mode
-                startInfo.FileName = settings["Compressor"];
+                string stdmerge = "";
+                string args = "";
+
                 if (settings.ContainsKey("Filename_real"))
                 {
-                    startInfo.Arguments = settings["UncompressCLI"].Replace(settings["Filename"], settings["Filename_real"]);
+                    args = settings["UncompressCLI"].Replace(settings["Filename"], settings["Filename_real"]);
                 }
                 else
                 {
-                    startInfo.Arguments = settings["UncompressCLI"];
+                    args = settings["UncompressCLI"];
                 }
-                m_logger.DebugFormat("Run \"{0}\" \"{1}\"", startInfo.FileName.ToString(), startInfo.Arguments.ToString());
-                using (Process p = Process.Start(startInfo))
+
+                m_logger.DebugFormat("Run \"{0}\" \"{1}\"", settings["Compressor"], args);
+                ret_code = RunWait(settings["Compressor"], args, out stdmerge);
+                if (ret_code == 0)
                 {
-                    p.WaitForExit();
-                    m_logger.Debug("Exitcode:" + p.ExitCode.ToString());
-                    cmd = p.ExitCode;
-                    if (cmd == 0)
-                    {
-                        break;
-                    }
-                    Thread.Sleep(new TimeSpan(0, 0, 30));
+                    break;
                 }
+                m_logger.DebugFormat("Exitcode:{0}\n{1}", ret_code, stdmerge);
+                Thread.Sleep(new TimeSpan(0, 0, 30));
             }
 
-            if (cmd != 0)
+            if (ret_code != 0)
             {
                 // Uncompessing failed, clean and disconnect
                 // mark the image as tmp and prevent the upload
@@ -868,6 +861,62 @@ namespace pGina.Plugin.pgSMB
             }
 
             return true;
+        }
+
+        private static int RunWait(string application, string arguments, out string stdmerge)
+        {
+            stdmerge = "";
+            string stdout = "";
+            string stderr = "";
+            int ret = -1;
+
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.FileName = application;
+            startInfo.Arguments = arguments;
+            startInfo.UseShellExecute = false;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.RedirectStandardError = true;
+
+            try
+            {
+                using (Process p = Process.Start(startInfo))
+                {
+                    using (StreamReader streamReader = p.StandardOutput)
+                    {
+                        stdout = streamReader.ReadToEnd();
+                    }
+                    using (StreamReader streamReader = p.StandardError)
+                    {
+                        stderr = streamReader.ReadToEnd();
+                    }
+                    p.WaitForExit();
+                    ret = p.ExitCode;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("RunWait failed error:{0}", ex.Message);
+                return -1;
+            }
+
+            stdmerge += stdout + "\n" + stderr;
+
+            string t = stdmerge.Replace("\r", "");
+            while (t.Contains("\n\n"))
+            {
+                t = t.Replace("\n\n", "\n");
+            }
+            string[] s = t.Split('\n');
+            if (s.Length >= 10)
+            {
+                stdmerge = "";
+                for (int x = s.Length - 10; x < s.Length; x++)
+                {
+                    stdmerge += s[x] + "\r\n";
+                }
+            }
+
+            return ret;
         }
     }
 }
