@@ -1423,6 +1423,7 @@
             // 
             // m_pginaVersionLbl
             // 
+            this.m_pginaVersionLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.m_pginaVersionLbl.AutoSize = true;
             this.m_pginaVersionLbl.Location = new System.Drawing.Point(12, 615);
             this.m_pginaVersionLbl.Name = "m_pginaVersionLbl";
