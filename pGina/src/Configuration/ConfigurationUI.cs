@@ -116,6 +116,22 @@ namespace pGina.Configuration
             LoadGeneralSettings();            
         }
 
+        private void Form_Load(object sender, EventArgs e)
+        {
+            ToolTip toolTip1 = new ToolTip();
+            toolTip1.AutoPopDelay = 10000;
+            toolTip1.InitialDelay = 0;
+            toolTip1.ReshowDelay = 0;
+            toolTip1.ShowAlways = true;
+
+            toolTip1.SetToolTip(this.notify_smtp, "space seperated FQDN list of your smtp servers\nsmtp.domain.local:25");
+            toolTip1.SetToolTip(this.notify_email, "space seperated FQDN list of email addresses\nadmin@domain.local");
+            toolTip1.SetToolTip(this.notify_user, "smtp username");
+            toolTip1.SetToolTip(this.notify_pass, "smtp password");
+            toolTip1.SetToolTip(this.notify_cred, "prefer Login credentials instead of smtp username and password");
+            toolTip1.SetToolTip(this.notify_ssl, "use encrypted smtp connection");
+        }
+
         private void VerifyRegistryAccess()
         {
             // Test write access
@@ -287,6 +303,14 @@ namespace pGina.Configuration
 
             // Load the unlock setting
             chk_originalUsernameUnlock.Checked = Settings.Get.UseOriginalUsernameInUnlockScenario;
+
+            // email notification
+            this.notify_smtp.Text = Settings.Get.GetSetting("notify_smtp");
+            this.notify_email.Text = Settings.Get.GetSetting("notify_email");
+            this.notify_user.Text = Settings.Get.GetSetting("notify_user");
+            this.notify_pass.Text = Settings.Get.GetEncryptedSetting("notify_pass");
+            this.notify_cred.Checked = Settings.Get.notify_cred;
+            this.notify_ssl.Checked = Settings.Get.notify_ssl;
         }
 
         private void UpdateCpStatus()
@@ -885,6 +909,14 @@ namespace pGina.Configuration
                 this.SaveCpSettings();
             else
                 this.SaveGinaSettings();
+
+            // email notification
+            Settings.Get.notify_smtp = this.notify_smtp.Text;
+            Settings.Get.notify_email = this.notify_email.Text;
+            Settings.Get.notify_user = this.notify_user.Text;
+            Settings.Get.SetEncryptedSetting("notify_pass", this.notify_pass.Text);
+            Settings.Get.notify_cred = this.notify_cred.Checked;
+            Settings.Get.notify_ssl = this.notify_ssl.Checked;
         }
 
         private void MoveUp(DataGridView dgv, int index)

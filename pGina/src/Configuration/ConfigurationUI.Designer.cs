@@ -34,6 +34,17 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
+            this.groupBox18 = new System.Windows.Forms.GroupBox();
+            this.notify_label_pass = new System.Windows.Forms.Label();
+            this.notify_label_user = new System.Windows.Forms.Label();
+            this.notify_label_email = new System.Windows.Forms.Label();
+            this.notify_label_smtp = new System.Windows.Forms.Label();
+            this.notify_ssl = new System.Windows.Forms.CheckBox();
+            this.notify_cred = new System.Windows.Forms.CheckBox();
+            this.notify_pass = new System.Windows.Forms.TextBox();
+            this.notify_user = new System.Windows.Forms.TextBox();
+            this.notify_email = new System.Windows.Forms.TextBox();
+            this.notify_smtp = new System.Windows.Forms.TextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.chk_originalUsernameUnlock = new System.Windows.Forms.CheckBox();
             this.groupBox14 = new System.Windows.Forms.GroupBox();
@@ -149,6 +160,7 @@
             this.btnSaveAndClose = new System.Windows.Forms.Button();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
+            this.groupBox18.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox14.SuspendLayout();
             this.servGB.SuspendLayout();
@@ -209,6 +221,7 @@
             // 
             // m_generalConfigTab
             // 
+            this.m_generalConfigTab.Controls.Add(this.groupBox18);
             this.m_generalConfigTab.Controls.Add(this.groupBox4);
             this.m_generalConfigTab.Controls.Add(this.groupBox14);
             this.m_generalConfigTab.Controls.Add(this.servGB);
@@ -222,6 +235,111 @@
             this.m_generalConfigTab.Text = "General";
             this.m_generalConfigTab.UseVisualStyleBackColor = true;
             // 
+            // groupBox18
+            //
+            this.groupBox18.Controls.Add(this.notify_label_pass);
+            this.groupBox18.Controls.Add(this.notify_label_user);
+            this.groupBox18.Controls.Add(this.notify_label_email);
+            this.groupBox18.Controls.Add(this.notify_label_smtp);
+            this.groupBox18.Controls.Add(this.notify_ssl);
+            this.groupBox18.Controls.Add(this.notify_cred);
+            this.groupBox18.Controls.Add(this.notify_pass);
+            this.groupBox18.Controls.Add(this.notify_user);
+            this.groupBox18.Controls.Add(this.notify_email);
+            this.groupBox18.Controls.Add(this.notify_smtp);
+            this.groupBox18.Location = new System.Drawing.Point(17, 464);
+            this.groupBox18.Name = "groupBox18";
+            this.groupBox18.Size = new System.Drawing.Size(749, 77);
+            this.groupBox18.TabIndex = 6;
+            this.groupBox18.TabStop = false;
+            this.groupBox18.Text = "Email Notifications";
+            //
+            // notify_label_pass
+            //
+            this.notify_label_pass.AutoSize = true;
+            this.notify_label_pass.Location = new System.Drawing.Point(307, 48);
+            this.notify_label_pass.Name = "notify_label_pass";
+            this.notify_label_pass.Size = new System.Drawing.Size(56, 13);
+            this.notify_label_pass.TabIndex = 9;
+            this.notify_label_pass.Text = "Password:";
+            //
+            // notify_label_user
+            //
+            this.notify_label_user.AutoSize = true;
+            this.notify_label_user.Location = new System.Drawing.Point(307, 22);
+            this.notify_label_user.Name = "notify_label_user";
+            this.notify_label_user.Size = new System.Drawing.Size(58, 13);
+            this.notify_label_user.TabIndex = 8;
+            this.notify_label_user.Text = "Username:";
+            //
+            // notify_label_email
+            //
+            this.notify_label_email.AutoSize = true;
+            this.notify_label_email.Location = new System.Drawing.Point(3, 48);
+            this.notify_label_email.Name = "notify_label_email";
+            this.notify_label_email.Size = new System.Drawing.Size(62, 13);
+            this.notify_label_email.TabIndex = 7;
+            this.notify_label_email.Text = "email Addr.:";
+            //
+            // notify_label_smtp
+            //
+            this.notify_label_smtp.AutoSize = true;
+            this.notify_label_smtp.Location = new System.Drawing.Point(3, 22);
+            this.notify_label_smtp.Name = "notify_label_smtp";
+            this.notify_label_smtp.Size = new System.Drawing.Size(66, 13);
+            this.notify_label_smtp.TabIndex = 6;
+            this.notify_label_smtp.Text = "smtp Server:";
+            //
+            // notify_ssl
+            //
+            this.notify_ssl.AutoSize = true;
+            this.notify_ssl.Location = new System.Drawing.Point(606, 47);
+            this.notify_ssl.Name = "notify_ssl";
+            this.notify_ssl.Size = new System.Drawing.Size(46, 17);
+            this.notify_ssl.TabIndex = 5;
+            this.notify_ssl.Text = "SSL";
+            this.notify_ssl.UseVisualStyleBackColor = true;
+            //
+            // notify_cred
+            //
+            this.notify_cred.AutoSize = true;
+            this.notify_cred.Location = new System.Drawing.Point(606, 21);
+            this.notify_cred.Name = "notify_cred";
+            this.notify_cred.Size = new System.Drawing.Size(137, 17);
+            this.notify_cred.TabIndex = 4;
+            this.notify_cred.Text = "Prefer Login credentials";
+            this.notify_cred.UseVisualStyleBackColor = true;
+            //
+            // notify_pass
+            //
+            this.notify_pass.Location = new System.Drawing.Point(371, 45);
+            this.notify_pass.Name = "notify_pass";
+            this.notify_pass.Size = new System.Drawing.Size(218, 20);
+            this.notify_pass.TabIndex = 3;
+            this.notify_pass.UseSystemPasswordChar = true;
+            //
+            // notify_user
+            //
+            this.notify_user.Location = new System.Drawing.Point(371, 19);
+            this.notify_user.Name = "notify_user";
+            this.notify_user.Size = new System.Drawing.Size(218, 20);
+            this.notify_user.TabIndex = 2;
+            //
+            // notify_email
+            //
+            this.notify_email.Location = new System.Drawing.Point(75, 45);
+            this.notify_email.Name = "notify_email";
+            this.notify_email.Size = new System.Drawing.Size(218, 20);
+            this.notify_email.TabIndex = 1;
+            //
+            // notify_smtp
+            //
+            this.notify_smtp.AccessibleName = "";
+            this.notify_smtp.Location = new System.Drawing.Point(75, 19);
+            this.notify_smtp.Name = "notify_smtp";
+            this.notify_smtp.Size = new System.Drawing.Size(218, 20);
+            this.notify_smtp.TabIndex = 0;
+            //
             // groupBox4
             // 
             this.groupBox4.Controls.Add(this.chk_originalUsernameUnlock);
@@ -1456,8 +1574,11 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ConfigurationUI";
             this.Text = "pGina Configuration";
+            this.Load += new System.EventHandler(this.Form_Load);
             this.m_tabs.ResumeLayout(false);
             this.m_generalConfigTab.ResumeLayout(false);
+            this.groupBox18.ResumeLayout(false);
+            this.groupBox18.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.groupBox14.ResumeLayout(false);
@@ -1631,5 +1752,16 @@
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.CheckBox chk_originalUsernameUnlock;
+        private System.Windows.Forms.GroupBox groupBox18;
+        private System.Windows.Forms.Label notify_label_pass;
+        private System.Windows.Forms.Label notify_label_user;
+        private System.Windows.Forms.Label notify_label_email;
+        private System.Windows.Forms.Label notify_label_smtp;
+        private System.Windows.Forms.CheckBox notify_ssl;
+        private System.Windows.Forms.CheckBox notify_cred;
+        private System.Windows.Forms.TextBox notify_pass;
+        private System.Windows.Forms.TextBox notify_user;
+        private System.Windows.Forms.TextBox notify_email;
+        private System.Windows.Forms.TextBox notify_smtp;
     }
 }

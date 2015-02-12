@@ -58,6 +58,12 @@ namespace pGina.Core
             s_settings.SetDefault("EnableSpecialActionButton", false);
             s_settings.SetDefault("SpecialAction", "Shutdown");
             s_settings.SetDefault("ShowServiceStatusInLogonUi", true);
+            s_settings.SetDefault("notify_smtp", "");
+            s_settings.SetDefault("notify_email", "");
+            s_settings.SetDefault("notify_user", "");
+            s_settings.SetDefaultEncryptedSetting("notify_pass", "");
+            s_settings.SetDefault("notify_cred", false);
+            s_settings.SetDefault("notify_ssl", false);
 
             s_settings.SetDefault("CredentialProviderFilters", new string[] { });
 
