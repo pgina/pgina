@@ -101,8 +101,9 @@ namespace Abstractions.Windows
         /// <param name="password"></param>
         /// <param name="subject"></param>
         /// <param name="body"></param>
+        /// <param name="ssl"></param>
         /// <returns></returns>
-        public static Boolean email(string[] mailAddress, string[] smtpAddress, string username, string password, string subject, string body)
+        public static Boolean email(string[] mailAddress, string[] smtpAddress, string username, string password, string subject, string body, bool ssl)
         {
             Boolean ret = false;
 
@@ -151,14 +152,6 @@ namespace Abstractions.Windows
                     return false;
                 }
             }
-            if (String.IsNullOrEmpty(username))
-            {
-                LibraryLogging.Error("can't send email: username is empty");
-            }
-            if (String.IsNullOrEmpty(password))
-            {
-                LibraryLogging.Error("can't send email: password is empty");
-            }
             if (String.IsNullOrEmpty(subject))
             {
                 LibraryLogging.Error("can't send email: subject is empty");
@@ -206,8 +199,11 @@ namespace Abstractions.Windows
                 }
                 using (SmtpClient client = new SmtpClient(smtp, port))
                 {
-                    client.EnableSsl = true;
-                    client.Credentials = new NetworkCredential(username, password);
+                    client.EnableSsl = ssl;
+                    if (!String.IsNullOrEmpty(username) && !String.IsNullOrEmpty(password))
+                    {
+                        client.Credentials = new NetworkCredential(username, password);
+                    }
 
                     for (uint y = 0; y < mailAddress.Length; y++)
                     {
