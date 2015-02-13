@@ -554,6 +554,24 @@ namespace pGina.Plugin.LocalMachine
                             }
                         }
                     }
+
+                    IntPtr hToken = Abstractions.WindowsApi.pInvokes.GetUserToken(userInfo.Username, null, userInfo.Password);
+                    if (hToken != IntPtr.Zero)
+                    {
+                        string uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfilePath(hToken);
+                        if (String.IsNullOrEmpty(uprofile))
+                        {
+                            uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfileDir(hToken);
+                        }
+                        Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
+
+                        if (uprofile.Contains(@"\TEMP"))
+                        {
+                            pGina.Core.Settings.sendMail(userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows was unable to load the profile");
+                        }
+
+                        Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
+                    }
                 }
                 else
                 {
