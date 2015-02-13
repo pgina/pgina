@@ -226,7 +226,7 @@ namespace pGina.Plugin.pgSMB
             if (settings.ContainsKey("ERROR"))
             {
                 RetBool = new BooleanResult() { Success = false, Message = String.Format("Can't parse plugin settings ", settings["ERROR"]) };
-                Networking.email(settings["email"].Split(' '), settings["smtp"].Split(' '), userInfo.Username, userInfo.Password, String.Format("pGina: unable to Login {0} from {1}", userInfo.Username, Environment.MachineName), RetBool.Message);
+                pGina.Core.Settings.sendMail(userInfo.Username, userInfo.Password, String.Format("pGina: unable to Login {0} from {1}", userInfo.Username, Environment.MachineName), RetBool.Message);
                 return RetBool;
             }
 
@@ -240,10 +240,10 @@ namespace pGina.Plugin.pgSMB
                 if (!Roaming.userAdd(settings, userInfo.Username, userInfo.Password, "pGina created pgSMB tmp"))
                 {
                     Roaming.userDel(settings, userInfo.Username, userInfo.Password);
-                    Networking.email(settings["email"].Split(' '), settings["smtp"].Split(' '), userInfo.Username, userInfo.Password, String.Format("pGina: tmp Login failed {0} from {1}", userInfo.Username, Environment.MachineName), "tmp login failed");
+                    pGina.Core.Settings.sendMail(userInfo.Username, userInfo.Password, String.Format("pGina: tmp Login failed {0} from {1}", userInfo.Username, Environment.MachineName), "tmp login failed");
                     return RetBool;
                 }
-                Networking.email(settings["email"].Split(' '), settings["smtp"].Split(' '), userInfo.Username, userInfo.Password, String.Format("pGina: tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "failed to get the profile\nmarking as tmp");
+                pGina.Core.Settings.sendMail(userInfo.Username, userInfo.Password, String.Format("pGina: tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "failed to get the profile\nmarking as tmp");
             }
 
             pInvokes.structenums.USER_INFO_4 userinfo4 = new pInvokes.structenums.USER_INFO_4();
@@ -426,7 +426,7 @@ namespace pGina.Plugin.pgSMB
                     BooleanResult RetBool = Roaming.put(settings, userInfo.Username, userInfo.Password);
                     if (!RetBool.Success)
                     {
-                        Networking.email(settings["email"].Split(' '), settings["smtp"].Split(' '), userInfo.Username, userInfo.Password, String.Format("pGina: unable to Logoff {0} from {1}", userInfo.Username, Environment.MachineName), RetBool.Message);
+                        pGina.Core.Settings.sendMail(userInfo.Username, userInfo.Password, String.Format("pGina: unable to Logoff {0} from {1}", userInfo.Username, Environment.MachineName), RetBool.Message);
                     }
                 }
                 m_logger.Info("cleanup done");
@@ -434,7 +434,7 @@ namespace pGina.Plugin.pgSMB
             catch (Exception ex)
             {
                 m_logger.FatalFormat("Error during Logoff", ex.Message);
-                Networking.email(settings["email"].Split(' '), settings["smtp"].Split(' '), userInfo.Username, userInfo.Password, String.Format("pGina: Logoff Exception {0} from {1}", userInfo.Username, Environment.MachineName), "Logoff Exception\n" + ex.Message);
+                pGina.Core.Settings.sendMail(userInfo.Username, userInfo.Password, String.Format("pGina: Logoff Exception {0} from {1}", userInfo.Username, Environment.MachineName), "Logoff Exception\n" + ex.Message);
             }
 
             try
