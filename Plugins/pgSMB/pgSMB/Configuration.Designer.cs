@@ -444,6 +444,7 @@ namespace pGina.Plugin.pgSMB
             this.email.Size = new System.Drawing.Size(311, 20);
             this.email.TabIndex = 28;
             this.email.WordWrap = false;
+            this.email.ReadOnly = true;
             //
             // email_label
             //
@@ -461,6 +462,7 @@ namespace pGina.Plugin.pgSMB
             this.smtp.Size = new System.Drawing.Size(311, 20);
             this.smtp.TabIndex = 30;
             this.smtp.WordWrap = false;
+            this.smtp.ReadOnly = true;
             //
             // smtp_label
             //
