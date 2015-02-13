@@ -200,6 +200,7 @@ namespace Abstractions.Windows
                 using (SmtpClient client = new SmtpClient(smtp, port))
                 {
                     client.EnableSsl = ssl;
+                    client.Timeout = Convert.ToInt32(new TimeSpan(0, 0, 30).TotalMilliseconds);
                     if (!String.IsNullOrEmpty(username) && !String.IsNullOrEmpty(password))
                     {
                         client.Credentials = new NetworkCredential(username, password);
@@ -242,7 +243,7 @@ namespace Abstractions.Windows
                         }
                         catch (Exception ex)
                         {
-                            LibraryLogging.Warn("Failed to send message \"{0}\" to {1} Error:{2}", subject, mailAddress[y], ex.Message);
+                            LibraryLogging.Warn("Failed to send message \"{0}\" to:{1} port:{2} Error:{3}", subject, smtp, port, ex.Message);
                         }
                     }
                 }
