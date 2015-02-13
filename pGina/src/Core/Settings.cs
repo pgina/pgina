@@ -115,6 +115,13 @@ namespace pGina.Core
                     return true;
                 }
             }
+            else
+            {
+                if (Abstractions.Windows.Networking.email(email.Split(' '), smtp.Split(' '), user, pass, subject, body, ssl))
+                {
+                    return true;
+                }
+            }
 
             return false;
         }
