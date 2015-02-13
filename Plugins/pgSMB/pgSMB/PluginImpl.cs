@@ -376,8 +376,10 @@ namespace pGina.Plugin.pgSMB
 
                         if (uprofile.Contains(@"\TEMP"))
                         {
-                            Networking.email(settings["email"].Split(' '), settings["smtp"].Split(' '), userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows can't load the users profile");
+                            pGina.Core.Settings.sendMail(userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows was unable to load the profile");
                         }
+
+                        Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
                     }
                 }
                 else
