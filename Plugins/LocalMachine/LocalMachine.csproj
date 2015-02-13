@@ -37,6 +37,9 @@
     <Reference Include="log4net">
       <HintPath>..\..\pGina\src\bin\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="pGina.Core">
+      <HintPath>..\..\pGina\src\bin\pGina.Core.dll</HintPath>
+    </Reference>
     <Reference Include="pGina.Shared, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\pGina\src\bin\pGina.Shared.dll</HintPath>
