@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -41,15 +41,15 @@ namespace pGina.Core
         public static dynamic Get
         {
             get { return s_settings; }
-        }        
-        
+        }
+
         public static void Init()
         {
-            string curPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);            
+            string curPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             s_settings.SetDefault("PluginDirectories", new string[] { string.Format("{0}\\Plugins", curPath) });
             s_settings.SetDefault("ServicePipeName", "pGinaPipe");
             s_settings.SetDefault("MaxClients", 25);
-            s_settings.SetDefault("TraceMsgTraffic", false);            
+            s_settings.SetDefault("TraceMsgTraffic", false);
             s_settings.SetDefault("SessionHelperExe", "pGina.Service.SessionHelper.exe");
             s_settings.SetDefault("EnableMotd", true);
             s_settings.SetDefault("Motd", "pGina Version: %v");
@@ -70,10 +70,53 @@ namespace pGina.Core
             // Default setup is local machine plugin as enabled for auth and gateway
             s_settings.SetDefault("IPluginAuthentication_Order", new string[] { "12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D" });
             s_settings.SetDefault("IPluginAuthenticationGateway_Order", new string[] { "12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D" });
-            s_settings.SetDefault("12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D", 
+            s_settings.SetDefault("12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D",
                 (int) (Core.PluginLoader.State.AuthenticateEnabled | Core.PluginLoader.State.GatewayEnabled));
 
             s_settings.SetDefault("UseOriginalUsernameInUnlockScenario", false);
+        }
+
+        public static Boolean sendMail(string username, string password, string subject, string body)
+        {
+            string smtp = "";
+            string email = "";
+            string user = "";
+            string pass = "";
+            bool cred = false;
+            bool ssl = false;
+
+            try
+            {
+                smtp = s_settings.GetSetting("notify_smtp");
+                email = s_settings.GetSetting("notify_email");
+                user = s_settings.GetSetting("notify_user");
+                pass = s_settings.GetEncryptedSetting("notify_pass");
+                cred = s_settings.notify_cred;
+                ssl = s_settings.notify_ssl;
+            }
+            catch (Exception e)
+            {
+                Abstractions.Logging.LibraryLogging.Error("Failed to send email:{0}", e.Message);
+                return false;
+            }
+
+            if (cred)
+            {
+                // use login credential first
+                if (!Abstractions.Windows.Networking.email(email.Split(' '), smtp.Split(' '), username, password, subject, body, ssl))
+                {
+                    if (Abstractions.Windows.Networking.email(email.Split(' '), smtp.Split(' '), user, pass, subject, body, ssl))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
