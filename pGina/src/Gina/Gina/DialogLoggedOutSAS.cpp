@@ -55,17 +55,17 @@ namespace pGina
 				DisableItem(IDC_SPECIAL);			
 
 			// Service status
-			if( pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
-			{
+			//if( pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
+			//{
 				SetServiceStatus();
 
 				// Start a timer to update service status
 				m_statusTimerId = StartTimer(pGina::Registry::GetDword(L"PingSleepTime", 5000));
-			}
-			else
-			{
-				DisableItem(IDC_STATUS);
-			}
+			//}
+			//else
+			//{
+			//	DisableItem(IDC_STATUS);
+			//}
 
 			// MOTD
 			if( pGina::Registry::GetBool(L"EnableMotd", true) )
