@@ -149,6 +149,11 @@ namespace pGina
 			pDEBUG(L"SetSerialization(%p)", pcpcs);
 			HRESULT result = E_NOTIMPL;
 
+			if (!(CLSID_CpGinaProvider == pcpcs->clsidCredentialProvider) || !(CPUS_CREDUI == m_usageScenario))
+			{
+				return result;
+			}
+
 			// Must match our auth package (negotiate)			
 			ULONG authPackage = 0;
 			result = Microsoft::Sample::RetrieveNegotiateAuthPackage(&authPackage);
