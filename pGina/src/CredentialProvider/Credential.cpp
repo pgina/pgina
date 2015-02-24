@@ -334,7 +334,7 @@ namespace pGina
 
 			pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);
 			loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password, reason);
-			if(!loginResult.Result())
+			if(!loginResult.Result() && (m_usageScenario != CPUS_CREDUI))
 			{
 				pERROR(L"Credential::GetSerialization: Failed attempt");
 				if(loginResult.Message().length() > 0)
@@ -393,24 +393,40 @@ namespace pGina
 						if(GetLastError() == ERROR_INSUFFICIENT_BUFFER)
 						{
 							rawbits = (BYTE *)HeapAlloc(GetProcessHeap(), 0, size);
-							if(!CredPackAuthenticationBufferW((CREDUIWIN_PACK_32_WOW & m_usageFlags) ? CRED_PACK_WOW_BUFFER : 0, domainUsername, protectedPassword, rawbits, &size))
+							if (rawbits)
 							{
-								HeapFree(GetProcessHeap(), 0, rawbits);
-								HeapFree(GetProcessHeap(), 0, domainUsername);
-								Credential::Thread_dialog_close(hThread_dialog);
-								return HRESULT_FROM_WIN32(GetLastError());
+								if(!CredPackAuthenticationBufferW((CREDUIWIN_PACK_32_WOW & m_usageFlags) ? CRED_PACK_WOW_BUFFER : 0, domainUsername, protectedPassword, rawbits, &size))
+								{
+									result = HRESULT_FROM_WIN32(GetLastError());
+									HeapFree(GetProcessHeap(), 0, rawbits);
+								}
+								else
+								{
+									pcpcs->rgbSerialization = rawbits;
+									pcpcs->cbSerialization = size;
+									result = S_OK;
+								}
 							}
-
-							pcpcs->rgbSerialization = rawbits;
-							pcpcs->cbSerialization = size;
+							else
+							{
+								result = E_OUTOFMEMORY;
+							}
 						}
 						else
 						{
-							HeapFree(GetProcessHeap(), 0, domainUsername);
-							Credential::Thread_dialog_close(hThread_dialog);
-							return E_FAIL;
+							result = E_FAIL;
 						}
 					}
+					else
+					{
+						result = E_FAIL;
+					}
+				}
+				if(!SUCCEEDED(result))
+				{
+					HeapFree(GetProcessHeap(), 0, domainUsername);
+					Credential::Thread_dialog_close(hThread_dialog);
+					return result;
 				}
 			}
 			else if( CPUS_LOGON == m_usageScenario || CPUS_UNLOCK_WORKSTATION == m_usageScenario )
