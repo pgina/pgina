@@ -491,6 +491,61 @@ namespace pGina.Service.Impl
             return motd;
         }
 
+        /// <summary>
+        /// m_sessionPropertyCache must be locked
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns>Dict<sessionID,pos in the list></returns>
+        private Dictionary<int, int> FindUserInPropertyCache(string username)
+        {
+            Dictionary<int, int> ret = new Dictionary<int, int>();
+
+            List<int> SessionsList = m_sessionPropertyCache.GetAll(); //all pgina watched sessions
+            //Dictionary<int, List<string>> othersessioncontext = new Dictionary<int, List<string>>(); //all exept my sessions, a list of usernames in which a process is running
+            foreach (int Sessions in SessionsList)
+            {
+                List<SessionProperties> ses = m_sessionPropertyCache.Get(Sessions);
+                for (int x = 0; x < ses.Count; x++)
+                {
+                    UserInformation uInfo = ses[x].GetTrackedSingle<UserInformation>();
+                    if (uInfo.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        ret.Add(Sessions, x);
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// m_sessionPropertyCache must be locked
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns>null == not found</returns>
+        private UserInformation FindUserInfoInPropertyCache(string username)
+        {
+            UserInformation uInfo = null;
+            Dictionary<int, int> foundIN = FindUserInPropertyCache(username);
+            if (foundIN.Count == 0)
+            {
+                return null;
+            }
+
+            foreach (KeyValuePair<int, int> pair in foundIN)
+            {
+                List<SessionProperties> sesProps = m_sessionPropertyCache.Get(pair.Key);
+                if (pair.Value == 0) //0 is an interactive session
+                {
+                    return sesProps[pair.Value].GetTrackedSingle<UserInformation>();
+                }
+
+                uInfo = sesProps[pair.Value].GetTrackedSingle<UserInformation>();
+            }
+
+            return uInfo;
+        }
+
         private void SeesionChangeThread(int sessionID, SessionChangeReason evnt)
         {
             m_logger.InfoFormat("SessionChange: {0} -> {1}", sessionID, evnt);
@@ -504,7 +559,7 @@ namespace pGina.Service.Impl
                         {
                             if (evnt == SessionChangeReason.SessionLogoff)
                             {
-                                //CREDUIhelper(sessionID);
+                                CREDUIhelper(sessionID);
                             }
                             plugin.SessionChange(sessionID, evnt, m_sessionPropertyCache.Get(sessionID));
                         }
@@ -524,6 +579,289 @@ namespace pGina.Service.Impl
             {
                 m_logger.ErrorFormat("Exception while handling SessionChange event: {0}", e);
             }
+        }
+
+        /// <summary>
+        /// m_sessionPropertyCache must be locked
+        /// </summary>
+        /// <param name="session"></param>
+        private void CREDUIhelper(int session)
+        {
+            m_logger.InfoFormat("CREDUIhelper:({0})", session);
+            List<SessionProperties> mysessionList = m_sessionPropertyCache.Get(session); //list of all users in my session
+            UserInformation userInfo = m_sessionPropertyCache.Get(session).First().GetTrackedSingle<UserInformation>(); //this user is logging of right now (my user)
+            List<int> SessionsList = m_sessionPropertyCache.GetAll(); //all pgina watched sessions
+            Dictionary<int,List<string>> othersessioncontext = new Dictionary<int,List<string>>(); //all exept my sessions, a list of usernames in which a process is running
+            foreach (int Sessions in SessionsList)
+            {
+                if (session != Sessions) //if not my session
+                {
+                    //get all usersNames from processes that dont run in my own session (context in which those processes are running)
+                    List<string> sesscontext = Abstractions.WindowsApi.pInvokes.GetSessionContext(Sessions);
+                    othersessioncontext.Add(Sessions, sesscontext);
+                }
+            }
+            List<string> InteractiveUserList = Abstractions.WindowsApi.pInvokes.GetInteractiveUserList(); //get interactive users
+
+
+
+            foreach (SessionProperties s in m_sessionPropertyCache.Get(session))
+            {
+                m_logger.InfoFormat("info: username:{0} credui:{1} description:{2} session:{3}", s.GetTrackedSingle<UserInformation>().Username, s.CREDUI, s.GetTrackedSingle<UserInformation>().Description, session);
+            }
+            //catch runas.exe credui processes
+            for (int y = 0; y < mysessionList.Count; y++)
+            {
+                UserInformation allmyuInfo = mysessionList[y].GetTrackedSingle<UserInformation>();
+                foreach (int Sessions in SessionsList)
+                {
+                    if (session != Sessions) //if not my session
+                    {
+                        // there is a program running as user 'allmyuInfo.Username' in session 'Sessions'
+                        // && this user 'allmyuInfo.Username' is not an interactive user
+                        m_logger.InfoFormat("{0} '{1}' '{2}'", allmyuInfo.Username, String.Join(" ", othersessioncontext[Sessions]), String.Join(" ", InteractiveUserList));
+                        if (othersessioncontext[Sessions].Any(s => s.Equals(allmyuInfo.Username, StringComparison.CurrentCultureIgnoreCase)) && !InteractiveUserList.Any(s => s.ToLower().Contains(Sessions + "\\" + allmyuInfo.Username.ToLower())))
+                        {
+                            bool hit = false;
+                            List<SessionProperties> othersessionList = m_sessionPropertyCache.Get(Sessions); //sessionlist of Sessions (not mine)
+                            for (int x = 1; x < othersessionList.Count; x++)
+                            {
+                                UserInformation ouserInfo = othersessionList[x].GetTrackedSingle<UserInformation>();
+                                m_logger.InfoFormat("compare:'{0}' '{1}'", ouserInfo.Username, allmyuInfo.Username);
+                                if (ouserInfo.Username.Equals(allmyuInfo.Username, StringComparison.CurrentCultureIgnoreCase))
+                                {
+                                    // SessionProperties List of 'Sessions' contains the user 'allmyuInfo.Username'
+                                    hit = true;
+                                }
+                            }
+                            if (!hit)
+                            {
+                                //this program was run by using runas or simmilar
+                                //push it into the SessionProperties list of 'Sessions'
+                                SessionProperties osesprop = new SessionProperties(Guid.NewGuid(), true);
+                                osesprop.AddTrackedSingle<UserInformation>(allmyuInfo);
+                                othersessionList.Add(osesprop);
+                                m_logger.InfoFormat("ive found a program in session:{0} that runs in the context of {1}", Sessions, allmyuInfo.Username);
+                                m_logger.InfoFormat("add user:{0} into SessionProperties of session:{1} an set CREDUI to:{2}", allmyuInfo.Username, Sessions, osesprop.CREDUI);
+                            }
+                            m_sessionPropertyCache.Add(Sessions, othersessionList);// refresh the cache
+                        }
+                    }
+                }
+            }
+
+
+
+
+            foreach (SessionProperties s in m_sessionPropertyCache.Get(session))
+            {
+                m_logger.InfoFormat("info: username:{0} credui:{1} description:{2} session:{3}", s.GetTrackedSingle<UserInformation>().Username, s.CREDUI, s.GetTrackedSingle<UserInformation>().Description, session);
+            }
+            //set SessionProperties.CREDUI
+            for (int y = 0; y < mysessionList.Count; y++)
+            {
+                UserInformation allmyuInfo = mysessionList[y].GetTrackedSingle<UserInformation>();
+                foreach (int Sessions in SessionsList)
+                {
+                    if (session != Sessions) //if not my session
+                    {
+                        List<SessionProperties> othersessionList = m_sessionPropertyCache.Get(Sessions); //sessionlist of Sessions (not mine)
+                        for (int x = 0; x < othersessionList.Count; x++) //all entries
+                        {
+                            UserInformation ouserInfo = othersessionList[x].GetTrackedSingle<UserInformation>();
+                            m_logger.InfoFormat("compare '{0}' '{1}'", ouserInfo.Username, allmyuInfo.Username);
+                            if (ouserInfo.Username.Equals(allmyuInfo.Username, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                // there is an entry in the SessionProperties List of session 'Sessions'
+                                // ill mark CREDUI of user 'allmyuInfo.Username' in my session 'session' as true
+                                // a plugin should not remove or upload a credui user (its up to the plugin dev)
+                                if (mysessionList[y].CREDUI != true)
+                                {
+                                    mysessionList[y].CREDUI = true;
+                                    m_logger.InfoFormat("an entry in session:{0} was found from user {1}", Sessions, allmyuInfo.Username);
+                                    m_logger.InfoFormat("set CREDUI in SessionProperties of user:{0} in session:{1} to {2}", allmyuInfo.Username, session, mysessionList[y].CREDUI);
+                                }
+                                // ill mark CREDUI of user 'ouserInfo.Username' in session 'Sessions' as false
+                                othersessionList[x].CREDUI = false;
+                                m_logger.InfoFormat("set CREDUI in SessionProperties of user:{0} in session:{1} to {2}", ouserInfo.Username, Sessions, othersessionList[x].CREDUI);
+                            }
+                        }
+
+
+
+                        /*
+                        if (othersessioncontext[Sessions].Any(s => s.Equals(allmyuInfo.Username, StringComparison.CurrentCultureIgnoreCase)))
+                        {
+                            // there is a process running in a different session under the context this user
+                            // ill mark the sessioninfo struct of my user as credui true
+                            // a plugin should not remove or upload a credui user (its up to the plugin dev)
+                            //mysessionList.First().CREDUI = true; //the first entry in the list is always an interactive login
+                            mysessionList[y].CREDUI = true;
+                            m_logger.InfoFormat("a program in session:{0} is running in the context of user {1}", Sessions, allmyuInfo.Username);
+                            m_logger.InfoFormat("set CREDUI in SessionProperties of user:{0} in session:{1} to {2}", allmyuInfo.Username, session, mysessionList[y].CREDUI);
+                            List<SessionProperties> othersessionList = m_sessionPropertyCache.Get(Sessions); //sessionlist of Sessions (not mine)
+                            bool hit = false;
+                            for (int x = 0; x < othersessionList.Count; x++)
+                            {
+                                //one user of this other sessions where a process runs under my user
+                                UserInformation ouserInfo = othersessionList[x].GetTrackedSingle<UserInformation>();
+                                m_logger.InfoFormat("compare:'{0}' '{1}'", ouserInfo.Username, allmyuInfo.Username);
+                                if (ouserInfo.Username.Equals(allmyuInfo.Username, StringComparison.CurrentCultureIgnoreCase))
+                                {
+                                    // this is the entry
+                                    hit = true;
+                                    if (x > 0)
+                                    {
+                                        // user is non interactive
+                                        if (userInfo.Username.Equals(ouserInfo.Username, StringComparison.CurrentCultureIgnoreCase))
+                                        {
+                                            othersessionList[x].CREDUI = false;
+                                        }
+                                        else
+                                        {
+                                            othersessionList[x].CREDUI = true;
+                                        }
+                                        m_logger.InfoFormat("set CREDUI in SessionProperties of user:{0} in session:{1} to {2}", ouserInfo.Username, Sessions, othersessionList[x].CREDUI);
+                                    }
+                                }
+                            }
+                            if (!hit)
+                            {
+                                //this program was run by using runas or simmilar
+                                //push it into the SessionProperties list of this session
+                                SessionProperties osesprop = mysessionList[y];
+                                osesprop.CREDUI = true;
+                                osesprop.Id = new Guid(Guid.NewGuid().ToString());
+                                othersessionList.Add(osesprop);
+                                m_logger.InfoFormat("ive found a program in session:{0} that runs in the context of {1}", Sessions, allmyuInfo.Username);
+                                m_logger.InfoFormat("add user:{0} into SessionProperties of session:{1} an set CREDUI to:{2}", allmyuInfo.Username, Sessions, osesprop.CREDUI);
+                            }
+                            m_sessionPropertyCache.Add(Sessions, othersessionList);// refresh the cache
+                        }*/
+                    }
+                }
+            }
+            m_sessionPropertyCache.Add(session, mysessionList);// refresh the cache
+            foreach (SessionProperties s in m_sessionPropertyCache.Get(session))
+            {
+                m_logger.InfoFormat("info: username:{0} credui:{1} description:{2} session:{3}", s.GetTrackedSingle<UserInformation>().Username, s.CREDUI, s.GetTrackedSingle<UserInformation>().Description, session);
+            }
+
+
+
+
+
+
+            /*
+            //shutdown/reboot case
+            if (mysessionList.First().CREDUI == false)
+            {
+                //this interactive user is logging out
+                foreach (int Sessions in SessionsList)
+                {
+                    if (session != Sessions) //if not my session
+                    {
+                        List<SessionProperties> othersessionList = m_sessionPropertyCache.Get(Sessions); //sessionlist of Sessions (not mine)
+                        for (int y = othersessionList.Count - 1; y > 0; y--) //only other credui users
+                        {
+                            if (userInfo.Username.Equals(othersessionList[y].GetTrackedSingle<UserInformation>().Username, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                //no process of my users should run anymore anywhere
+                                //if so mysessionList.First().CREDUI would be true
+                                m_logger.InfoFormat("no process is running in session:{0} under the context of user:{1} removing:{1} in session:{0}", Sessions, userInfo.Username);
+                                othersessionList.RemoveAt(y);
+                            }
+                        }
+                        m_sessionPropertyCache.Add(Sessions, othersessionList);// refresh the cache
+                    }
+                }
+            }
+            */
+
+
+
+
+
+            for (int x = mysessionList.Count - 1; x > 0; x--)
+            {
+                UserInformation myuserInfo = mysessionList[x].GetTrackedSingle<UserInformation>();
+                if (InteractiveUserList.Any(s => s.ToLower().Contains(myuserInfo.Username.ToLower())))
+                {
+                    // a program in my session runs in a different context of an also interactive logged in user
+                    // ill remove this SessionProperty from my SessionProperties List
+                    mysessionList.RemoveAt(x);
+                    m_logger.InfoFormat("user {0} is still interactively logged in", myuserInfo.Username);
+                    m_logger.InfoFormat("removing SessionProperties entry of user:{0} from session:{1}", myuserInfo.Username, session);
+                }
+            }
+
+
+
+
+
+
+            /*
+            List<string> myCREDUIusernameList = new List<string>(); //my credui usersnames
+            for (int x = 1; x < mysessionList.Count; x++)
+            {
+                UserInformation myCREDUIusername = mysessionList[x].GetTrackedSingle<UserInformation>();
+                myCREDUIusernameList.Add(myCREDUIusername.Username);
+            }*/
+            for (int x = mysessionList.Count - 1; x > 0; x--) //only credui users
+            {
+                bool hit = false;
+                UserInformation myCREDUIusername = mysessionList[x].GetTrackedSingle<UserInformation>();
+                foreach (int Sessions in SessionsList)
+                {
+                    if (session != Sessions) //if not my session
+                    {
+                        List<SessionProperties> othersessionList = m_sessionPropertyCache.Get(Sessions); //sessionlist of Sessions (not mine)
+                        for (int y = othersessionList.Count - 1; y >= 0; y--) //all users
+                        {
+                            UserInformation oCREDUIusername = othersessionList[y].GetTrackedSingle<UserInformation>();
+                            //m_logger.InfoFormat("'{0}' '{1}'", oCREDUIusername.Username, String.Join(" ", myCREDUIusernameList));
+                            //if (myCREDUIusernameList.Any(s => s.Equals(oCREDUIusername.Username, StringComparison.CurrentCultureIgnoreCase)))
+                            m_logger.InfoFormat("'{0}' '{1}'", myCREDUIusername.Username, oCREDUIusername.Username);
+                            if (myCREDUIusername.Username.Equals(oCREDUIusername.Username, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                hit = true;
+                                m_logger.InfoFormat("found SessionProperties entry in session:{0} that equals username {1} in my session:{2}", Sessions, oCREDUIusername.Username, session);
+                                m_logger.InfoFormat("removing the SessionProperties entry from session:{0} of user:{1}", session, oCREDUIusername.Username);
+                                mysessionList.RemoveAt(x);
+                                break;
+                                /*
+                                //is the credui programm still running
+                                m_logger.InfoFormat("'{0}' '{1}'", String.Join(" ", othersessioncontext[Sessions].ToArray()), oCREDUIusername.Username);
+                                if (othersessioncontext[Sessions].Any(s => s.Equals(oCREDUIusername.Username, StringComparison.CurrentCultureIgnoreCase)))
+                                {
+                                    //remove from my list
+                                    m_logger.InfoFormat("the program is still running, removing the SessionProperties entry from session:{0} of user:{1}", session, oCREDUIusername.Username);
+                                    mysessionList.RemoveAt(x);
+                                }
+                                else
+                                {
+                                    //remove from other list, its not running anymore
+                                    m_logger.InfoFormat("the program has been closed, removing the SessionProperties entry from session:{0} of user:{1}", Sessions, oCREDUIusername.Username);
+                                    othersessionList.RemoveAt(y);
+                                }*/
+                            }
+                        }
+                        m_sessionPropertyCache.Add(Sessions, othersessionList);
+                        if (hit)
+                        {
+                            break;
+                        }
+                    }
+                }
+                if (!hit)
+                {
+                    //this credui user runs only in my session
+                    m_logger.InfoFormat("the last program in context of {0} is running in session:{1} set CREDUI to false", mysessionList[x].GetTrackedSingle<UserInformation>().Username, session);
+                    mysessionList[x].CREDUI = false;
+                }
+            }
+            // refresh the cache
+            m_sessionPropertyCache.Add(session, mysessionList);
         }
 
         private ChangePasswordResponseMessage HandleChangePasswordRequest(ChangePasswordRequestMessage msg)

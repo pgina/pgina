@@ -582,6 +582,12 @@ namespace Abstractions.WindowsApi
             internal static extern int RegDeleteTree(structenums.baseKey hKey, [MarshalAs(UnmanagedType.LPStr)]string subKey);
             #endregion
 
+            [DllImport("advapi32.dll", SetLastError = true)]
+            internal static extern bool GetTokenInformation(IntPtr TokenHandle, TOKEN_INFORMATION_CLASS TokenInformationClass, IntPtr TokenInformation, int TokenInformationLength, out int ReturnLength);
+
+            [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            internal static extern bool LookupAccountSid(string lpSystemName, IntPtr Sid, StringBuilder lpName, ref uint cchName, StringBuilder ReferencedDomainName, ref uint cchReferencedDomainName, out SID_NAME_USE peUse);
+
             [DllImport("wtsapi32.dll", SetLastError = true)]
             internal static extern bool WTSRegisterSessionNotification(IntPtr hWnd, [MarshalAs(UnmanagedType.U4)] int dwFlags);
 
@@ -668,6 +674,33 @@ namespace Abstractions.WindowsApi
                 internal int Count;
                 internal LUID Luid;
                 internal UInt32 Attr;
+            }
+
+            internal struct TOKEN_USER
+            {
+                #pragma warning disable 0649
+                internal SID_AND_ATTRIBUTES User;
+                #pragma warning restore 0649
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            internal struct SID_AND_ATTRIBUTES
+            {
+                internal IntPtr Sid;
+                internal int Attributes;
+            }
+
+            internal enum SID_NAME_USE
+            {
+                SidTypeUser = 1,
+                SidTypeGroup,
+                SidTypeDomain,
+                SidTypeAlias,
+                SidTypeWellKnownGroup,
+                SidTypeDeletedAccount,
+                SidTypeInvalid,
+                SidTypeUnknown,
+                SidTypeComputer
             }
 
             internal enum State
@@ -1032,7 +1065,7 @@ namespace Abstractions.WindowsApi
                     }*/
                     if (!string.IsNullOrEmpty(user))
                     {
-                        result.Add(user);
+                        result.Add(string.Format("{0}\\{1}", sessionInfo.SessionID, user));
                     }
                 }
 
@@ -1330,6 +1363,95 @@ namespace Abstractions.WindowsApi
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// return username based on context a programs runs in a session
+        /// a program running as administrator will add administrator to the list
+        /// </summary>
+        /// <param name="sessionID"></param>
+        /// <returns>is a lower username like administrator</returns>
+        public static List<string> GetSessionContext(int sessionID)
+        {
+            List<string> ret = new List<string>();
+
+            foreach (Process process in Process.GetProcesses())
+            {
+                try { var test = process.Handle; }
+                catch { continue; }
+                if (process.SessionId == sessionID)
+                {
+                    //Console.WriteLine("process:{0}", process.ProcessName);
+                    IntPtr tokenHandle;
+                    // Get the Process Token
+                    if (!SafeNativeMethods.OpenProcessToken(process.Handle, SafeNativeMethods.TokenAccessRights.TOKEN_READ, out tokenHandle))
+                    {
+                        LibraryLogging.Error("OpenProcessToken error:{0}", LastError());
+                        return ret;
+                    }
+
+                    int TokenInfLength = 0;
+                    if (!SafeNativeMethods.GetTokenInformation(tokenHandle, SafeNativeMethods.TOKEN_INFORMATION_CLASS.TokenUser, IntPtr.Zero, TokenInfLength, out TokenInfLength))
+                    {
+                        int error = Marshal.GetLastWin32Error();
+                        if (error != 122 /*ERROR_INSUFFICIENT_BUFFER*/)
+                        {
+                            LibraryLogging.Error("GetTokenInformation error:{0} {1}", error, LastError());
+                        }
+                        else
+                        {
+                            IntPtr TokenInformation = Marshal.AllocHGlobal(TokenInfLength);
+                            if (!SafeNativeMethods.GetTokenInformation(tokenHandle, SafeNativeMethods.TOKEN_INFORMATION_CLASS.TokenUser, TokenInformation, TokenInfLength, out TokenInfLength))
+                            {
+                                LibraryLogging.Error("GetTokenInformation error:{0}", LastError());
+                            }
+                            else
+                            {
+                                SafeNativeMethods.TOKEN_USER TokenUser = (SafeNativeMethods.TOKEN_USER)Marshal.PtrToStructure(TokenInformation, typeof(SafeNativeMethods.TOKEN_USER));
+
+                                StringBuilder name = new StringBuilder();
+                                uint cchName = (uint)name.Capacity;
+                                StringBuilder referencedDomainName = new StringBuilder();
+                                uint cchReferencedDomainName = (uint)referencedDomainName.Capacity;
+                                SafeNativeMethods.SID_NAME_USE sidUse;
+
+
+                                bool WinAPI = SafeNativeMethods.LookupAccountSid(null, TokenUser.User.Sid, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse);
+                                if (!WinAPI)
+                                {
+                                    error = Marshal.GetLastWin32Error();
+                                    if (error == 122 /*ERROR_INSUFFICIENT_BUFFER*/)
+                                    {
+                                        name.EnsureCapacity((int)cchName);
+                                        referencedDomainName.EnsureCapacity((int)cchReferencedDomainName);
+                                        WinAPI = SafeNativeMethods.LookupAccountSid(null, TokenUser.User.Sid, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse);
+                                        if (!WinAPI)
+                                        {
+                                            LibraryLogging.Error("LookupAccountSid error:{0}", LastError());
+                                        }
+                                    }
+                                    else
+                                    {
+                                        LibraryLogging.Error("LookupAccountSid error:{0}", LastError());
+                                    }
+                                }
+                                if (WinAPI)
+                                {
+                                    LibraryLogging.Info("Found process:{0} in session:{1} account:{2}", process.ProcessName, sessionID, name.ToString());
+                                    if (!ret.Contains(name.ToString()))
+                                    {
+                                        ret.Add(name.ToString());
+                                    }
+                                }
+                            }
+                            Marshal.FreeHGlobal(TokenInformation);
+                        }
+                    }
+                    SafeNativeMethods.CloseHandle(tokenHandle);
+                }
+            }
+
+            return ret;
         }
 
         /// <summary>
