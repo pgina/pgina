@@ -28,9 +28,9 @@ namespace pGina.Service.Impl
             return m_service.OnCustomCommand();
         }
 
-        public void SessionChange(SessionChangeDescription desc)
+        public void SessionChange(int sessionID, SessionChangeReason evnt)
         {
-            m_service.SessionChange(desc);
+            m_service.SessionChange(sessionID, evnt);
         }
     }
 }

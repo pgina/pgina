@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -57,7 +57,7 @@ namespace pGina.Service.Impl
     {
         private ILog m_logger = LogManager.GetLogger("pGina.Service.Impl");
         private ILog m_abstractLogger = LogManager.GetLogger("Abstractions");
-        private PipeServer m_server = null;        
+        private PipeServer m_server = null;
         private ObjectCache<int, SessionProperties> m_sessionPropertyCache = new ObjectCache<int, SessionProperties>();
 
         static Service()
@@ -86,7 +86,7 @@ namespace pGina.Service.Impl
             {
                 // don't kill the existing exception stack with one of our own
             }
-        }        
+        }
 
         private void HookUpAbstractionsLibraryLogging()
         {
@@ -120,7 +120,7 @@ namespace pGina.Service.Impl
                 m_server = new PipeServer(pipeName, maxClients, (Func<IDictionary<string, object>, IDictionary<string, object>>)HandleMessage);
                 m_logger.DebugFormat("Using plugin directories: ");
                 foreach (string dir in PluginDirectories)
-                    m_logger.DebugFormat("  {0}", dir); 
+                    m_logger.DebugFormat("  {0}", dir);
             }
             catch (Exception e)
             {
@@ -133,7 +133,7 @@ namespace pGina.Service.Impl
         public void Start()
         {
             m_logger.InfoFormat("Starting service");
-            HookUpAbstractionsLibraryLogging();            
+            HookUpAbstractionsLibraryLogging();
             m_server.Start();
             PluginDriver.Starting();
         }
@@ -142,7 +142,7 @@ namespace pGina.Service.Impl
         {
             m_logger.InfoFormat("Stopping service");
             PluginDriver.Stopping();
-            DetachAbstractionsLibraryLogging();            
+            DetachAbstractionsLibraryLogging();
             m_server.Stop();
         }
 
@@ -165,6 +165,13 @@ namespace pGina.Service.Impl
             return result;
         }
 
+        public void SessionChange(int sessionID, SessionChangeReason evnt)
+        {
+            m_logger.InfoFormat("SessionChange:{0} {1}", sessionID, (int)evnt);
+            Thread rem_local = new Thread(() => SeesionChangeThread(sessionID, evnt));
+            rem_local.Start();
+        }
+        /*
         public void SessionChange(SessionChangeDescription changeDescription)
         {
             m_logger.InfoFormat("SessionChange: {0} -> {1}", changeDescription.SessionId, changeDescription.Reason);
@@ -197,12 +204,12 @@ namespace pGina.Service.Impl
             {
                 m_logger.ErrorFormat("Exception while handling SessionChange event: {0}", e);
             }
-        }        
+        }*/
 
         // This will be called on seperate threads, 1 per client connection and
         //  represents a connected client - that is, until we return null,
         //  the connection remains open and operations on behalf of this client
-        //  should occur in this thread etc.  The current managed thread id 
+        //  should occur in this thread etc.  The current managed thread id
         //  can be used to differentiate between instances if scope requires.
         private IDictionary<string, object> HandleMessage(IDictionary<string, object> msg)
         {
@@ -217,14 +224,14 @@ namespace pGina.Service.Impl
             {
                 logger.DebugFormat("{0} message received", type);
             }
-            
+
             switch (type)
             {
                 case MessageType.Disconnect:
                     // We ack, and mark this as LastMessage, which tells the pipe framework
                     //  not to expect further messages
                     IDictionary<string, object> disconnectAck = new EmptyMessage(MessageType.Ack).ToDict();  // Ack
-                    disconnectAck["LastMessage"] = true; 
+                    disconnectAck["LastMessage"] = true;
                     return disconnectAck;
                 case MessageType.Hello:
                     return new EmptyMessage(MessageType.Hello).ToDict();  // Ack with our own hello
@@ -269,7 +276,7 @@ namespace pGina.Service.Impl
                     break;
             }
         }
-                
+
         private LoginResponseMessage HandleLoginRequest(LoginRequestMessage msg)
         {
             if (String.IsNullOrEmpty(msg.Username))
@@ -328,7 +335,7 @@ namespace pGina.Service.Impl
                     Username = sessionDriver.UserInformation.Username,
                     Domain = sessionDriver.UserInformation.Domain,
                     Password = sessionDriver.UserInformation.Password
-                };                
+                };
             }
             catch (Exception e)
             {
@@ -440,6 +447,41 @@ namespace pGina.Service.Impl
             }
 
             return motd;
+        }
+
+        private void SeesionChangeThread(int sessionID, SessionChangeReason evnt)
+        {
+            m_logger.InfoFormat("SessionChange: {0} -> {1}", sessionID, evnt);
+            try
+            {
+                lock (m_sessionPropertyCache)
+                {
+                    foreach (IPluginEventNotifications plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
+                    {
+                        if (m_sessionPropertyCache.Exists(sessionID))
+                        {
+                            if (evnt == SessionChangeReason.SessionLogoff)
+                            {
+                                //CREDUIhelper(sessionID);
+                            }
+                            plugin.SessionChange(sessionID, evnt, m_sessionPropertyCache.Get(sessionID));
+                        }
+                        else
+                        {
+                            plugin.SessionChange(sessionID, evnt, null);
+                        }
+                    }
+                    // If this is a logout, remove from our map
+                    if (evnt == SessionChangeReason.SessionLogoff && m_sessionPropertyCache.Exists(sessionID))
+                    {
+                        m_sessionPropertyCache.Remove(sessionID);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                m_logger.ErrorFormat("Exception while handling SessionChange event: {0}", e);
+            }
         }
 
         private ChangePasswordResponseMessage HandleChangePasswordRequest(ChangePasswordRequestMessage msg)

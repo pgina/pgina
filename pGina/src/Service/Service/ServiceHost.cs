@@ -34,6 +34,7 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using System.Reflection;
+using System.Windows.Forms;
 
 using pGina.Service.Impl;
 
@@ -74,6 +75,7 @@ namespace Service
                 m_serviceThreadObj = new pGina.Service.Impl.ServiceThread();
                 m_serviceThread = new Thread(new ThreadStart(m_serviceThreadObj.Start));
                 m_serviceThread.Start();
+                new Thread(RunMessagePump).Start();
             }
             catch (Exception e)
             {
@@ -82,9 +84,15 @@ namespace Service
             }
         }
 
+        void RunMessagePump()
+        {
+            Application.Run(new HiddenForm(m_serviceThreadObj));
+        }
+
         protected override void OnStop()
         {
             WaitForServiceInit();
+            Application.Exit();
             m_serviceThreadObj.Stop();
         }
 
@@ -117,13 +125,13 @@ namespace Service
             }
             m_logger.Info("RequestAdditionalTime finished");
         }
-
+        /*
         protected override void OnSessionChange(SessionChangeDescription changeDescription)
         {
             base.OnSessionChange(changeDescription);
             WaitForServiceInit();
             m_serviceThreadObj.SessionChange(changeDescription);
-        }
+        }*/
 
         private void WaitForServiceInit()
         {

@@ -582,6 +582,12 @@ namespace Abstractions.WindowsApi
             internal static extern int RegDeleteTree(structenums.baseKey hKey, [MarshalAs(UnmanagedType.LPStr)]string subKey);
             #endregion
 
+            [DllImport("wtsapi32.dll", SetLastError = true)]
+            internal static extern bool WTSRegisterSessionNotification(IntPtr hWnd, [MarshalAs(UnmanagedType.U4)] int dwFlags);
+
+            [DllImport("WtsApi32.dll", SetLastError = true)]
+            internal static extern bool WTSUnRegisterSessionNotification(IntPtr hWnd);
+
             [DllImport("advapi32.dll", SetLastError = true)]
             internal static extern bool SetServiceStatus(IntPtr hServiceStatus, ref structenums.SERVICE_STATUS lpServiceStatus);
 
@@ -1302,6 +1308,28 @@ namespace Abstractions.WindowsApi
             if (hToken != IntPtr.Zero) CloseHandle(hToken);
 
             return result;
+        }
+
+        public static bool WTSRegister(IntPtr handle)
+        {
+            if (!SafeNativeMethods.WTSRegisterSessionNotification(handle, 1/*NOTIFY_FOR_ALL_SESSIONS*/))
+            {
+                LibraryLogging.Error("WTSRegisterSessionNotification error:{0}", LastError());
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool WTSUnRegister(IntPtr handle)
+        {
+            if (!SafeNativeMethods.WTSUnRegisterSessionNotification(handle))
+            {
+                LibraryLogging.Error("WTSUnRegisterSessionNotification error:{0}", LastError());
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>

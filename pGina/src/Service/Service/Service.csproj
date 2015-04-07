@@ -64,7 +64,9 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -75,6 +77,9 @@
   <ItemGroup>
     <Compile Include="..\..\Core\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="HiddenForm.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
@@ -103,6 +108,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Abstractions\Abstractions.csproj">
+      <Project>{3E914BA5-74D4-4487-82DA-FFD7F7929363}</Project>
+      <Name>Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Shared\Shared.csproj">
       <Project>{0EEFBC3F-4DFD-42F6-888E-1A28F4EFEFE3}</Project>
       <Name>Shared</Name>
@@ -113,7 +122,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
