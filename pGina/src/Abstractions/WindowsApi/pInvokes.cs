@@ -582,6 +582,13 @@ namespace Abstractions.WindowsApi
             internal static extern int RegDeleteTree(structenums.baseKey hKey, [MarshalAs(UnmanagedType.LPStr)]string subKey);
             #endregion
 
+            [DllImport("advapi32.dll", SetLastError = true)]
+            internal static extern bool SetServiceStatus(IntPtr hServiceStatus, ref structenums.SERVICE_STATUS lpServiceStatus);
+
+            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool ChangeServiceConfig2(SafeHandle hService, int dwInfoLevel, IntPtr lpInfo);
+
             [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
             internal struct USER_INFO_1052
             {
@@ -655,6 +662,34 @@ namespace Abstractions.WindowsApi
                 internal int Count;
                 internal LUID Luid;
                 internal UInt32 Attr;
+            }
+
+            internal enum State
+            {
+                SERVICE_STOPPED = 0x00000001,
+                SERVICE_START_PENDING = 0x00000002,
+                SERVICE_STOP_PENDING = 0x00000003,
+                SERVICE_RUNNING = 0x00000004,
+                SERVICE_CONTINUE_PENDING = 0x00000005,
+                SERVICE_PAUSE_PENDING = 0x00000006,
+                SERVICE_PAUSED = 0x00000007,
+            }
+            internal enum INFO_LEVEL : uint
+            {
+                SERVICE_CONFIG_DESCRIPTION = 0x00000001,
+                SERVICE_CONFIG_FAILURE_ACTIONS = 0x00000002,
+                SERVICE_CONFIG_DELAYED_AUTO_START_INFO = 0x00000003,
+                SERVICE_CONFIG_FAILURE_ACTIONS_FLAG = 0x00000004,
+                SERVICE_CONFIG_SERVICE_SID_INFO = 0x00000005,
+                SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO = 0x00000006,
+                SERVICE_CONFIG_PRESHUTDOWN_INFO = 0x00000007,
+                SERVICE_CONFIG_TRIGGER_INFO = 0x00000008,
+                SERVICE_CONFIG_PREFERRED_NODE = 0x00000009
+            }
+            [StructLayout(LayoutKind.Sequential)]
+            internal struct SERVICE_PRESHUTDOWN_INFO
+            {
+                internal UInt32 dwPreshutdownTimeout;
             }
 
             internal static Boolean RegistryLoadPrivilegeSet = false;
@@ -766,6 +801,152 @@ namespace Abstractions.WindowsApi
                 HKEY_USERS = 0x80000003,
                 HKEY_CURRENT_CONFIG = 0x80000005
             }
+
+            public enum PBT
+            {
+                // Vista++ && XP++
+                APMPOWERSTATUSCHANGE = 0xA, //Power status has changed.
+                APMRESUMEAUTOMATIC = 0x12, //Operation is resuming automatically from a low-power state. This message is sent every time the system resumes.
+                APMRESUMESUSPEND = 0x7, //Operation is resuming from a low-power state. This message is sent after PBT_APMRESUMEAUTOMATIC if the resume is triggered by user input, such as pressing a key.
+                APMSUSPEND = 0x4, //System is suspending operation.
+                POWERSETTINGCHANGE = 0x8013, //A power setting change event has been received.
+                // XP++ only
+                APMBATTERYLOW = 0x9, //Battery power is low. In Windows Server 2008 and Windows Vista, use PBT_APMPOWERSTATUSCHANGE instead.
+                APMOEMEVENT = 0xB, //OEM-defined event occurred. In Windows Server 2008 and Windows Vista, this event is not available because these operating systems support only ACPI; APM BIOS events are not supported.
+                APMQUERYSUSPEND = 0x0, //Request for permission to suspend. In Windows Server 2008 and Windows Vista, use the SetThreadExecutionState function instead.
+                APMQUERYSUSPENDFAILED = 0x2, //Suspension request denied. In Windows Server 2008 and Windows Vista, use SetThreadExecutionState instead.
+                APMRESUMECRITICAL = 0x6, //Operation resuming after critical suspension. In Windows Server 2008 and Windows Vista, use PBT_APMRESUMEAUTOMATIC instead.
+            }
+
+            public enum WTS
+            {
+                CONSOLE_CONNECT = 0x1, //The session identified by lParam was connected to the console terminal or RemoteFX session.
+                CONSOLE_DISCONNECT = 0x2, //The session identified by lParam was disconnected from the console terminal or RemoteFX session.
+                REMOTE_CONNECT = 0x3, //The session identified by lParam was connected to the remote terminal.
+                REMOTE_DISCONNECT = 0x4, //The session identified by lParam was disconnected from the remote terminal.
+                SESSION_LOGON = 0x5, //A user has logged on to the session identified by lParam.
+                SESSION_LOGOFF = 0x6, //A user has logged off the session identified by lParam.
+                SESSION_LOCK = 0x7, //The session identified by lParam has been locked.
+                SESSION_UNLOCK = 0x8, //The session identified by lParam has been unlocked.
+                SESSION_REMOTE_CONTROL = 0x9, //The session identified by lParam has changed its remote controlled status. To determine the status, call GetSystemMetrics and check the SM_REMOTECONTROL metric.
+                SESSION_CREATE = 0xA, //Reserved for future use.
+                SESSION_TERMINATE = 0xB, //Reserved for future use.
+            }
+
+            public enum DBT
+            {
+                CONFIGCHANGECANCELED = 0x0019, //A request to change the current configuration (dock or undock) has been canceled.
+                CONFIGCHANGED = 0x0018, //The current configuration has changed, due to a dock or undock.
+                CUSTOMEVENT = 0x8006, //A custom event has occurred.
+                DEVICEARRIVAL = 0x8000, //A device or piece of media has been inserted and is now available.
+                DEVICEQUERYREMOVE = 0x8001, //Permission is requested to remove a device or piece of media. Any application can deny this request and cancel the removal.
+                DEVICEQUERYREMOVEFAILED = 0x8002, //A request to remove a device or piece of media has been canceled.
+                DEVICEREMOVECOMPLETE = 0x8004, //A device or piece of media has been removed.
+                DEVICEREMOVEPENDING = 0x8003, //A device or piece of media is about to be removed. Cannot be denied.
+                DEVICETYPESPECIFIC = 0x8005, //A device-specific event has occurred.
+                DEVNODES_CHANGED = 0x0007, //A device has been added to or removed from the system.
+                QUERYCHANGECONFIG = 0x0017, //Permission is requested to change the current configuration (dock or undock).
+                USERDEFINED = 0xFFFF, //The meaning of this message is user-defined.
+            }
+
+            public enum WM
+            {
+                POWERBROADCAST = 0x0218, //PBT enums
+                WTSSESSION_CHANGE = 0x02B1, //WTS enums
+                DEVICECHANGE = 0x0219, //DBT enums
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct SERVICE_STATUS
+            {
+                public int serviceType;
+                public int currentState;
+                public int controlsAccepted;
+                public int win32ExitCode;
+                public int serviceSpecificExitCode;
+                public int checkPoint;
+                public int waitHint;
+            }
+            public enum ServiceControl
+            {
+                SERVICE_CONTROL_DEVICEEVENT = 0x0000000B,
+                SERVICE_CONTROL_HARDWAREPROFILECHANGE = 0x0000000C,
+                SERVICE_CONTROL_POWEREVENT = 0x0000000D,
+                SERVICE_CONTROL_SESSIONCHANGE = 0x0000000E,
+                SERVICE_CONTROL_TIMECHANGE = 0x00000010,
+                SERVICE_CONTROL_TRIGGEREVENT = 0x00000020,
+                SERVICE_CONTROL_USERMODEREBOOT = 0x00000040,
+                SERVICE_CONTROL_CONTINUE = 0x00000003,
+                SERVICE_CONTROL_INTERROGATE = 0x00000004,
+                SERVICE_CONTROL_NETBINDADD = 0x00000007,
+                SERVICE_CONTROL_NETBINDDISABLE = 0x0000000A,
+                SERVICE_CONTROL_NETBINDENABLE = 0x00000009,
+                SERVICE_CONTROL_NETBINDREMOVE = 0x00000008,
+                SERVICE_CONTROL_PARAMCHANGE = 0x00000006,
+                SERVICE_CONTROL_PAUSE = 0x00000002,
+                SERVICE_CONTROL_PRESHUTDOWN = 0x0000000F,
+                SERVICE_CONTROL_SHUTDOWN = 0x00000005,
+                SERVICE_CONTROL_STOP = 0x00000001,
+            }
+            public enum ServiceAccept
+            {
+                SERVICE_ACCEPT_NETBINDCHANGE = 0x00000010,
+                SERVICE_ACCEPT_PARAMCHANGE = 0x00000008,
+                SERVICE_ACCEPT_PAUSE_CONTINUE = 0x00000002,
+                SERVICE_ACCEPT_PRESHUTDOWN = 0x00000100,
+                SERVICE_ACCEPT_SHUTDOWN = 0x00000004,
+                SERVICE_ACCEPT_STOP = 0x00000001,
+                SERVICE_ACCEPT_HARDWAREPROFILECHANGE = 0x00000020,
+                SERVICE_ACCEPT_POWEREVENT = 0x00000040,
+                SERVICE_ACCEPT_SESSIONCHANGE = 0x00000080,
+                SERVICE_ACCEPT_TIMECHANGE = 0x00000200,
+                SERVICE_ACCEPT_TRIGGEREVENT = 0x00000400,
+                SERVICE_ACCEPT_USERMODEREBOOT = 0x00000800, //windows 8
+            }
+        }
+
+        public static bool SetPreshutdownTimeout(SafeHandle handle, ref structenums.SERVICE_STATUS myServiceStatus)
+        {
+            SafeNativeMethods.SERVICE_PRESHUTDOWN_INFO spi = new SafeNativeMethods.SERVICE_PRESHUTDOWN_INFO();
+            spi.dwPreshutdownTimeout = 3600 * 1000;
+            IntPtr lpInfo = Marshal.AllocHGlobal(Marshal.SizeOf(spi));
+            if (lpInfo == IntPtr.Zero)
+            {
+                string errorMessage = LastError();
+                LibraryLogging.Error("Unable to allocate memory for service action, error: {0}", errorMessage);
+                EventLog.WriteEntry("pGina", String.Format("Unable to allocate memory for service action\nerror:{0}", errorMessage), EventLogEntryType.Warning);
+
+                return false;
+            }
+            else
+            {
+                Marshal.StructureToPtr(spi, lpInfo, false);
+                if (!SafeNativeMethods.ChangeServiceConfig2(handle, (int)SafeNativeMethods.INFO_LEVEL.SERVICE_CONFIG_PRESHUTDOWN_INFO, lpInfo))
+                {
+                    string errorMessage = LastError();
+                    LibraryLogging.Error("ChangeServiceConfig2 error: {0}", errorMessage);
+                    EventLog.WriteEntry("pGina", String.Format("ChangeServiceConfig2\nThe service will be forced to stop during a shutdown within 3 minutes\nerror:{0}", errorMessage), EventLogEntryType.Warning);
+
+                    return false;
+                }
+                Marshal.FreeHGlobal(lpInfo);
+            }
+
+            return true;
+        }
+
+        public static bool ShutdownPending(IntPtr handle, ref structenums.SERVICE_STATUS myServiceStatus, TimeSpan wait)
+        {
+            myServiceStatus.checkPoint++;
+            myServiceStatus.currentState = (int)SafeNativeMethods.State.SERVICE_STOP_PENDING;
+            myServiceStatus.waitHint = wait.Milliseconds;
+            if (!SafeNativeMethods.SetServiceStatus(handle, ref myServiceStatus))
+            {
+                LibraryLogging.Error("SetServiceStatus error:{0}", LastError());
+                return false;
+            }
+
+            return true;
         }
 
         public static int GetSessionId()

@@ -34,7 +34,6 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 using pGina.Service.Impl;
 
@@ -42,107 +41,21 @@ using log4net;
 
 namespace Service
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct SERVICE_STATUS
-    {
-        public int serviceType;
-        public int currentState;
-        public int controlsAccepted;
-        public int win32ExitCode;
-        public int serviceSpecificExitCode;
-        public int checkPoint;
-        public int waitHint;
-    }
-    public enum State
-    {
-        SERVICE_STOPPED = 0x00000001,
-        SERVICE_START_PENDING = 0x00000002,
-        SERVICE_STOP_PENDING = 0x00000003,
-        SERVICE_RUNNING = 0x00000004,
-        SERVICE_CONTINUE_PENDING = 0x00000005,
-        SERVICE_PAUSE_PENDING = 0x00000006,
-        SERVICE_PAUSED = 0x00000007,
-    }
-    public enum ServiceAccept
-    {
-        SERVICE_ACCEPT_NETBINDCHANGE = 0x00000010,
-        SERVICE_ACCEPT_PARAMCHANGE = 0x00000008,
-        SERVICE_ACCEPT_PAUSE_CONTINUE = 0x00000002,
-        SERVICE_ACCEPT_PRESHUTDOWN = 0x00000100,
-        SERVICE_ACCEPT_SHUTDOWN = 0x00000004,
-        SERVICE_ACCEPT_STOP = 0x00000001,
-        SERVICE_ACCEPT_HARDWAREPROFILECHANGE = 0x00000020,
-        SERVICE_ACCEPT_POWEREVENT = 0x00000040,
-        SERVICE_ACCEPT_SESSIONCHANGE = 0x00000080,
-        SERVICE_ACCEPT_TIMECHANGE = 0x00000200,
-        SERVICE_ACCEPT_TRIGGEREVENT = 0x00000400,
-        SERVICE_ACCEPT_USERMODEREBOOT = 0x00000800, //windows 8
-    }
-    public enum ServiceControl
-    {
-        SERVICE_CONTROL_DEVICEEVENT = 0x0000000B,
-        SERVICE_CONTROL_HARDWAREPROFILECHANGE = 0x0000000C,
-        SERVICE_CONTROL_POWEREVENT = 0x0000000D,
-        SERVICE_CONTROL_SESSIONCHANGE = 0x0000000E,
-        SERVICE_CONTROL_TIMECHANGE = 0x00000010,
-        SERVICE_CONTROL_TRIGGEREVENT = 0x00000020,
-        SERVICE_CONTROL_USERMODEREBOOT = 0x00000040,
-        SERVICE_CONTROL_CONTINUE = 0x00000003,
-        SERVICE_CONTROL_INTERROGATE = 0x00000004,
-        SERVICE_CONTROL_NETBINDADD = 0x00000007,
-        SERVICE_CONTROL_NETBINDDISABLE = 0x0000000A,
-        SERVICE_CONTROL_NETBINDENABLE = 0x00000009,
-        SERVICE_CONTROL_NETBINDREMOVE = 0x00000008,
-        SERVICE_CONTROL_PARAMCHANGE = 0x00000006,
-        SERVICE_CONTROL_PAUSE = 0x00000002,
-        SERVICE_CONTROL_PRESHUTDOWN = 0x0000000F,
-        SERVICE_CONTROL_SHUTDOWN = 0x00000005,
-        SERVICE_CONTROL_STOP = 0x00000001,
-    }
-    public enum INFO_LEVEL : uint
-    {
-        SERVICE_CONFIG_DESCRIPTION = 0x00000001,
-        SERVICE_CONFIG_FAILURE_ACTIONS = 0x00000002,
-        SERVICE_CONFIG_DELAYED_AUTO_START_INFO = 0x00000003,
-        SERVICE_CONFIG_FAILURE_ACTIONS_FLAG = 0x00000004,
-        SERVICE_CONFIG_SERVICE_SID_INFO = 0x00000005,
-        SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO = 0x00000006,
-        SERVICE_CONFIG_PRESHUTDOWN_INFO = 0x00000007,
-        SERVICE_CONFIG_TRIGGER_INFO = 0x00000008,
-        SERVICE_CONFIG_PREFERRED_NODE = 0x00000009
-    }
-    [StructLayout(LayoutKind.Sequential)]
-    public struct SERVICE_PRESHUTDOWN_INFO
-    {
-        public UInt32 dwPreshutdownTimeout;
-    }
     public partial class pGinaServiceHost : ServiceBase
     {
         private Thread m_serviceThread = null;
         private pGina.Service.Impl.ServiceThread m_serviceThreadObj = null;
-        const int SERVICE_ACCEPT_PRESHUTDOWN = 0x100;
-        const int SERVICE_CONTROL_PRESHUTDOWN = 0xf;
-
         private ILog m_logger = LogManager.GetLogger("Pgina Service");
-
-        [DllImport("advapi32.dll", SetLastError = true)]
-        internal static extern bool SetServiceStatus(IntPtr hServiceStatus, ref SERVICE_STATUS lpServiceStatus);
-
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ChangeServiceConfig2(IntPtr hService, int dwInfoLevel, IntPtr lpInfo);
-
-        private SERVICE_STATUS myServiceStatus;
+        private Abstractions.WindowsApi.pInvokes.structenums.SERVICE_STATUS myServiceStatus;
 
         public pGinaServiceHost()
         {
             InitializeComponent();
 
             FieldInfo fi = typeof(ServiceBase).GetField("acceptedCommands", BindingFlags.Instance | BindingFlags.NonPublic);
-            int val = (int)fi.GetValue(this) | (int)ServiceAccept.SERVICE_ACCEPT_PRESHUTDOWN;
+            int val = (int)fi.GetValue(this) | (int)Abstractions.WindowsApi.pInvokes.structenums.ServiceAccept.SERVICE_ACCEPT_PRESHUTDOWN;
             fi.SetValue(this, val);
 
-            //prepare myServiceStatus for further use
             using (ServiceController sc = new ServiceController(this.ServiceName))
             {
                 myServiceStatus.serviceType = (int)sc.ServiceType;
@@ -150,27 +63,7 @@ namespace Service
                 myServiceStatus.serviceSpecificExitCode = 0;
                 myServiceStatus.win32ExitCode = 0;
 
-                SERVICE_PRESHUTDOWN_INFO spi = new SERVICE_PRESHUTDOWN_INFO();
-                spi.dwPreshutdownTimeout = 3600 * 1000;
-                IntPtr lpInfo = Marshal.AllocHGlobal(Marshal.SizeOf(spi));
-                IntPtr sHandle = sc.ServiceHandle.DangerousGetHandle();
-                if (lpInfo == IntPtr.Zero)
-                {
-                    string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).ToString();
-                    m_logger.ErrorFormat("Unable to allocate memory for service action, error: {0}", errorMessage);
-                    EventLog.WriteEntry("pGina", String.Format("Unable to allocate memory for service action\nerror:{0}", errorMessage), EventLogEntryType.Warning);
-                }
-                else
-                {
-                    Marshal.StructureToPtr(spi, lpInfo, false);
-                    if (!ChangeServiceConfig2(sHandle, (int)INFO_LEVEL.SERVICE_CONFIG_PRESHUTDOWN_INFO, lpInfo))
-                    {
-                        string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).ToString();
-                        m_logger.ErrorFormat("ChangeServiceConfig2 error: {0}", errorMessage);
-                        EventLog.WriteEntry("pGina", String.Format("ChangeServiceConfig2\nThe service will be forced to stop during a shutdown within 3 minutes\nerror:{0}", errorMessage), EventLogEntryType.Warning);
-                    }
-                    Marshal.FreeHGlobal(lpInfo);
-                }
+                Abstractions.WindowsApi.pInvokes.SetPreshutdownTimeout(sc.ServiceHandle, ref myServiceStatus);
             }
         }
 
@@ -200,7 +93,7 @@ namespace Service
             WaitForServiceInit();
             switch (command)
             {
-                case (int)ServiceControl.SERVICE_CONTROL_PRESHUTDOWN:
+                case (int)Abstractions.WindowsApi.pInvokes.structenums.ServiceControl.SERVICE_CONTROL_PRESHUTDOWN:
                     Thread postpone = new Thread(SignalShutdownPending);
                     postpone.Start();
                     break;
@@ -212,17 +105,11 @@ namespace Service
         private void SignalShutdownPending()
         {
             m_logger.Info("Preshutdown Event received");
+            //DateTime end = DateTime.Now.AddMinutes(5);
+            //while (end.Ticks > DateTime.Now.Ticks) //delay shutdown to n minutes, testing only
             while (m_serviceThreadObj.OnCustomCommand())
             {
-                myServiceStatus.checkPoint++;
-                myServiceStatus.currentState = (int)State.SERVICE_STOP_PENDING;
-                myServiceStatus.waitHint = new TimeSpan(0,3,0).Milliseconds;
-                if (!SetServiceStatus(this.ServiceHandle, ref myServiceStatus))
-                {
-                    string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).ToString();
-                    m_logger.ErrorFormat("RequestAdditionalTime failed with {0}", errorMessage);
-                }
-                else
+                if (Abstractions.WindowsApi.pInvokes.ShutdownPending(this.ServiceHandle, ref myServiceStatus, new TimeSpan(0, 3, 0)))
                 {
                     //m_logger.Info("RequestAdditionalTime suceeded");
                 }
