@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -41,10 +41,27 @@ namespace pGina.Shared.Types
             set { m_sessionId = value; }
         }
 
+        private bool m_credui = false;
+        public bool CREDUI
+        {
+            get { return m_credui; }
+            set { m_credui = value; }
+        }
+
+        public SessionProperties(Guid sessionId, bool credui)
+        {
+            m_sessionId = sessionId;
+            m_credui = credui;
+            AddTrackedObject("SessionId", new Guid(m_sessionId.ToString()));
+            AddTrackedObject("CREDUI", m_credui.ToString());
+        }
+
         public SessionProperties(Guid sessionId)
         {
             m_sessionId = sessionId;
+            m_credui = false;
             AddTrackedObject("SessionId", new Guid(m_sessionId.ToString()));
+            AddTrackedObject("CREDUI", m_credui.ToString());
         }
 
         public void AddTracked<T>(string name, T value)

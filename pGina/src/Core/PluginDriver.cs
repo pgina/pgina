@@ -39,6 +39,7 @@ namespace pGina.Core
     public class PluginDriver
     {
         private Guid m_sessionId = Guid.NewGuid();
+        private bool m_credui = false;
         private SessionProperties m_properties = null;
         private ILog m_logger = null;
 
@@ -50,6 +51,17 @@ namespace pGina.Core
                 m_sessionId = value;
                 m_properties.Id = value;
                 m_properties.AddTrackedObject("SessionId", new Guid(m_sessionId.ToString()));
+            }
+        }
+
+        public bool CREDUI
+        {
+            get { return m_credui; }
+            set
+            {
+                m_credui = value;
+                m_properties.CREDUI = value;
+                m_properties.AddTrackedObject("CREDUI", m_credui.ToString());
             }
         }
 
