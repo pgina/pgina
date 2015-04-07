@@ -168,7 +168,7 @@ namespace pGina.Service.Impl
         public void SessionChange(int sessionID, SessionChangeReason evnt)
         {
             m_logger.InfoFormat("SessionChange:{0} {1}", sessionID, (int)evnt);
-            Thread rem_local = new Thread(() => SeesionChangeThread(sessionID, evnt));
+            Thread rem_local = new Thread(() => SessionChangeThread(sessionID, evnt));
             rem_local.Start();
         }
         /*
@@ -546,7 +546,7 @@ namespace pGina.Service.Impl
             return uInfo;
         }
 
-        private void SeesionChangeThread(int sessionID, SessionChangeReason evnt)
+        private void SessionChangeThread(int sessionID, SessionChangeReason evnt)
         {
             m_logger.InfoFormat("SessionChange: {0} -> {1}", sessionID, evnt);
             try
