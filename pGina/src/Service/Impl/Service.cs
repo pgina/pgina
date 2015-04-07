@@ -58,7 +58,7 @@ namespace pGina.Service.Impl
         private ILog m_logger = LogManager.GetLogger("pGina.Service.Impl");
         private ILog m_abstractLogger = LogManager.GetLogger("Abstractions");
         private PipeServer m_server = null;
-        private ObjectCache<int, SessionProperties> m_sessionPropertyCache = new ObjectCache<int, SessionProperties>();
+        private ObjectCache<int, List<SessionProperties>> m_sessionPropertyCache = new ObjectCache<int, List<SessionProperties>>();
 
         static Service()
         {
@@ -299,7 +299,7 @@ namespace pGina.Service.Impl
 
                 BooleanResult result = new BooleanResult() { Success = true, Message = "" };
 
-                if (msg.Reason == LoginRequestMessage.LoginReason.Login)
+                if (new[] {LoginRequestMessage.LoginReason.Login, LoginRequestMessage.LoginReason.CredUI}.Contains(msg.Reason))
                 {
                     m_logger.DebugFormat("Processing LoginRequest for: {0} in session: {1} reason: {2}", sessionDriver.UserInformation.Username, msg.Session, msg.Reason);
 
@@ -312,15 +312,57 @@ namespace pGina.Service.Impl
                         {
                             //the user is still logged in
                             isLoggedIN = true;
-                            m_logger.DebugFormat("User:{0} is Locked", sessionDriver.UserInformation.Username);
+                            m_logger.DebugFormat("User:{0} is Locked in Session:{1}", sessionDriver.UserInformation.Username, msg.Session);
                         }
                     }
                     if (!isLoggedIN)
                         result = sessionDriver.PerformLoginProcess();
 
-                    lock (m_sessionPropertyCache)
+                    if (result.Success && (!isLoggedIN || msg.Reason == LoginRequestMessage.LoginReason.CredUI))
                     {
-                        m_sessionPropertyCache.Add(msg.Session, sessionDriver.SessionProperties);
+                        lock (m_sessionPropertyCache)
+                        {
+                            List<SessionProperties> ses = new List<SessionProperties>();
+                            if (m_sessionPropertyCache.Exists(msg.Session))
+                            {
+                                ses = m_sessionPropertyCache.Get(msg.Session);
+                            }
+                            bool partof = false;
+                            foreach (SessionProperties sess in ses)
+                            {
+                                UserInformation ui = sess.GetTrackedSingle<UserInformation>();
+                                m_logger.InfoFormat("compare stored-user:{0} this-user:{1}", ui.Username, sessionDriver.UserInformation.Username);
+                                if (sessionDriver.UserInformation.Username.Equals(ui.Username, StringComparison.CurrentCultureIgnoreCase))
+                                {
+                                    partof = true;
+                                    m_logger.InfoFormat("contain user {0} in sessioninfo:{1} GUID:{2}", ui.Username, msg.Session, sess.Id);
+                                    break;
+                                }
+                            }
+                            if (!partof)
+                            {
+                                if (isLoggedIN)
+                                {
+                                    UserInformation ui = FindUserInfoInPropertyCache(sessionDriver.UserInformation.Username);
+                                    if (ui != null)
+                                    {
+                                        sessionDriver.SessionProperties.AddTrackedSingle<UserInformation>(ui);
+                                    }
+                                }
+                                if (msg.Reason == LoginRequestMessage.LoginReason.CredUI)
+                                {
+                                    sessionDriver.SessionProperties.CREDUI = true;
+                                }
+                                else
+                                {
+                                    sessionDriver.SessionProperties.CREDUI = false;
+                                }
+                                ses.Add(sessionDriver.SessionProperties);
+                                m_logger.InfoFormat("add user {0} to sessioninfo:{1} GUID:{2} CREDUI:{3}", sessionDriver.UserInformation.Username, msg.Session, sessionDriver.SessionProperties.Id, (msg.Reason == LoginRequestMessage.LoginReason.CredUI) ? "true" : "false");
+                                m_logger.InfoFormat("ses username:{0} description:{1} credui:{2} isLoggedIN:{3}", ses.Last().GetTrackedSingle<UserInformation>().Username, ses.Last().GetTrackedSingle<UserInformation>().Description, ses.Last().CREDUI, isLoggedIN);
+                                m_sessionPropertyCache.Add(msg.Session, ses);
+                            }
+                        }
                     }
                 }
                 else
@@ -363,7 +405,7 @@ namespace pGina.Service.Impl
             {
                 if (m_sessionPropertyCache.Exists(msg.SessionID))
                 {
-                    SessionProperties props = m_sessionPropertyCache.Get(msg.SessionID);
+                    SessionProperties props = m_sessionPropertyCache.Get(msg.SessionID).First();
                     UserInformation userInfo = props.GetTrackedSingle<UserInformation>();
 
                     return new UserInformationResponseMessage
@@ -490,7 +532,7 @@ namespace pGina.Service.Impl
             {
                 m_logger.DebugFormat("Processing ChangePasswordRequest for: {0} domain: {1} session: {2}", msg.Username, msg.Domain, msg.Session);
 
-                SessionProperties properties = m_sessionPropertyCache.Get(msg.Session);
+                SessionProperties properties = m_sessionPropertyCache.Get(msg.Session).First();
                 UserInformation userinfo = properties.GetTrackedSingle<UserInformation>();
                 userinfo.oldPassword = msg.OldPassword;
                 userinfo.Password = msg.NewPassword;

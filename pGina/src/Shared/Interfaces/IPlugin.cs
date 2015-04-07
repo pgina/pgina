@@ -120,7 +120,7 @@ namespace pGina.Shared.Interfaces
         /// If the session is a pGina session, this is the properties instance used by the plugins at auth time.
         /// This value is null if the session is not a pGina session.
         /// </param>
-        void SessionChange(SessionChangeDescription changeDescription, Types.SessionProperties properties);                
+        void SessionChange(int sessionID, SessionChangeReason evnt, List<Types.SessionProperties> properties);                
     }
 
     /// <summary>
