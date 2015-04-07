@@ -47,6 +47,17 @@ namespace Abstractions.Helpers
         {            
         }
 
+        public List<KeyType> GetAll()
+        {
+            List<KeyType> ret = new List<KeyType>();
+            foreach (KeyValuePair<KeyType, CacheEntry> entry in m_cache)
+            {
+                ret.Add(entry.Key);
+            }
+
+            return ret;
+        }
+
         protected virtual CacheEntry WrapValue(KeyType key, ValueType value)
         {
             return new CacheEntry()
