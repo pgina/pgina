@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -144,24 +144,24 @@ namespace pGina.Plugin.SessionLimit
             StartTimer();
         }
 
-        public void Stopping() 
-        { 
+        public void Stopping()
+        {
             StopTimer();
             m_cache = null;
         }
 
-        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, SessionProperties properties)
+        public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, List<SessionProperties> properties)
         {
             // Only applies to pGina sessions!
             if (properties != null)
             {
-                switch (changeDescription.Reason)
+                switch (Reason)
                 {
                     case System.ServiceProcess.SessionChangeReason.SessionLogon:
-                        LogonEvent(changeDescription.SessionId);
+                        LogonEvent(SessionId);
                         break;
                     case System.ServiceProcess.SessionChangeReason.SessionLogoff:
-                        LogoffEvent(changeDescription.SessionId);
+                        LogoffEvent(SessionId);
                         break;
                 }
             }

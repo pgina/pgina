@@ -172,7 +172,7 @@ namespace pGina.Plugin.LocalMachine
             return m_sam.Children.Find(username, "User");
         }
 
-        public static void ScrambleUsersPassword(string username)
+        public void ScrambleUsersPassword(string username)
         {
             using (DirectoryEntry userDe = GetUserDirectoryEntry(username))
             {
@@ -533,7 +533,7 @@ namespace pGina.Plugin.LocalMachine
             }
         }
 
-        public static void RemoveUserAndProfile(string user, int sessionID)
+        public void RemoveUserAndProfile(string user, int sessionID)
         {
             using (UserPrincipal userPrincipal = GetUserPrincipal(user))
             {
@@ -546,20 +546,26 @@ namespace pGina.Plugin.LocalMachine
                         // instead of while (true)
                         if (File.Exists(usersProfileDir + "\\NTUSER.DAT"))
                         {
+                            bool inuse = true;
                             for (int x = 0; x < 60; x++)
                             {
                                 try
                                 {
                                     using (FileStream isunloaded = File.Open(usersProfileDir + "\\NTUSER.DAT", FileMode.Open, FileAccess.Read))
                                     {
+                                        inuse = false;
                                         break;
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    m_logger.DebugFormat("Ex loop{1}:{0}", ex.Message, x);
+                                    m_logger.DebugFormat("loop{1}:{0}", ex.Message, x);
                                     Thread.Sleep(1000);
                                 }
+                            }
+                            if (inuse)
+                            {
+                                return;
                             }
                         }
                         m_logger.DebugFormat("User {0} has profile in {1}, giving myself delete permission", user, usersProfileDir);

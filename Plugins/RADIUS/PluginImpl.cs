@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -66,10 +66,10 @@ namespace pGina.Plugin.RADIUS
                 m_settings.SetDefault("Description", m_defaultDescription);
 
                 m_sessionManager = new Dictionary<Guid, Session>();
-                
+
                 m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
-            }            
-        }        
+            }
+        }
 
         public string Name
         {
@@ -114,7 +114,7 @@ namespace pGina.Plugin.RADIUS
 
             try
             {
-                RADIUSClient client = GetClient(); 
+                RADIUSClient client = GetClient();
                 bool result = client.Authenticate(userInfo.Username, userInfo.Password);
                 if (result)
                 {
@@ -123,7 +123,7 @@ namespace pGina.Plugin.RADIUS
 
                     //Check for session timeout
                     if ((bool)Settings.Store.AllowSessionTimeout && p.containsAttribute(Packet.AttributeType.Session_Timeout))
-                    {   
+                    {
                         int seconds = client.lastReceievedPacket.getFirstIntAttribute(Packet.AttributeType.Session_Timeout);
                         session.SetSessionTimeout(seconds, SessionTimeoutCallback);
                         //m_logger.DebugFormat("Setting timeout for {0} to {1} seconds.", userInfo.Username, seconds);
@@ -138,10 +138,10 @@ namespace pGina.Plugin.RADIUS
                         foreach(byte[] val in p.getByteArrayAttributes(Packet.AttributeType.Vendor_Specific)){
                             //m_logger.DebugFormat("Vendor ID: {0:D}, Type: {1:D}, Value: {2}", Packet.VSA_vendorID(val), Packet.VSA_VendorType(val), Packet.VSA_valueAsString(val));
 
-                            if ((bool)Settings.Store.WisprSessionTerminate && Packet.VSA_vendorID(val) == (int)Packet.VSA_WISPr.Vendor_ID 
+                            if ((bool)Settings.Store.WisprSessionTerminate && Packet.VSA_vendorID(val) == (int)Packet.VSA_WISPr.Vendor_ID
                                 && Packet.VSA_VendorType(val) == (int)Packet.VSA_WISPr.WISPr_Session_Terminate_Time)
                             {
-                                
+
                                 try
                                 {
                                     //Value is in format "2014-03-11T23:59:59"
@@ -195,7 +195,7 @@ namespace pGina.Plugin.RADIUS
                         {
                             m_logger.DebugFormat("Interim Updates are enabled, but no update interval was provided by the server or user.");
                         }
-                        
+
                     }
 
                     lock (m_sessionManager)
@@ -244,10 +244,10 @@ namespace pGina.Plugin.RADIUS
         }
 
         //Processes accounting on logon/logoff
-        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, pGina.Shared.Types.SessionProperties properties)
+        public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, List<SessionProperties> properties)
         {
-            if (changeDescription.Reason != System.ServiceProcess.SessionChangeReason.SessionLogon
-                && changeDescription.Reason != System.ServiceProcess.SessionChangeReason.SessionLogoff)
+            if (Reason != System.ServiceProcess.SessionChangeReason.SessionLogon
+                && Reason != System.ServiceProcess.SessionChangeReason.SessionLogoff)
             {
                 //m_logger.DebugFormat("Not logging on or off for this session change call ({0})... exiting.", changeDescription.Reason);
                 return;
@@ -267,14 +267,14 @@ namespace pGina.Plugin.RADIUS
 
             //Determine username (may change depending on value of UseModifiedName setting)
             string username = null;
-            UserInformation ui = properties.GetTrackedSingle<UserInformation>();
+            UserInformation ui = properties.First().GetTrackedSingle<UserInformation>();
 
             if (ui == null)
             {
                 //m_logger.DebugFormat("No userinformation for this session logoff... exiting...");
                 return;
             }
-                    
+
 
             if ((bool)Settings.Store.UseModifiedName)
                 username = ui.Username;
@@ -284,12 +284,12 @@ namespace pGina.Plugin.RADIUS
             Session session = null;
 
             //User is logging on
-            if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
+            if (Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
             {
                 lock (m_sessionManager)
                 {
                     //Check if session information is already available for this id
-                    if (!m_sessionManager.Keys.Contains(properties.Id))
+                    if (!m_sessionManager.Keys.Contains(properties.First().Id))
                     {
                         //No session info - must have authed with something other than RADIUS.
                         //m_logger.DebugFormat("RADIUS Accounting Logon: Unable to find session for {0} with GUID {1}", username, properties.Id);
@@ -300,9 +300,9 @@ namespace pGina.Plugin.RADIUS
                         }
 
                         RADIUSClient client = GetClient();
-                        session = new Session(properties.Id, username, client);
-                        m_sessionManager.Add(properties.Id, session);
-                            
+                        session = new Session(properties.First().Id, username, client);
+                        m_sessionManager.Add(properties.First().Id, session);
+
                         //Check forced interim-update setting
                         if ((bool)Settings.Store.SendInterimUpdates && (bool)Settings.Store.ForceInterimUpdates)
                         {
@@ -312,12 +312,12 @@ namespace pGina.Plugin.RADIUS
                     }
 
                     else
-                        session = m_sessionManager[properties.Id];
+                        session = m_sessionManager[properties.First().Id];
                 }
 
 
                 //Determine which plugin authenticated the user (if any)
-                PluginActivityInformation pai = properties.GetTrackedSingle<PluginActivityInformation>();
+                PluginActivityInformation pai = properties.First().GetTrackedSingle<PluginActivityInformation>();
                 Packet.Acct_Authentic authSource = Packet.Acct_Authentic.Not_Specified;
                 IEnumerable<Guid> authPlugins = pai.GetAuthenticationPlugins();
                 Guid LocalMachinePluginGuid = new Guid("{12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D}");
@@ -340,7 +340,7 @@ namespace pGina.Plugin.RADIUS
                 {
                     lock (session)
                     {
-                        session.windowsSessionId = changeDescription.SessionId; //Grab session ID now that we're authenticated
+                        session.windowsSessionId = SessionId; //Grab session ID now that we're authenticated
                         session.username = username; //Accting username may have changed depending on 'Use Modified username for accounting option'
                         session.client.startAccounting(username, authSource);
                         //m_logger.DebugFormat("Successfully completed accounting start process...");
@@ -353,14 +353,14 @@ namespace pGina.Plugin.RADIUS
 
             }
 
-                
+
             //User is logging off
-            else if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
+            else if (Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
             {
                 lock (m_sessionManager)
                 {
-                    if (m_sessionManager.Keys.Contains(properties.Id))
-                        session = m_sessionManager[properties.Id];
+                    if (m_sessionManager.Keys.Contains(properties.First().Id))
+                        session = m_sessionManager[properties.First().Id];
                     else
                     {
                         //m_logger.DebugFormat("Users {0} is logging off, but no RADIUS session information is available for session ID {1}.", username, properties.Id);
@@ -368,7 +368,7 @@ namespace pGina.Plugin.RADIUS
                     }
 
                     //Remove the session from the session manager
-                    m_sessionManager.Remove(properties.Id);
+                    m_sessionManager.Remove(properties.First().Id);
                 }
 
                 lock (session)
@@ -392,7 +392,7 @@ namespace pGina.Plugin.RADIUS
                     }
                 }
             }
-            
+
         }
 
         public void Configure()
@@ -401,7 +401,7 @@ namespace pGina.Plugin.RADIUS
             conf.ShowDialog();
         }
 
-        public void Starting() 
+        public void Starting()
         {
             if(m_sessionManager == null)
                 m_sessionManager = new Dictionary<Guid, Session>();
@@ -423,7 +423,7 @@ namespace pGina.Plugin.RADIUS
             byte[] ipAddr = null;
             string nasIdentifier = null;
             string calledStationId = null;
-            
+
             if((bool)Settings.Store.SendNASIPAddress)
                 ipAddr = getNetworkInfo().Item1;
 
@@ -437,7 +437,7 @@ namespace pGina.Plugin.RADIUS
                 calledStationId = (String)Settings.Store.CalledStationID;
                 calledStationId = calledStationId.Contains('%') ? replaceSymbols(calledStationId) : calledStationId;
             }
- 
+
             RADIUSClient client = new RADIUSClient(servers, authport, acctport, sharedKey, timeout, retry, sessionId, ipAddr, nasIdentifier, calledStationId);
             return client;
         }
@@ -449,7 +449,7 @@ namespace pGina.Plugin.RADIUS
                 .Replace("%ipaddr", String.Join(".", networkInfo.Item1))
                 .Replace("%computername", Environment.MachineName);
         }
-        
+
         //Returns a tuple containing the current IPv4 address and mac address for the adapter
         //If ipAddressRegex is set, this will attempt to return the first address that matches the expression
         //Otherwise it returns the first viable IP address or 0.0.0.0 if no viable address is found. An empty
@@ -457,12 +457,12 @@ namespace pGina.Plugin.RADIUS
         private Tuple<byte[], string> getNetworkInfo()
         {
             string ipAddressRegex = Settings.Store.IPSuggestion;
-           
+
             //Fallback values
             byte[] ipAddr = null;
             string macAddr = null;
 
-            //Check each network adapter. 
+            //Check each network adapter.
             foreach(NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces()){
                 foreach (UnicastIPAddressInformation ipaddr in nic.GetIPProperties().UnicastAddresses)
                 {   //Check to see if the NIC has any valid IP addresses.
@@ -503,7 +503,7 @@ namespace pGina.Plugin.RADIUS
             //m_logger.DebugFormat("Log off {0}.", result ? "successful" : "failed");
         }
 
-        //Gets invoked if wispr session limit 
+        //Gets invoked if wispr session limit
         private void SessionTerminateCallback(object state)
         {
             Session session = (Session)state;
@@ -524,14 +524,14 @@ namespace pGina.Plugin.RADIUS
             m_logger.DebugFormat("Logging off user {0} in session{1} due to session-terminate-time.", session.username, session.windowsSessionId);
             bool result = Abstractions.WindowsApi.pInvokes.LogoffSession(session.windowsSessionId.Value);
             //m_logger.DebugFormat("Log off {0}.", result ? "successful" : "failed");
-            
+
         }
 
         //Gets invoked when its time to send interim updates
         private void InterimUpdatesCallback(object state)
         {
             Session session = (Session)state;
-            //m_logger.DebugFormat("Sending interim-update for user {0}", session.username); 
+            //m_logger.DebugFormat("Sending interim-update for user {0}", session.username);
             lock (session)
             {
                 try

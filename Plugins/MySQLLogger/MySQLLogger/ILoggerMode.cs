@@ -10,11 +10,11 @@ namespace pGina.Plugin.MySqlLogger
     interface ILoggerMode
     {
         //Logs the specified event/properties
-        bool Log(System.ServiceProcess.SessionChangeDescription changeDescription, pGina.Shared.Types.SessionProperties properties);
-        
+        bool Log(int SessionId, System.ServiceProcess.SessionChangeReason Reason, pGina.Shared.Types.SessionProperties properties);
+
         //Tests to make sure the table exists, and contains the right columns, returns a string indicating the table status.
         string TestTable();
-        
+
         //Attempts to create the neccesary table for the logging mode, and returns a string indicating it's success/failure
         string CreateTable();
 
@@ -45,11 +45,11 @@ namespace pGina.Plugin.MySqlLogger
                 logger = new SessionLogger();
             else
                 throw new ArgumentException("Invalid LoggerMode");
-            
+
             logger.SetConnection(m_conn);
             return logger;
 
-            
+
         }
 
         public static void closeConnection(){

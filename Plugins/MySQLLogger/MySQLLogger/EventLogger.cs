@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -49,49 +49,49 @@ namespace pGina.Plugin.MySqlLogger
         public EventLoggerMode() { }
 
         //Logs the event if it's an event we track according to the registry.
-        public bool Log(System.ServiceProcess.SessionChangeDescription changeDescription, pGina.Shared.Types.SessionProperties properties)
+        public bool Log(int SessionId, System.ServiceProcess.SessionChangeReason Reason, pGina.Shared.Types.SessionProperties properties)
         {
             //Get the logging message for this event.
             string msg = null;
-            switch (changeDescription.Reason)
+            switch (Reason)
             {
                 case System.ServiceProcess.SessionChangeReason.SessionLogon:
-                    msg = LogonEvent(changeDescription.SessionId, properties);
+                    msg = LogonEvent(SessionId, properties);
                     break;
                 case System.ServiceProcess.SessionChangeReason.SessionLogoff:
-                    msg = LogoffEvent(changeDescription.SessionId, properties);
+                    msg = LogoffEvent(SessionId, properties);
                     break;
                 case System.ServiceProcess.SessionChangeReason.SessionLock:
-                    msg = SessionLockEvent(changeDescription.SessionId, properties);
+                    msg = SessionLockEvent(SessionId, properties);
                     break;
                 case System.ServiceProcess.SessionChangeReason.SessionUnlock:
-                    msg = SessionUnlockEvent(changeDescription.SessionId, properties);
+                    msg = SessionUnlockEvent(SessionId, properties);
                     break;
                 case System.ServiceProcess.SessionChangeReason.SessionRemoteControl:
-                    msg = SesionRemoteControlEvent(changeDescription.SessionId, properties);
+                    msg = SesionRemoteControlEvent(SessionId, properties);
                     break;
                 case System.ServiceProcess.SessionChangeReason.ConsoleConnect:
-                    msg = ConsoleConnectEvent(changeDescription.SessionId, properties);
+                    msg = ConsoleConnectEvent(SessionId, properties);
                     break;
                 case System.ServiceProcess.SessionChangeReason.ConsoleDisconnect:
-                    msg = ConsoleDisconnectEvent(changeDescription.SessionId, properties);
+                    msg = ConsoleDisconnectEvent(SessionId, properties);
                     break;
                 case System.ServiceProcess.SessionChangeReason.RemoteConnect:
-                    msg = RemoteConnectEvent(changeDescription.SessionId, properties);
+                    msg = RemoteConnectEvent(SessionId, properties);
                     break;
                 case System.ServiceProcess.SessionChangeReason.RemoteDisconnect:
-                    msg = RemoteDisconnectEvent(changeDescription.SessionId, properties);
+                    msg = RemoteDisconnectEvent(SessionId, properties);
                     break;
             }
 
-            m_logger.DebugFormat("SessionChange({0}) - Message: {1}", changeDescription.Reason.ToString(), msg);
+            m_logger.DebugFormat("SessionChange({0}) - Message: {1}", Reason.ToString(), msg);
 
             //Check if there is a message to log
             if (!string.IsNullOrEmpty(msg))
             {
                 if (m_conn == null)
                     throw new InvalidOperationException("No MySQL Connection present.");
-                
+
                 //Send it to the server
                 logToServer(msg);
             }
@@ -107,7 +107,7 @@ namespace pGina.Plugin.MySqlLogger
             {
                 if (m_conn.State != System.Data.ConnectionState.Open)
                     m_conn.Open();
-                
+
                 //Get list of tables and check if the event table name exists
                 MySqlCommand cmd = new MySqlCommand("SHOW TABLES", m_conn);
                 string table = Settings.Store.EventTable;
@@ -119,10 +119,10 @@ namespace pGina.Plugin.MySqlLogger
                         tableExists = true;
                 }
                 rdr.Close();
-                
+
                 if (!tableExists)
                     return "Connection was successful, but no table exists.  Click \"Create Table\" to create the required table.";
-                
+
                 //Table exists, verify columns
                 string[] columns = { "TimeStamp", "Host", "Ip", "Machine", "Message" };
                 cmd = new MySqlCommand("DESCRIBE " + table, m_conn);
@@ -143,8 +143,8 @@ namespace pGina.Plugin.MySqlLogger
                 if (colCt == columns.Length)
                     return "Table exists and is setup correctly.";
                 else
-                    return "Table exists, but appears to have incorrect columns.";    
-            
+                    return "Table exists, but appears to have incorrect columns.";
+
             }
             catch (MySqlException ex)
             {
@@ -157,12 +157,12 @@ namespace pGina.Plugin.MySqlLogger
         {
             if (m_conn == null)
                 throw new InvalidOperationException("No MySQL Connection present.");
-            
+
             try
             {
                 if(m_conn.State != System.Data.ConnectionState.Open)
                     m_conn.Open();
-                
+
                 string table = Settings.Store.EventTable;
                 string sql = string.Format(
                     "CREATE TABLE {0} (" +
@@ -172,11 +172,11 @@ namespace pGina.Plugin.MySqlLogger
                     "   Machine TINYTEXT, " +
                     "   Message TEXT )", table);
                 MySqlCommand cmd = new MySqlCommand(sql, m_conn);
-                
+
                 cmd.ExecuteNonQuery();
 
                 return "Table created.";
-                
+
             }
             catch (MySqlException ex)
             {
@@ -203,7 +203,7 @@ namespace pGina.Plugin.MySqlLogger
             string machine = Environment.MachineName;
             string sql = String.Format("INSERT INTO {0}(TimeStamp, Host, Ip, Machine, Message) " +
                 "VALUES (NOW(), @host, @ip, @machine, @message)", table);
-            
+
             MySqlCommand m_command = new MySqlCommand(sql, m_conn);
             m_command.Prepare();
             m_command.Parameters.AddWithValue("@host", hostName);

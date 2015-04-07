@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -65,9 +65,9 @@ namespace pGina.Plugin.MySqlLogger
 
         public string Version
         {
-            get 
-            { 
-                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(); 
+            get
+            {
+                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             }
         }
 
@@ -77,27 +77,30 @@ namespace pGina.Plugin.MySqlLogger
             dlg.ShowDialog();
         }
 
-        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, pGina.Shared.Types.SessionProperties properties)
+        public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, List<SessionProperties> properties)
         {
-            m_logger.DebugFormat("SessionChange({0}) - ID: {1}", changeDescription.Reason.ToString(), changeDescription.SessionId);
-            
+            if (properties == null)
+                return;
+
+            m_logger.DebugFormat("SessionChange({0}) - ID: {1}", Reason.ToString(), SessionId);
+
             //If SessionMode is enabled, send event to it.
             if ((bool)Settings.Store.SessionMode)
             {
                 ILoggerMode mode = LoggerModeFactory.getLoggerMode(LoggerMode.SESSION);
-                mode.Log(changeDescription, properties);
+                mode.Log(SessionId, Reason, properties.First());
             }
 
             //If EventMode is enabled, send event to it.
             if ((bool)Settings.Store.EventMode)
             {
                 ILoggerMode mode = LoggerModeFactory.getLoggerMode(LoggerMode.EVENT);
-                mode.Log(changeDescription, properties);
+                mode.Log(SessionId, Reason, properties.First());
             }
 
             //Close the connection if it's still open
             LoggerModeFactory.closeConnection();
-            
+
         }
 
         public void Starting()

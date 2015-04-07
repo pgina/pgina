@@ -278,47 +278,52 @@ namespace pGina.Plugin.pgSMB
             dialog.ShowDialog();
         }
 
-        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, SessionProperties properties)
+        public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, List<SessionProperties> properties)
         {
-            if (properties == null || changeDescription == null)
+            if (properties == null)
             {
                 return;
             }
 
-            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-            if (!userInfo.HasSID)
+            if (Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
             {
-                m_logger.InfoFormat("SessionChange Event denied for ID:{0}", changeDescription.SessionId);
-                return;
-            }
-
-            if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
-            {
-                m_logger.DebugFormat("SessionChange SessionLogoff for ID:{0} as user:{1}", changeDescription.SessionId, userInfo.Username);
-
-                if (userInfo.Description.Contains("pGina created pgSMB"))
+                foreach (SessionProperties s in properties)
                 {
-                    try
-                    {
-                        Locker.TryEnterWriteLock(-1);
-                        RunningTasks.Add(userInfo.Username.ToLower(), true);
-                    }
-                    finally
-                    {
-                        Locker.ExitWriteLock();
-                    }
+                    UserInformation userInfo = s.GetTrackedSingle<UserInformation>();
+                    m_logger.DebugFormat("SessionChange SessionLogoff for ID:{0} as user:{1}", SessionId, userInfo.Username);
+                    m_logger.InfoFormat("{0} {1} {2}", userInfo.Description.Contains("pGina created"), userInfo.HasSID, s.CREDUI);
 
-                    Thread rem_smb = new Thread(() => cleanup(userInfo, changeDescription.SessionId));
-                    rem_smb.Start();
-                }
-                else
-                {
-                    m_logger.InfoFormat("User {0} is'nt a pGina pgSMB plugin created user. I'm not executing Notification stage", userInfo.Username);
+                    if (userInfo.Description.Contains("pGina created") && userInfo.HasSID && !s.CREDUI)
+                    {
+                        try
+                        {
+                            Locker.TryEnterWriteLock(-1);
+                            RunningTasks.Add(userInfo.Username.ToLower(), true);
+                        }
+                        finally
+                        {
+                            Locker.ExitWriteLock();
+                        }
+
+                        Thread rem_smb = new Thread(() => cleanup(userInfo, SessionId));
+                        rem_smb.Start();
+                    }
+                    else
+                    {
+                        m_logger.InfoFormat("User {0} {1}. I'm not executing Notification stage", userInfo.Username, (s.CREDUI) ? "has a program running in his context" : "is'nt a pGina created user");
+                    }
                 }
             }
-            if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
+            if (Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
             {
-                m_logger.DebugFormat("SessionChange SessionLogon for ID:{0} as user:{1}", changeDescription.SessionId, userInfo.Username);
+                UserInformation userInfo = properties.First().GetTrackedSingle<UserInformation>();
+                if (!userInfo.HasSID)
+                {
+                    m_logger.InfoFormat("SessionLogon Event denied for ID:{0}", SessionId);
+                    return;
+                }
+
+                m_logger.DebugFormat("SessionChange SessionLogon for ID:{0} as user:{1}", SessionId, userInfo.Username);
 
                 if (userInfo.Description.Contains("pGina created pgSMB"))
                 {
@@ -328,12 +333,12 @@ namespace pGina.Plugin.pgSMB
                     {
                         try
                         {
-                            Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(changeDescription.SessionId, settings["ScriptPath"]);
+                            Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, settings["ScriptPath"]);
                         }
                         catch (Exception ex)
                         {
                             m_logger.ErrorFormat("Can't run application {0} because {1}", settings["ScriptPath"], ex.ToString());
-                            pInvokes.SendMessageToUser(changeDescription.SessionId, "Can't run application", String.Format("I'm unable to run your LoginScript\n{0}", settings["ScriptPath"]));
+                            pInvokes.SendMessageToUser(SessionId, "Can't run application", String.Format("I'm unable to run your LoginScript\n{0}", settings["ScriptPath"]));
                         }
                     }
 
@@ -349,7 +354,7 @@ namespace pGina.Plugin.pgSMB
                             m_logger.InfoFormat("done quota GPO settings for user {0}", userInfo.SID.ToString());
                             try
                             {
-                                Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(changeDescription.SessionId, "proquota.exe");
+                                Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, "proquota.exe");
                             }
                             catch (Exception ex)
                             {

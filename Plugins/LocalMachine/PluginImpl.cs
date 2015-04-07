@@ -39,6 +39,7 @@ using log4net;
 
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
+using pGina.Core;
 using Abstractions;
 
 namespace pGina.Plugin.LocalMachine
@@ -52,6 +53,7 @@ namespace pGina.Plugin.LocalMachine
         private Dictionary<string, Boolean> RunningTasks = new Dictionary<string, Boolean>();
         private ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
         public static Boolean IsShuttingDown = false;
+        private object logoff_locker = new object();
 
         #region Init-plugin
         public static Guid PluginUuid
@@ -264,6 +266,7 @@ namespace pGina.Plugin.LocalMachine
                     userInfo.Description = user.Description;
                 }
                 properties.AddTrackedSingle<UserInformation>(userInfo);
+                m_logger.InfoFormat("props set {0}", userInfo.Description);
             }
             catch (LocalAccount.GroupSyncException e)
             {
@@ -480,45 +483,49 @@ namespace pGina.Plugin.LocalMachine
             return false;
         }
 
-        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, SessionProperties properties)
+        public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, List<SessionProperties> properties)
         {
-            if (properties == null || changeDescription == null)
+            if (properties == null)
                 return;
 
-            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-            if (!userInfo.HasSID)
+            if (Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
             {
-                m_logger.InfoFormat("SessionChange Event denied for ID:{0}", changeDescription.SessionId);
-                return;
-            }
-
-            if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
-            {
-                m_logger.DebugFormat("SessionChange SessionLogoff for ID:{0} as user:{1}", changeDescription.SessionId, userInfo.Username);
-
-                if (userInfo.Description.Contains("pGina created"))
+                foreach (SessionProperties s in properties)
                 {
-                    try
+                    UserInformation uInfo = s.GetTrackedSingle<UserInformation>();
+                    m_logger.DebugFormat("SessionChange SessionLogoff for ID:{0} as user:{1}", SessionId, uInfo.Username);
+                    m_logger.InfoFormat("{0} {1} {2}", uInfo.Description.Contains("pGina created"), uInfo.HasSID, s.CREDUI);
+                    if (uInfo.Description.Contains("pGina created") && uInfo.HasSID && !s.CREDUI)
                     {
-                        Locker.TryEnterWriteLock(-1);
-                        RunningTasks.Add(userInfo.Username.ToLower(), true);
-                    }
-                    finally
-                    {
-                        Locker.ExitWriteLock();
-                    }
+                        try
+                        {
+                            Locker.TryEnterWriteLock(-1);
+                            RunningTasks.Add(uInfo.Username.ToLower(), true);
+                        }
+                        finally
+                        {
+                            Locker.ExitWriteLock();
+                        }
 
-                    Thread rem_local = new Thread(() => cleanup(userInfo, changeDescription.SessionId));
-                    rem_local.Start();
-                }
-                else
-                {
-                    m_logger.InfoFormat("User {0} is'nt a pGina created user. I'm not executing Notification stage", userInfo.Username);
+                        Thread rem_local = new Thread(() => cleanup(uInfo, SessionId));
+                        rem_local.Start();
+                    }
+                    else
+                    {
+                        m_logger.InfoFormat("User {0} {1}. I'm not executing Notification stage", uInfo.Username, (s.CREDUI) ? "has a program running in his context" : "is'nt a pGina created user");
+                    }
                 }
             }
-            if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
+            if (Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
             {
-                m_logger.DebugFormat("SessionChange SessionLogon for ID:{0} as user:{1}", changeDescription.SessionId, userInfo.Username);
+                UserInformation userInfo = properties.First().GetTrackedSingle<UserInformation>();
+                if (!userInfo.HasSID)
+                {
+                    m_logger.InfoFormat("SessionLogon Event denied for ID:{0}", SessionId);
+                    return;
+                }
+
+                m_logger.DebugFormat("SessionChange SessionLogon for ID:{0} as user:{1}", SessionId, userInfo.Username);
 
                 if (userInfo.Description.Contains("pGina created") && !userInfo.Description.Contains("pgSMB"))
                 {
@@ -526,7 +533,7 @@ namespace pGina.Plugin.LocalMachine
                     {
                         try
                         {
-                            Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(changeDescription.SessionId, userInfo.LoginScript);
+                            Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, userInfo.LoginScript);
                         }
                         catch (Exception ex)
                         {
@@ -546,7 +553,7 @@ namespace pGina.Plugin.LocalMachine
                             m_logger.InfoFormat("done quota GPO settings for user {0}", userInfo.SID.ToString());
                             try
                             {
-                                Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(changeDescription.SessionId, "proquota.exe");
+                                Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, "proquota.exe");
                             }
                             catch (Exception ex)
                             {
@@ -607,25 +614,29 @@ namespace pGina.Plugin.LocalMachine
 
             if (LocalAccount.UserExists(userInfo.Username))
             {
-                if (remove)
+                lock (logoff_locker)
                 {
-                    m_logger.DebugFormat("remove profile {0}", userInfo.Username);
-                    LocalAccount.RemoveUserAndProfile(userInfo.Username, sessionID);
+                    LocalAccount lo = new LocalAccount(userInfo);
+                    if (remove)
+                    {
+                        m_logger.DebugFormat("remove profile {0}", userInfo.Username);
+                        lo.RemoveUserAndProfile(userInfo.Username, sessionID);
+                    }
+                    else
+                    {
+                        m_logger.DebugFormat("not removing profile {0}", userInfo.Username);
+                    }
+                    if (scramble && !remove)
+                    {
+                        m_logger.DebugFormat("scramble password {0}", userInfo.Username);
+                        lo.ScrambleUsersPassword(userInfo.Username);
+                    }
+                    else
+                    {
+                        m_logger.DebugFormat("not scramble password {0}", userInfo.Username);
+                    }
+                    m_logger.DebugFormat("cleanup done for user {0}", userInfo.Username);
                 }
-                else
-                {
-                    m_logger.DebugFormat("not removing profile {0}", userInfo.Username);
-                }
-                if (scramble && !remove)
-                {
-                    m_logger.DebugFormat("scramble password {0}", userInfo.Username);
-                    LocalAccount.ScrambleUsersPassword(userInfo.Username);
-                }
-                else
-                {
-                    m_logger.DebugFormat("not scramble password {0}", userInfo.Username);
-                }
-                m_logger.DebugFormat("cleanup done for user {0}", userInfo.Username);
             }
             else
             {

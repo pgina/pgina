@@ -22,7 +22,7 @@ namespace pGina.Plugin.MySqlLogger
         public SessionLogger(){ }
 
         //Logs the session if it's a LogOn or LogOff event.
-        public bool Log(SessionChangeDescription changeDescription, SessionProperties properties)
+        public bool Log(int SessionId, System.ServiceProcess.SessionChangeReason Reason, SessionProperties properties)
         {
             if (m_conn == null)
                 throw new InvalidOperationException("No MySQL Connection present.");
@@ -38,23 +38,23 @@ namespace pGina.Plugin.MySqlLogger
             }
 
             //Logon Event
-            if (changeDescription.Reason == SessionChangeReason.SessionLogon)
+            if (Reason == SessionChangeReason.SessionLogon)
             {
                 if(m_conn.State != System.Data.ConnectionState.Open)
                     m_conn.Open();
 
                 string table = Settings.Store.SessionTable;
-                
+
                 //Update the existing entry for this machine/ip if it exists.
                 string updatesql = string.Format("UPDATE {0} SET logoutstamp=NOW() " +
                     "WHERE logoutstamp=0 and machine=@machine and ipaddress=@ipaddress", table);
-                
+
                 MySqlCommand cmd = new MySqlCommand(updatesql, m_conn);
                 cmd.Prepare();
                 cmd.Parameters.AddWithValue("@machine", Environment.MachineName);
                 cmd.Parameters.AddWithValue("@ipaddress", getIPAddress());
                 cmd.ExecuteNonQuery();
-                
+
                 //Insert new entry for this logon event
                 string insertsql = string.Format("INSERT INTO {0} (dbid, loginstamp, logoutstamp, username,machine,ipaddress) " +
                     "VALUES (NULL, NOW(), 0, @username, @machine, @ipaddress)", table);
@@ -70,7 +70,7 @@ namespace pGina.Plugin.MySqlLogger
             }
 
             //LogOff Event
-            else if (changeDescription.Reason == SessionChangeReason.SessionLogoff)
+            else if (Reason == SessionChangeReason.SessionLogoff)
             {
                 if (m_conn.State != System.Data.ConnectionState.Open)
                     m_conn.Open();
@@ -108,7 +108,7 @@ namespace pGina.Plugin.MySqlLogger
 
                 string table = Settings.Store.SessionTable;
                 MySqlCommand cmd = new MySqlCommand("SHOW TABLES", m_conn);
-                
+
                 bool tableExists = false;
                 MySqlDataReader rdr = cmd.ExecuteReader();
                 while (rdr.Read())
@@ -117,7 +117,7 @@ namespace pGina.Plugin.MySqlLogger
                         tableExists = true;
                 }
                 rdr.Close();
-                
+
                 if (!tableExists)
                     return "Connection was successful, but no table exists.  Click \"Create Table\" to create the required table.";
 
@@ -126,7 +126,7 @@ namespace pGina.Plugin.MySqlLogger
                 cmd = new MySqlCommand("DESCRIBE " + table, m_conn);
                 rdr = cmd.ExecuteReader();
                 int colCt = 0;
-                
+
                 //Check each column name and match it against the list of columns, keep count of how many match
                 while (rdr.Read())
                 {
@@ -145,7 +145,7 @@ namespace pGina.Plugin.MySqlLogger
                     return "Table exists and is setup correctly.";
                 else
                     return "Table exists, but appears to have incorrect columns.";
-                
+
             }
             catch (MySqlException ex)
             {
@@ -177,7 +177,7 @@ namespace pGina.Plugin.MySqlLogger
 
                 MySqlCommand cmd = new MySqlCommand(sql, m_conn);
                 cmd.ExecuteNonQuery();
-                
+
                 return "Table created.";
             }
             catch (MySqlException ex)
@@ -195,7 +195,7 @@ namespace pGina.Plugin.MySqlLogger
         //Returns the IPv4 address of the current machine
         private string getIPAddress(){
             IPAddress[] ipList = Dns.GetHostAddresses("");
-            
+
             // Grab the first IPv4 address in the list
             foreach (IPAddress addr in ipList)
             {
