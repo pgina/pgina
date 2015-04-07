@@ -222,7 +222,7 @@ namespace pGina
 				//  even..  woah!
 				if(!responseMsg->Result())					
 				{
-					if(pGina::Registry::GetBool(L"LocalAdminFallback", true))
+					if(pGina::Registry::GetBool(L"LocalAdminFallback", false))
 					{
 						Log::Warn(L"Unable to authenticate %s, checking to see if local admin fallback applies", request.Username().c_str());
 						if(pGina::Helpers::IsUserLocalAdmin(request.Username()))
