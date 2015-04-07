@@ -838,12 +838,12 @@ namespace Abstractions.WindowsApi
 
                     string domain = Marshal.PtrToStringAnsi(domainInfo);
                     SafeNativeMethods.WTSFreeMemory(domainInfo);
-                    
+                    /*
                     if (!string.IsNullOrEmpty(domain))
                     {
                         result.Add(string.Format("{0}\\{1}", domain, user));
-                    }
-                    else if (!string.IsNullOrEmpty(user))
+                    }*/
+                    if (!string.IsNullOrEmpty(user))
                     {
                         result.Add(user);
                     }
