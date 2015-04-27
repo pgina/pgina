@@ -97,7 +97,7 @@ namespace Service
                         case (int)Abstractions.WindowsApi.pInvokes.structenums.PBT.APMRESUMECRITICAL:
                             m_logger.InfoFormat("PBT_APMRESUMECRITICAL");
                             break;
-                    }/*
+                    }*/
                     break;
                 case (int)Abstractions.WindowsApi.pInvokes.structenums.WM.WTSSESSION_CHANGE:
                     //m_logger.InfoFormat("WM_WTSSESSION_CHANGE " + m.WParam.ToInt32());
