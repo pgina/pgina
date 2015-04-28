@@ -553,14 +553,14 @@ namespace pGina.Service.Impl
             {
                 lock (m_sessionPropertyCache)
                 {
+                    if (evnt == SessionChangeReason.SessionLogoff)
+                    {
+                            CREDUIhelper(sessionID);
+                    }
                     foreach (IPluginEventNotifications plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
                     {
                         if (m_sessionPropertyCache.Exists(sessionID))
                         {
-                            if (evnt == SessionChangeReason.SessionLogoff)
-                            {
-                                CREDUIhelper(sessionID);
-                            }
                             plugin.SessionChange(sessionID, evnt, m_sessionPropertyCache.Get(sessionID));
                         }
                         else
