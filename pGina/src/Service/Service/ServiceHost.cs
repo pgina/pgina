@@ -117,13 +117,15 @@ namespace Service
             //while (end.Ticks > DateTime.Now.Ticks) //delay shutdown to n minutes, testing only
             while (m_serviceThreadObj.OnCustomCommand())
             {
-                if (Abstractions.WindowsApi.pInvokes.ShutdownPending(this.ServiceHandle, ref myServiceStatus, new TimeSpan(0, 3, 0)))
+                if (Abstractions.WindowsApi.pInvokes.ShutdownPending(this.ServiceHandle, ref myServiceStatus, new TimeSpan(0, 0, 500)))
                 {
                     //m_logger.Info("RequestAdditionalTime suceeded");
                 }
-                Thread.Sleep(1000);
+                Thread.Sleep(250);
             }
             m_logger.Info("RequestAdditionalTime finished");
+            this.OnStop();
+            Abstractions.WindowsApi.pInvokes.SetServiceStopped(this.ServiceHandle, ref myServiceStatus);
         }
         /*
         protected override void OnSessionChange(SessionChangeDescription changeDescription)

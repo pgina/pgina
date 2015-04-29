@@ -988,6 +988,20 @@ namespace Abstractions.WindowsApi
             return true;
         }
 
+        public static bool SetServiceStopped(IntPtr handle, ref structenums.SERVICE_STATUS myServiceStatus)
+        {
+            myServiceStatus.checkPoint++;
+            myServiceStatus.currentState = (int)SafeNativeMethods.State.SERVICE_STOPPED;
+            myServiceStatus.waitHint = 0;
+            if (!SafeNativeMethods.SetServiceStatus(handle, ref myServiceStatus))
+            {
+                LibraryLogging.Error("SetServiceStatus error:{0}", LastError());
+                return false;
+            }
+
+            return true;
+        }
+
         public static int GetSessionId()
         {
             int ret=0;
