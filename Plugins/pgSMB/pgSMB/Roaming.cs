@@ -245,7 +245,7 @@ namespace pGina.Plugin.pgSMB
                 {
                     break;
                 }
-                m_logger.DebugFormat("Exitcode:{0}\n{1}", ret_code, stdmerge);
+                m_logger.DebugFormat("Exitcode:{0}\n{1}", ret_code, tail(stdmerge, 10));
                 Thread.Sleep(new TimeSpan(0, 0, 30));
             }
 
@@ -462,7 +462,7 @@ namespace pGina.Plugin.pgSMB
                 {
                     break;
                 }
-                m_logger.DebugFormat("Exitcode:{0}\n{1}", ret_code, stdmerge);
+                m_logger.DebugFormat("Exitcode:{0}\n{1}", ret_code, tail(stdmerge,10));
                 Thread.Sleep(new TimeSpan(0, 0, 30));
             }
 
@@ -904,23 +904,30 @@ namespace pGina.Plugin.pgSMB
                 return -1;
             }
 
-            stdmerge += stdout + "\n" + stderr;
+            stdmerge += stdout + "\r\n" + stderr;
 
-            string t = stdmerge.Replace("\r", "");
+            return ret;
+        }
+
+        private static string tail(string input, int lines)
+        {
+            string ret = "";
+
+            string t = input.Replace("\r", "");
             while (t.Contains("\n\n"))
             {
                 t = t.Replace("\n\n", "\n");
             }
             string[] s = t.Split('\n');
-            if (s.Length >= 10)
+            if (s.Length >= lines)
             {
-                stdmerge = "";
-                for (int x = s.Length - 10; x < s.Length; x++)
+                ret = "";
+                for (int x = s.Length - lines; x < s.Length; x++)
                 {
-                    stdmerge += s[x] + "\r\n";
+                    ret += s[x] + "\r\n";
                 }
             }
-            stdmerge.TrimEnd(new char[] { '\r', '\n', ' ', '\t' });
+            ret.TrimEnd(new char[] { '\r', '\n', ' ', '\t' });
 
             return ret;
         }
