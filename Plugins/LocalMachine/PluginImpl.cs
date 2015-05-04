@@ -266,7 +266,6 @@ namespace pGina.Plugin.LocalMachine
                     userInfo.Description = user.Description;
                 }
                 properties.AddTrackedSingle<UserInformation>(userInfo);
-                m_logger.InfoFormat("props set {0}", userInfo.Description);
             }
             catch (LocalAccount.GroupSyncException e)
             {
@@ -582,7 +581,7 @@ namespace pGina.Plugin.LocalMachine
                 }
                 else
                 {
-                    m_logger.InfoFormat("User {0} is'nt a pGina created user. I'm not executing Notification stage", userInfo.Username);
+                    m_logger.InfoFormat("User {0} {1}. I'm not executing Notification stage", userInfo.Username, (userInfo.Description.Contains("pgSMB")) ? "was created by pgSMB" : "is'nt a pGina created user");
                 }
             }
         }
