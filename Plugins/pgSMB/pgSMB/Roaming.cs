@@ -199,6 +199,7 @@ namespace pGina.Plugin.pgSMB
                 {
                     break;
                 }
+                Thread.Sleep(new TimeSpan(0, 0, 3));
             }
             if (String.IsNullOrEmpty(server[0]) || String.IsNullOrEmpty(server[1]))
             {
@@ -638,6 +639,7 @@ namespace pGina.Plugin.pgSMB
                 {
                     return true;
                 }
+                Thread.Sleep(new TimeSpan(0, 0, 3));
             }
 
             return false;
@@ -685,6 +687,7 @@ namespace pGina.Plugin.pgSMB
                 {
                     work = true;
                 }
+                Thread.Sleep(new TimeSpan(0, 0, 3));
 
                 break;
             }
@@ -718,6 +721,7 @@ namespace pGina.Plugin.pgSMB
                 {
                     work = true;
                 }
+                Thread.Sleep(new TimeSpan(0, 0, 3));
 
                 break;
             }
@@ -819,6 +823,7 @@ namespace pGina.Plugin.pgSMB
                     {
                         m_logger.Error(ex.Message);
                     }
+                    Thread.Sleep(new TimeSpan(0, 0, 3));
                 }
 
                 return false;
@@ -915,6 +920,7 @@ namespace pGina.Plugin.pgSMB
                     stdmerge += s[x] + "\r\n";
                 }
             }
+            stdmerge.TrimEnd(new char[] { '\r', '\n', ' ', '\t' });
 
             return ret;
         }
