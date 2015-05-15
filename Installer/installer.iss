@@ -45,6 +45,7 @@ DisableDirPage=auto
 AlwaysShowDirOnReadyPage=yes
 AlwaysShowGroupOnReadyPage=yes
 DisableProgramGroupPage=auto
+AlwaysRestart=yes
 
 ArchitecturesInstallIn64BitMode=x64 ia64
 
@@ -103,45 +104,64 @@ winxpsp3_title=Windows XP Service Pack 3
 #expr SaveToFile(AddBackslash(SourcePath) + "Preprocessed"+MyAppSetupname+SetupScriptVersion+".iss")
 
 [Code]
+var isVerySilent: Boolean;
+
 function InitializeSetup(): Boolean;
+var ResultCode: integer;
 begin
-	//init windows version
-	initwinversion();
+  isVerySilent := False;
+  for ResultCode := 1 to ParamCount do
+    if CompareText(ParamStr(ResultCode), '/verysilent') = 0 then
+    begin
+      isVerySilent := True;
+      Break;
+    end;
+
+  //init windows version
+  initwinversion();
+
+  //check if dotnetfx20 can be installed on this OS
+  //if not minwinspversion(5, 0, 3) then begin
+  //	MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [CustomMessage('win2000sp3_title')]), mbError, MB_OK);
+  //	exit;
+  //end;
+  if not minwinspversion(5, 1, 3) then begin
+    if not isVerySilent then begin
+      MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [CustomMessage('winxpsp3_title')]), mbError, MB_OK);
+      end;
+    Abort;
+  end;
 	
-	//check if dotnetfx20 can be installed on this OS
-	//if not minwinspversion(5, 0, 3) then begin
-	//	MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [CustomMessage('win2000sp3_title')]), mbError, MB_OK);
-	//	exit;
-	//end;
-	if not minwinspversion(5, 1, 3) then begin
-		MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [CustomMessage('winxpsp3_title')]), mbError, MB_OK);
-		exit;
-	end;
-	
-	// If no .NET 4.0 framework found, install the full thing
+  // If no .NET 4.0 framework found, install the full thing
 #ifdef use_dotnetfx40
-	dotnetfx40full(false);
+  dotnetfx40full(false);
 #endif
 
-	// Visual C++ 2010 Redistributable
+  // Visual C++ 2010 Redistributable
 #ifdef use_vc2010
-	vc2010();
+  vc2010();
 #endif
 	
-	Result := true;
+  Result := true;
 end;
 
 procedure DoPreInstall();
+var ResultCode: Integer;
 begin
   // If our service is already installed, stop it!
   if IsServiceInstalled('pGina') = true then begin
-		StopService('pGina');		
-	end
+    Exec('net', 'stop pgina', '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
+    StopService('pGina');		
+  end
 end;
 
 procedure DoPostInstall();
 begin
-  // ...
+  if IsWin64 then begin
+    RestartReplace(ExpandConstant('{app}') + '\x64\pGinaCredentialProvider.dll', 'C:\WINDOWS\SYSTEM32\pGinaCredentialProvider.dll')
+  end else begin
+    RestartReplace(ExpandConstant('{app}') + '\Win32\pGinaCredentialProvider.dll', 'C:\WINDOWS\SYSTEM32\pGinaCredentialProvider.dll')
+  end
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
