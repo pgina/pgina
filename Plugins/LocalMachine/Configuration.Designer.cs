@@ -150,9 +150,9 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.label1);
-            this.groupBox3.Controls.Add(this.m_chkScrambleWhenLMFails);
-            this.groupBox3.Controls.Add(this.m_scrambleAllExceptDGV);
+            //this.groupBox3.Controls.Add(this.label1);
+            //this.groupBox3.Controls.Add(this.m_chkScrambleWhenLMFails);
+            //this.groupBox3.Controls.Add(this.m_scrambleAllExceptDGV);
             this.groupBox3.Controls.Add(this.m_chkRemoveProfile);
             this.groupBox3.Controls.Add(this.m_chkScramble);
             this.groupBox3.Controls.Add(this.m_chkGroupFailIsFAIL);
@@ -199,7 +199,7 @@
             this.m_chkScramble.Name = "m_chkScramble";
             this.m_chkScramble.Size = new System.Drawing.Size(177, 17);
             this.m_chkScramble.TabIndex = 7;
-            this.m_chkScramble.Text = "Scramble password after logout.";
+            this.m_chkScramble.Text = "Scramble password after logout (only pGina created users).";
             this.m_chkScramble.UseVisualStyleBackColor = true;
             this.m_chkScramble.CheckedChanged += new System.EventHandler(this.m_chkScramble_CheckedChanged);
             // 
@@ -218,9 +218,9 @@
             this.m_groupsDgv.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.m_groupsDgv.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Group});
-            this.m_groupsDgv.Location = new System.Drawing.Point(15, 262);
+            this.m_groupsDgv.Location = new System.Drawing.Point(15, 101);
             this.m_groupsDgv.Name = "m_groupsDgv";
-            this.m_groupsDgv.Size = new System.Drawing.Size(311, 111);
+            this.m_groupsDgv.Size = new System.Drawing.Size(311, 272);
             this.m_groupsDgv.TabIndex = 5;
             // 
             // Group
