@@ -144,15 +144,13 @@ namespace pGina
 
 		IFACEMETHODIMP Provider::SetSerialization(__in const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs)
 		{			
-			/*if ((CLSID_CpGinaProvider != pcpcs->clsidCredentialProvider) && (m_usageScenario == CPUS_CREDUI))
-				return E_INVALIDARG;*/
+			if ((CLSID_CpGinaProvider != pcpcs->clsidCredentialProvider) && (m_usageScenario == CPUS_CREDUI))
+			{
+				return E_INVALIDARG;
+			}
+
 			pDEBUG(L"SetSerialization(%p)", pcpcs);
 			HRESULT result = E_NOTIMPL;
-
-			if (!(CLSID_CpGinaProvider == pcpcs->clsidCredentialProvider) || !(CPUS_CREDUI == m_usageScenario))
-			{
-				return result;
-			}
 
 			// Must match our auth package (negotiate)			
 			ULONG authPackage = 0;
