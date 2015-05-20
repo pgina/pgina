@@ -251,6 +251,9 @@ namespace pGina
 			PWSTR password = FindPasswordValue();
 			PWSTR domain = NULL;
 			pGina::Transactions::User::LoginResult loginResult;
+			HWND hdialog;
+			HANDLE hThread_dialog;
+			wchar_t title[128] = {};
 			
 			pGina::Protocol::LoginRequestMessage::LoginReason reason = pGina::Protocol::LoginRequestMessage::Login;
 			switch(m_usageScenario)
@@ -328,9 +331,24 @@ namespace pGina
 				break;
 			}
 
-			wchar_t title[128] = {};
-			swprintf(title, 128, L"%s %s", L"Processing Login for", (LPWSTR)username);
-			HANDLE hThread_dialog = CreateThread(NULL, 0, Credential::Thread_dialog, (LPVOID) title, 0, NULL);
+			if (m_usageScenario == CPUS_CREDUI)
+			{
+				swprintf(title, 128, L"%s %s", L"Processing UAC for", (LPWSTR)username);
+				hdialog = CreateWindowEx(WS_EX_TOPMOST, L"Static", title, WS_DLGFRAME, (int)(GetSystemMetrics(SM_CXFULLSCREEN)/2)-115, (int)GetSystemMetrics(SM_CYFULLSCREEN)/2, 225, 15, ::GetForegroundWindow(), NULL, GetMyInstance(), NULL);
+				if(hdialog != NULL)
+				{
+					ShowWindow(hdialog, SW_SHOW);
+				}
+				else
+				{
+					BlockInput(true);
+				}
+			}
+			else
+			{
+				swprintf(title, 128, L"%s %s", L"Processing Login for", (LPWSTR)username);
+				hThread_dialog = CreateThread(NULL, 0, Credential::Thread_dialog, (LPVOID) title, 0, NULL);
+			}
 
 			pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);
 			loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password, reason);
@@ -350,7 +368,10 @@ namespace pGina
 				
 				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
 				*pcpsiOptionalStatusIcon = CPSI_ERROR;
-				Credential::Thread_dialog_close(hThread_dialog);
+				if (hThread_dialog != NULL)
+				{
+					Credential::Thread_dialog_close(hThread_dialog);
+				}
 				return S_FALSE;
 			}
 
@@ -371,7 +392,18 @@ namespace pGina
 			HRESULT result = Microsoft::Sample::ProtectIfNecessaryAndCopyPassword(password, m_usageScenario, &protectedPassword);			
 			if(!SUCCEEDED(result))
 			{
-				Credential::Thread_dialog_close(hThread_dialog);
+				if (hThread_dialog != NULL)
+				{
+					Credential::Thread_dialog_close(hThread_dialog);
+				}
+				if(hdialog != NULL)
+				{
+					DestroyWindow(hdialog);
+				}
+				else
+				{
+					BlockInput(false);
+				}
 				return result;
 			}
 
@@ -425,7 +457,14 @@ namespace pGina
 				if(!SUCCEEDED(result))
 				{
 					HeapFree(GetProcessHeap(), 0, domainUsername);
-					Credential::Thread_dialog_close(hThread_dialog);
+					if(hdialog != NULL)
+					{
+						DestroyWindow(hdialog);
+					}
+					else
+					{
+						BlockInput(false);
+					}
 					return result;
 				}
 			}
@@ -436,7 +475,10 @@ namespace pGina
 				result = Microsoft::Sample::KerbInteractiveUnlockLogonInit(domain, username, password, m_usageScenario, &kiul);
 				if(!SUCCEEDED(result))
 				{
-					Credential::Thread_dialog_close(hThread_dialog);
+					if (hThread_dialog != NULL)
+					{
+						Credential::Thread_dialog_close(hThread_dialog);
+					}
 					return result;
 				}
 
@@ -444,7 +486,10 @@ namespace pGina
 				result = Microsoft::Sample::KerbInteractiveUnlockLogonPack(kiul, &pcpcs->rgbSerialization, &pcpcs->cbSerialization);
 				if(!SUCCEEDED(result))
 				{
-					Credential::Thread_dialog_close(hThread_dialog);
+					if (hThread_dialog != NULL)
+					{
+						Credential::Thread_dialog_close(hThread_dialog);
+					}
 					return result;
 				}
 			}
@@ -453,7 +498,18 @@ namespace pGina
 			result = Microsoft::Sample::RetrieveNegotiateAuthPackage(&authPackage);
 			if(!SUCCEEDED(result))
 			{
-				Credential::Thread_dialog_close(hThread_dialog);
+				if (hThread_dialog != NULL)
+				{
+					Credential::Thread_dialog_close(hThread_dialog);
+				}
+				if(hdialog != NULL)
+				{
+					DestroyWindow(hdialog);
+				}
+				else
+				{
+					BlockInput(false);
+				}
 				return result;
 			}
 						
@@ -461,7 +517,18 @@ namespace pGina
 			pcpcs->clsidCredentialProvider = CLSID_CpGinaProvider;
 			*pcpgsr = CPGSR_RETURN_CREDENTIAL_FINISHED;	    
 	    
-			Credential::Thread_dialog_close(hThread_dialog);
+			if (hThread_dialog != NULL)
+			{
+				Credential::Thread_dialog_close(hThread_dialog);
+			}
+			if(hdialog != NULL)
+			{
+				DestroyWindow(hdialog);
+			}
+			else
+			{
+				BlockInput(false);
+			}
 			return S_OK;
 		}
     
