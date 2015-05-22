@@ -33,7 +33,7 @@ namespace pGina
 	{
 		std::wstring GetString(const wchar_t * keyName, const wchar_t * defaultValue)
 		{
-			std::wstring result = GetString(HKEY_LOCAL_MACHINE, L"SOFTWARE\\pGina3", keyName);
+			std::wstring result = GetString(HKEY_LOCAL_MACHINE, L"SOFTWARE\\pGina3.fork", keyName);
 
 			if( result.length() == 0 ) result = defaultValue;
 			
@@ -46,7 +46,7 @@ namespace pGina
 			DWORD tmpResult = defaultValue;			
 			HKEY hKey = NULL;
 
-			if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"Software\\pGina3", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+			if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\pGina3.fork", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
 			{
 				DWORD dataLength = sizeof(tmpResult);										
 				if(RegQueryValueEx(hKey, keyName, 0, NULL, (LPBYTE) &tmpResult, &dataLength) == ERROR_SUCCESS)
@@ -112,7 +112,7 @@ namespace pGina
 
 		std::vector<std::wstring> GetStringArray( const wchar_t *subKeyName )
 		{
-			return GetStringArray(HKEY_LOCAL_MACHINE, L"SOFTWARE\\pGina3", subKeyName);
+			return GetStringArray(HKEY_LOCAL_MACHINE, L"SOFTWARE\\pGina3.fork", subKeyName);
 		}
 
 		std::vector<std::wstring> GetStringArray( HKEY base, const wchar_t *subKeyName, const wchar_t *valueName )
