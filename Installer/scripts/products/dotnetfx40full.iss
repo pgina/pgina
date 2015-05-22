@@ -34,6 +34,6 @@ begin
     			CustomMessage('dotnetfx40full_lcid') + '/q ' + {#dotnetfx40full_passive} + '/norestart',
     			CustomMessage('dotnetfx40full_title'),
     			CustomMessage('dotnetfx40full_size'),
-    			dotnetfx40full_url,false,false);
+    			dotnetfx40full_url,false,true);
     end;
 end;
