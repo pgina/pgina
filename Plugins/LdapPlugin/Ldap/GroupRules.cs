@@ -156,7 +156,7 @@ namespace pGina.Plugin.Ldap
         public static GroupAuthzRule FromRegString(string str)
         {
             str = str.Trim();
-            if (Regex.IsMatch(str, @"[0-1]\t[0-2]\t([\w%]+=[\w% ]+,?)+\t\(.*\)\t[0|1]"))
+            if (Regex.IsMatch(Regex.Replace(str, @"(\\.)+", ""), @"[0-1]\t[0-2]\t([\w%]+=[^,\t]+,?)+\t\(.*\)\t[0|1]"))
             {
                 string[] parts = Regex.Split(str, @"\t");
                 if (parts.Length == 5)
@@ -224,7 +224,7 @@ namespace pGina.Plugin.Ldap
         public static GroupGatewayRule FromRegString(string str)
         {
             str = str.Trim();
-            if (Regex.IsMatch(str, @"[0-1]\t[0-2]\t([\w%]+=[\w% ]+,?)+\t\(.*\)\t[\w-]+") || Regex.IsMatch(str, @"2\t0\t\t\t[\w-]+"))
+            if (Regex.IsMatch(Regex.Replace(str, @"(\\.)+", ""), @"[0-1]\t[0-2]\t([\w%]+=[^,\t]+,?)+\t\(.*\)\t[\w-]+") || Regex.IsMatch(str, @"2\t0\t\t\t[\w-]+"))
             {
                 string[] parts = Regex.Split(str, @"\t");
                 if (parts.Length == 5)
