@@ -129,6 +129,37 @@ namespace Abstractions.Windows
         }
 
         /// <summary>
+        /// Delete ProfileList regkeys
+        /// </summary>
+        /// <param name="userSID"></param>
+        /// <returns></returns>
+        public static Boolean DelProfileList(string userSID)
+        {
+            List<string> regkeys = new List<string>(){
+                ROOT_PROFILE_KEY + "\\" + userSID,
+                ROOT_PROFILE_KEY + "\\" + userSID + ".bak"
+            };
+            UIntPtr key = UIntPtr.Zero;
+            Boolean ret = true;
+
+            foreach (string regkey in regkeys)
+            {
+                key = Abstractions.WindowsApi.pInvokes.RegistryOpenKey(Abstractions.WindowsApi.pInvokes.structenums.baseKey.HKEY_LOCAL_MACHINE, regkey);
+                if (key != UIntPtr.Zero)
+                {
+                    bool r = Abstractions.WindowsApi.pInvokes.RegistryDeleteTree(Abstractions.WindowsApi.pInvokes.structenums.baseKey.HKEY_LOCAL_MACHINE, regkey);
+                    if (ret != false)
+                    {
+                        ret = r;
+                    }
+                    Abstractions.WindowsApi.pInvokes.RegistryCloseKey(key);
+                }
+            }
+
+            return ret;
+        }
+
+        /// <summary>
         /// returns user profile direrctory
         /// empty string on error
         /// </summary>
