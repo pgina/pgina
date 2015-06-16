@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -29,9 +29,9 @@ using System.ServiceProcess;
 using System.Collections.Generic;
 
 namespace pGina.Shared.Interfaces
-{    
+{
     /// <summary>
-    /// All plugins must implement this interface 
+    /// All plugins must implement this interface
     /// </summary>
     public interface IPluginBase
     {
@@ -41,34 +41,34 @@ namespace pGina.Shared.Interfaces
         Guid Uuid { get; }
 
         /// <summary>
-        /// Called when pGina service starts.  Intended for 'startup' time processing.  This is 
+        /// Called when pGina service starts.  Intended for 'startup' time processing.  This is
         /// not called during simulation so plugins should not do anything here that would
         /// be necessary for logon processing.
         /// </summary>
         void Starting();
 
         /// <summary>
-        /// Called when the pGina service is shutting down, for 'stopping' time processing.  This 
+        /// Called when the pGina service is shutting down, for 'stopping' time processing.  This
         /// is not called during simulation.  Plugins should not depend on this to clean up
         /// post logon.
         /// </summary>
         void Stopping();
     }
-    
+
     /// <summary>
     /// Plugins which wish to integrate with the pGina configuration/Plugin
-    /// management UI must implement this interface 
+    /// management UI must implement this interface
     /// </summary>
     public interface IPluginConfiguration : IPluginBase
     {
         void Configure();
     }
-    
-    
+
+
     /// <summary>
     /// Plugins that want to be available for use in authentication must
     /// implement this interface.  At least one plugin
-    /// must succeed for the login process to continue. 
+    /// must succeed for the login process to continue.
     /// </summary>
     public interface IPluginAuthentication : IPluginBase
     {
@@ -78,7 +78,7 @@ namespace pGina.Shared.Interfaces
     /// <summary>
     /// Plugins that want to validate a users access (not identity per-se) must
     ///  implement this interface.  All plugins which implement this interface
-    ///  must succeed for the login process to continue. 
+    ///  must succeed for the login process to continue.
     /// </summary>
     public interface IPluginAuthorization : IPluginBase
     {
@@ -86,12 +86,12 @@ namespace pGina.Shared.Interfaces
     }
 
     /// <summary>
-    /// Plugins that want to be involved in account management (post-auth*) 
+    /// Plugins that want to be involved in account management (post-auth*)
     ///  must implement this interface.  All plugins which implement this interface
     ///  must succeed for the login process to continue.
     /// </summary>
     public interface IPluginAuthenticationGateway : IPluginBase
-    {       
+    {
         /// <summary>
         /// User has been authenticated and authorized - now
         ///  is your chance to do other accounting/management before the user's login is successful.
@@ -99,28 +99,28 @@ namespace pGina.Shared.Interfaces
         /// <param name="properties">Info about the session</param>
         /// <returns>Whether or not the plugin was successful.</returns>
         Types.BooleanResult AuthenticatedUserGateway(Types.SessionProperties properties);
-    }          
+    }
 
     /// <summary>
     /// Plugins that want notification of events as they occur must implement
     /// this interface.  Note that these are notifications only - these are
-    /// called from the core service in the context of the service and it's 
+    /// called from the core service in the context of the service and it's
     /// session (i.e. not in users session, as user, etc).  Plugins which want
-    /// to perform processing which requires specific context should see the 
-    /// IPlugin[User|System]SessionHelper interfaces. 
+    /// to perform processing which requires specific context should see the
+    /// IPlugin[User|System]SessionHelper interfaces.
     /// </summary>
     public interface IPluginEventNotifications : IPluginBase
-    {        
+    {
         /// <summary>
         /// Default System session notification (as provided to pGina service
-        ///  via http://msdn.microsoft.com/en-us/library/system.serviceprocess.servicebase.onsessionchange.aspx) 
+        ///  via http://msdn.microsoft.com/en-us/library/system.serviceprocess.servicebase.onsessionchange.aspx)
         /// </summary>
         /// <param name="changeDescription">See MSDN, includes session id and change reason (login, logout etc)</param>
         /// <param name="properties">
         /// If the session is a pGina session, this is the properties instance used by the plugins at auth time.
         /// This value is null if the session is not a pGina session.
         /// </param>
-        void SessionChange(int sessionID, SessionChangeReason evnt, List<Types.SessionProperties> properties);                
+        void SessionChange(int sessionID, SessionChangeReason evnt, Types.SessionProperties properties);
     }
 
     /// <summary>
