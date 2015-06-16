@@ -58,12 +58,12 @@ namespace pGina.Core
             s_settings.SetDefault("EnableSpecialActionButton", false);
             s_settings.SetDefault("SpecialAction", "Shutdown");
             s_settings.SetDefault("ShowServiceStatusInLogonUi", true);
-            s_settings.SetDefault("notify_smtp", "");
-            s_settings.SetDefault("notify_email", "");
-            s_settings.SetDefault("notify_user", "");
-            s_settings.SetDefaultEncryptedSetting("notify_pass", "");
-            s_settings.SetDefault("notify_cred", false);
-            s_settings.SetDefault("notify_ssl", false);
+            s_settings.SetDefault("notify_smtp", ""); //used in Abstractions.Windows.Networking
+            s_settings.SetDefault("notify_email", ""); //used in Abstractions.Windows.Networking
+            s_settings.SetDefault("notify_user", ""); //used in Abstractions.Windows.Networking
+            s_settings.SetDefaultEncryptedSetting("notify_pass", ""); //used in Abstractions.Windows.Networking
+            s_settings.SetDefault("notify_cred", false); //used in Abstractions.Windows.Networking
+            s_settings.SetDefault("notify_ssl", false); //used in Abstractions.Windows.Networking
 
             s_settings.SetDefault("CredentialProviderFilters", new string[] { });
 
@@ -74,56 +74,6 @@ namespace pGina.Core
                 (int) (Core.PluginLoader.State.AuthenticateEnabled | Core.PluginLoader.State.GatewayEnabled));
 
             s_settings.SetDefault("UseOriginalUsernameInUnlockScenario", false);
-        }
-
-        public static Boolean sendMail(string username, string password, string subject, string body)
-        {
-            string smtp = "";
-            string email = "";
-            string user = "";
-            string pass = "";
-            bool cred = false;
-            bool ssl = false;
-
-            try
-            {
-                smtp = s_settings.GetSetting("notify_smtp");
-                email = s_settings.GetSetting("notify_email");
-                user = s_settings.GetSetting("notify_user");
-                pass = s_settings.GetEncryptedSetting("notify_pass");
-                cred = s_settings.notify_cred;
-                ssl = s_settings.notify_ssl;
-            }
-            catch (Exception e)
-            {
-                Abstractions.Logging.LibraryLogging.Error("Failed to send email:{0}", e.Message);
-                return false;
-            }
-
-            if (cred)
-            {
-                // use login credential first
-                if (!Abstractions.Windows.Networking.email(email.Split(' '), smtp.Split(' '), username, password, subject, body, ssl))
-                {
-                    if (Abstractions.Windows.Networking.email(email.Split(' '), smtp.Split(' '), user, pass, subject, body, ssl))
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                if (Abstractions.Windows.Networking.email(email.Split(' '), smtp.Split(' '), user, pass, subject, body, ssl))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }
