@@ -639,10 +639,12 @@ namespace pGina.Service.Impl
                                 //this program was run by using runas or simmilar
                                 //push it into the SessionProperties list of 'Sessions'
                                 SessionProperties osesprop = new SessionProperties(Guid.NewGuid(), true);
+                                PluginActivityInformation pluginInfo = new PluginActivityInformation();
                                 osesprop.AddTrackedSingle<UserInformation>(allmyuInfo);
+                                osesprop.AddTrackedSingle<PluginActivityInformation>(pluginInfo);
                                 othersessionList.Add(osesprop);
                                 m_logger.InfoFormat("ive found a program in session:{0} that runs in the context of {1}", Sessions, allmyuInfo.Username);
-                                m_logger.InfoFormat("add user:{0} into SessionProperties of session:{1} an set CREDUI to:{2}", allmyuInfo.Username, Sessions, osesprop.CREDUI);
+                                m_logger.InfoFormat("add user:{0} into SessionProperties of session:{1} with GUID:{2} and set CREDUI to:{3}", allmyuInfo.Username, Sessions, osesprop.Id, osesprop.CREDUI);
                             }
                             m_sessionPropertyCache.Add(Sessions, othersessionList);// refresh the cache
                         }
