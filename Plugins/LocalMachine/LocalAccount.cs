@@ -540,40 +540,45 @@ namespace pGina.Plugin.LocalMachine
                 // First we have to work out where the users profile is on disk.
                 try
                 {
-                    string usersProfileDir = Abstractions.Windows.User.GetProfileDir(userPrincipal.Sid);
-                    if (!string.IsNullOrEmpty(usersProfileDir))
+                    List<string> usersProfileDirs = Abstractions.Windows.User.GetProfileDir(userPrincipal.Sid);
+                    foreach (string usersProfileDir in usersProfileDirs)
                     {
-                        // instead of while (true)
-                        if (File.Exists(usersProfileDir + "\\NTUSER.DAT"))
+                        if (!string.IsNullOrEmpty(usersProfileDir))
                         {
-                            bool inuse = true;
-                            for (int x = 0; x < 60; x++)
+                            // instead of while (true)
+                            if (File.Exists(usersProfileDir + "\\NTUSER.DAT"))
                             {
-                                try
+                                bool inuse = true;
+                                for (int x = 0; x < 60; x++)
                                 {
-                                    using (FileStream isunloaded = File.Open(usersProfileDir + "\\NTUSER.DAT", FileMode.Open, FileAccess.Read))
+                                    try
                                     {
-                                        inuse = false;
-                                        break;
+                                        using (FileStream isunloaded = File.Open(usersProfileDir + "\\NTUSER.DAT", FileMode.Open, FileAccess.Read))
+                                        {
+                                            inuse = false;
+                                            break;
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        m_logger.DebugFormat("loop{1}:{0}", ex.Message, x);
+                                        Thread.Sleep(1000);
                                     }
                                 }
-                                catch (Exception ex)
+                                if (inuse)
                                 {
-                                    m_logger.DebugFormat("loop{1}:{0}", ex.Message, x);
-                                    Thread.Sleep(1000);
+                                    return;
                                 }
                             }
-                            if (inuse)
-                            {
-                                return;
-                            }
+                            m_logger.DebugFormat("User {0} has profile in {1}, giving myself delete permission", user, usersProfileDir);
+                            try { Directory.Delete(usersProfileDir, true); }
+                            catch { }
+                            RecurseDelete(usersProfileDir);
                         }
-                        m_logger.DebugFormat("User {0} has profile in {1}, giving myself delete permission", user, usersProfileDir);
-                        try {Directory.Delete(usersProfileDir, true); }catch {}
-                        RecurseDelete(usersProfileDir);
-                        // Now remove it from the registry as well
-                        Abstractions.WindowsApi.pInvokes.DeleteProfile(userPrincipal.Sid);
                     }
+                    // Now remove it from the registry as well
+                    Abstractions.WindowsApi.pInvokes.DeleteProfile(userPrincipal.Sid);
+                    Abstractions.Windows.User.DelProfileList(userPrincipal.Sid.ToString());
                 }
                 catch (KeyNotFoundException)
                 {
@@ -631,6 +636,11 @@ namespace pGina.Plugin.LocalMachine
         private static void RecurseDelete(string directory)
         {
             // m_logger.DebugFormat("Dir: {0}", directory);
+            if (!Directory.Exists(directory))
+            {
+                return;
+            }
+
             DirectorySecurity dirSecurity = Directory.GetAccessControl(directory);
             dirSecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().Name, FileSystemRights.FullControl, AccessControlType.Allow));
             Directory.SetAccessControl(directory, dirSecurity);

@@ -39,7 +39,6 @@ using log4net;
 
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
-using pGina.Core;
 using Abstractions;
 
 namespace pGina.Plugin.LocalMachine
@@ -482,49 +481,62 @@ namespace pGina.Plugin.LocalMachine
             return false;
         }
 
-        public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, List<SessionProperties> properties)
+        public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, SessionProperties properties)
         {
             if (properties == null)
                 return;
 
             if (Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
             {
-                foreach (SessionProperties s in properties)
+                UserInformation uInfo = properties.GetTrackedSingle<UserInformation>();
+                m_logger.DebugFormat("{1} SessionChange SessionLogoff for ID:{0}", SessionId, uInfo.Username);
+                m_logger.InfoFormat("{3} {0} {1} {2}", uInfo.Description.Contains("pGina created"), uInfo.HasSID, properties.CREDUI, uInfo.Username);
+                if (uInfo.Description.Contains("pGina created") && uInfo.HasSID && !properties.CREDUI)
                 {
-                    UserInformation uInfo = s.GetTrackedSingle<UserInformation>();
-                    m_logger.DebugFormat("SessionChange SessionLogoff for ID:{0} as user:{1}", SessionId, uInfo.Username);
-                    m_logger.InfoFormat("{0} {1} {2}", uInfo.Description.Contains("pGina created"), uInfo.HasSID, s.CREDUI);
-                    if (uInfo.Description.Contains("pGina created") && uInfo.HasSID && !s.CREDUI)
+                    try
                     {
-                        try
-                        {
-                            Locker.TryEnterWriteLock(-1);
-                            RunningTasks.Add(uInfo.Username.ToLower(), true);
-                        }
-                        finally
-                        {
-                            Locker.ExitWriteLock();
-                        }
+                        Locker.TryEnterWriteLock(-1);
+                        RunningTasks.Add(uInfo.Username.ToLower(), true);
+                    }
+                    finally
+                    {
+                        Locker.ExitWriteLock();
+                    }
 
-                        Thread rem_local = new Thread(() => cleanup(uInfo, SessionId));
-                        rem_local.Start();
-                    }
-                    else
+                    // add this plugin into PluginActivityInformation
+                    m_logger.DebugFormat("{1} properties.id:{0}", properties.Id, uInfo.Username);
+
+                    PluginActivityInformation notification = properties.GetTrackedSingle<PluginActivityInformation>();
+                    foreach (Guid gui in notification.GetNotificationPlugins())
                     {
-                        m_logger.InfoFormat("User {0} {1}. I'm not executing Notification stage", uInfo.Username, (s.CREDUI) ? "has a program running in his context" : "is'nt a pGina created user");
+                        m_logger.DebugFormat("{1} PluginActivityInformation Guid:{0}", gui, uInfo.Username);
                     }
+                    m_logger.DebugFormat("{1} PluginActivityInformation add guid:{0}", PluginUuid, uInfo.Username);
+                    notification.AddNotificationResult(PluginUuid, new BooleanResult { Message = "", Success = false });
+                    properties.AddTrackedSingle<PluginActivityInformation>(notification);
+                    foreach (Guid gui in notification.GetNotificationPlugins())
+                    {
+                        m_logger.DebugFormat("{1} PluginActivityInformation Guid:{0}", gui, uInfo.Username);
+                    }
+
+                    Thread rem_local = new Thread(() => cleanup(uInfo, SessionId, properties));
+                    rem_local.Start();
+                }
+                else
+                {
+                    m_logger.InfoFormat("{0} {1}. I'm not executing Notification stage", uInfo.Username, (properties.CREDUI) ? "has a program running in his context" : "is'nt a pGina created user");
                 }
             }
             if (Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
             {
-                UserInformation userInfo = properties.First().GetTrackedSingle<UserInformation>();
+                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
                 if (!userInfo.HasSID)
                 {
-                    m_logger.InfoFormat("SessionLogon Event denied for ID:{0}", SessionId);
+                    m_logger.InfoFormat("{1} SessionLogon Event denied for ID:{0}", SessionId, userInfo.Username);
                     return;
                 }
 
-                m_logger.DebugFormat("SessionChange SessionLogon for ID:{0} as user:{1}", SessionId, userInfo.Username);
+                m_logger.DebugFormat("{1} SessionChange SessionLogon for ID:{0}", SessionId, userInfo.Username);
 
                 if (userInfo.Description.Contains("pGina created") && !userInfo.Description.Contains("pgSMB"))
                 {
@@ -536,27 +548,28 @@ namespace pGina.Plugin.LocalMachine
                         }
                         catch (Exception ex)
                         {
-                            m_logger.ErrorFormat("Can't run application {0} because {1}", userInfo.LoginScript, ex.ToString());
+                            m_logger.ErrorFormat("{2} Can't run application {0} because {1}", userInfo.LoginScript, ex.ToString(), userInfo.Username);
+                            Abstractions.WindowsApi.pInvokes.SendMessageToUser(SessionId, "Can't run application", String.Format("I'm unable to run your LoginScript\n{0}", userInfo.LoginScript));
                         }
                     }
 
                     if (!Abstractions.Windows.User.QueryQuota(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString()) && Convert.ToUInt32(userInfo.usri4_max_storage) > 0)
                     {
-                        m_logger.InfoFormat("no quota GPO settings for user {0}", userInfo.SID.ToString());
+                        m_logger.InfoFormat("{1} no quota GPO settings for user {0}", userInfo.SID.ToString(), userInfo.Username);
                         if (!Abstractions.Windows.User.SetQuota(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString(), Convert.ToUInt32(userInfo.usri4_max_storage)))
                         {
-                            m_logger.InfoFormat("failed to set quota GPO for user {0}", userInfo.SID.ToString());
+                            m_logger.InfoFormat("{1} failed to set quota GPO for user {0}", userInfo.SID.ToString(), userInfo.Username);
                         }
                         else
                         {
-                            m_logger.InfoFormat("done quota GPO settings for user {0}", userInfo.SID.ToString());
+                            m_logger.InfoFormat("{1} done quota GPO settings for user {0}", userInfo.SID.ToString(), userInfo.Username);
                             try
                             {
                                 Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, "proquota.exe");
                             }
                             catch (Exception ex)
                             {
-                                m_logger.ErrorFormat("Can't run application {0} because {1}", "proquota.exe", ex.ToString());
+                                m_logger.ErrorFormat("{2} Can't run application {0} because {1}", "proquota.exe", ex.ToString(), userInfo.Username);
                             }
                         }
                     }
@@ -573,7 +586,7 @@ namespace pGina.Plugin.LocalMachine
 
                         if (uprofile.Contains(@"\TEMP"))
                         {
-                            pGina.Core.Settings.sendMail(userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows was unable to load the profile");
+                            Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows was unable to load the profile");
                         }
 
                         Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
@@ -581,12 +594,12 @@ namespace pGina.Plugin.LocalMachine
                 }
                 else
                 {
-                    m_logger.InfoFormat("User {0} {1}. I'm not executing Notification stage", userInfo.Username, (userInfo.Description.Contains("pgSMB")) ? "was created by pgSMB" : "is'nt a pGina created user");
+                    m_logger.InfoFormat("{0} {1}. I'm not executing Notification stage", userInfo.Username, (userInfo.Description.Contains("pgSMB")) ? "was created by pgSMB" : "is'nt a pGina created user");
                 }
             }
         }
 
-        private void cleanup(UserInformation userInfo, int sessionID)
+        private void cleanup(UserInformation userInfo, int sessionID, SessionProperties properties)
         {
             bool scramble = Settings.Store.ScramblePasswords;
             bool remove = Settings.Store.RemoveProfiles;
@@ -608,8 +621,24 @@ namespace pGina.Plugin.LocalMachine
                     Thread.Sleep(1000);
                 }
             }
+            while (true)
+            {
+                // if no other notification plugin is working on this user
+                // if the first entry from GetNotificationPlugins is equal to this plugin UID
+                IEnumerable<Guid> guids = properties.GetTrackedSingle<PluginActivityInformation>().GetNotificationPlugins();
+                /*foreach(Guid gui in guids)
+                {
+                    m_logger.DebugFormat("{1} PluginActivityInformation guid:{0}", gui, userInfo.Username);
+                }*/
+                if (guids.DefaultIfEmpty(Guid.Empty).FirstOrDefault().Equals(PluginUuid) || guids.ToList().Count == 0)
+                {
+                    break;
+                }
 
-            m_logger.DebugFormat("start cleanup for user {0} with Description \"{1}\"", userInfo.Username, userInfo.Description);
+                Thread.Sleep(1000);
+            }
+
+            m_logger.DebugFormat("{0} start cleanup with Description \"{1}\"", userInfo.Username, userInfo.Description);
 
             if (LocalAccount.UserExists(userInfo.Username))
             {
@@ -618,34 +647,43 @@ namespace pGina.Plugin.LocalMachine
                     LocalAccount lo = new LocalAccount(userInfo);
                     if (remove)
                     {
-                        m_logger.DebugFormat("remove profile {0}", userInfo.Username);
+                        m_logger.DebugFormat("{0} remove profile", userInfo.Username);
                         lo.RemoveUserAndProfile(userInfo.Username, sessionID);
                     }
                     else
                     {
-                        m_logger.DebugFormat("not removing profile {0}", userInfo.Username);
+                        m_logger.DebugFormat("{0} not removing profile", userInfo.Username);
                     }
                     if (scramble && !remove)
                     {
-                        m_logger.DebugFormat("scramble password {0}", userInfo.Username);
+                        m_logger.DebugFormat("{0} scramble password", userInfo.Username);
                         lo.ScrambleUsersPassword(userInfo.Username);
                     }
                     else
                     {
-                        m_logger.DebugFormat("not scramble password {0}", userInfo.Username);
+                        m_logger.DebugFormat("{0} not scramble password", userInfo.Username);
                     }
-                    m_logger.DebugFormat("cleanup done for user {0}", userInfo.Username);
+                    m_logger.DebugFormat("{0} cleanup done", userInfo.Username);
                 }
             }
             else
             {
-                m_logger.Debug(userInfo.Username + " doesnt exist");
+                m_logger.DebugFormat("{0} doesnt exist", userInfo.Username);
             }
 
             try
             {
                 Locker.TryEnterWriteLock(-1);
                 RunningTasks.Remove(userInfo.Username.ToLower());
+
+                PluginActivityInformation notification = properties.GetTrackedSingle<PluginActivityInformation>();
+                notification.DelNotificationResult(PluginUuid);
+                m_logger.InfoFormat("{1} PluginActivityInformation del Guid:{0}", PluginUuid, userInfo.Username);
+                properties.AddTrackedSingle<PluginActivityInformation>(notification);
+                foreach (Guid guid in properties.GetTrackedSingle<PluginActivityInformation>().GetNotificationPlugins())
+                {
+                    m_logger.InfoFormat("{1} PluginActivityInformation Guid:{0}", guid, userInfo.Username);
+                }
             }
             finally
             {
