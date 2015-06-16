@@ -44,10 +44,11 @@ namespace pGina.Plugin.pgSMB
 {
     public class Roaming
     {
-        private static ILog m_logger = LogManager.GetLogger("pgSMB[Roaming]");
+        private ILog m_logger = LogManager.GetLogger("pgSMB[Roaming]");
 
-        public static BooleanResult get(Dictionary<string,string> settings, string username, string password)
+        public BooleanResult get(Dictionary<string,string> settings, string username, string password)
         {
+            m_logger = LogManager.GetLogger(String.Format("pgSMB[Roaming:{0}]", username));
             if (!UserCanBeUsed(username))
             {
                 // user exists and was not created by pgina
@@ -144,7 +145,7 @@ namespace pGina.Plugin.pgSMB
                     {
                         DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"]));
                     }
-                    if (!Roaming.CreateRoamingFolder(settings["RoamingDest_real"], username))
+                    if (!CreateRoamingFolder(settings["RoamingDest_real"], username))
                     {
                         return new BooleanResult() { Success = false, Message = string.Format("Unable to create the Roaming folder {0}", settings["RoamingDest_real"]) };
                     }
@@ -166,8 +167,9 @@ namespace pGina.Plugin.pgSMB
             return new BooleanResult() { Success = true };
         }
 
-        public static BooleanResult put(Dictionary<string, string> settings, string username, string password)
+        public BooleanResult put(Dictionary<string, string> settings, string username, string password)
         {
+            m_logger = LogManager.GetLogger(String.Format("pgSMB[Roaming:{0}]", username));
             try
             {
                 if (!PutProfile(settings, username, password))
@@ -184,7 +186,7 @@ namespace pGina.Plugin.pgSMB
             return new BooleanResult() { Success = true };
         }
 
-        private static Boolean PutProfile(Dictionary<string, string> settings, string username, string password)
+        private Boolean PutProfile(Dictionary<string, string> settings, string username, string password)
         {
             int ret_code = -1;
 
@@ -270,6 +272,14 @@ namespace pGina.Plugin.pgSMB
             {
                 m_logger.ErrorFormat("Unable to find the file \"{0}\" in your compress command {1}", settings["Filename"], settings["CompressCLI"]);
                 return false;
+            }
+            else
+            {
+                if (ret_code != 0)
+                {
+                    m_logger.DebugFormat("File.Delete {0}", ThereIsTheProfile);
+                    File.Delete(ThereIsTheProfile);
+                }
             }
 
             if (ret_code == 0)
@@ -425,7 +435,7 @@ namespace pGina.Plugin.pgSMB
             return false;
         }
 
-        private static Boolean GetProfile(Dictionary<string,string> settings, string username, string password)
+        private Boolean GetProfile(Dictionary<string,string> settings, string username, string password)
         {
             int ret_code = -1;
             m_logger.DebugFormat("User {0} owns a remote profile", username);
@@ -477,7 +487,7 @@ namespace pGina.Plugin.pgSMB
             return true;
         }
 
-        private static string GetExistingUserProfile(string username, string password)
+        private string GetExistingUserProfile(string username, string password)
         {
             Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
             if (!Abstractions.WindowsApi.pInvokes.UserGet(username, ref userinfo4))
@@ -494,7 +504,7 @@ namespace pGina.Plugin.pgSMB
             return Abstractions.Windows.User.GetProfileDir(username, password);
         }
 
-        public static Boolean userAdd(Dictionary<string,string> settings, string username, string password, string comment)
+        public Boolean userAdd(Dictionary<string,string> settings, string username, string password, string comment)
         {
             Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
 
@@ -546,7 +556,7 @@ namespace pGina.Plugin.pgSMB
             return true;
         }
 
-        public static Boolean UserCanBeUsed(string username)
+        public Boolean UserCanBeUsed(string username)
         {
             Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
 
@@ -567,7 +577,7 @@ namespace pGina.Plugin.pgSMB
             }
         }
 
-        public static Boolean userDel(Dictionary<string, string> settings, string username, string password)
+        public Boolean userDel(Dictionary<string, string> settings, string username, string password)
         {
             if (!Abstractions.WindowsApi.pInvokes.UserDel(username))
             {
@@ -581,7 +591,7 @@ namespace pGina.Plugin.pgSMB
             return true;
         }
 
-        public static Boolean DirectoryDel(string path, uint retry)
+        public Boolean DirectoryDel(string path, uint retry)
         {
             for (uint x = 1; x <= retry; x++)
             {
@@ -645,7 +655,7 @@ namespace pGina.Plugin.pgSMB
             return false;
         }
 
-        private static Boolean SetACL(string dir, string username, string password, uint maxstore, uint retry)
+        private Boolean SetACL(string dir, string username, string password, uint maxstore, uint retry)
         {
             Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
             if (!Abstractions.WindowsApi.pInvokes.UserGet(username, ref userinfo4))
@@ -673,59 +683,7 @@ namespace pGina.Plugin.pgSMB
                 //not critical
             }
 
-            bool work = false;
-            for (int x = 1; x <= retry; x++)
-            {
-                if (!Abstractions.WindowsApi.pInvokes.RegistryLoad(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username, dir + "\\NTUSER.DAT"))
-                {
-                    m_logger.WarnFormat("Can't load regfile {0}\\{1}", dir, "NTUSER.DAT");
-                    Thread.Sleep(new TimeSpan(0, 0, 10));
-                    work = false;
-                    continue;
-                }
-                else
-                {
-                    work = true;
-                }
-                Thread.Sleep(new TimeSpan(0, 0, 3));
-
-                break;
-            }
-            if (!work)
-            {
-                return false;
-            }
-
-            if (!Abstractions.Windows.User.SetQuota(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username, maxstore))
-            {
-                m_logger.WarnFormat("Can't set quota");
-                //not critical
-            }
-
-            if (!Abstractions.Windows.Security.RegSec(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username))
-            {
-                m_logger.WarnFormat("Can't set ACL for regkey {0}\\{1}", Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE.ToString(), username);
-                return false;
-            }
-
-            for (int x = 1; x <= retry; x++)
-            {
-                if (!Abstractions.WindowsApi.pInvokes.RegistryUnLoad(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username))
-                {
-                    m_logger.WarnFormat("Can't unload regkey {0}\\{1}", dir, "NTUSER.DAT");
-                    Thread.Sleep(new TimeSpan(0, 0, 10));
-                    work = false;
-                    continue;
-                }
-                else
-                {
-                    work = true;
-                }
-                Thread.Sleep(new TimeSpan(0, 0, 3));
-
-                break;
-            }
-            if (!work)
+            if (!SetACLquotaREGfile(dir + "\\NTUSER.DAT", retry, username, maxstore, true, true))
             {
                 return false;
             }
@@ -733,7 +691,77 @@ namespace pGina.Plugin.pgSMB
             return true;
         }
 
-        private static string[] SMBserver(string share, Boolean visversa)
+        private bool SetACLquotaREGfile(string file, uint retry, string username, uint quotasize, bool quota, bool acl)
+        {
+            bool work = false;
+            bool critical = true;
+
+            for (int x = 1; x <= retry; x++)
+            {
+                if (!Abstractions.WindowsApi.pInvokes.RegistryLoad(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username, file))
+                {
+                    m_logger.WarnFormat("Can't load regfile {0}\\{1}", file);
+                    Thread.Sleep(new TimeSpan(0, 0, 10));
+                    work = false;
+                    continue;
+                }
+                else
+                {
+                    work = true;
+                }
+                Thread.Sleep(new TimeSpan(0, 0, 3));
+
+                break;
+            }
+            if (!work)
+            {
+                return false;
+            }
+
+            if (quota)
+            {
+                if (!Abstractions.Windows.User.SetQuota(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username, quotasize))
+                {
+                    m_logger.WarnFormat("Can't set quota");
+                    critical = false;
+                }
+            }
+
+            if (acl)
+            {
+                if (!Abstractions.Windows.Security.RegSec(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username))
+                {
+                    m_logger.WarnFormat("Can't set ACL for regkey {0}\\{1}", Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE.ToString(), username);
+                    critical = false;
+                }
+            }
+
+            for (int x = 1; x <= retry; x++)
+            {
+                if (!Abstractions.WindowsApi.pInvokes.RegistryUnLoad(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username))
+                {
+                    m_logger.WarnFormat("Can't unload regkey {0}\\{1}", file);
+                    Thread.Sleep(new TimeSpan(0, 0, 10));
+                    work = false;
+                    continue;
+                }
+                else
+                {
+                    work = true;
+                }
+                Thread.Sleep(new TimeSpan(0, 0, 3));
+
+                break;
+            }
+            if (!work || !critical)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private string[] SMBserver(string share, Boolean visversa)
         {
             string[] ret = { null, null };
             string[] server;
@@ -782,7 +810,7 @@ namespace pGina.Plugin.pgSMB
             return ret;
         }
 
-        private static Boolean Connect2share(string share, string username, string password, uint retry, Boolean DISconnect)
+        private Boolean Connect2share(string share, string username, string password, uint retry, Boolean DISconnect)
         {
             if (DISconnect)
             {
@@ -830,7 +858,7 @@ namespace pGina.Plugin.pgSMB
             }
         }
 
-        private static Boolean CreateRoamingFolder(string dir, string username)
+        private Boolean CreateRoamingFolder(string dir, string username)
         {
             if (!Directory.Exists(dir))
             {
@@ -868,7 +896,7 @@ namespace pGina.Plugin.pgSMB
             return true;
         }
 
-        private static int RunWait(string application, string arguments, out string stdmerge)
+        private int RunWait(string application, string arguments, out string stdmerge)
         {
             stdmerge = "";
             string stdout = "";
@@ -904,12 +932,12 @@ namespace pGina.Plugin.pgSMB
                 return -1;
             }
 
-            stdmerge += stdout + "\r\n" + stderr;
+            stdmerge += String.Format("{0}\r\n{1}", stdout.TrimEnd(), stderr.TrimEnd()).TrimEnd();
 
             return ret;
         }
 
-        private static string tail(string input, int lines)
+        private string tail(string input, int lines)
         {
             string ret = "";
 
@@ -927,9 +955,8 @@ namespace pGina.Plugin.pgSMB
                     ret += s[x] + "\r\n";
                 }
             }
-            ret.TrimEnd(new char[] { '\r', '\n', ' ', '\t' });
 
-            return ret;
+            return ret.TrimEnd();
         }
     }
 }
