@@ -561,7 +561,10 @@ namespace pGina.Service.Impl
                     {
                         if (m_sessionPropertyCache.Exists(sessionID))
                         {
-                            plugin.SessionChange(sessionID, evnt, m_sessionPropertyCache.Get(sessionID));
+                            foreach (SessionProperties props in m_sessionPropertyCache.Get(sessionID))
+                            {
+                                plugin.SessionChange(sessionID, evnt, props);
+                            }
                         }
                         else
                         {
@@ -571,6 +574,7 @@ namespace pGina.Service.Impl
                     // If this is a logout, remove from our map
                     if (evnt == SessionChangeReason.SessionLogoff && m_sessionPropertyCache.Exists(sessionID))
                     {
+                        //m_logger.InfoFormat("delete sessionInfos:{0} from sessionID:{1}", String.Join(" ", m_sessionPropertyCache.Get(sessionID).Select(l => l.Id).ToList()), sessionID);
                         m_sessionPropertyCache.Remove(sessionID);
                     }
                 }
