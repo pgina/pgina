@@ -304,21 +304,31 @@ namespace pGina.Service.Impl
                     m_logger.DebugFormat("Processing LoginRequest for: {0} in session: {1} reason: {2}", sessionDriver.UserInformation.Username, msg.Session, msg.Reason);
 
                     Boolean isLoggedIN = false;
-                    List<string> Users = Abstractions.WindowsApi.pInvokes.GetInteractiveUserList();
+                    Boolean isUACLoggedIN = false;
+                    List<string> Users = Abstractions.WindowsApi.pInvokes.GetSessionContext(-1);
+                    List<string> iUsers = Abstractions.WindowsApi.pInvokes.GetInteractiveUserList();
                     foreach (string user in Users)
                     {
-                        m_logger.DebugFormat("Interactive user:{0}", user);
+                        m_logger.DebugFormat("Program running as user:{0}", user);
                         if (user.EndsWith(sessionDriver.UserInformation.Username, StringComparison.CurrentCultureIgnoreCase))
                         {
                             //the user is still logged in
                             isLoggedIN = true;
-                            m_logger.DebugFormat("User:{0} is Locked in Session:{1}", sessionDriver.UserInformation.Username, msg.Session);
+                            if (iUsers.Any(s => s.ToLower().Contains(sessionDriver.UserInformation.Username.ToLower())))
+                            {
+                                m_logger.DebugFormat("User:{0} is Locked in Session:{1}", sessionDriver.UserInformation.Username, msg.Session);
+                            }
+                            else
+                            {
+                                isUACLoggedIN = true;
+                                m_logger.DebugFormat("User:{0} is UACed in Session:?", sessionDriver.UserInformation.Username);
+                            }
                         }
                     }
                     if (!isLoggedIN)
                         result = sessionDriver.PerformLoginProcess();
 
-                    if (result.Success && (!isLoggedIN || msg.Reason == LoginRequestMessage.LoginReason.CredUI))
+                    if (result.Success && (!isLoggedIN || msg.Reason == LoginRequestMessage.LoginReason.CredUI || isUACLoggedIN))
                     {
                         lock (m_sessionPropertyCache)
                         {
