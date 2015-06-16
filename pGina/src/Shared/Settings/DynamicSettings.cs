@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -34,7 +34,7 @@ using Microsoft.Win32;
 namespace pGina.Shared.Settings
 {
     public class pGinaDynamicSettings : Abstractions.Settings.DynamicSettings
-    {    
+    {
         public const string pGinaRoot = @"SOFTWARE\pGina3.fork";
         public pGinaDynamicSettings() :
             base(pGinaRoot)
@@ -43,7 +43,7 @@ namespace pGina.Shared.Settings
 
         public pGinaDynamicSettings(Guid pluginGuid) :
             base(string.Format(@"{0}\Plugins\{1}", pGinaRoot, pluginGuid.ToString()))
-        {            
+        {
         }
 
         public pGinaDynamicSettings(Guid pluginGuid, string subKey) :
@@ -100,7 +100,116 @@ namespace pGina.Shared.Settings
                     }
                 }
             }
+        }
 
+        /// <summary>
+        /// Get a dictionary containing all values of the pgina registry
+        /// key.  The Dictionary key is the sub-key name, the value is a pGinaDynamicSettings object
+        /// corresponding to the sub-key.
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string, string> GetSettings(string subKey, string[] encypted)
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            foreach (string s in encypted)
+            {
+            }
+
+            try
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(subKey, false))
+                {
+                    if (key != null)
+                    {
+                        string[] names = key.GetValueNames();
+                        foreach (string n in names)
+                        {
+                            object type = key.GetValue(n);
+                            string value = "";
+                            switch (key.GetValueKind(n))
+                            {
+                                case RegistryValueKind.String:
+                                case RegistryValueKind.ExpandString:
+                                    value += type;
+                                    break;
+                                case RegistryValueKind.Binary:
+                                    foreach (byte b in (byte[])type)
+                                    {
+                                        value += b;
+                                    }
+                                    Console.WriteLine();
+                                    break;
+                                case RegistryValueKind.DWord:
+                                    value += Convert.ToString((Int32)type);
+                                    break;
+                                case RegistryValueKind.QWord:
+                                    value += Convert.ToString((Int64)type);
+                                    break;
+                                case RegistryValueKind.MultiString:
+                                    foreach (string s in (string[])type)
+                                    {
+                                        value += String.Format("{0}\n", s);
+                                    }
+                                    value = value.TrimEnd();
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            if (encypted.Any(s => s.Equals(n, StringComparison.CurrentCultureIgnoreCase)))
+                            {
+                                value = DecryptSetting(subKey, n);
+                            }
+                            result.Add(n, value);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Abstractions.Logging.LibraryLogging.Error("GetSettings({0}, {{1}}) failed:{2}", subKey, String.Join(", ", encypted), ex.Message);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Get a string containing a value of the pgina registry
+        /// key.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetSetting(string subKey, string value, string[] encypted)
+        {
+            Dictionary<string, string> keys = GetSettings(subKey, encypted);
+            foreach (KeyValuePair<string, string> pair in keys)
+            {
+                if (pair.Value.Equals(value, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return pair.Value;
+                }
+            }
+
+            return "";
+        }
+
+        /// <summary>
+        /// Get an encryted string containing a value of the pgina registry
+        /// key.
+        /// </summary>
+        /// <returns></returns>
+        public static string DecryptSetting(string subKey, string name)
+        {
+            try
+            {
+                dynamic s_settings = new Abstractions.Settings.DynamicSettings(subKey);
+                return s_settings.GetEncryptedSetting(name);
+            }
+            catch (Exception ex)
+            {
+                Abstractions.Logging.LibraryLogging.Error("DecryptSetting({0}, {1}) failed:{2}", subKey, name, ex.Message);
+            }
+
+            return null;
         }
     }
 }
