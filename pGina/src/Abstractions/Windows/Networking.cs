@@ -257,5 +257,40 @@ namespace Abstractions.Windows
 
             return ret;
         }
+
+        public static Boolean sendMail(Dictionary<string, string> settings, string username, string password, string subject, string body)
+        {
+            string mailAddress = settings["notify_email"];
+            string smtpAddress = settings["notify_smtp"];
+            string user = settings["notify_user"];
+            string pass = settings["notify_pass"];
+            bool ssl = Convert.ToBoolean(settings["notify_cred"]);
+            bool cred = Convert.ToBoolean(settings["notify_ssl"]);
+
+            if (cred)
+            {
+                // use login credential first
+                if (!Abstractions.Windows.Networking.email(mailAddress.Split(' '), smtpAddress.Split(' '), username, password, subject, body, ssl))
+                {
+                    if (Abstractions.Windows.Networking.email(mailAddress.Split(' '), smtpAddress.Split(' '), user, pass, subject, body, ssl))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (Abstractions.Windows.Networking.email(mailAddress.Split(' '), smtpAddress.Split(' '), user, pass, subject, body, ssl))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
