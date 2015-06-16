@@ -229,7 +229,7 @@ namespace pGina.Plugin.Ldap
                 if ((bool)Settings.Store.AuthzDefault)
                     return new BooleanResult() { Success = true, Message = "" };
                 else
-                    return new BooleanResult() { Success = false, Message = String.Format("You are not allowed to login!\n\nNo matching rule found!\nDefault rule:{0}", (bool)Settings.Store.AuthzDefault ? "Allow" : "Deny") };
+                    return new BooleanResult() { Success = false, Message = String.Format("You are not allowed to login! No matching rule found! Default rule:{0}", (bool)Settings.Store.AuthzDefault ? "Allow" : "Deny") };
             }
             catch (Exception e)
             {
