@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -36,23 +36,23 @@ namespace pGina
 			std::wstring result = GetString(HKEY_LOCAL_MACHINE, L"SOFTWARE\\pGina3.fork", keyName);
 
 			if( result.length() == 0 ) result = defaultValue;
-			
+
 			return result;
-		}	
+		}
 
 		DWORD GetDword(const wchar_t * keyName, DWORD defaultValue)
 		{
 			DWORD result = defaultValue;
-			DWORD tmpResult = defaultValue;			
+			DWORD tmpResult = defaultValue;
 			HKEY hKey = NULL;
 
-			if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\pGina3.fork", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+			if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"Software\\pGina3.fork", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
 			{
-				DWORD dataLength = sizeof(tmpResult);										
+				DWORD dataLength = sizeof(tmpResult);
 				if(RegQueryValueEx(hKey, keyName, 0, NULL, (LPBYTE) &tmpResult, &dataLength) == ERROR_SUCCESS)
 				{
 					result = tmpResult;
-				}				
+				}
 				RegCloseKey(hKey);
 			}
 
@@ -86,16 +86,16 @@ namespace pGina
 		{
 			std::wstring result = L"";	// Do not assign NULL!
 			HKEY hKey = NULL;
-			
+
 			if(RegOpenKeyEx(base, subKeyName, 0, KEY_READ, &hKey) == ERROR_SUCCESS)
 			{
-				DWORD dataLength = 0;				
+				DWORD dataLength = 0;
 				if(RegQueryValueEx(hKey, valueName, 0, NULL, NULL, &dataLength) == ERROR_SUCCESS)
 				{
 					int bufferSize = dataLength + sizeof(wchar_t);
 					wchar_t * buffer = (wchar_t *) malloc(bufferSize);
 					memset(buffer, 0, bufferSize);
-					
+
 					if(RegQueryValueEx(hKey, valueName, 0, NULL, (LPBYTE) buffer, &dataLength) == ERROR_SUCCESS)
 					{
 						result = buffer;
@@ -122,20 +122,20 @@ namespace pGina
 
 			if( RegOpenKeyEx(base, subKeyName, 0, KEY_READ, &hKey) == ERROR_SUCCESS)
 			{
-				DWORD dataLength = 0;				
+				DWORD dataLength = 0;
 				if(RegQueryValueEx(hKey, valueName, 0, NULL, NULL, &dataLength) == ERROR_SUCCESS)
 				{
 					int bufferSize = dataLength + 2*sizeof(wchar_t);
 					int buffLength = bufferSize / sizeof(wchar_t);
 					wchar_t * buffer = (wchar_t *) malloc(bufferSize);
 					ZeroMemory(buffer, bufferSize);
-				
+
 					if(RegQueryValueEx(hKey, valueName, 0, NULL, (LPBYTE) buffer, &dataLength) == ERROR_SUCCESS)
 					{
 						std::wstring str;
 						size_t index = 0;
 						size_t len = wcsnlen(&buffer[index], buffLength);
-				
+
 						while(len > 0 && len < buffLength - index)
 						{
 							str = &buffer[index];
