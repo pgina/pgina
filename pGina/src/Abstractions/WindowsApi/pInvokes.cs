@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -97,7 +97,7 @@ namespace Abstractions.WindowsApi
                 /// </summary>
                 CREDUIWIN_PACK_32_WOW = 0x10000000,
             }
-            
+
             public enum ResourceScope
             {
                 RESOURCE_CONNECTED = 1,
@@ -332,7 +332,7 @@ namespace Abstractions.WindowsApi
             public enum LogonType
             {
                 /// <summary>
-                /// This logon type is intended for users who will be interactively using the computer, such as a user being logged on  
+                /// This logon type is intended for users who will be interactively using the computer, such as a user being logged on
                 /// by a terminal server, remote shell, or similar process.
                 /// This logon type has the additional expense of caching logon information for disconnected operations;
                 /// therefore, it is inappropriate for some client/server applications,
@@ -347,38 +347,38 @@ namespace Abstractions.WindowsApi
                 LOGON32_LOGON_NETWORK = 3,
 
                 /// <summary>
-                /// This logon type is intended for batch servers, where processes may be executing on behalf of a user without 
+                /// This logon type is intended for batch servers, where processes may be executing on behalf of a user without
                 /// their direct intervention. This type is also for higher performance servers that process many plaintext
-                /// authentication attempts at a time, such as mail or Web servers. 
+                /// authentication attempts at a time, such as mail or Web servers.
                 /// The LogonUser function does not cache credentials for this logon type.
                 /// </summary>
                 LOGON32_LOGON_BATCH = 4,
 
                 /// <summary>
-                /// Indicates a service-type logon. The account provided must have the service privilege enabled. 
+                /// Indicates a service-type logon. The account provided must have the service privilege enabled.
                 /// </summary>
                 LOGON32_LOGON_SERVICE = 5,
 
                 /// <summary>
-                /// This logon type is for GINA DLLs that log on users who will be interactively using the computer. 
-                /// This logon type can generate a unique audit record that shows when the workstation was unlocked. 
+                /// This logon type is for GINA DLLs that log on users who will be interactively using the computer.
+                /// This logon type can generate a unique audit record that shows when the workstation was unlocked.
                 /// </summary>
                 LOGON32_LOGON_UNLOCK = 7,
 
                 /// <summary>
-                /// This logon type preserves the name and password in the authentication package, which allows the server to make 
-                /// connections to other network servers while impersonating the client. A server can accept plaintext credentials 
-                /// from a client, call LogonUser, verify that the user can access the system across the network, and still 
+                /// This logon type preserves the name and password in the authentication package, which allows the server to make
+                /// connections to other network servers while impersonating the client. A server can accept plaintext credentials
+                /// from a client, call LogonUser, verify that the user can access the system across the network, and still
                 /// communicate with other servers.
-                /// NOTE: Windows NT:  This value is not supported. 
+                /// NOTE: Windows NT:  This value is not supported.
                 /// </summary>
                 LOGON32_LOGON_NETWORK_CLEARTEXT = 8,
 
                 /// <summary>
                 /// This logon type allows the caller to clone its current token and specify new credentials for outbound connections.
-                /// The new logon session has the same local identifier but uses different credentials for other network connections. 
+                /// The new logon session has the same local identifier but uses different credentials for other network connections.
                 /// NOTE: This logon type is supported only by the LOGON32_PROVIDER_WINNT50 logon provider.
-                /// NOTE: Windows NT:  This value is not supported. 
+                /// NOTE: Windows NT:  This value is not supported.
                 /// </summary>
                 LOGON32_LOGON_NEW_CREDENTIALS = 9,
             }
@@ -389,14 +389,14 @@ namespace Abstractions.WindowsApi
             public enum LogonProvider
             {
                 /// <summary>
-                /// Use the standard logon provider for the system. 
-                /// The default security provider is negotiate, unless you pass NULL for the domain name and the user name 
-                /// is not in UPN format. In this case, the default provider is NTLM. 
+                /// Use the standard logon provider for the system.
+                /// The default security provider is negotiate, unless you pass NULL for the domain name and the user name
+                /// is not in UPN format. In this case, the default provider is NTLM.
                 /// NOTE: Windows 2000/NT:   The default security provider is NTLM.
                 /// </summary>
                 LOGON32_PROVIDER_DEFAULT = 0,
             }
-            #endregion            
+            #endregion
 
             #region credui.dll
             [DllImport("credui.dll", CharSet = CharSet.Auto)]
@@ -406,10 +406,10 @@ namespace Abstractions.WindowsApi
                                                                          ref bool fSave, PromptForWindowsCredentialsFlags flags);
 
             [DllImport("credui.dll", CharSet = CharSet.Auto)]
-            public static extern bool CredUnPackAuthenticationBuffer(int dwFlags, IntPtr pAuthBuffer, uint cbAuthBuffer,                                                                       
-                                                                       StringBuilder pszUserName, ref int pcchMaxUserName,                                                                       
-                                                                       StringBuilder pszDomainName, ref int pcchMaxDomainname,                                                                       
-                                                                       StringBuilder pszPassword, ref int pcchMaxPassword);                                                                       
+            public static extern bool CredUnPackAuthenticationBuffer(int dwFlags, IntPtr pAuthBuffer, uint cbAuthBuffer,
+                                                                       StringBuilder pszUserName, ref int pcchMaxUserName,
+                                                                       StringBuilder pszDomainName, ref int pcchMaxDomainname,
+                                                                       StringBuilder pszPassword, ref int pcchMaxPassword);
             #endregion
 
             #region ole32.dll
@@ -428,7 +428,7 @@ namespace Abstractions.WindowsApi
             #endregion
 
             #region wtsapi32.dll
-            [DllImport("wtsapi32.dll", SetLastError = true)]            
+            [DllImport("wtsapi32.dll", SetLastError = true)]
             public static extern bool WTSQueryUserToken(int sessionId, out IntPtr Token);
 
             [DllImport("wtsapi32.dll")]
@@ -456,7 +456,7 @@ namespace Abstractions.WindowsApi
 
             #region userenv.dll
             [DllImport("userenv.dll")]
-            public static extern bool DeleteProfile(string sidString, string path, string machine);            
+            public static extern bool DeleteProfile(string sidString, string path, string machine);
 
             #endregion
 
@@ -472,14 +472,14 @@ namespace Abstractions.WindowsApi
 
             #region advapi32.dll
             [DllImport("advapi32.dll", SetLastError = true)]
-            public extern static bool DuplicateTokenEx(IntPtr hExistingToken, uint dwDesiredAccess, IntPtr tokenAttr, 
+            public extern static bool DuplicateTokenEx(IntPtr hExistingToken, uint dwDesiredAccess, IntPtr tokenAttr,
                 SECURITY_IMPERSONATION_LEVEL ImpersonationLevel, TOKEN_TYPE TokenType, out IntPtr phNewToken);
 
             [DllImport("advapi32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern bool OpenProcessToken(IntPtr ProcessHandle,
                                                         UInt32 DesiredAccess, out IntPtr TokenHandle);
-            
+
             // TokenInformation is really an IntPtr, but we only ever call this with SessionId, so we ref the int directly
             [DllImport("advapi32.dll", SetLastError = true)]
             public static extern bool SetTokenInformation(IntPtr TokenHandle, TOKEN_INFORMATION_CLASS TokenInformationClass,
@@ -1022,7 +1022,7 @@ namespace Abstractions.WindowsApi
             IntPtr result = IntPtr.Zero;
             if (SafeNativeMethods.WTSQueryUserToken(sessionId, out result))
                 return result;
-            return IntPtr.Zero;        
+            return IntPtr.Zero;
         }
 
         public static bool DeleteProfile(SecurityIdentifier sid)
@@ -1031,21 +1031,21 @@ namespace Abstractions.WindowsApi
         }
 
         public static List<string> GetInteractiveUserList()
-        {            
-            List<string> result = new List<string>();                          
+        {
+            List<string> result = new List<string>();
 
             IntPtr sessionInfoList = IntPtr.Zero;
             int sessionCount = 0;
             int retVal = SafeNativeMethods.WTSEnumerateSessions(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, 0, 1, ref sessionInfoList, ref sessionCount);
 
             if(retVal != 0)
-            {                
+            {
                 int dataSize = Marshal.SizeOf(typeof(SafeNativeMethods.WTS_SESSION_INFO));
-                int currentSession = (int) sessionInfoList;                
+                int currentSession = (int) sessionInfoList;
 
                 for(int x = 0; x < sessionCount; x++)
                 {
-                    SafeNativeMethods.WTS_SESSION_INFO sessionInfo = 
+                    SafeNativeMethods.WTS_SESSION_INFO sessionInfo =
                         (SafeNativeMethods.WTS_SESSION_INFO)Marshal.PtrToStructure((IntPtr)currentSession, typeof(SafeNativeMethods.WTS_SESSION_INFO));
                     currentSession += dataSize;
 
@@ -1086,7 +1086,7 @@ namespace Abstractions.WindowsApi
                 SafeNativeMethods.WTSFreeMemory(sessionInfoList);
             }
 
-            return result;            
+            return result;
         }
 
         public static bool IsSessionLoggedOFF(int session)
@@ -1156,7 +1156,7 @@ namespace Abstractions.WindowsApi
                 SafeNativeMethods.WTSFreeMemory(userInfo);
                 throw new Win32Exception(Win32ErrorResult, "WTSQuerySessionInformation");
             }
-            
+
             string userName = Marshal.PtrToStringAnsi(userInfo);
             SafeNativeMethods.WTSFreeMemory(userInfo);
             return userName;
@@ -1168,9 +1168,9 @@ namespace Abstractions.WindowsApi
         }
 
         public static System.Diagnostics.Process StartProcessInSession(int sessionId, string cmdLine)
-        {           
+        {
             IntPtr processToken = IntPtr.Zero;
-            IntPtr duplicateToken = IntPtr.Zero;            
+            IntPtr duplicateToken = IntPtr.Zero;
 
             try
             {
@@ -1195,13 +1195,13 @@ namespace Abstractions.WindowsApi
             finally
             {
                 SafeNativeMethods.CloseHandle(processToken);
-                SafeNativeMethods.CloseHandle(duplicateToken);                
-            }            
+                SafeNativeMethods.CloseHandle(duplicateToken);
+            }
         }
 
         public static System.Diagnostics.Process StartUserProcessInSession(int sessionId, string cmdLine)
         {
-            IntPtr processToken = IntPtr.Zero;            
+            IntPtr processToken = IntPtr.Zero;
 
             try
             {
@@ -1214,7 +1214,7 @@ namespace Abstractions.WindowsApi
             }
             finally
             {
-                SafeNativeMethods.CloseHandle(processToken);                
+                SafeNativeMethods.CloseHandle(processToken);
             }
         }
 
@@ -1267,15 +1267,15 @@ namespace Abstractions.WindowsApi
             SafeNativeMethods.CREDUI_INFO uiInfo = new SafeNativeMethods.CREDUI_INFO();
             uiInfo.cbSize = Marshal.SizeOf(uiInfo);
             uiInfo.pszCaptionText = caption;
-            uiInfo.pszMessageText = message;            
-            
+            uiInfo.pszMessageText = message;
+
             uint authPackage = 0;
             IntPtr outCredBuffer = new IntPtr();
             uint outCredSize;
             bool save = false;
             int result = SafeNativeMethods.CredUIPromptForWindowsCredentials(ref uiInfo, 0, ref authPackage,
                                                            IntPtr.Zero, 0, out outCredBuffer, out outCredSize, ref save, 0);
-                                                            
+
 
             var usernameBuf = new StringBuilder(100);
             var passwordBuf = new StringBuilder(100);
@@ -1295,7 +1295,7 @@ namespace Abstractions.WindowsApi
                         UserName = usernameBuf.ToString(),
                         Password = passwordBuf.ToString(),
                         Domain = domainBuf.ToString()
-                    };                    
+                    };
                 }
             }
 
@@ -1325,7 +1325,7 @@ namespace Abstractions.WindowsApi
         }
 
         /// <summary>
-        /// Attempts to validate the user's credentials for a local account using 
+        /// Attempts to validate the user's credentials for a local account using
         /// a pInvoke to LogonUser.
         /// </summary>
         /// <param name="username">The username</param>
@@ -1337,7 +1337,7 @@ namespace Abstractions.WindowsApi
         }
 
         /// <summary>
-        /// Attempts to validate the user's credentials using 
+        /// Attempts to validate the user's credentials using
         /// a pInvoke to LogonUser.
         /// </summary>
         /// <param name="username">The username</param>
@@ -1380,10 +1380,11 @@ namespace Abstractions.WindowsApi
         }
 
         /// <summary>
-        /// return username based on context a programs runs in a session
+        /// return username based on context in which a program is running.
         /// a program running as administrator will add administrator to the list
+        /// session ID -1 retuns all sessions instead of a specific one
         /// </summary>
-        /// <param name="sessionID"></param>
+        /// <param name="sessionID">the seesion ID or -1 for all sessions</param>
         /// <returns>is a lower username like administrator</returns>
         public static List<string> GetSessionContext(int sessionID)
         {
@@ -1393,7 +1394,7 @@ namespace Abstractions.WindowsApi
             {
                 try { var test = process.Handle; }
                 catch { continue; }
-                if (process.SessionId == sessionID)
+                if (process.SessionId == sessionID || sessionID == -1)
                 {
                     //Console.WriteLine("process:{0}", process.ProcessName);
                     IntPtr tokenHandle;
@@ -1451,7 +1452,7 @@ namespace Abstractions.WindowsApi
                                 }
                                 if (WinAPI)
                                 {
-                                    LibraryLogging.Info("Found process:{0} in session:{1} account:{2}", process.ProcessName, sessionID, name.ToString());
+                                    LibraryLogging.Info("Found process:{0} in session:{1} account:{2}", process.ProcessName, process.SessionId, name.ToString());
                                     if (!ret.Contains(name.ToString()))
                                     {
                                         ret.Add(name.ToString());
@@ -1640,7 +1641,7 @@ namespace Abstractions.WindowsApi
             {
                 return true;
             }
-            
+
             return false;
         }
 
