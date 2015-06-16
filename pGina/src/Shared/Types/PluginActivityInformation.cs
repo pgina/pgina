@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -30,78 +30,172 @@ using System.Linq;
 using System.Text;
 
 namespace pGina.Shared.Types
-{    
+{
     public class PluginActivityInformation
-    {        
+    {
         private Dictionary<Guid, BooleanResult> m_authentication = new Dictionary<Guid, BooleanResult>();
         private Dictionary<Guid, BooleanResult> m_authorization = new Dictionary<Guid, BooleanResult>();
         private Dictionary<Guid, BooleanResult> m_gateway = new Dictionary<Guid, BooleanResult>();
+        private Dictionary<Guid, BooleanResult> m_notification = new Dictionary<Guid, BooleanResult>();
 
         public List<Interfaces.IPluginAuthentication> LoadedAuthenticationPlugins { get; set; }
         public List<Interfaces.IPluginAuthenticationGateway> LoadedAuthenticationGatewayPlugins { get; set; }
-        public List<Interfaces.IPluginAuthorization> LoadedAuthorizationPlugins { get; set; }        
+        public List<Interfaces.IPluginAuthorization> LoadedAuthorizationPlugins { get; set; }
+        public List<Interfaces.IPluginEventNotifications> LoadedNotificationPlugins { get; set; }
 
         public void AddAuthenticateResult(Guid pluginId, BooleanResult result)
         {
-            if(m_authentication.ContainsKey(pluginId))
-                m_authentication[pluginId] = result;
-            else
-                m_authentication.Add(pluginId, result);
+            lock (m_authentication)
+            {
+                if (m_authentication.ContainsKey(pluginId))
+                    m_authentication[pluginId] = result;
+                else
+                    m_authentication.Add(pluginId, result);
+            }
         }
 
         public void AddAuthorizationResult(Guid pluginId, BooleanResult result)
         {
-            if(m_authorization.ContainsKey(pluginId))
-                m_authorization[pluginId] = result;
-            else
-                m_authorization.Add(pluginId, result);
+            lock (m_authorization)
+            {
+                if (m_authorization.ContainsKey(pluginId))
+                    m_authorization[pluginId] = result;
+                else
+                    m_authorization.Add(pluginId, result);
+            }
         }
 
         public void AddGatewayResult(Guid pluginId, BooleanResult result)
         {
-            if (m_gateway.ContainsKey(pluginId))
-                m_gateway[pluginId] = result;
-            else
-                m_gateway.Add(pluginId, result);
+            lock (m_gateway)
+            {
+                if (m_gateway.ContainsKey(pluginId))
+                    m_gateway[pluginId] = result;
+                else
+                    m_gateway.Add(pluginId, result);
+            }
         }
 
+        public void AddNotificationResult(Guid pluginId, BooleanResult result)
+        {
+            lock (m_notification)
+            {
+                if (m_notification.ContainsKey(pluginId))
+                    m_notification[pluginId] = result;
+                else
+                    m_notification.Add(pluginId, result);
+            }
+        }
 
         public BooleanResult GetAuthenticationResult(Guid pluginGuid)
         {
-            return m_authentication[pluginGuid];
+            lock (m_authentication)
+            {
+                return m_authentication[pluginGuid];
+            }
         }
 
         public BooleanResult GetAuthorizationResult(Guid pluginGuid)
         {
-            return m_authorization[pluginGuid];
+            lock (m_authorization)
+            {
+                return m_authorization[pluginGuid];
+            }
         }
 
         public BooleanResult GetGatewayResult(Guid pluginGuid)
         {
-            return m_gateway[pluginGuid];
+            lock (m_authentication)
+            {
+                return m_gateway[pluginGuid];
+            }
+        }
+
+        public BooleanResult GetNotificationResult(Guid pluginGuid)
+        {
+            lock (m_notification)
+            {
+                return m_notification[pluginGuid];
+            }
         }
 
         public IEnumerable<Guid> GetAuthenticationPlugins()
         {
-            foreach (KeyValuePair<Guid, BooleanResult> kv in m_authentication)
+            lock (m_authentication)
             {
-                yield return kv.Key;
+                foreach (KeyValuePair<Guid, BooleanResult> kv in m_authentication)
+                {
+                    yield return kv.Key;
+                }
             }
         }
 
         public IEnumerable<Guid> GetAuthorizationPlugins()
         {
-            foreach (KeyValuePair<Guid, BooleanResult> kv in m_authorization)
+            lock (m_authorization)
             {
-                yield return kv.Key;
+                foreach (KeyValuePair<Guid, BooleanResult> kv in m_authorization)
+                {
+                    yield return kv.Key;
+                }
             }
         }
 
         public IEnumerable<Guid> GetGatewayPlugins()
         {
-            foreach (KeyValuePair<Guid, BooleanResult> kv in m_gateway)
+            lock (m_gateway)
             {
-                yield return kv.Key;
+                foreach (KeyValuePair<Guid, BooleanResult> kv in m_gateway)
+                {
+                    yield return kv.Key;
+                }
+            }
+        }
+
+        public IEnumerable<Guid> GetNotificationPlugins()
+        {
+            lock (m_notification)
+            {
+                foreach (KeyValuePair<Guid, BooleanResult> kv in m_notification)
+                {
+                    yield return kv.Key;
+                }
+            }
+        }
+
+        public void DelAuthenticateResult(Guid pluginId)
+        {
+            lock (m_authentication)
+            {
+                if (m_authentication.ContainsKey(pluginId))
+                    m_authentication.Remove(pluginId);
+            }
+        }
+
+        public void DelAuthorizationResult(Guid pluginId)
+        {
+            lock (m_authorization)
+            {
+                if (m_authorization.ContainsKey(pluginId))
+                    m_authorization.Remove(pluginId);
+            }
+        }
+
+        public void DelGatewayResult(Guid pluginId)
+        {
+            lock (m_gateway)
+            {
+                if (m_gateway.ContainsKey(pluginId))
+                    m_gateway.Remove(pluginId);
+            }
+        }
+
+        public void DelNotificationResult(Guid pluginId)
+        {
+            lock (m_notification)
+            {
+                if (m_notification.ContainsKey(pluginId))
+                    m_notification.Remove(pluginId);
             }
         }
     }
