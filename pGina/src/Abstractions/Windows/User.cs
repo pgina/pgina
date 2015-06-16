@@ -44,8 +44,10 @@ namespace Abstractions.Windows
         /// </summary>
         /// <param name="sid"></param>
         /// <returns></returns>
-        public static string GetProfileDir(SecurityIdentifier sid)
+        public static List<string> GetProfileDir(SecurityIdentifier sid)
         {
+            List<string> ret = new List<string>();
+
             //"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\S-1-5-21-534125731-1308685933-1530606844-1000}"
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(ROOT_PROFILE_KEY))
             {
@@ -53,22 +55,23 @@ namespace Abstractions.Windows
                 {
                     foreach (string keyName in key.GetSubKeyNames())
                     {
-                        if (keyName == sid.ToString())
+                        if (keyName.Contains(sid.ToString())) //get the %SID% and %SID%.bak key
                         {
                             using(RegistryKey subKey = Registry.LocalMachine.OpenSubKey(string.Format("{0}\\{1}", ROOT_PROFILE_KEY, keyName)))
                             {
-                                return (string) subKey.GetValue("ProfileImagePath", null, RegistryValueOptions.None);
+                                LibraryLogging.Info("ProfileList key found {0}", keyName);
+                                ret.Add(subKey.GetValue("ProfileImagePath", "", RegistryValueOptions.None).ToString());
                             }
                         }
                     }
-
-                    throw new KeyNotFoundException(string.Format("Unable to find value for: {0}", sid));
                 }
                 else
                 {
                     throw new KeyNotFoundException(string.Format("Unable to open registry key"));
                 }
             }
+
+            return ret;
         }
 
         /// <summary>
