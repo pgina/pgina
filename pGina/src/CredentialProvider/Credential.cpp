@@ -460,6 +460,7 @@ namespace pGina
 					if(hdialog != NULL)
 					{
 						DestroyWindow(hdialog);
+						MessageBox(::GetForegroundWindow(), loginResult.Message().c_str(), L"Error during login", MB_OK);
 					}
 					else
 					{
