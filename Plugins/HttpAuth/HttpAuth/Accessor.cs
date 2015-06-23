@@ -62,6 +62,10 @@ namespace pGina.Plugin.HttpAuth
                 s_logger.InfoFormat("Response: {0}", response);
 
                 // save it for later use
+                if(resps.ContainsKey(uname))
+                {
+                    resps.Remove(uname);
+                }
                 resps.Add(uname, UInfo.parseResponse(response));
 
                 // Successful authentication
@@ -73,12 +77,24 @@ namespace pGina.Plugin.HttpAuth
 
                 // Authentication failure
                 HttpWebResponse res = (HttpWebResponse)we.Response;
-                var resReader = new StreamReader(res.GetResponseStream());
-                var m = resReader.ReadLine();
+                string m;
 
-                if (m.Length == 0)
+                if (res != null)
                 {
-                    m = res.StatusCode + ": " + res.StatusDescription;
+                    var resReader = new StreamReader(res.GetResponseStream());
+                    var responseBody = resReader.ReadLine();
+                    if (responseBody.Length > 0)
+                    {
+                        m = responseBody;
+                    }
+                    else
+                    {
+                        m = res.StatusCode + ": " + res.StatusDescription;
+                    }
+                }
+                else
+                {
+                    m = we.ToString();
                 }
 
                 return new BooleanResult() { Success = false, Message = m };
