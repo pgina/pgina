@@ -5,6 +5,9 @@ Response (HR) to such request is either:
 -  200 OK and contains all info about given user. For details see UInfo.cs
 -  400 <Error message>
 
+If response contains groups that exists locally (e.g. 'administrators'),
+logged user will be added to that groups.
+
 ## implementation details
 
 The HR is cached in auth stage for processing within following stages.
