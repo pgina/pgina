@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using log4net;
 
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
+using System.DirectoryServices.AccountManagement;
 
 namespace pGina.Plugin.HttpAuth
 {
@@ -63,11 +61,17 @@ namespace pGina.Plugin.HttpAuth
                 return new BooleanResult() { Success = false, Message = e.Message };
             }
 
+            PrincipalContext ctx = new PrincipalContext(ContextType.Machine);
+            GroupPrincipal grp;
 
             //  like group m-ship ...
             foreach (string g in uinfo.groups)
             {
-                userInfo.Groups.Add(new GroupInformation { Name = g });
+                grp = GroupPrincipal.FindByIdentity(ctx, IdentityType.Name, g);
+                if (grp != null)
+                {
+                    userInfo.Groups.Add(new GroupInformation { Name = g, SID = grp.Sid });
+                }
             }
 
             // and what else ??? :)
