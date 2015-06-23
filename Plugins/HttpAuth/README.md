@@ -8,6 +8,18 @@ Response (HR) to such request is either:
 If response contains groups that exists locally (e.g. 'administrators'),
 logged user will be added to that groups.
 
+Example of successful login response body:
+```
+
+gandalf
+Gandalg The Gray
+g@ndalf.shire
+administrators;lecturers;wizards
+```
+Will login gandalf that will then be among local admins
+(and lecturers and wizards if they exists as local groups).
+
+
 ## implementation details
 
 The HR is cached in auth stage for processing within following stages.
