@@ -669,6 +669,49 @@ namespace pGina.Service.Impl
                 m_logger.InfoFormat("info: username:{0} credui:{1} description:{2} session:{3}", s.GetTrackedSingle<UserInformation>().Username, s.CREDUI, s.GetTrackedSingle<UserInformation>().Description, session);
             }
             //catch runas.exe credui processes
+            foreach (KeyValuePair<int, List<string>> context in othersessioncontext)
+            {
+                // all usersNames from processes in session bla.Key format: sessionID\username
+                m_logger.InfoFormat("othersessioncontext: {0}", String.Join(" ", context.Value.Select(s => String.Format("{0}\\{1}", context.Key, s))));
+
+                List<SessionProperties> othersessionList = m_sessionPropertyCache.Get(context.Key); //sessionlist of SessionProperties
+                foreach (string user in context.Value)
+                {
+                    if (!othersessionList.Any(s => s.GetTrackedSingle<UserInformation>().Username.Equals(user, StringComparison.CurrentCultureIgnoreCase)))
+                    {
+                        //user is not part of othersessionList
+                        bool cancopy = false;
+                        foreach (int Session in SessionsList)
+                        {
+                            if (context.Key != Session && !cancopy) //if not bla.key session
+                            {
+                                foreach (SessionProperties sesprop in m_sessionPropertyCache.Get(Session))
+                                {
+                                    UserInformation sespropUInfo = sesprop.GetTrackedSingle<UserInformation>();
+                                    if (sespropUInfo.Username.Equals(user, StringComparison.CurrentCultureIgnoreCase))
+                                    {
+                                        // SessionProperties found
+                                        SessionProperties osesprop = new SessionProperties(Guid.NewGuid(), true);
+                                        PluginActivityInformation pluginInfo = new PluginActivityInformation();
+                                        osesprop.AddTrackedSingle<UserInformation>(sespropUInfo);
+                                        osesprop.AddTrackedSingle<PluginActivityInformation>(pluginInfo);
+                                        othersessionList.Add(osesprop);
+                                        m_logger.InfoFormat("add user:{0} into SessionProperties of session:{1} with GUID:{2} and set CREDUI to:{3}", sespropUInfo.Username, context.Key, osesprop.Id, osesprop.CREDUI);
+                                        cancopy = true;
+                                        m_sessionPropertyCache.Add(context.Key, othersessionList);// refresh the cache
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (!cancopy)
+                        {
+                            m_logger.InfoFormat("unamble to track program running under user:{0} in session:{1}", user, context.Key);
+                        }
+                    }
+                }
+            }
+            /*
             for (int y = 0; y < mysessionList.Count; y++)
             {
                 UserInformation allmyuInfo = mysessionList[y].GetTrackedSingle<UserInformation>();
@@ -710,6 +753,7 @@ namespace pGina.Service.Impl
                     }
                 }
             }
+            */
 
 
 
