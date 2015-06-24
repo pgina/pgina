@@ -1390,80 +1390,141 @@ namespace Abstractions.WindowsApi
         {
             List<string> ret = new List<string>();
 
+            Dictionary<int, List<string>> contextALL = GetSessionContext();
+            foreach (KeyValuePair<int, List<string>> pair in contextALL)
+            {
+                if (pair.Key == sessionID || sessionID == -1)
+                {
+                    foreach (string user in pair.Value)
+                    {
+                        if (!ret.Any(s => s.Equals(user, StringComparison.CurrentCultureIgnoreCase)))
+                        {
+                            ret.Add(user);
+                        }
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// return username based on context in which a program is running.
+        /// a program running as administrator will add administrator to the list
+        /// session ID -1 retuns all sessions instead of a specific one
+        /// </summary>
+        /// <param name="sessionID">the seesion ID or -1 for all sessions</param>
+        /// <param name="contextALL">a GetSessionContext() Directory</param>
+        /// <returns>is a lower username like administrator</returns>
+        public static List<string> GetSessionContextParser(int sessionID, Dictionary<int, List<string>> contextALL)
+        {
+            List<string> ret = new List<string>();
+
+            foreach (KeyValuePair<int, List<string>> pair in contextALL)
+            {
+                if (pair.Key == sessionID || sessionID == -1)
+                {
+                    foreach (string user in pair.Value)
+                    {
+                        if (!ret.Any(s => s.Equals(user, StringComparison.CurrentCultureIgnoreCase)))
+                        {
+                            ret.Add(user);
+                        }
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// returns a Dictionary of SessionID Keys and a List of usernames based on context in which a program is running.
+        /// a program running as administrator will add administrator to the list
+        /// </summary>
+        /// <returns>is a lower username like administrator</returns>
+        public static Dictionary<int, List<string>> GetSessionContext()
+        {
+            Dictionary<int, List<string>> ret = new Dictionary<int, List<string>>();
+
             foreach (Process process in Process.GetProcesses())
             {
                 try { var test = process.Handle; }
                 catch { continue; }
-                if (process.SessionId == sessionID || sessionID == -1)
-                {
-                    //Console.WriteLine("process:{0}", process.ProcessName);
-                    IntPtr tokenHandle;
-                    // Get the Process Token
-                    if (!SafeNativeMethods.OpenProcessToken(process.Handle, SafeNativeMethods.TokenAccessRights.TOKEN_READ, out tokenHandle))
-                    {
-                        LibraryLogging.Error("OpenProcessToken error:{0}", LastError());
-                        return ret;
-                    }
 
-                    int TokenInfLength = 0;
-                    if (!SafeNativeMethods.GetTokenInformation(tokenHandle, SafeNativeMethods.TOKEN_INFORMATION_CLASS.TokenUser, IntPtr.Zero, TokenInfLength, out TokenInfLength))
+                //Console.WriteLine("process:{0}", process.ProcessName);
+                IntPtr tokenHandle;
+                // Get the Process Token
+                if (!SafeNativeMethods.OpenProcessToken(process.Handle, SafeNativeMethods.TokenAccessRights.TOKEN_READ, out tokenHandle))
+                {
+                    LibraryLogging.Error("OpenProcessToken error:{0}", LastError());
+                    return ret;
+                }
+
+                int TokenInfLength = 0;
+                if (!SafeNativeMethods.GetTokenInformation(tokenHandle, SafeNativeMethods.TOKEN_INFORMATION_CLASS.TokenUser, IntPtr.Zero, TokenInfLength, out TokenInfLength))
+                {
+                    int error = Marshal.GetLastWin32Error();
+                    if (error != 122 /*ERROR_INSUFFICIENT_BUFFER*/)
                     {
-                        int error = Marshal.GetLastWin32Error();
-                        if (error != 122 /*ERROR_INSUFFICIENT_BUFFER*/)
+                        LibraryLogging.Error("GetTokenInformation error:{0} {1}", error, LastError());
+                    }
+                    else
+                    {
+                        IntPtr TokenInformation = Marshal.AllocHGlobal(TokenInfLength);
+                        if (!SafeNativeMethods.GetTokenInformation(tokenHandle, SafeNativeMethods.TOKEN_INFORMATION_CLASS.TokenUser, TokenInformation, TokenInfLength, out TokenInfLength))
                         {
-                            LibraryLogging.Error("GetTokenInformation error:{0} {1}", error, LastError());
+                            LibraryLogging.Error("GetTokenInformation error:{0}", LastError());
                         }
                         else
                         {
-                            IntPtr TokenInformation = Marshal.AllocHGlobal(TokenInfLength);
-                            if (!SafeNativeMethods.GetTokenInformation(tokenHandle, SafeNativeMethods.TOKEN_INFORMATION_CLASS.TokenUser, TokenInformation, TokenInfLength, out TokenInfLength))
+                            SafeNativeMethods.TOKEN_USER TokenUser = (SafeNativeMethods.TOKEN_USER)Marshal.PtrToStructure(TokenInformation, typeof(SafeNativeMethods.TOKEN_USER));
+
+                            StringBuilder name = new StringBuilder();
+                            uint cchName = (uint)name.Capacity;
+                            StringBuilder referencedDomainName = new StringBuilder();
+                            uint cchReferencedDomainName = (uint)referencedDomainName.Capacity;
+                            SafeNativeMethods.SID_NAME_USE sidUse;
+
+
+                            bool WinAPI = SafeNativeMethods.LookupAccountSid(null, TokenUser.User.Sid, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse);
+                            if (!WinAPI)
                             {
-                                LibraryLogging.Error("GetTokenInformation error:{0}", LastError());
-                            }
-                            else
-                            {
-                                SafeNativeMethods.TOKEN_USER TokenUser = (SafeNativeMethods.TOKEN_USER)Marshal.PtrToStructure(TokenInformation, typeof(SafeNativeMethods.TOKEN_USER));
-
-                                StringBuilder name = new StringBuilder();
-                                uint cchName = (uint)name.Capacity;
-                                StringBuilder referencedDomainName = new StringBuilder();
-                                uint cchReferencedDomainName = (uint)referencedDomainName.Capacity;
-                                SafeNativeMethods.SID_NAME_USE sidUse;
-
-
-                                bool WinAPI = SafeNativeMethods.LookupAccountSid(null, TokenUser.User.Sid, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse);
-                                if (!WinAPI)
+                                error = Marshal.GetLastWin32Error();
+                                if (error == 122 /*ERROR_INSUFFICIENT_BUFFER*/)
                                 {
-                                    error = Marshal.GetLastWin32Error();
-                                    if (error == 122 /*ERROR_INSUFFICIENT_BUFFER*/)
-                                    {
-                                        name.EnsureCapacity((int)cchName);
-                                        referencedDomainName.EnsureCapacity((int)cchReferencedDomainName);
-                                        WinAPI = SafeNativeMethods.LookupAccountSid(null, TokenUser.User.Sid, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse);
-                                        if (!WinAPI)
-                                        {
-                                            LibraryLogging.Error("LookupAccountSid error:{0}", LastError());
-                                        }
-                                    }
-                                    else
+                                    name.EnsureCapacity((int)cchName);
+                                    referencedDomainName.EnsureCapacity((int)cchReferencedDomainName);
+                                    WinAPI = SafeNativeMethods.LookupAccountSid(null, TokenUser.User.Sid, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse);
+                                    if (!WinAPI)
                                     {
                                         LibraryLogging.Error("LookupAccountSid error:{0}", LastError());
                                     }
                                 }
-                                if (WinAPI)
+                                else
                                 {
-                                    LibraryLogging.Info("Found process:{0} in session:{1} account:{2}", process.ProcessName, process.SessionId, name.ToString());
-                                    if (!ret.Contains(name.ToString()))
+                                    LibraryLogging.Error("LookupAccountSid error:{0}", LastError());
+                                }
+                            }
+                            if (WinAPI)
+                            {
+                                LibraryLogging.Info("Found process:{0} in session:{1} account:{2}", process.ProcessName, process.SessionId, name.ToString());
+                                if (!ret.ContainsKey(process.SessionId))
+                                {
+                                    ret.Add(process.SessionId, new List<string>() { name.ToString() });
+                                }
+                                else
+                                {
+                                    if (!ret[process.SessionId].Contains(name.ToString()))
                                     {
-                                        ret.Add(name.ToString());
+                                        ret[process.SessionId].Add(name.ToString());
                                     }
                                 }
                             }
-                            Marshal.FreeHGlobal(TokenInformation);
                         }
+                        Marshal.FreeHGlobal(TokenInformation);
                     }
-                    SafeNativeMethods.CloseHandle(tokenHandle);
                 }
+                SafeNativeMethods.CloseHandle(tokenHandle);
             }
 
             return ret;
