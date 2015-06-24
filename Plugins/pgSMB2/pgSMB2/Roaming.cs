@@ -403,6 +403,7 @@ namespace pGina.Plugin.pgSMB2
                     if (ntpTime != DateTime.MinValue)
                     {
                         File.SetLastWriteTimeUtc(remoteFile, ntpTime);
+                        File.SetLastWriteTimeUtc(uPath + "\\NTUSER.DAT", ntpTime);
                     }
                     // cleanup local user
                     m_logger.DebugFormat("File.Delete {0}", ThereIsTheProfile);
