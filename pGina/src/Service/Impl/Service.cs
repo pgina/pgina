@@ -279,13 +279,17 @@ namespace pGina.Service.Impl
 
         private LoginResponseMessage HandleLoginRequest(LoginRequestMessage msg)
         {
-            if (String.IsNullOrEmpty(msg.Username))
-                return new LoginResponseMessage() { Result = false, Message = "No Username supplied" };
             try
             {
                 PluginDriver sessionDriver = new PluginDriver();
-                sessionDriver.UserInformation.Username = msg.Username.Trim();
-                sessionDriver.UserInformation.Password = msg.Password;
+                sessionDriver.UserInformation.Username = (String.IsNullOrEmpty(msg.Username))? "" : msg.Username.Trim().Split('\\').DefaultIfEmpty("").LastOrDefault();
+                sessionDriver.UserInformation.Password = (String.IsNullOrEmpty(msg.Password)) ? "" : msg.Password;
+                sessionDriver.UserInformation.Domain = (String.IsNullOrEmpty(msg.Username))? "" : (msg.Username.Trim().Contains('\\')) ? msg.Username.Trim().Split('\\').DefaultIfEmpty("").FirstOrDefault() : "";
+
+                if (String.IsNullOrEmpty(sessionDriver.UserInformation.Username))
+                {
+                    return new LoginResponseMessage() { Result = false, Message = String.Format("No Username supplied\n\n'{0}' was entered and parsed to '{1}'", msg.Username, sessionDriver.UserInformation.Username) };
+                }
 
                 // check if a plugin still does some logoff work for this user
                 Boolean thisUserLogoff = false;
@@ -305,23 +309,64 @@ namespace pGina.Service.Impl
 
                     Boolean isLoggedIN = false;
                     Boolean isUACLoggedIN = false;
-                    List<string> Users = Abstractions.WindowsApi.pInvokes.GetSessionContext(-1);
+                    Dictionary<int, List<string>> contextALL = Abstractions.WindowsApi.pInvokes.GetSessionContext();
+                    List<string> Users = Abstractions.WindowsApi.pInvokes.GetSessionContextParser(-1, contextALL);
                     List<string> iUsers = Abstractions.WindowsApi.pInvokes.GetInteractiveUserList();
                     foreach (string user in Users)
                     {
                         m_logger.DebugFormat("Program running as user:{0}", user);
-                        if (user.EndsWith(sessionDriver.UserInformation.Username, StringComparison.CurrentCultureIgnoreCase))
+                        if (user.Equals(sessionDriver.UserInformation.Username, StringComparison.CurrentCultureIgnoreCase))
                         {
                             //the user is still logged in
                             isLoggedIN = true;
-                            if (iUsers.Any(s => s.ToLower().Contains(sessionDriver.UserInformation.Username.ToLower())))
+                            if (iUsers.Any(s => s.EndsWith("\\" + sessionDriver.UserInformation.Username, StringComparison.CurrentCultureIgnoreCase)))
                             {
-                                m_logger.DebugFormat("User:{0} is Locked in Session:{1}", sessionDriver.UserInformation.Username, msg.Session);
+                                int Locked_sessionID = Convert.ToInt32(iUsers.Find(s => s.EndsWith("\\" + sessionDriver.UserInformation.Username, StringComparison.CurrentCultureIgnoreCase)).Split('\\').First());
+                                m_logger.DebugFormat("User:{0} is Locked in Session:{1}", sessionDriver.UserInformation.Username, Locked_sessionID);
+                                // verify that this unlock is present somewhere in m_sessionPropertyCache
+                                // if not, this login is not backed by m_sessionPropertyCache
+                                if (m_sessionPropertyCache.GetAll().Any(i => i == Locked_sessionID))
+                                {
+                                    UserInformation uInfo = m_sessionPropertyCache.Get(Locked_sessionID).First().GetTrackedSingle<UserInformation>();
+                                    if (!uInfo.Username.Equals(sessionDriver.UserInformation.Username, StringComparison.CurrentCultureIgnoreCase))
+                                    {
+                                        // that should never ever happen
+                                        m_logger.ErrorFormat("User {0} is Locked in Session {1} but the username doesn't match the session information pGina contains. '{0}' vs. '{2}'", sessionDriver.UserInformation.Username, Locked_sessionID, uInfo.Username);
+                                        return new LoginResponseMessage() { Result = false, Message = String.Format("User {0} is Locked in Session {1} but the username doesn't match the session information pGina contains\n\n'{0}' vs '{2}'", sessionDriver.UserInformation.Username, Locked_sessionID, uInfo.Username) };
+                                    }
+                                }
+                                else
+                                {
+                                    m_logger.ErrorFormat("User {0} is Locked in Session {1} but was not authenticated by pGina. Unable to find SessionProperty in m_sessionPropertyCache.Get({1})", sessionDriver.UserInformation.Username, Locked_sessionID);
+                                    return new LoginResponseMessage() { Result = false, Message = String.Format("User {0} is Locked in Session {1} but was not authenticated by pGina\n\nIt is possible that another Credential Provider was used\nor the pGina service has crashed.\n", sessionDriver.UserInformation.Username, Locked_sessionID) };
+                                }
                             }
                             else
                             {
-                                isUACLoggedIN = true;
-                                m_logger.DebugFormat("User:{0} is UACed in Session:?", sessionDriver.UserInformation.Username);
+                                // verify that this UACed login is present somewhere in m_sessionPropertyCache
+                                // if not, this login is not backed by m_sessionPropertyCache
+                                foreach (int session in m_sessionPropertyCache.GetAll())
+                                {
+                                    if (m_sessionPropertyCache.Get(session).Any(s => s.GetTrackedSingle<UserInformation>().Username.Equals(sessionDriver.UserInformation.Username, StringComparison.CurrentCultureIgnoreCase)))
+                                    {
+                                        m_logger.DebugFormat("User:{0} is pGina UACed in Session:{1}", sessionDriver.UserInformation.Username, session);
+                                        isUACLoggedIN = true;
+                                        break;
+                                    }
+                                }
+                                if (!isUACLoggedIN)
+                                {
+                                    List<string> runas_in_session = new List<string>();
+                                    foreach (KeyValuePair<int, List<string>> pair in contextALL)
+                                    {
+                                        if (pair.Value.Any(s => s.Equals(sessionDriver.UserInformation.Username, StringComparison.CurrentCultureIgnoreCase)))
+                                        {
+                                            runas_in_session.Add(iUsers.DefaultIfEmpty("").FirstOrDefault(s => s.StartsWith(pair.Key.ToString())));
+                                        }
+                                    }
+                                    m_logger.DebugFormat("There is a program running as {0} but it was'nt started with pGina. I can't log you in because this would conflict with the current running process. Session in which a process is running:{1}", sessionDriver.UserInformation.Username, String.Join(",", runas_in_session));
+                                    return new LoginResponseMessage() { Result = false, Message = String.Format("There is a program running as {0} but it was'nt started with pGina.\nI can't log you in because this would conflict with the current running process.\n\nSession in which a process is running:\n{1}", sessionDriver.UserInformation.Username, String.Join("\n", runas_in_session)) };
+                                }
                             }
                         }
                     }
