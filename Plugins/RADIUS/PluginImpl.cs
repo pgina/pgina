@@ -244,7 +244,7 @@ namespace pGina.Plugin.RADIUS
         }
 
         //Processes accounting on logon/logoff
-        public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, List<SessionProperties> properties)
+        public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, SessionProperties properties)
         {
             if (Reason != System.ServiceProcess.SessionChangeReason.SessionLogon
                 && Reason != System.ServiceProcess.SessionChangeReason.SessionLogoff)
@@ -267,7 +267,7 @@ namespace pGina.Plugin.RADIUS
 
             //Determine username (may change depending on value of UseModifiedName setting)
             string username = null;
-            UserInformation ui = properties.First().GetTrackedSingle<UserInformation>();
+            UserInformation ui = properties.GetTrackedSingle<UserInformation>();
 
             if (ui == null)
             {
@@ -289,7 +289,7 @@ namespace pGina.Plugin.RADIUS
                 lock (m_sessionManager)
                 {
                     //Check if session information is already available for this id
-                    if (!m_sessionManager.Keys.Contains(properties.First().Id))
+                    if (!m_sessionManager.Keys.Contains(properties.Id))
                     {
                         //No session info - must have authed with something other than RADIUS.
                         //m_logger.DebugFormat("RADIUS Accounting Logon: Unable to find session for {0} with GUID {1}", username, properties.Id);
@@ -300,8 +300,8 @@ namespace pGina.Plugin.RADIUS
                         }
 
                         RADIUSClient client = GetClient();
-                        session = new Session(properties.First().Id, username, client);
-                        m_sessionManager.Add(properties.First().Id, session);
+                        session = new Session(properties.Id, username, client);
+                        m_sessionManager.Add(properties.Id, session);
 
                         //Check forced interim-update setting
                         if ((bool)Settings.Store.SendInterimUpdates && (bool)Settings.Store.ForceInterimUpdates)
@@ -312,12 +312,12 @@ namespace pGina.Plugin.RADIUS
                     }
 
                     else
-                        session = m_sessionManager[properties.First().Id];
+                        session = m_sessionManager[properties.Id];
                 }
 
 
                 //Determine which plugin authenticated the user (if any)
-                PluginActivityInformation pai = properties.First().GetTrackedSingle<PluginActivityInformation>();
+                PluginActivityInformation pai = properties.GetTrackedSingle<PluginActivityInformation>();
                 Packet.Acct_Authentic authSource = Packet.Acct_Authentic.Not_Specified;
                 IEnumerable<Guid> authPlugins = pai.GetAuthenticationPlugins();
                 Guid LocalMachinePluginGuid = new Guid("{12FA152D-A2E3-4C8D-9535-5DCD49DFCB6D}");
@@ -359,8 +359,8 @@ namespace pGina.Plugin.RADIUS
             {
                 lock (m_sessionManager)
                 {
-                    if (m_sessionManager.Keys.Contains(properties.First().Id))
-                        session = m_sessionManager[properties.First().Id];
+                    if (m_sessionManager.Keys.Contains(properties.Id))
+                        session = m_sessionManager[properties.Id];
                     else
                     {
                         //m_logger.DebugFormat("Users {0} is logging off, but no RADIUS session information is available for session ID {1}.", username, properties.Id);
@@ -368,7 +368,7 @@ namespace pGina.Plugin.RADIUS
                     }
 
                     //Remove the session from the session manager
-                    m_sessionManager.Remove(properties.First().Id);
+                    m_sessionManager.Remove(properties.Id);
                 }
 
                 lock (session)
