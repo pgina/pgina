@@ -1011,8 +1011,7 @@ namespace Abstractions.WindowsApi
             }
             catch
             {
-                int lastError = Marshal.GetLastWin32Error();
-                throw new Win32Exception(lastError, "WTSGetActiveConsoleSessionId");
+                LibraryLogging.Error("GetSessionId() WTSGetActiveConsoleSessionId Error:{0}", LastError());
             }
             return ret;
         }
@@ -1037,7 +1036,6 @@ namespace Abstractions.WindowsApi
             IntPtr sessionInfoList = IntPtr.Zero;
             int sessionCount = 0;
             int retVal = SafeNativeMethods.WTSEnumerateSessions(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, 0, 1, ref sessionInfoList, ref sessionCount);
-
             if(retVal != 0)
             {
                 int dataSize = Marshal.SizeOf(typeof(SafeNativeMethods.WTS_SESSION_INFO));
@@ -1045,8 +1043,7 @@ namespace Abstractions.WindowsApi
 
                 for(int x = 0; x < sessionCount; x++)
                 {
-                    SafeNativeMethods.WTS_SESSION_INFO sessionInfo =
-                        (SafeNativeMethods.WTS_SESSION_INFO)Marshal.PtrToStructure((IntPtr)currentSession, typeof(SafeNativeMethods.WTS_SESSION_INFO));
+                    SafeNativeMethods.WTS_SESSION_INFO sessionInfo = (SafeNativeMethods.WTS_SESSION_INFO)Marshal.PtrToStructure((IntPtr)currentSession, typeof(SafeNativeMethods.WTS_SESSION_INFO));
                     currentSession += dataSize;
 
                     uint bytes = 0;
@@ -1055,23 +1052,19 @@ namespace Abstractions.WindowsApi
                     bool sResult = SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionInfo.SessionID, SafeNativeMethods.WTS_INFO_CLASS.WTSUserName, out userInfo, out bytes);
                     if (!sResult)
                     {
-                        int Win32ErrorResult = Marshal.GetLastWin32Error();
-                        SafeNativeMethods.WTSFreeMemory(sessionInfoList);
-                        throw new Win32Exception(Win32ErrorResult, "WTSQuerySessionInformation");
+                        LibraryLogging.Error("GetInteractiveUserList() WTSQuerySessionInformation WTSUserName Error:{0}", LastError());
                     }
                     string user = Marshal.PtrToStringAnsi(userInfo);
                     SafeNativeMethods.WTSFreeMemory(userInfo);
-
+                    /*
                     sResult = SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionInfo.SessionID, SafeNativeMethods.WTS_INFO_CLASS.WTSDomainName, out domainInfo, out bytes);
                     if (!sResult)
                     {
-                        int Win32ErrorResult = Marshal.GetLastWin32Error();
-                        SafeNativeMethods.WTSFreeMemory(sessionInfoList);
-                        throw new Win32Exception(Win32ErrorResult, "WTSQuerySessionInformation");
+                        LibraryLogging.Error("GetInteractiveUserList() WTSQuerySessionInformation WTSDomainName Error:{0}", LastError());
                     }
-
                     string domain = Marshal.PtrToStringAnsi(domainInfo);
                     SafeNativeMethods.WTSFreeMemory(domainInfo);
+                    */
                     /*
                     if (!string.IsNullOrEmpty(domain))
                     {
@@ -1147,14 +1140,11 @@ namespace Abstractions.WindowsApi
         {
             uint bytes = 0;
             IntPtr userInfo = IntPtr.Zero;
-            bool result = SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE,
-                sessionId, SafeNativeMethods.WTS_INFO_CLASS.WTSUserName, out userInfo, out bytes);
+            bool result = SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionId, SafeNativeMethods.WTS_INFO_CLASS.WTSUserName, out userInfo, out bytes);
 
             if (!result)
             {
-                int Win32ErrorResult = Marshal.GetLastWin32Error();
-                SafeNativeMethods.WTSFreeMemory(userInfo);
-                throw new Win32Exception(Win32ErrorResult, "WTSQuerySessionInformation");
+                LibraryLogging.Error("GetUserName({1}) WTSQuerySessionInformation WTSUserName Error:{0}", LastError(), sessionId);
             }
 
             string userName = Marshal.PtrToStringAnsi(userInfo);
@@ -1178,17 +1168,22 @@ namespace Abstractions.WindowsApi
                 using (System.Diagnostics.Process me = System.Diagnostics.Process.GetCurrentProcess())
                 {
                     if (!SafeNativeMethods.OpenProcessToken(me.Handle, (uint)TokenAccessLevels.AllAccess, out processToken))
-                        throw new Win32Exception(Marshal.GetLastWin32Error(), "Unable to open process token");
+                    {
+                        LibraryLogging.Error("StartProcessInSession({1}, {2}) OpenProcessToken Error:{0}", LastError(), sessionId, cmdLine);
+                    }
                 }
 
                 // Duplicate it, so we can change it's session id
-                if (!SafeNativeMethods.DuplicateTokenEx(processToken, (uint)SafeNativeMethods.ACCESS_MASK.MAXIMUM_ALLOWED, IntPtr.Zero,
-                     SafeNativeMethods.SECURITY_IMPERSONATION_LEVEL.SecurityIdentification, SafeNativeMethods.TOKEN_TYPE.TokenPrimary, out duplicateToken))
-                    throw new Win32Exception(Marshal.GetLastWin32Error(), "DuplicateTokenEx");
+                if (!SafeNativeMethods.DuplicateTokenEx(processToken, (uint)SafeNativeMethods.ACCESS_MASK.MAXIMUM_ALLOWED, IntPtr.Zero, SafeNativeMethods.SECURITY_IMPERSONATION_LEVEL.SecurityIdentification, SafeNativeMethods.TOKEN_TYPE.TokenPrimary, out duplicateToken))
+                {
+                    LibraryLogging.Error("StartProcessInSession({1}, {2}) DuplicateTokenEx Error:{0}", LastError(), sessionId, cmdLine);
+                }
 
                 // Poke the session id we want into our new token
                 if (!SafeNativeMethods.SetTokenInformation(duplicateToken, SafeNativeMethods.TOKEN_INFORMATION_CLASS.TokenSessionId, ref sessionId, Marshal.SizeOf(sessionId)))
-                    throw new Win32Exception(Marshal.GetLastWin32Error(), "SetTokenInformation");
+                {
+                    LibraryLogging.Error("StartProcessInSession({1}, {2}) SetTokenInformation Error:{0}", LastError(), sessionId, cmdLine);
+                }
 
                 return StartProcessWithToken(duplicateToken, cmdLine);
             }
@@ -1208,7 +1203,9 @@ namespace Abstractions.WindowsApi
                 // Get user's token from session id, WTSQueryUserToken already returns a primary token for us
                 //  so all we then have to do is use it to start the process.
                 if (!SafeNativeMethods.WTSQueryUserToken(sessionId, out processToken))
-                    throw new Win32Exception(Marshal.GetLastWin32Error(), "WTSQueryUserToken");
+                {
+                    LibraryLogging.Error("StartUserProcessInSession({1}, {2}) WTSQueryUserToken Error:{0}", LastError(), sessionId, cmdLine);
+                }
 
                 return StartProcessWithToken(processToken, cmdLine);
             }
@@ -1232,7 +1229,9 @@ namespace Abstractions.WindowsApi
 
                 // Create an environment block
                 if (!SafeNativeMethods.CreateEnvironmentBlock(ref environmentBlock, token, false))
-                    throw new Win32Exception(Marshal.GetLastWin32Error(), "CreateEnvironmentBlock");
+                {
+                    LibraryLogging.Error("StartProcessWithToken(IntPtr, {1}) CreateEnvironmentBlock Error:{0}", LastError(), cmdLine);
+                }
 
                 // Now we can finally get into the business at hand and setup our process info
                 SafeNativeMethods.STARTUPINFO startInfo = new SafeNativeMethods.STARTUPINFO();
@@ -1241,12 +1240,9 @@ namespace Abstractions.WindowsApi
                 startInfo.lpDesktop = "Winsta0\\Default";   // TBD: Support other desktops?
 
                 SafeNativeMethods.PROCESS_INFORMATION procInfo = new SafeNativeMethods.PROCESS_INFORMATION();
-                if (!SafeNativeMethods.CreateProcessAsUser(token, null, cmdLine,
-                                    ref defSec, ref defSec, false, SafeNativeMethods.CREATE_UNICODE_ENVIRONMENT,
-                                    environmentBlock, null, ref startInfo, out procInfo))
+                if (!SafeNativeMethods.CreateProcessAsUser(token, null, cmdLine, ref defSec, ref defSec, false, SafeNativeMethods.CREATE_UNICODE_ENVIRONMENT, environmentBlock, null, ref startInfo, out procInfo))
                 {
-                    int lastError = Marshal.GetLastWin32Error();
-                    throw new Win32Exception(lastError, "CreateProcessAsUser");
+                    LibraryLogging.Error("StartProcessWithToken(IntPtr, {1}) CreateProcessAsUser Error:{0}", LastError(), cmdLine);
                 }
 
                 // We made it, process is running! Closing our handles to it ensures it doesn't orphan,
