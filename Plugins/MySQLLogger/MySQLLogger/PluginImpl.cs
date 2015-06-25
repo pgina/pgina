@@ -77,7 +77,7 @@ namespace pGina.Plugin.MySqlLogger
             dlg.ShowDialog();
         }
 
-        public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, List<SessionProperties> properties)
+        public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, SessionProperties properties)
         {
             if (properties == null)
                 return;
@@ -88,14 +88,14 @@ namespace pGina.Plugin.MySqlLogger
             if ((bool)Settings.Store.SessionMode)
             {
                 ILoggerMode mode = LoggerModeFactory.getLoggerMode(LoggerMode.SESSION);
-                mode.Log(SessionId, Reason, properties.First());
+                mode.Log(SessionId, Reason, properties);
             }
 
             //If EventMode is enabled, send event to it.
             if ((bool)Settings.Store.EventMode)
             {
                 ILoggerMode mode = LoggerModeFactory.getLoggerMode(LoggerMode.EVENT);
-                mode.Log(SessionId, Reason, properties.First());
+                mode.Log(SessionId, Reason, properties);
             }
 
             //Close the connection if it's still open
