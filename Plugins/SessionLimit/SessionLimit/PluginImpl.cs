@@ -40,7 +40,7 @@ using Abstractions.WindowsApi;
 
 namespace pGina.Plugin.SessionLimit
 {
-    public class PluginImpl : IPluginConfiguration, IPluginEventNotifications, IPluginLogoffRequestAddTime
+    public class PluginImpl : IPluginConfiguration, IPluginEventNotifications
     {
         private ILog m_logger = LogManager.GetLogger("SessionLimitPlugin");
 
@@ -150,7 +150,7 @@ namespace pGina.Plugin.SessionLimit
             m_cache = null;
         }
 
-        public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, List<SessionProperties> properties)
+        public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, SessionProperties properties)
         {
             // Only applies to pGina sessions!
             if (properties != null)
