@@ -82,7 +82,10 @@ namespace Abstractions.Helpers
 
         public virtual ValueType Get(KeyType key)
         {
-            return m_cache[key].Value;
+            if (Exists(key))
+                return m_cache[key].Value;
+
+            return (ValueType)Activator.CreateInstance(typeof(ValueType));
         }
         
         public virtual void Remove(KeyType key)
