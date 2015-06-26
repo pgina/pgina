@@ -1,4 +1,4 @@
-#define MyAppName "pGina"
+#define MyAppName "pGina.fork"
 #define MyAppVersion "3.2.4.1"
 #define MyAppPublisher "pGina Team"
 #define MyAppURL "http://www.pgina.org/"
@@ -23,7 +23,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppID={{3D8D0F0D-7DBF-400C-9C44-00BD21986138}
+AppID={{3D8D0F0D-7DBF-400C-9C44-00BD21986139}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} v{#MyAppVersion}
