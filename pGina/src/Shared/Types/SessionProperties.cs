@@ -85,14 +85,18 @@ namespace pGina.Shared.Types
             }
         }
 
-        public T GetTracked<T>(string name)
+        internal T GetTracked<T>(string name)
         {
             return (T)GetTrackedObject(name);
         }
 
         public T GetTrackedSingle<T>()
         {
-            return GetTracked<T>(typeof(T).ToString());
+            object ret = GetTracked<T>(typeof(T).ToString());
+            if (ret == null)
+                return (T)Activator.CreateInstance(typeof(T));
+
+            return (T)ret;
         }
 
         public object GetTrackedObject(string name)
@@ -100,7 +104,7 @@ namespace pGina.Shared.Types
             lock(this)
             {
                 if(!m_sessionDictionary.ContainsKey(name))
-                    throw new KeyNotFoundException(string.Format("No tracked variable {0} in session {1}", name, m_sessionId));
+                    return null;
 
                 return m_sessionDictionary[name];
             }
