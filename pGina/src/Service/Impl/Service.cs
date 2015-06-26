@@ -648,6 +648,11 @@ namespace pGina.Service.Impl
         {
             m_logger.InfoFormat("CREDUIhelper:({0})", session);
             List<SessionProperties> mysessionList = m_sessionPropertyCache.Get(session); //list of all users in my session
+            if (mysessionList.Count == 0)
+            {
+                m_logger.InfoFormat("User:? in session:{0} is unknown to pGina", session);
+                return;
+            }
             UserInformation userInfo = m_sessionPropertyCache.Get(session).First().GetTrackedSingle<UserInformation>(); //this user is logging of right now (my user)
             List<int> SessionsList = m_sessionPropertyCache.GetAll(); //all pgina watched sessions
             Dictionary<int,List<string>> othersessioncontext = new Dictionary<int,List<string>>(); //all exept my sessions, a list of usernames in which a process is running
