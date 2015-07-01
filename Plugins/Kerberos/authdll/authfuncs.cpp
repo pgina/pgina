@@ -54,9 +54,6 @@ extern "C"{
 		CtxtHandle clientContext = {};
 		unsigned long clientContextAttr = 0;
 
-		CtxtHandle serverContext = {};
-		unsigned long serverContextAttr = 0;
-
 		/////////////////////////////
 		// Clear the client buffer //
 		/////////////////////////////
