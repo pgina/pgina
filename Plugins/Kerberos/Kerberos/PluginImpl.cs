@@ -79,17 +79,15 @@ namespace pGina.Plugin.Kerberos
         {
             pGina.Shared.Types.UserInformation userInfo = properties.GetTrackedSingle<pGina.Shared.Types.UserInformation>();
 
-            //m_logger.InfoFormat("Domain before: {0} in {1}", userInfo.Domain, userInfo.Groups);
-            userInfo.Domain = Settings.Store.Realm;
-            m_logger.InfoFormat("Domain after: {0} in {1}", userInfo.Domain, userInfo.Groups);
+            // Get the Kerberos Realm we are authenticating against from the registry
+            string krbRealm = Settings.Store.Realm;
+            //m_logger.InfoFormat("Kerberos Target Realm: {0}", krbRealm);
 
             /**
              * Call unmanaged DLL that will deal with Microsofts AcquireCredentialHandle() and InitializeSecurityContext() calls after creating a new SEC_WIN_AUTH_IDENTITY structure
              * from the supplied user name, password, and domain.  The return result will indicate either success or various kerberos error messages.
              * */
-            int r = auth_user(userInfo.Username, userInfo.Password, userInfo.Domain, "krbtgt/" + userInfo.Domain.ToUpper());
-
-            //userInfo.Domain = "";
+            int r = auth_user(userInfo.Username, userInfo.Password, krbRealm, "krbtgt/" + krbRealm.ToUpper());
             switch (r)
             {
                 /*
