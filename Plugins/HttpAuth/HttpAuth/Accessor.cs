@@ -4,6 +4,9 @@ using System.Net;
 using pGina.Shared.Types;
 using System.IO;
 using log4net;
+using System.Collections;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace pGina.Plugin.HttpAuth
 {
@@ -20,10 +23,10 @@ namespace pGina.Plugin.HttpAuth
                 // try to get URL from DNS
                 try
                 {
-                    IPHostEntry entries = Dns.GetHostEntry("pginaloginserver");
-                    if (entries.AddressList.Length > 0)
+                    List<string> entries = _getTxtRecords("pginaloginserver");
+                    if (entries.Count > 0)
                     {
-                        loginServer = entries.AddressList[0].ToString();
+                        loginServer = entries[0].ToString();    // gets the first item
                     }
                     else
                     {
@@ -48,6 +51,38 @@ namespace pGina.Plugin.HttpAuth
                 return null;
             }
         }
+
+        /*
+         * Uses http://www.robertsindall.co.uk/blog/getting-dns-txt-record-using-c-sharp/
+         * because c# and whole M$osft is crap and has no tools to resolve TXT recs!!!
+         */
+        private static List<string> _getTxtRecords(string hostname)
+        {
+            List<string> txtRecords = new List<string>();
+            string output;
+            string pattern = string.Format(@"{0}\s*text =\s*""([\w\-\=]*)""", hostname);
+
+            var startInfo = new ProcessStartInfo("nslookup");
+            startInfo.Arguments = string.Format("-type=TXT {0}", hostname);
+            startInfo.RedirectStandardOutput = true;
+            startInfo.UseShellExecute = false;
+            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+            using (var cmd = Process.Start(startInfo))
+            {
+                output = cmd.StandardOutput.ReadToEnd();
+            }
+
+            MatchCollection matches = Regex.Matches(output, pattern, RegexOptions.IgnoreCase);
+            foreach (Match match in matches)
+            {
+                if (match.Success)
+                    txtRecords.Add(match.Groups[1].Value);
+            }
+
+            return txtRecords;
+        }
+
 
         public static BooleanResult getResponse(String uname, String pwd)
         {
