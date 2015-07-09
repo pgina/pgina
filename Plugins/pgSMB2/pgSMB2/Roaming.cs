@@ -720,7 +720,7 @@ namespace pGina.Plugin.pgSMB2
             {
                 if (!Abstractions.WindowsApi.pInvokes.RegistryLoad(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username, file))
                 {
-                    m_logger.WarnFormat("Can't load regfile {0}\\{1}", file);
+                    m_logger.WarnFormat("Can't load regfile {0}", file);
                     Thread.Sleep(new TimeSpan(0, 0, 10));
                     work = false;
                     continue;
@@ -760,7 +760,7 @@ namespace pGina.Plugin.pgSMB2
             {
                 if (!Abstractions.WindowsApi.pInvokes.RegistryUnLoad(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, username))
                 {
-                    m_logger.WarnFormat("Can't unload regkey {0}\\{1}", file);
+                    m_logger.WarnFormat("Can't unload regkey {0}", file);
                     Thread.Sleep(new TimeSpan(0, 0, 10));
                     work = false;
                     continue;
