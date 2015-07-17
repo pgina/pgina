@@ -28,6 +28,9 @@ namespace pGina.Plugin.HttpAuth
             u.fullName = strReader.ReadLine();
             u.email = strReader.ReadLine();
             u.groups = strReader.ReadLine().Split(';');
+            if(u.groups.Length == 1 && u.groups[0].Contains(";")) {
+                throw new Exception("Bad response arrived (groups wrong): " + res);
+            }
             return u;
         }
     }
