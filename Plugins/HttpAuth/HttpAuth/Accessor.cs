@@ -60,7 +60,6 @@ namespace pGina.Plugin.HttpAuth
         {
             List<string> txtRecords = new List<string>();
             string output;
-            string pattern = string.Format(@"{0}\s*text =\s*""([\w\-\=]*)""", hostname);
 
             var startInfo = new ProcessStartInfo("nslookup");
             startInfo.Arguments = string.Format("-type=TXT {0}", hostname);
@@ -73,7 +72,7 @@ namespace pGina.Plugin.HttpAuth
                 output = cmd.StandardOutput.ReadToEnd();
             }
 
-            MatchCollection matches = Regex.Matches(output, pattern, RegexOptions.IgnoreCase);
+            MatchCollection matches = Regex.Matches(output, "\"([^\"]*)\"", RegexOptions.IgnoreCase);
             foreach (Match match in matches)
             {
                 if (match.Success)
@@ -88,7 +87,7 @@ namespace pGina.Plugin.HttpAuth
         {
             var cli = new WebClient();
             cli.Headers[HttpRequestHeader.ContentType] = "application/json";
-            var data = "{\"uname\":\"" + uname + "\",\"pwd\":\"" + pwd + "\"}";
+            var data = "{\"username\":\"" + uname + "\",\"password\":\"" + pwd + "\"}";
 
             try
             {
