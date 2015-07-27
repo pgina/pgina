@@ -1075,6 +1075,7 @@ namespace Abstractions.WindowsApi
                         result.Add(string.Format("{0}\\{1}", sessionInfo.SessionID, user));
                     }
                 }
+                //LibraryLogging.Info("InteractiveUsers:{0}", String.Join<string>(", ", result));
 
                 SafeNativeMethods.WTSFreeMemory(sessionInfoList);
             }
@@ -1503,7 +1504,7 @@ namespace Abstractions.WindowsApi
                             }
                             if (WinAPI)
                             {
-                                LibraryLogging.Info("Found process:{0} in session:{1} account:{2}", process.ProcessName, process.SessionId, name.ToString());
+                                //LibraryLogging.Info("Found process:{0} in session:{1} account:{2}", process.ProcessName, process.SessionId, name.ToString());
                                 if (!ret.ContainsKey(process.SessionId))
                                 {
                                     ret.Add(process.SessionId, new List<string>() { name.ToString() });
