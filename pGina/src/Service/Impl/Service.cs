@@ -354,6 +354,17 @@ namespace pGina.Service.Impl
                                         break;
                                     }
                                 }
+				// is this user a local user and was not created by pGina
+                                Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
+                                if (Abstractions.WindowsApi.pInvokes.UserGet(sessionDriver.UserInformation.Username, ref userinfo4))
+                                {
+                                    if (!userinfo4.comment.Contains("pGina created"))
+                                    {
+                                        m_logger.DebugFormat("User:{0} is local non pGina", sessionDriver.UserInformation.Username);
+                                        isUACLoggedIN = true;
+                                    }
+                                }
+
                                 if (!isUACLoggedIN)
                                 {
                                     List<string> runas_in_session = new List<string>();
