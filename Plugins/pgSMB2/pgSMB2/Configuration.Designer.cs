@@ -190,6 +190,7 @@ namespace pGina.Plugin.pgSMB2
             this.MaxStore.Size = new System.Drawing.Size(93, 20);
             this.MaxStore.TabIndex = 19;
             this.MaxStore.ValueChanged += new System.EventHandler(this.MaxStore_MB);
+            this.MaxStore.ReadOnly = true;
             //
             // HomeDir
             //
