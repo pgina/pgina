@@ -180,7 +180,7 @@ namespace pGina.Core
             m_logger.DebugFormat("Authenticating user {0}, {1} plugins available", m_properties.GetTrackedSingle<UserInformation>().Username, plugins.Count);
 
             // At least one must succeed
-            BooleanResult finalResult = new BooleanResult() { Success = false };
+            BooleanResult finalResult = new BooleanResult() { Message = "No plugin is set for Authentication", Success = false };
 
             foreach (IPluginAuthentication plugin in plugins)
             {
@@ -239,7 +239,7 @@ namespace pGina.Core
             m_logger.DebugFormat("Authorizing user {0}, {1} plugins available", m_properties.GetTrackedSingle<UserInformation>().Username, plugins.Count);
 
             // At least one must succeed
-            BooleanResult finalResult = new BooleanResult() { Success = false };
+            BooleanResult finalResult = new BooleanResult() { Message = "No plugin is set for Authorization", Success = false };
 
             foreach (IPluginAuthorization plugin in plugins)
             {
