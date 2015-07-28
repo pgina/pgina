@@ -22,5 +22,5 @@ for /f "tokens=3*" %%a in ('reg.exe query "HKCR\VisualStudio.Solution\CLSID" /ve
 find /I "===" %~dps0x64.log
 find /I "===" %~dps0Win32.log
 @echo finished
-pause
-exit 0
+if Not "%~1" == "batch" pause
+exit /b 0
