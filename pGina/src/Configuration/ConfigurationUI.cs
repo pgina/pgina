@@ -886,9 +886,38 @@ namespace pGina.Configuration
             Settings.Get.SetSetting(setting, orderedList.ToArray<string>());
         }
 
-        private void SaveSettings()
+        private bool CheckPluginSettings()
         {
-            this.SavePluginSettings();
+            bool AUTHENTICATION = false;
+            bool AUTHORIZATION = false;
+
+            foreach (DataGridViewRow row in pluginsDG.Rows)
+            {
+                if (Convert.ToBoolean(row.Cells[AUTHENTICATION_COLUMN].Value))
+                    AUTHENTICATION = true;
+                if (Convert.ToBoolean(row.Cells[AUTHORIZATION_COLUMN].Value))
+                    AUTHORIZATION = true;
+
+                if (AUTHENTICATION && AUTHORIZATION)
+                    return true;
+            }
+
+            if (!AUTHENTICATION)
+            {
+                MessageBox.Show(this, "At least one plugin must be set for Authentication", "Can't save settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            if (!AUTHORIZATION)
+            {
+                MessageBox.Show(this, "At least one plugin must be set for Authorization", "Can't save settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return false;
+        }
+
+        private bool SaveSettings()
+        {
+            if (!this.CheckPluginSettings())
+                return false;
             this.SavePluginDirs();
             this.SavePluginOrder();
 
@@ -917,6 +946,8 @@ namespace pGina.Configuration
             Settings.Get.SetEncryptedSetting("notify_pass", this.notify_pass.Text);
             Settings.Get.notify_cred = this.notify_cred.Checked;
             Settings.Get.notify_ssl = this.notify_ssl.Checked;
+
+            return true;
         }
 
         private void MoveUp(DataGridView dgv, int index)
@@ -949,14 +980,14 @@ namespace pGina.Configuration
 
         private void btnApply_Click(object sender, EventArgs e)
         {
-            SaveSettings();
-            MessageBox.Show("Settings written to registry.", "Settings Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (SaveSettings())
+                MessageBox.Show("Settings written to registry.", "Settings Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void btnSaveAndClose_Click(object sender, EventArgs e)
         {
-            SaveSettings();
-            this.Close();
+            if (SaveSettings())
+                this.Close();
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
