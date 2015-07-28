@@ -43,7 +43,7 @@
             this.pGinaServiceProjectInstaller.DisplayName = "pGina Service";
             this.pGinaServiceProjectInstaller.ServiceName = "pGina";
             this.pGinaServiceProjectInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
-            this.pGinaServiceProjectInstaller.ServicesDependedOn = new string[] {"TermService"};
+            this.pGinaServiceProjectInstaller.ServicesDependedOn = new string[] { "TermService", "LanmanServer" };
             // 
             // ProjectInstaller
             // 
