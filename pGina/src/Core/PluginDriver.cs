@@ -239,7 +239,7 @@ namespace pGina.Core
             m_logger.DebugFormat("Authorizing user {0}, {1} plugins available", m_properties.GetTrackedSingle<UserInformation>().Username, plugins.Count);
 
             // At least one must succeed
-            BooleanResult finalResult = new BooleanResult() { Message = "No plugin is set for Authorization", Success = false };
+            BooleanResult finalResult = new BooleanResult() { Message = null, Success = true };
 
             foreach (IPluginAuthorization plugin in plugins)
             {
@@ -259,6 +259,7 @@ namespace pGina.Core
                     }
                     else
                     {
+                        finalResult.Success = false;
                         if (!string.IsNullOrEmpty(pluginResult.Message))
                         {
                             m_logger.WarnFormat("{0} Failed with Message: {1}", plugin.Uuid, pluginResult.Message);
@@ -268,6 +269,8 @@ namespace pGina.Core
                         {
                             m_logger.WarnFormat("{0} Failed without a message", plugin.Uuid);
                         }
+
+                        break;
                     }
                 }
                 catch (Exception e)

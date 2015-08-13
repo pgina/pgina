@@ -889,27 +889,27 @@ namespace pGina.Configuration
         private bool CheckPluginSettings()
         {
             bool AUTHENTICATION = false;
-            bool AUTHORIZATION = false;
+            //bool AUTHORIZATION = false;
 
             foreach (DataGridViewRow row in pluginsDG.Rows)
             {
                 if (Convert.ToBoolean(row.Cells[AUTHENTICATION_COLUMN].Value))
-                    AUTHENTICATION = true;
+                    AUTHENTICATION = true;/*
                 if (Convert.ToBoolean(row.Cells[AUTHORIZATION_COLUMN].Value))
-                    AUTHORIZATION = true;
+                    AUTHORIZATION = true;*/
 
-                if (AUTHENTICATION && AUTHORIZATION)
+                if (AUTHENTICATION /*&& AUTHORIZATION*/)
                     return true;
             }
 
             if (!AUTHENTICATION)
             {
                 MessageBox.Show(this, "At least one plugin must be set for Authentication", "Can't save settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            }/*
             if (!AUTHORIZATION)
             {
                 MessageBox.Show(this, "At least one plugin must be set for Authorization", "Can't save settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            }*/
 
             return false;
         }
@@ -918,6 +918,7 @@ namespace pGina.Configuration
         {
             if (!this.CheckPluginSettings())
                 return false;
+            this.SavePluginSettings();
             this.SavePluginDirs();
             this.SavePluginOrder();
 
