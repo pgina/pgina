@@ -1596,5 +1596,10 @@ namespace pGina.Configuration
         {
             this.motdTB.Enabled = this.enableMotdCB.Checked;
         }
+
+        private void Btn_help(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation.html");
+        }
     }
 }

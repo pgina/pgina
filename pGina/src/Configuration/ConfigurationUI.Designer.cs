@@ -158,6 +158,7 @@
             this.btnOkay = new System.Windows.Forms.Button();
             this.m_pginaVersionLbl = new System.Windows.Forms.Label();
             this.btnSaveAndClose = new System.Windows.Forms.Button();
+            this.help = new System.Windows.Forms.Button();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
             this.groupBox18.SuspendLayout();
@@ -1561,11 +1562,23 @@
             this.btnSaveAndClose.UseVisualStyleBackColor = true;
             this.btnSaveAndClose.Click += new System.EventHandler(this.btnSaveAndClose_Click);
             //
+            // help
+            //
+            this.help.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.help.Location = new System.Drawing.Point(464, 602);
+            this.help.Name = "help";
+            this.help.Size = new System.Drawing.Size(75, 23);
+            this.help.TabIndex = 7;
+            this.help.Text = "Help";
+            this.help.UseVisualStyleBackColor = true;
+            this.help.Click += new System.EventHandler(this.Btn_help);
+            //
             // ConfigurationUI
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(822, 637);
+            this.Controls.Add(this.help);
             this.Controls.Add(this.btnSaveAndClose);
             this.Controls.Add(this.m_pginaVersionLbl);
             this.Controls.Add(this.btnApply);
@@ -1763,5 +1776,6 @@
         private System.Windows.Forms.TextBox notify_user;
         private System.Windows.Forms.TextBox notify_email;
         private System.Windows.Forms.TextBox notify_smtp;
+        private System.Windows.Forms.Button help;
     }
 }
