@@ -66,53 +66,69 @@ namespace Abstractions.Windows
         /// apply registry security settings to user profiles
         /// </summary>
         /// <param name="where"></param>
-        /// <param name="name"></param>
+        /// <param name="keyname"></param>
+        /// <param name="username"></param>
         /// <returns></returns>
-        public static Boolean RegSec(pInvokes.structenums.RegistryLocation where, string name)
+        public static Boolean RegSec(pInvokes.structenums.RegistryLocation where, string keyname, string username)
         {
             try
             {
                 bool result = false;
-                RegistryAccessRule accessRule = new RegistryAccessRule(name, RegistryRights.FullControl, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow);
+                IdentityReference UserIRef = new NTAccount(String.Format("{0}\\{1}", Environment.MachineName, username));
 
-                using (RegistryKey key = pInvokes.GetRegistryLocation(where).OpenSubKey(name, true))
+                using (RegistryKey key = pInvokes.GetRegistryLocation(where).OpenSubKey(keyname, true))
                 {
                     RegistrySecurity keySecurity = key.GetAccessControl(AccessControlSections.Access);
 
                     // delete unknown users
-                    try
+                    foreach (RegistryAccessRule user in keySecurity.GetAccessRules(true, true, typeof(System.Security.Principal.NTAccount)))
                     {
-                        foreach (RegistryAccessRule user in keySecurity.GetAccessRules(true, true, typeof(System.Security.Principal.NTAccount)))
+                        //LibraryLogging.Debug("registry ACE user: {0}", user.IdentityReference.Value);
+                        if (user.IdentityReference.Value.StartsWith("S-1-5-21-") && !user.IdentityReference.Value.Equals(UserIRef.Value))
                         {
-                            //LibraryLogging.Debug("registry ACE user: {0}", user.IdentityReference.Value);
-                            if (user.IdentityReference.Value.StartsWith("S-1-5-21-"))
+                            //LibraryLogging.Info("mod registry ACE:{2} from unknown user:{0} to {1}", user.IdentityReference.Value, username, key.Name);
+
+                            RegistryAccessRule accessRule = new RegistryAccessRule(UserIRef, user.RegistryRights, user.InheritanceFlags, user.PropagationFlags, user.AccessControlType);
+                            keySecurity.ModifyAccessRule(AccessControlModification.Add, accessRule, out result);
+                            if (result)
                             {
-                                LibraryLogging.Debug("delete registry ACE from unknown user: {0}", user.IdentityReference.Value);
-                                keySecurity.RemoveAccessRule(user);
+                                keySecurity.ModifyAccessRule(AccessControlModification.Remove, user, out result);
+                                if (result)
+                                {
+                                    key.SetAccessControl(keySecurity);
+                                }
+                                else
+                                {
+                                    LibraryLogging.Error("unable to add User:{0} registry ACE {1} {2}", username, result, pInvokes.LastError());
+                                    return false;
+                                }
                             }
+                            else
+                            {
+                                LibraryLogging.Error("unable to delete registry ACE from unknown user: {0}", user.IdentityReference.Value, result, pInvokes.LastError());
+                                return false;
+                            }
+
+                            break;
                         }
                     }
-                    catch (Exception ex)
+                    foreach (string subkey in key.GetSubKeyNames())
                     {
-                        LibraryLogging.Error("delete registry ACE from unknown user error: {0}", ex.Message);
-                    }
-
-                    //add the user
-                    keySecurity.ModifyAccessRule(AccessControlModification.Add, accessRule, out result);
-                    if (result)
-                    {
-                        key.SetAccessControl(keySecurity);
-                    }
-                    else
-                    {
-                        LibraryLogging.Error("unable to add User {0} registry ACE {1} {2}", name, result, pInvokes.LastError());
-                        return false;
+                        if (!RegSec(where, keyname + "\\" + subkey, username))
+                        {
+                            return false;
+                        }
                     }
                 }
             }
+            catch (SystemException ex)
+            {
+                LibraryLogging.Warn("RegSec:{0} Warning {1}", keyname, ex.Message);
+                return true;
+            }
             catch (Exception ex)
             {
-                LibraryLogging.Error("RegSec error {0}", ex.Message);
+                LibraryLogging.Error("RegSec:{0} Error:{1}", keyname, ex.Message);
                 return false;
             }
 
