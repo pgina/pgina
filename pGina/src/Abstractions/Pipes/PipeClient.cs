@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -40,15 +40,15 @@ using Abstractions.Logging;
 namespace Abstractions.Pipes
 {
     public class PipeClient : Pipe
-    {                                
-        public PipeClient(string name, Func<BinaryReader, BinaryWriter, bool> action) 
+    {
+        public PipeClient(string name, Func<BinaryReader, BinaryWriter, bool> action)
             : base(name, action)
-        {            
+        {
         }
 
         public PipeClient(string name, Func<IDictionary<string, object>, IDictionary<string, object>> action)
             : base(name, action)
-        {            
+        {
         }
 
         public PipeClient(string name)
@@ -71,12 +71,12 @@ namespace Abstractions.Pipes
         }
 
         public void Start(Func<IDictionary<string, object>, IDictionary<string, object>> action, IDictionary<string, object> initialMessage, int timeout)
-        {                
+        {
             Start(
                 (Func<BinaryReader, BinaryWriter, bool>)((r, w) =>
                 {
                     return DefaultMessageHandler(r, w, action);
-                }), 
+                }),
             initialMessage, timeout);
         }
 
@@ -115,7 +115,7 @@ namespace Abstractions.Pipes
                     LibraryLogging.Error("Error broken pipe connection");
                     Start(action, initialMessage, timeout);
                 }
-            }                         
-        }        
+            }
+        }
     }
 }

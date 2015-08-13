@@ -1,6 +1,6 @@
 /**
  * Note that this file is a copy, with the listed edits, of
- * helpers.h from the Microsoft Platform SDK sample, original 
+ * helpers.h from the Microsoft Platform SDK sample, original
  * copyright notice thereof follows this comment block.
  *
  * - Remove FieldDescriptor* functions - not used
@@ -38,7 +38,7 @@ namespace Microsoft
 	{
 		//creates a UNICODE_STRING from a NULL-terminated string
 		HRESULT UnicodeStringInitWithString(
-			__in PWSTR pwz, 
+			__in PWSTR pwz,
 			__out UNICODE_STRING* pus
 			);
 

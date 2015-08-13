@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -58,22 +58,22 @@ namespace pGina
 			virtual void DisplayLockedNotice() = 0;
 			virtual bool DisplayStatusMessage(HDESK hDesktop, DWORD dwOptions, PWSTR pTitle, PWSTR pMessage) = 0;
 			virtual bool GetStatusMessage(DWORD * pdwOptions, PWSTR pMessage, DWORD dwBufferSize) = 0;
-			virtual bool RemoveStatusMessage() = 0;					
-			
+			virtual bool RemoveStatusMessage() = 0;
+
 			// SAS handling
-			virtual int  LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, 
-								 	  PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile) = 0;			
-			virtual int  LoggedOnSAS(DWORD dwSasType, PVOID pReserved) = 0;			
+			virtual int  LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions,
+								 	  PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile) = 0;
+			virtual int  LoggedOnSAS(DWORD dwSasType, PVOID pReserved) = 0;
 			virtual int  WkstaLockedSAS(DWORD dwSasType) = 0;
-			
+
 			// Things to do when winlogon says to...
-			virtual bool ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOID pEnvironment) = 0;			
+			virtual bool ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOID pEnvironment) = 0;
 			virtual bool StartApplication(PWSTR pszDesktopName, PVOID pEnvironment, PWSTR pszCmdLine) = 0;
-			virtual bool NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo) = 0;						
+			virtual bool NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo) = 0;
 
 			virtual ~Gina();
 
-		protected:			
+		protected:
 			WinlogonInterface * m_winlogon;
 		};
 	}

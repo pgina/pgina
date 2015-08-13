@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -42,16 +42,16 @@ namespace Abstractions.Helpers
 
         private TimeSpan m_entryTtl;
         private Timer m_timer = null;
-        private Stopwatch m_stopwatch = new Stopwatch(); 
+        private Stopwatch m_stopwatch = new Stopwatch();
 
         public TimedCache() : this(TimeSpan.FromMinutes(5))
-        {            
+        {
         }
 
         public TimedCache(TimeSpan ttl) : base()
         {
             m_entryTtl = ttl;
-            InitTimer();            
+            InitTimer();
         }
 
         protected override CacheEntry WrapValue(KeyType key, ValueType value)
@@ -63,7 +63,7 @@ namespace Abstractions.Helpers
                 InsertionTime = m_stopwatch.Elapsed
             });
         }
-        
+
         public override ValueType Get(KeyType key)
         {
             return Get(key, false);
@@ -83,7 +83,7 @@ namespace Abstractions.Helpers
                 return m_cache[key].Value;
             }
         }
-        
+
         private void InitTimer()
         {
             m_stopwatch.Start();
@@ -106,7 +106,7 @@ namespace Abstractions.Helpers
 
                 foreach (KeyType key in expirations)
                 {
-                    CacheEntry ce = m_cache[key];                    
+                    CacheEntry ce = m_cache[key];
                     if (ce.Value is IDisposable)
                     {
                         IDisposable disposableValue = (IDisposable)ce.Value;
@@ -131,7 +131,7 @@ namespace Abstractions.Helpers
                     {
                         IDisposable disposableValue = (IDisposable)ce.Value;
                         disposableValue.Dispose();
-                    }                 
+                    }
                 }
                 m_cache.Clear();
             }
@@ -147,6 +147,6 @@ namespace Abstractions.Helpers
             }
 
             base.Dispose(disposing);
-        }        
+        }
     }
 }

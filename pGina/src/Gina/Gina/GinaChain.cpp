@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -40,20 +40,20 @@
 #include "HookedLoggedOutSAS.h"
 
 // Dialog ID's for MSGINA's WlxLoggedOutSAS Dialog
-#define IDD_WLXLOGGEDOUTSAS_DIALOG 1500 
+#define IDD_WLXLOGGEDOUTSAS_DIALOG 1500
 
 namespace pGina
 {
 	namespace GINA
 	{
-		GinaChain::GinaChain(WinlogonInterface *pWinLogonIface) : 
+		GinaChain::GinaChain(WinlogonInterface *pWinLogonIface) :
 			Gina(pWinLogonIface), WinlogonProxy(pWinLogonIface), m_passthru(false)
 		{
 			// Are we in passthru mode?
 			m_passthru = pGina::Registry::GetBool(L"GinaPassthru", false);
 
-			// When we use the winlogon router table, we want it to 
-			//	direct all winlogon calls to us (via our WinlogonProxy 
+			// When we use the winlogon router table, we want it to
+			//	direct all winlogon calls to us (via our WinlogonProxy
 			//	implementation).  We sit between winlogon and a real
 			//	GINA, so our Gina interface let's us have first shot
 			//	at Winlogon->Gina direction calls, and WinlogonRouter+
@@ -72,9 +72,9 @@ namespace pGina
 				return;
 			}
 
-			// Now negotiate and initialize our wrapped gina			
+			// Now negotiate and initialize our wrapped gina
 			if(!m_wrappedGina->Negotiate(WinlogonInterface::Version()))
-			{	
+			{
 				pERROR(L"Failed to negotiate with wrapped gina using version: %d (0x%08x)", WinlogonInterface::Version(), WinlogonInterface::Version());
 				return;
 			}
@@ -168,27 +168,27 @@ namespace pGina
 		}
 
 		// SAS handling
-		int  GinaChain::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, 
+		int  GinaChain::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions,
 									 PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile)
 		{
-			// If configured to pass through to MS GINA, or auto-logon is enabled, we 
+			// If configured to pass through to MS GINA, or auto-logon is enabled, we
 			// pass through, and let the MS GINA handle the logon.
 			if(m_passthru || IsAutoLogonEnabled())
 			{
-				return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);				
+				return m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
 			}
 
 			// We auth'd in another session - this session is the real one though, need to tell the service to add!
 			if(dwSasType == WLX_SAS_TYPE_AUTHENTICATED)
 			{
 				// We could do this, but we don't get password (without additional wrapping of our own in WlxGetConsoleSwitchCredentials
-				//  So instead we grab it post SAS processing via msgina.				
+				//  So instead we grab it post SAS processing via msgina.
 				WLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0 credInfo;
 				if(m_winlogon->WlxQueryConsoleSwitchCredentials(&credInfo))
 				{
 					pDEBUG(L"LoggedOutSAS: CredInfo=%p PrivateDataLen: 0x%08x PrivateData: %p", &credInfo, credInfo.PrivateDataLen, credInfo.PrivateData);
-				}				
-				
+				}
+
 				int msresult = m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
 				//pGina::Transactions::LoginInfo::Add(pMprNotifyInfo->pszUserName, pMprNotifyInfo->pszDomain, pMprNotifyInfo->pszPassword);
 				return msresult;
@@ -199,13 +199,13 @@ namespace pGina
 			std::wstring username;
 			std::wstring password;
 			std::wstring domain;
-						
+
 			bool showDialog = true;
 
 			if(pGina::Helpers::UserIsRemote())
 			{
 				WLX_CLIENT_CREDENTIALS_INFO_V2_0 creds;
-				creds.dwType = WLX_CREDENTIAL_TYPE_V2_0;				
+				creds.dwType = WLX_CREDENTIAL_TYPE_V2_0;
 				if(m_winlogon->WlxQueryTsLogonCredentials(&creds))
 				{
 					if(creds.pszUserName) username = creds.pszUserName;
@@ -215,12 +215,12 @@ namespace pGina
 
 					pDEBUG(L"fPromptForPassword: %s", creds.fPromptForPassword ? L"TRUE" : L"FALSE");
 					pDEBUG(L"fDisconnectOnLogonFailure: %s", creds.fDisconnectOnLogonFailure ? L"TRUE" : L"FALSE");
-				}				
+				}
 			}
-			
+
 			if(showDialog)
 			{
-				DialogLoggedOutSAS dialog(m_winlogon);						
+				DialogLoggedOutSAS dialog(m_winlogon);
 				dialog.Username(username);
 				dialog.Password(password);
 
@@ -251,17 +251,17 @@ namespace pGina
 				std::wstring failureMsg = result.Message();
 				pERROR(L"GinaChain::LoggedOutSAS: %s", failureMsg.c_str());
 				m_winlogon->WlxMessageBox(NULL, const_cast<wchar_t *>(failureMsg.c_str()), L"Login Failure", MB_ICONEXCLAMATION | MB_OK);
-				return WLX_SAS_ACTION_NONE;					
-			}			
+				return WLX_SAS_ACTION_NONE;
+			}
 
-			pDEBUG(L"inaChain::LoggedOutSAS: Successful, resulting username: %s", result.Username().c_str());						
+			pDEBUG(L"inaChain::LoggedOutSAS: Successful, resulting username: %s", result.Username().c_str());
 
 			// Invoke the msgina logged out sas dialog, intercept it, set username/password, and hit ok!
 			HookedLoggedOutSAS::Enabled(true);
 			HookedLoggedOutSAS::SetLoginInfo(result);
 			int msresult = m_wrappedGina->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pMprNotifyInfo, pProfile);
-			HookedLoggedOutSAS::Enabled(false);				
-			return msresult;			
+			HookedLoggedOutSAS::Enabled(false);
+			return msresult;
 		}
 
 		int  GinaChain::LoggedOnSAS(DWORD dwSasType, PVOID pReserved)
@@ -274,7 +274,7 @@ namespace pGina
 			return m_wrappedGina->WkstaLockedSAS(dwSasType);
 		}
 
-			
+
 		// Things to do when winlogon says to...
 		bool GinaChain::ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOID pEnvironment)
 		{
@@ -289,16 +289,16 @@ namespace pGina
 		bool GinaChain::NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo)
 		{
 			return m_wrappedGina->NetworkProviderLoad(pNprNotifyInfo);
-		}					
+		}
 
 		// Winlogon calls from MSGINA that we hook
 		int GinaChain::WlxDialogBoxParam(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam)
 		{
 			// Is it a dialog id (integer)?
-			if (!HIWORD(lpszTemplate)) 
+			if (!HIWORD(lpszTemplate))
 			{
 				// Make sure we only hook the dialogs we want
-				switch ((DWORD) lpszTemplate) 
+				switch ((DWORD) lpszTemplate)
 				{
 					case IDD_WLXLOGGEDOUTSAS_DIALOG:
 						// Thank god gina is single threaded... I think...
@@ -306,7 +306,7 @@ namespace pGina
 						return WinlogonProxy::WlxDialogBoxParam(hInst, lpszTemplate, hwndOwner, HookedLoggedOutSAS::GetDlgHookProc(), dwInitParam);
 						break;
 				}
-			}			
+			}
 
 			// Everyone else falls through
    			return WinlogonProxy::WlxDialogBoxParam(hInst, lpszTemplate, hwndOwner, dlgprc, dwInitParam);

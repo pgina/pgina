@@ -12,7 +12,7 @@ using pGina.Shared.Settings;
 namespace pGina.Plugin.SingleUser
 {
     public partial class Configuration : Form
-    {       
+    {
         public Configuration()
         {
             InitializeComponent();
@@ -44,7 +44,7 @@ namespace pGina.Plugin.SingleUser
             Settings.Store.SetEncryptedSetting("Password", m_txtPass.Text, null);
             Settings.Store.RequirePlugins = substituteCB.Checked;
             Settings.Store.RequireAllPlugins = allRB.Checked;
-            
+
 
             List<string> uuids = new List<string>();
             foreach (DataGridViewRow row in m_dgv.Rows)

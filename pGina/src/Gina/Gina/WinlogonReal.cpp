@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -32,7 +32,7 @@ namespace pGina
 {
 	namespace GINA
 	{
-		void RealWinlogonInterface::WlxUseCtrlAltDel() 
+		void RealWinlogonInterface::WlxUseCtrlAltDel()
 		{
 			return ((PWLX_DISPATCH_VERSION_1_3)m_pFuncTable)->WlxUseCtrlAltDel(m_hWlx);
 		}
@@ -162,7 +162,7 @@ namespace pGina
 			// Must be at 1_4 for this call
 			if(WinlogonInterface::Version() <= WLX_VERSION_1_3)
 				return 0;
-			
+
 			return ((PWLX_DISPATCH_VERSION_1_4)m_pFuncTable)->WlxQueryConsoleSwitchCredentials(pCred);
 		}
 

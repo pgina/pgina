@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -55,10 +55,10 @@ namespace pGina.Plugin.UsernameMod
                 m_settings = new pGinaDynamicSettings(SimpleUuid);
                 m_settings.SetDefault("ShowDescription", true);
                 m_settings.SetDefault("Description", m_defaultDescription);
-                
+
                 m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
             }
-        }        
+        }
 
         public string Name
         {
@@ -82,11 +82,11 @@ namespace pGina.Plugin.UsernameMod
         {
             get { return SimpleUuid; }
         }
-        
+
         /// <summary>
-        /// Runs the rules against the username, modifying it for future plugins. 
+        /// Runs the rules against the username, modifying it for future plugins.
         /// If a IMatchRule is present and matches, it will allow a login for that
-        /// user regardless of an entered password. 
+        /// user regardless of an entered password.
         /// </summary>
         /// <param name="properties"></param>
         /// <returns></returns>
@@ -101,7 +101,7 @@ namespace pGina.Plugin.UsernameMod
 
                 // Get user info
                 UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-                
+
                 bool authenticated = false; //By default, we don't authenticate
                 string username = userInfo.Username;
 
@@ -109,7 +109,7 @@ namespace pGina.Plugin.UsernameMod
 
                 foreach (IUsernameRule rule in rules.list)
                 {
-                    
+
                     if(rule.stage == Stage.Authentication){
                         m_logger.DebugFormat("[Authentication] Running rule: {0}", rule.ToString());
                         if (rule is IModifyRule)
@@ -127,13 +127,13 @@ namespace pGina.Plugin.UsernameMod
                 //Set the changes to the username
                 userInfo.Username = username;
 
-                return new BooleanResult() { Success = authenticated };                
+                return new BooleanResult() { Success = authenticated };
             }
 
             catch (Exception e)
             {
                 m_logger.ErrorFormat("Error running rules. {0}", e.Message);
-                return new BooleanResult() { Success = false, Message = "Unable to modify username during authentication stage." };                
+                return new BooleanResult() { Success = false, Message = "Unable to modify username during authentication stage." };
             }
         }
 
@@ -250,7 +250,7 @@ namespace pGina.Plugin.UsernameMod
                 return new BooleanResult() { Success = false, Message = "Unable to modify username during gateway stage." };
             }
         }
-        
+
         public void Configure()
         {
             Configuration conf = new Configuration();

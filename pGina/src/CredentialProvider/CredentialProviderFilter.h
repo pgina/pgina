@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -37,29 +37,29 @@ namespace pGina
 		public:
 
 			// IUnknown
-			IFACEMETHODIMP_(ULONG) AddRef();    
-			IFACEMETHODIMP_(ULONG) Release();    
+			IFACEMETHODIMP_(ULONG) AddRef();
+			IFACEMETHODIMP_(ULONG) Release();
 			IFACEMETHODIMP QueryInterface(__in REFIID riid, __deref_out void** ppv);
-			
+
 			// ICredentialProviderFilter
-			HRESULT STDMETHODCALLTYPE Filter( 
+			HRESULT STDMETHODCALLTYPE Filter(
             /* [in] */ CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus,
             /* [in] */ DWORD dwFlags,
             /* [size_is][in] */ GUID *rgclsidProviders,
             /* [size_is][out][in] */ BOOL *rgbAllow,
             /* [in] */ DWORD cProviders);
 
-			HRESULT STDMETHODCALLTYPE UpdateRemoteCredential( 
+			HRESULT STDMETHODCALLTYPE UpdateRemoteCredential(
             /* [in] */ const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION *pcpcsIn,
             /* [out] */ CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION *pcpcsOut);
-        
+
 			// CredentialProviderFilter
 			CredentialProviderFilter(void);
 			~CredentialProviderFilter(void);
 
 		private:
 			long m_referenceCount;
-		
+
 		};
 	}
 }

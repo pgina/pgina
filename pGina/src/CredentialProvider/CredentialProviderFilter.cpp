@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -45,7 +45,7 @@ namespace pGina {
 		{
 			static const QITAB qit[] =
 			{
-				QITABENT(CredentialProviderFilter, ICredentialProviderFilter), 
+				QITABENT(CredentialProviderFilter, ICredentialProviderFilter),
 				{0},
 			};
 			return QISearch(this, qit, riid, ppv);
@@ -64,7 +64,7 @@ namespace pGina {
 			return count;
 		}
 
-		HRESULT STDMETHODCALLTYPE CredentialProviderFilter::Filter(            
+		HRESULT STDMETHODCALLTYPE CredentialProviderFilter::Filter(
 			/* [in] */ CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus,
             /* [in] */ DWORD dwFlags,
             /* [size_is][in] */ GUID *rgclsidProviders,
@@ -74,7 +74,7 @@ namespace pGina {
 			pDEBUG(L"CredentialProviderFilter::Filter");
 
 			// Retrieve the registry settings
-			std::vector<std::wstring> rawFilterSettings = 
+			std::vector<std::wstring> rawFilterSettings =
 				pGina::Registry::GetStringArray(L"CredentialProviderFilters");
 
 			// If there's nothing there, there's nothing to do.
@@ -91,7 +91,7 @@ namespace pGina {
 				{
 					std::wstring guidStr = s.substr(0, idx);
 					std::wstring filterStr = s.substr(idx+1);
-					
+
 					struct FilterSetting setting;
 					HRESULT hr = CLSIDFromString(guidStr.c_str(), &(setting.uuid));
 					if( SUCCEEDED(hr) )
@@ -117,7 +117,7 @@ namespace pGina {
 						setting = filterSettings[j];
 					}
 				}
-				
+
 				// If we are filtering this CP
 				if( doFilter )
 				{
@@ -138,7 +138,7 @@ namespace pGina {
 			return S_OK;
 		}
 
-		HRESULT STDMETHODCALLTYPE CredentialProviderFilter::UpdateRemoteCredential( 
+		HRESULT STDMETHODCALLTYPE CredentialProviderFilter::UpdateRemoteCredential(
             /* [in] */ const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION *pcpcsIn,
             /* [out] */ CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION *pcpcsOut)
 		{
@@ -162,7 +162,7 @@ namespace pGina {
 
 		CredentialProviderFilter::CredentialProviderFilter(void) :
 			m_referenceCount(1)
-		{ 
+		{
 			AddDllReference();
 		}
 

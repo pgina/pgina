@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -53,7 +53,7 @@ namespace pGina.Plugin.Ldap
             m_settings.SetDefault("UseSsl", false);
             m_settings.SetDefault("UseTls", false);
             m_settings.SetDefault("RequireCert", false);
-            m_settings.SetDefault("ServerCertFile", "");            
+            m_settings.SetDefault("ServerCertFile", "");
             m_settings.SetDefault("UseAuthBindForAuthzAndGateway", false);
             m_settings.SetDefault("SearchDN", "");
             m_settings.SetDefaultEncryptedSetting("SearchPW", "");

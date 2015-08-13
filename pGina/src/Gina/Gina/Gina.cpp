@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -38,8 +38,8 @@ namespace pGina
 		{
 			// If hWlx == NULL || pFuncs is null, then we
 			//	create a winlogon interface that is fake for testing purposes.
-			if(hWlx == NULL || pFuncs == NULL)			
-				return new DebugWinlogonInterface();			
+			if(hWlx == NULL || pFuncs == NULL)
+				return new DebugWinlogonInterface();
 
 			return new RealWinlogonInterface(hWlx, pFuncs);
 		}
@@ -50,11 +50,11 @@ namespace pGina
 			// Create a winlogon interface class, and a Gina class, and pair them
 			//  the result becomes our context, which Winlogon will give us on all
 			//  calls.
-			*context = new GinaChain(WinlogonInterfaceFactory(hWlx, pWinlogonFunctions));			
+			*context = new GinaChain(WinlogonInterfaceFactory(hWlx, pWinlogonFunctions));
 			return true;
 		}
 
-		Gina::Gina(WinlogonInterface *pWinLogonIface) : 
+		Gina::Gina(WinlogonInterface *pWinLogonIface) :
 			m_winlogon(pWinLogonIface)
 		{
 		}

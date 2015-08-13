@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -38,13 +38,13 @@ namespace Abstractions.Helpers
         protected class CacheEntry
         {
             public KeyType Key;
-            public ValueType Value;            
+            public ValueType Value;
         }
 
         protected Dictionary<KeyType, CacheEntry> m_cache = new Dictionary<KeyType, CacheEntry>();
-        
+
         public ObjectCache()
-        {            
+        {
         }
 
         public List<KeyType> GetAll()
@@ -66,7 +66,7 @@ namespace Abstractions.Helpers
                 Value = value,
             };
         }
-        
+
         public virtual void Add(KeyType key, ValueType value)
         {
             CacheEntry ce = WrapValue(key, value);
@@ -87,7 +87,7 @@ namespace Abstractions.Helpers
 
             return (ValueType)Activator.CreateInstance(typeof(ValueType));
         }
-        
+
         public virtual void Remove(KeyType key)
         {
             lock (m_cache)
@@ -116,14 +116,14 @@ namespace Abstractions.Helpers
                 if (disposing)
                 {
                     m_cache.Clear();
-                }                
+                }
             }
         }
-        
+
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);            
+            GC.SuppressFinalize(this);
         }
 
         ~ObjectCache()

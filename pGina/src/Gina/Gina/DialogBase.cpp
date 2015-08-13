@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -35,7 +35,7 @@ namespace pGina
 			m_winlogon(iface), m_dialogId(dialogId), m_instance(GetMyInstance()), m_hwnd(0), m_nextTimer(1)
 		{
 		}
-		
+
 		int DialogBase::ShowDialog()
 		{
 			return m_winlogon->WlxDialogBoxParam(m_instance, MAKEINTRESOURCE(m_dialogId), 0, DialogProcInternal, (LPARAM)this);
@@ -53,7 +53,7 @@ namespace pGina
 				dialog->CenterWindow();
 
 				// Now set a ptr to us in user data that will always be available
-				SetWindowLongPtr(hwnd, GWLP_USERDATA, lparam);				
+				SetWindowLongPtr(hwnd, GWLP_USERDATA, lparam);
 
 				// Inherited init
 				dialog->DialogInit();
@@ -65,24 +65,24 @@ namespace pGina
 				DialogBase * dialog = (DialogBase *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
 				if(!dialog)
 					return FALSE;
-			
+
 				// We call different verbs on subs based on message
 				switch(msg)
 				{
 				case WM_COMMAND:
 					if(dialog->Command(LOWORD(wparam)))
-						return true;					
-					break;				
+						return true;
+					break;
 				case WM_TIMER:
 					if(dialog->Timer(LOWORD(wparam)))
 						return true;
 					break;
 				case WM_DESTROY:
-					dialog->InternalDestroy();					
+					dialog->InternalDestroy();
 					break;
-				}			
+				}
 
-				return dialog->DialogProcImpl(msg, wparam, lparam);					
+				return dialog->DialogProcImpl(msg, wparam, lparam);
 			}
 		}
 
@@ -100,29 +100,29 @@ namespace pGina
 		}
 
 		void DialogBase::CenterWindow()
-		{						
+		{
 			RECT    rect = {0, 0, 0, 0};
 			GetWindowRect(m_hwnd, &rect);
 			LONG Style = GetWindowLong(m_hwnd, GWL_STYLE);
 
 			LONG dx = rect.right - rect.left;
 			LONG dy = rect.bottom - rect.top;
-						
-			LONG    dxParent, dyParent;			
-			if ((Style & WS_CHILD) == 0) 
+
+			LONG    dxParent, dyParent;
+			if ((Style & WS_CHILD) == 0)
 			{
 				// No parent, center on screen
 				dxParent = GetSystemMetrics(SM_CXSCREEN);
 				dyParent = GetSystemMetrics(SM_CYSCREEN);
-			} 
-			else  
+			}
+			else
 			{
-				// Center on parent								
+				// Center on parent
 				HWND hwndParent = GetParent(m_hwnd);
-				if (hwndParent == NULL)  
+				if (hwndParent == NULL)
 				{
 					// No parent? Use desktop...
-					hwndParent = GetDesktopWindow(); 
+					hwndParent = GetDesktopWindow();
 				}
 
 				RECT    rectParent;
@@ -153,7 +153,7 @@ namespace pGina
 		{
 			SetDlgItemText(m_hwnd, itemId, text);
 		}
-		
+
 		void DialogBase::EnableItem(int itemId)
 		{
 			EnableWindow(GetItem(itemId), TRUE);
@@ -165,7 +165,7 @@ namespace pGina
 		}
 
 		void DialogBase::HideItem(int itemId)
-		{			
+		{
 			ShowWindow(GetItem(itemId), FALSE);
 		}
 
@@ -185,7 +185,7 @@ namespace pGina
 		}
 
 		std::wstring DialogBase::GetItemText(int itemId)
-		{			
+		{
 			wchar_t buffer[1024 * 64];	// 64k buffer
 			memset(buffer, 0, sizeof(buffer));
 			GetDlgItemText(m_hwnd, itemId, buffer, 1024 * 64);

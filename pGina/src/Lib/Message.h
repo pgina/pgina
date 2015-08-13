@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -36,10 +36,10 @@
 namespace pGina
 {
 	namespace Messaging
-	{				
+	{
 		class Message
 		{
-		public:	
+		public:
 			typedef std::map<std::wstring, PropertyBase *> PropertyMap;
 
 			Message();
@@ -77,7 +77,7 @@ namespace pGina
 
 			template<typename T>
 			void Property(std::wstring const& propertyName, T const& value, PropertyType type)
-			{				
+			{
 				// Create a new property to be inserted
 				pGina::Messaging::Property<T> * prop = new pGina::Messaging::Property<T>(propertyName, value, type);
 
@@ -92,13 +92,13 @@ namespace pGina
 
 				// Insert our new property
 				m_properties[propertyName] = prop;
-			}	
+			}
 
 			PropertyMap& Properties() { return m_properties; }
-						
-		private:			
-			static int MarshalToBuffer(Message *msg, pGina::Memory::Buffer * buffer);			
-			PropertyMap m_properties;			
+
+		private:
+			static int MarshalToBuffer(Message *msg, pGina::Memory::Buffer * buffer);
+			PropertyMap m_properties;
 		};
 	}
 }

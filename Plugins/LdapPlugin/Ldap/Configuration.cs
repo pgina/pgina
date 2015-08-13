@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -141,7 +141,7 @@ namespace pGina.Plugin.Ldap
 
             string filter = Settings.Store.SearchFilter;
             searchFilterTextBox.Text = filter;
-            
+
             bool useAuth = Settings.Store.UseAuthBindForAuthzAndGateway;
             useAuthBindForAuthzAndGatewayCb.Checked = useAuth;
 
@@ -189,7 +189,7 @@ namespace pGina.Plugin.Ldap
                     }
                 }
             }
-            
+
             /////////////// Authorization tab /////////////////
             this.authzRuleMemberComboBox.SelectedIndex = 0;
             this.authzRuleActionComboBox.SelectedIndex = 0;
@@ -326,7 +326,7 @@ namespace pGina.Plugin.Ldap
             try
             {
                 int port = Convert.ToInt32(ldapPortTextBox.Text.Trim());
-                if (port <= 0) throw new FormatException(); 
+                if (port <= 0) throw new FormatException();
             }
             catch (FormatException)
             {
@@ -360,7 +360,7 @@ namespace pGina.Plugin.Ldap
 
         private void StoreSettings()
         {
-            Settings.Store.LdapHost = Regex.Split(ldapHostTextBox.Text.Trim(), @"\s+"); 
+            Settings.Store.LdapHost = Regex.Split(ldapHostTextBox.Text.Trim(), @"\s+");
             Settings.Store.LdapPort = Convert.ToInt32(ldapPortTextBox.Text.Trim());
             Settings.Store.LdapTimeout = Convert.ToInt32(timeoutTextBox.Text.Trim());
             Settings.Store.UseSsl = (useSslCheckBox.CheckState == CheckState.Checked);
@@ -370,7 +370,7 @@ namespace pGina.Plugin.Ldap
             Settings.Store.UseAuthBindForAuthzAndGateway = (useAuthBindForAuthzAndGatewayCb.CheckState == CheckState.Checked);
             Settings.Store.SearchDN = searchDnTextBox.Text.Trim();
             Settings.Store.SetEncryptedSetting("SearchPW", searchPassTextBox.Text);
-            
+
             // Authentication
             Settings.Store.AllowEmptyPasswords = this.allowEmptyPwCB.Checked;
             Settings.Store.DnPattern = dnPatternTextBox.Text.Trim();
@@ -391,7 +391,7 @@ namespace pGina.Plugin.Ldap
                 Settings.Store.AttribConv = AttribConv.ToArray();
             else
                 Settings.Store.AttribConv = new string[] { };
-            
+
             // Authorization
             Settings.Store.AuthzRequireAuth = this.authzRequireAuthCB.Checked;
             Settings.Store.AuthzAllowOnError = this.authzAllowOnErrorCB.Checked;
@@ -430,7 +430,7 @@ namespace pGina.Plugin.Ldap
                         entries.Add(entry);
                     }
                 }
-                
+
             }
             CPAttributeSettings.Save(entries);
         }
@@ -455,7 +455,7 @@ namespace pGina.Plugin.Ldap
             else if (idx == 1) c = GroupRule.Condition.NOT_MEMBER_OF;
             else
                 throw new Exception("Unrecognized option in authzRuleAddButton_Click");
-           
+
 
             idx = this.authzRuleActionComboBox.SelectedIndex;
             bool allow;
@@ -539,7 +539,7 @@ namespace pGina.Plugin.Ldap
         {
             int idx = this.gatewayRulesListBox.SelectedIndex;
             if( idx >= 0 && idx < this.gatewayRulesListBox.Items.Count )
-                this.gatewayRulesListBox.Items.RemoveAt(idx); 
+                this.gatewayRulesListBox.Items.RemoveAt(idx);
         }
 
         private void authzRuleDeleteBtn_Click(object sender, EventArgs e)

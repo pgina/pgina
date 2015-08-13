@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -39,7 +39,7 @@ namespace pGina
 		public:
 			static DWORD Version() { return s_winlogonVersion; }
 			static void  Version(DWORD v) { s_winlogonVersion = v; }
-		
+
 			// Winlogon functions
 			virtual void WlxUseCtrlAltDel() = 0;
 			virtual void WlxSetContextPointer(void *newContext) = 0;
@@ -71,7 +71,7 @@ namespace pGina
 
 		protected:
 			// No public constructor, only a Real or Test impl should be created
-			WinlogonInterface() {}			
+			WinlogonInterface() {}
 
 		private:
 			static DWORD s_winlogonVersion;

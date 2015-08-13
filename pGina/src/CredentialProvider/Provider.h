@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -43,10 +43,10 @@ namespace pGina
 		{
 		public:
 			// IUnknown
-			IFACEMETHODIMP_(ULONG) AddRef();    
-			IFACEMETHODIMP_(ULONG) Release();    
+			IFACEMETHODIMP_(ULONG) AddRef();
+			IFACEMETHODIMP_(ULONG) Release();
 			IFACEMETHODIMP QueryInterface(__in REFIID riid, __deref_out void** ppv);
-			
+
 			// ICredentialProvider
 			IFACEMETHODIMP SetUsageScenario(__in CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, __in DWORD dwFlags);
 			IFACEMETHODIMP SetSerialization(__in const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs);
@@ -68,7 +68,7 @@ namespace pGina
 			bool SerializedUserNameAvailable();
 			bool SerializedPasswordAvailable();
 			bool SerializedDomainNameAvailable();
-			void GetSerializedCredentials(PWSTR *username, PWSTR *password, PWSTR *domain);			
+			void GetSerializedCredentials(PWSTR *username, PWSTR *password, PWSTR *domain);
 
 		private:
 			long m_referenceCount;
@@ -77,7 +77,7 @@ namespace pGina
 			UINT_PTR							m_logonUiCallbackContext;
 			Credential *						m_credential;
 			DWORD								m_usageFlags;
-			KERB_INTERACTIVE_UNLOCK_LOGON *		m_setSerialization;			
+			KERB_INTERACTIVE_UNLOCK_LOGON *		m_setSerialization;
 		};
 	}
 }

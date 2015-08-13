@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -37,9 +37,9 @@ namespace pGina
 {
 	namespace GINA
 	{
-		// Gina implementation that loads another gina dll that hooks 
+		// Gina implementation that loads another gina dll that hooks
 		//	(and stubs) msgina.dll for customization (ui etc).  We are both
-		//  a Gina() interface (for winlogon) and a WinlogonProxy (for our 
+		//  a Gina() interface (for winlogon) and a WinlogonProxy (for our
 		//  chained GINA).
 		class GinaChain : public Gina, public WinlogonProxy
 		{
@@ -64,19 +64,19 @@ namespace pGina
 			virtual void DisplayLockedNotice();
 			virtual bool DisplayStatusMessage(HDESK hDesktop, DWORD dwOptions, PWSTR pTitle, PWSTR pMessage);
 			virtual bool GetStatusMessage(DWORD * pdwOptions, PWSTR pMessage, DWORD dwBufferSize);
-			virtual bool RemoveStatusMessage();						
-			
+			virtual bool RemoveStatusMessage();
+
 			// SAS handling
-			virtual int  LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, 
+			virtual int  LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions,
 									 PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile);
 			virtual int  LoggedOnSAS(DWORD dwSasType, PVOID pReserved);
 			virtual int  WkstaLockedSAS(DWORD dwSasType);
-			
+
 			// Things to do when winlogon says to...
 			virtual bool ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOID pEnvironment);
 			virtual bool StartApplication(PWSTR pszDesktopName, PVOID pEnvironment, PWSTR pszCmdLine);
-			virtual bool NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo);		
-		
+			virtual bool NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo);
+
 			// Winlogon callbacks that we hook
 			virtual int  WlxDialogBoxParam(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam);
 		private:

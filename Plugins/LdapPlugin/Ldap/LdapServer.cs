@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -43,7 +43,7 @@ namespace pGina.Plugin.Ldap
     public class LdapServer : IDisposable
     {
         private log4net.ILog m_logger = log4net.LogManager.GetLogger("LdapServer");
-        
+
         /// <summary>
         /// The connection object.
         /// </summary>
@@ -177,15 +177,15 @@ namespace pGina.Plugin.Ldap
             if (m_cert == null)
             {
                 m_logger.Debug("Verifying server cert with Windows store.");
-                
+
                 // We set the RevocationMode to NoCheck because most custom (self-generated) CAs
                 // do not work properly with revocation lists.  This is slightly less secure, but
                 // the most common use case for this plugin probably doesn't rely on revocation
                 // lists.
-                X509ChainPolicy policy = new X509ChainPolicy() { 
-                    RevocationMode = X509RevocationMode.NoCheck 
+                X509ChainPolicy policy = new X509ChainPolicy() {
+                    RevocationMode = X509RevocationMode.NoCheck
                 };
-                
+
                 // Create a validator using the policy
                 X509CertificateValidator validator = X509CertificateValidator.CreatePeerOrChainTrustValidator(true, policy);
                 try
@@ -321,7 +321,7 @@ namespace pGina.Plugin.Ldap
         }
 
         /// <summary>
-        /// Does a search in the subtree at searchBase, using the filter provided and 
+        /// Does a search in the subtree at searchBase, using the filter provided and
         /// returns the DN of the first match.
         /// </summary>
         /// <param name="searchBase">The DN of the root of the subtree for the search (search context).</param>
@@ -398,7 +398,7 @@ namespace pGina.Plugin.Ldap
         /// <returns></returns>
         public BooleanResult Authenticate(string uname, string password, SessionProperties properties)
         {
-            // Check for empty password.  If configured to do so, we fail on 
+            // Check for empty password.  If configured to do so, we fail on
             // empty passwords.
             bool allowEmpty = Settings.Store.AllowEmptyPasswords;
             if (!allowEmpty && string.IsNullOrEmpty(password))

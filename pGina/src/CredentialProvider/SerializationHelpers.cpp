@@ -1,6 +1,6 @@
 /**
  * Note that this file is a copy, with the listed edits, of
- * helpers.cpp from the Microsoft Platform SDK sample, original 
+ * helpers.cpp from the Microsoft Platform SDK sample, original
  * copyright notice thereof follows this comment block.
  *
  * - Remove FieldDescriptor* functions - not used
@@ -25,7 +25,7 @@
 namespace Microsoft
 {
 	namespace Sample
-	{		
+	{
 		//
 		// This function copies the length of pwz and the pointer pwz into the UNICODE_STRING structure
 		// This function is intended for serializing a credential in GetSerialization only.
@@ -73,7 +73,7 @@ namespace Microsoft
 
 		//
 		// The following function is intended to be used ONLY with the Kerb*Pack functions.  It does
-		// no bounds-checking because its callers have precise requirements and are written to respect 
+		// no bounds-checking because its callers have precise requirements and are written to respect
 		// its limitations.
 		// You can read more about the UNICODE_STRING type at:
 		// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/secauthn/security/unicode_string.asp
@@ -94,7 +94,7 @@ namespace Microsoft
 		//
 		// Initialize the members of a KERB_INTERACTIVE_UNLOCK_LOGON with weak references to the
 		// passed-in strings.  This is useful if you will later use KerbInteractiveUnlockLogonPack
-		// to serialize the structure.  
+		// to serialize the structure.
 		//
 		// The password is stored in encrypted form for CPUS_LOGON and CPUS_UNLOCK_WORKSTATION
 		// because the system can accept encrypted credentials.  It is not encrypted in CPUS_CREDUI
@@ -117,9 +117,9 @@ namespace Microsoft
 			// serialized credential.  We could replace the calls to UnicodeStringInitWithString
 			// and KerbInteractiveUnlockLogonPack with a single cal to CredPackAuthenticationBuffer,
 			// but that API has a drawback: it returns a KERB_INTERACTIVE_UNLOCK_LOGON whose
-			// MessageType is always KerbInteractiveLogon.  
+			// MessageType is always KerbInteractiveLogon.
 			//
-			// If we only handled CPUS_LOGON, this drawback would not be a problem.  For 
+			// If we only handled CPUS_LOGON, this drawback would not be a problem.  For
 			// CPUS_UNLOCK_WORKSTATION, we could cast the output buffer of CredPackAuthenticationBuffer
 			// to KERB_INTERACTIVE_UNLOCK_LOGON and modify the MessageType to KerbWorkstationUnlockLogon,
 			// but such a cast would be unsupported -- the output format of CredPackAuthenticationBuffer
@@ -175,7 +175,7 @@ namespace Microsoft
 		// WinLogon and LSA consume "packed" KERB_INTERACTIVE_UNLOCK_LOGONs.  In these, the PWSTR members of each
 		// UNICODE_STRING are not actually pointers but byte offsets into the overall buffer represented
 		// by the packed KERB_INTERACTIVE_UNLOCK_LOGON.  For example:
-		// 
+		//
 		// rkiulIn.Logon.LogonDomainName.Length = 14                                    -> Length is in bytes, not characters
 		// rkiulIn.Logon.LogonDomainName.Buffer = sizeof(KERB_INTERACTIVE_UNLOCK_LOGON) -> LogonDomainName begins immediately
 		//                                                                              after the KERB_... struct in the buffer
@@ -184,7 +184,7 @@ namespace Microsoft
 		//
 		// rkiulIn.Logon.Password.Length = 16
 		// rkiulIn.Logon.Password.Buffer = sizeof(KERB_INTERACTIVE_UNLOCK_LOGON) + 14 + 10
-		// 
+		//
 		// THere's more information on this at:
 		// http://msdn.microsoft.com/msdnmag/issues/05/06/SecurityBriefs/#void
 		//
@@ -251,12 +251,12 @@ namespace Microsoft
 			return hr;
 		}
 
-		// 
+		//
 		// This function packs the string pszSourceString in pszDestinationString
 		// for use with LSA functions including LsaLookupAuthenticationPackage.
 		//
 		static HRESULT _LsaInitString(
-			__out PSTRING pszDestinationString, 
+			__out PSTRING pszDestinationString,
 			__in PCSTR pszSourceString
 			)
 		{
@@ -316,7 +316,7 @@ namespace Microsoft
 		// pwzToProtect must not be NULL or the empty string.
 		//
 		static HRESULT _ProtectAndCopyString(
-			__in PCWSTR pwzToProtect, 
+			__in PCWSTR pwzToProtect,
 			__deref_out PWSTR* ppwzProtected
 			)
 		{
@@ -377,7 +377,7 @@ namespace Microsoft
 
 		//
 		// If pwzPassword should be encrypted, return a copy encrypted with CredProtect.
-		// 
+		//
 		// If not, just return a copy.
 		//
 		HRESULT ProtectIfNecessaryAndCopyPassword(
@@ -404,7 +404,7 @@ namespace Microsoft
 					CRED_PROTECTION_TYPE protectionType;
 
 					// If the password is already encrypted, we should not encrypt it again.
-					// An encrypted password may be received through SetSerialization in the 
+					// An encrypted password may be received through SetSerialization in the
 					// CPUS_LOGON scenario during a Terminal Services connection, for instance.
 					if (CredIsProtectedW(pwzPasswordCopy, &protectionType))
 					{
@@ -424,7 +424,7 @@ namespace Microsoft
 					{
 						hr = _ProtectAndCopyString(pwzPasswordCopy, ppwzProtectedPassword);
 					}
-            
+
 					CoTaskMemFree(pwzPasswordCopy);
 				}
 			}
@@ -438,7 +438,7 @@ namespace Microsoft
 
 		//
 		// Unpack a KERB_INTERACTIVE_UNLOCK_LOGON *in place*.  That is, reset the Buffers from being offsets to
-		// being real pointers.  This means, of course, that passing the resultant struct across any sort of 
+		// being real pointers.  This means, of course, that passing the resultant struct across any sort of
 		// memory space boundary is not going to work -- repack it if necessary!
 		//
 		void KerbInteractiveUnlockLogonUnpackInPlace(
@@ -464,7 +464,7 @@ namespace Microsoft
 						? (PWSTR)((BYTE*)pkiul + (ULONG_PTR)pkil->UserName.Buffer)
 						: NULL;
 
-					pkil->Password.Buffer = pkil->Password.Buffer 
+					pkil->Password.Buffer = pkil->Password.Buffer
 						? (PWSTR)((BYTE*)pkiul + (ULONG_PTR)pkil->Password.Buffer)
 						: NULL;
 				}
@@ -553,7 +553,7 @@ namespace Microsoft
 			HRESULT hr;
 			size_t cchDomain = lstrlen(pwszDomain);
 			size_t cchUsername = lstrlen(pwszUsername);
-			// Length of domain, 1 character for '\', length of Username, plus null terminator. 
+			// Length of domain, 1 character for '\', length of Username, plus null terminator.
 			size_t cbLen = sizeof(WCHAR) * (cchDomain + 1 + cchUsername +1);
 			PWSTR pwszDest = (PWSTR)HeapAlloc(GetProcessHeap(), 0, cbLen);
 			if (pwszDest)

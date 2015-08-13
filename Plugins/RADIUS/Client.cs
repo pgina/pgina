@@ -22,14 +22,14 @@ namespace pGina.Plugin.RADIUS
         public string sharedKey { get; set; } //Private shared key for server
         public int timeout { get; set; } //timeout in ms
         public int maxRetries { get; set; } //Number of times to retry sending packet
-        
+
         public string sessionId { get; set; } //SessionId is required for accounting
         public Packet lastReceievedPacket { get; private set; } //Last packet received from server
         public bool authenticated { get; private set; } //Whether username was successfully authenticated
 
         public DateTime accountingStartTime { get; set; }
-        
-        public byte[] NAS_IP_Address { get; set; } 
+
+        public byte[] NAS_IP_Address { get; set; }
         public string NAS_Identifier { get; set; }
         public string called_station_id { get; set; }
 
@@ -42,7 +42,7 @@ namespace pGina.Plugin.RADIUS
         }
 
         public string ipAddressRegex { get; set; }
-        
+
         private static Random r = new Random();
         private ILog m_logger = LogManager.GetLogger("RADIUSPlugin");
 
@@ -81,9 +81,9 @@ namespace pGina.Plugin.RADIUS
         {
             Packet authPacket = new Packet(Packet.Code.Access_Request, identifier, sharedKey);
             authPacket.sharedKey = sharedKey;
-            
+
             authPacket.addAttribute(Packet.AttributeType.User_Name, username);
-                        
+
             authPacket.addAttribute(Packet.AttributeType.User_Password, password);
             if(!String.IsNullOrEmpty(sessionId))
                 authPacket.addAttribute(Packet.AttributeType.Acct_Session_Id, sessionId);
@@ -153,7 +153,7 @@ namespace pGina.Plugin.RADIUS
 
         //Sends a start accounting request to the RADIUS server, returns true on acknowledge of request
         public bool startAccounting(string username, Packet.Acct_Authentic authType)
-        {               
+        {
             //Create accounting request packet
             Packet accountingRequest = new Packet(Packet.Code.Accounting_Request, identifier, sharedKey);
             accountingRequest.addAttribute(Packet.AttributeType.User_Name, username);

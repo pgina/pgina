@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -37,7 +37,7 @@
 namespace pGina
 {
 	namespace GINA
-	{				
+	{
 		void DialogLoggedOutSAS::DialogInit()
 		{
 			if(!m_username.empty()) SetItemText(IDC_USERNAME_TXT, m_username.c_str());
@@ -52,7 +52,7 @@ namespace pGina
 				SetItemText(IDC_SPECIAL, pGina::Registry::GetString(L"SpecialAction", L"Shutdown").c_str());
 			}
 			else
-				DisableItem(IDC_SPECIAL);			
+				DisableItem(IDC_SPECIAL);
 
 			// Service status
 			//if( pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
@@ -85,8 +85,8 @@ namespace pGina
 			{
 			case IDCANCEL:
 				FinishWithResult(SAS_ACTION_NONE);
-				return true;	
-			
+				return true;
+
 			case IDC_LOGIN_BUTTON:
 				m_username = GetItemText(IDC_USERNAME_TXT);
 				m_password = GetItemText(IDC_PASSWORD_TXT);
@@ -103,14 +103,14 @@ namespace pGina
 					else if(_wcsicmp(action.c_str(), L"Sleep") == 0)
 						FinishWithResult(SAS_ACTION_SHUTDOWN_SLEEP);
 					else if(_wcsicmp(action.c_str(), L"Hibernate") == 0)
-						FinishWithResult(SAS_ACTION_SHUTDOWN_HIBERNATE);					
+						FinishWithResult(SAS_ACTION_SHUTDOWN_HIBERNATE);
 				}
 				return true;
 			}
 
 			return false;
 		}
-		
+
 		void DialogLoggedOutSAS::SetServiceStatus()
 		{
 			if( pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
@@ -131,7 +131,7 @@ namespace pGina
 		{
 			if(timerId == m_statusTimerId)
 			{
-				SetServiceStatus();	
+				SetServiceStatus();
 				return true;
 			}
 
@@ -139,9 +139,9 @@ namespace pGina
 		}
 
 		INT_PTR DialogLoggedOutSAS::DialogProcImpl(UINT msg, WPARAM wparam, LPARAM lparam)
-		{			
+		{
 			return FALSE;
-		}		
+		}
 
 		void DialogLoggedOutSAS::ApplyLogoImage()
 		{
@@ -156,8 +156,8 @@ namespace pGina
 				else
 				{
 					pDEBUG(L"Credential::GetBitmapValue: Loading image from: %s", tileImage.c_str());
-					m_bitmap = (HBITMAP) LoadImageW((HINSTANCE) NULL, tileImage.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);			
-				}				
+					m_bitmap = (HBITMAP) LoadImageW((HINSTANCE) NULL, tileImage.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+				}
 			}
 
 			if(m_bitmap)

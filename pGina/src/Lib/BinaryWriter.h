@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -45,7 +45,7 @@ namespace pGina
 				m_bytesWritten = 0;
 			}
 
-			BinaryWriter(Buffer &buffer)				
+			BinaryWriter(Buffer &buffer)
 			{
 				m_buffer = buffer.Raw();
 				m_bufferLength = buffer.Length();
@@ -53,12 +53,12 @@ namespace pGina
 				m_bytesWritten = 0;
 			}
 
-			BinaryWriter(Buffer *buffer) 
+			BinaryWriter(Buffer *buffer)
 			{
 				m_buffer = buffer ? buffer->Raw() : 0;
 				m_bufferLength = buffer ? buffer->Length() : 0;
 				m_cursor = m_buffer;
-				m_bytesWritten = 0;				
+				m_bytesWritten = 0;
 			}
 
 			BinaryWriter(unsigned char * buffer, int length)
@@ -72,7 +72,7 @@ namespace pGina
 			void Write(int);
 			void Write(unsigned char);
 			void Write(bool);
-			void Write(std::string const&);			
+			void Write(std::string const&);
 			void Write(std::wstring const&);
 
 			bool EndOfBuffer() { return (m_cursor - m_buffer >= m_bufferLength); }
@@ -83,7 +83,7 @@ namespace pGina
 
 			unsigned char * m_buffer;
 			unsigned char * m_cursor;
-			int m_bufferLength;			
+			int m_bufferLength;
 			int m_bytesWritten;
 		};
 	}

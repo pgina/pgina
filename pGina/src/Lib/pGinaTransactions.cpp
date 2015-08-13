@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -37,13 +37,13 @@
 namespace pGina
 {
 	namespace Transactions
-	{			
+	{
 		/* static */
 		void Log::Debug(const wchar_t *format, ...)
 		{
 			wchar_t buffer[2048];
 			memset(buffer, 0, sizeof(buffer));
-			
+
 			va_list args;
 			va_start(args, format);
 			_vsnwprintf_s( buffer, sizeof(buffer) / sizeof(WORD), _TRUNCATE, format, args);
@@ -56,7 +56,7 @@ namespace pGina
 		{
 			wchar_t buffer[2048];
 			memset(buffer, 0, sizeof(buffer));
-			
+
 			va_list args;
 			va_start(args, format);
 			_vsnwprintf_s( buffer, sizeof(buffer) / sizeof(WORD), _TRUNCATE, format, args);
@@ -69,7 +69,7 @@ namespace pGina
 		{
 			wchar_t buffer[2048];
 			memset(buffer, 0, sizeof(buffer));
-			
+
 			va_list args;
 			va_start(args, format);
 			_vsnwprintf_s( buffer, sizeof(buffer) / sizeof(WORD), _TRUNCATE, format, args);
@@ -82,14 +82,14 @@ namespace pGina
 		{
 			wchar_t buffer[2048];
 			memset(buffer, 0, sizeof(buffer));
-			
+
 			va_list args;
 			va_start(args, format);
 			_vsnwprintf_s( buffer, sizeof(buffer) / sizeof(WORD), _TRUNCATE, format, args);
 
 			LogInternal(L"Error", buffer);
 		}
-		
+
 		/* static */
 		void Log::LogInternal(const wchar_t *level, const wchar_t *message)
 		{
@@ -102,7 +102,7 @@ namespace pGina
 			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
 			std::wstring pipePath = L"\\\\.\\pipe\\";
 			pipePath += pipeName;
-						
+
 			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);
 			if(pipeClient.Connect())
 			{
@@ -111,27 +111,27 @@ namespace pGina
 
 				// Always send hello first, expect hello in return
 				pGina::Protocol::HelloMessage hello;
-				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);		
+				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);
 				cleanup.Add(reply);
 
 				if(reply && reply->Type() != pGina::Protocol::Hello)
 					return;
-				
+
 				// Then send a log message, expect ack in return
-				pGina::Protocol::LogMessage log(L"NativeLib", level, message);				
+				pGina::Protocol::LogMessage log(L"NativeLib", level, message);
 				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, log);
 				cleanup.Add(reply);
 
 				if(reply && reply->Type() != pGina::Protocol::Ack)
 					return;
-								
+
 				// Send disconnect, expect ack, then close
 				pGina::Protocol::DisconnectMessage disconnect;
 				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, disconnect);
-				cleanup.Add(reply);		
+				cleanup.Add(reply);
 
 				// We close regardless, no need to check reply type..
-				pipeClient.Close();		
+				pipeClient.Close();
 			}
 		}
 
@@ -141,7 +141,7 @@ namespace pGina
 			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
 			std::wstring pipePath = L"\\\\.\\pipe\\";
 			pipePath += pipeName;
-						
+
 			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);
 			if(pipeClient.Connect())
 			{
@@ -150,19 +150,19 @@ namespace pGina
 
 				// Always send hello first, expect hello in return
 				pGina::Protocol::HelloMessage hello;
-				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);		
+				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);
 				cleanup.Add(reply);
 
 				if(reply && reply->Type() != pGina::Protocol::Hello)
 					return false;
-												
+
 				// Send disconnect, expect ack, then close
 				pGina::Protocol::DisconnectMessage disconnect;
 				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, disconnect);
-				cleanup.Add(reply);		
+				cleanup.Add(reply);
 
 				// We close regardless, no need to check reply type..
-				pipeClient.Close();		
+				pipeClient.Close();
 				return true;
 			}
 
@@ -171,26 +171,26 @@ namespace pGina
 
 		/* static */
 		User::LoginResult User::ProcessLoginForUser(const wchar_t *username, const wchar_t *domain, const wchar_t *password, pGina::Protocol::LoginRequestMessage::LoginReason reason)
-		{			
+		{
 			// Write a log message to the service
 			std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
 			std::wstring pipePath = L"\\\\.\\pipe\\";
-			pipePath += pipeName;					
+			pipePath += pipeName;
 
 			// Start a cleanup pool for messages we collect along the way
 			pGina::Memory::ObjectCleanupPool cleanup;
 
-			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);			
+			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);
 			if(pipeClient.Connect())
-			{				
+			{
 				// Always send hello first, expect hello in return
 				pGina::Protocol::HelloMessage hello;
-				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);		
+				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);
 				cleanup.Add(reply);
 
 				if(reply && reply->Type() != pGina::Protocol::Hello)
 					return LoginResult();
-				
+
 				// Then send a loging request message, expect a loginresult message
 				pGina::Protocol::LoginRequestMessage request(username, domain, password, reason);
 				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, request);
@@ -201,14 +201,14 @@ namespace pGina
 
 				// Did they login?
 				pGina::Protocol::LoginResponseMessage * responseMsg = static_cast<pGina::Protocol::LoginResponseMessage *>(reply);
-				
+
 				// Send disconnect, expect ack, then close
 				pGina::Protocol::DisconnectMessage disconnect;
 				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, disconnect);
-				cleanup.Add(reply);		
+				cleanup.Add(reply);
 
 				// We close regardless, no need to check reply type..
-				pipeClient.Close();		
+				pipeClient.Close();
 
 				// If a domain was not specified, we must set it to local machine else no u/p will work regardless
 				if(responseMsg->Domain().length() == 0)
@@ -217,10 +217,10 @@ namespace pGina
 					responseMsg->Domain(pGina::Helpers::GetMachineName());
 				}
 
-				// If we failed, and the 'LocalAdminFallback' option is on, try this with LogonUser iff the username is an 
+				// If we failed, and the 'LocalAdminFallback' option is on, try this with LogonUser iff the username is an
 				//	admin locally.  In fact, it is so rare that this should be turned off, that we don't expose it in the UI
 				//  even..  woah!
-				if(!responseMsg->Result())					
+				if(!responseMsg->Result())
 				{
 					if(pGina::Registry::GetBool(L"LocalAdminFallback", false))
 					{
@@ -241,25 +241,25 @@ namespace pGina
 					}
 				}
 
-				return LoginResult(responseMsg->Result(), responseMsg->Username(), responseMsg->Password(), responseMsg->Domain(), responseMsg->Message());				
+				return LoginResult(responseMsg->Result(), responseMsg->Username(), responseMsg->Password(), responseMsg->Domain(), responseMsg->Message());
 			}
 			else
 			{
 				Log::Warn(L"Unable to connect to pGina service pipe - LastError: 0x%08x, falling back on LogonUser()", GetLastError());
 				if(LocalLoginForUser(username, password))
-					return LoginResult(true, username ? username : L"", password ? password : L"", pGina::Helpers::GetMachineName(), L"");					
+					return LoginResult(true, username ? username : L"", password ? password : L"", pGina::Helpers::GetMachineName(), L"");
 			}
 
 			return LoginResult();
-		}	
+		}
 
 		/* static */
 		bool User::LocalLoginForUser(const wchar_t *username, const wchar_t *password)
 		{
-			std::wstring domainName = pGina::Helpers::GetMachineName();				
+			std::wstring domainName = pGina::Helpers::GetMachineName();
 			Log::Debug(L"Using LogonUser(%s, %s, *****)", username, domainName.c_str());
 			HANDLE token = NULL;
-			if(LogonUser(username, domainName.c_str(), password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &token) == TRUE)				
+			if(LogonUser(username, domainName.c_str(), password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &token) == TRUE)
 			{
 				CloseHandle(token);
 				return true;
@@ -276,7 +276,7 @@ namespace pGina
 			std::wstring pipePath = L"\\\\.\\pipe\\";
 			pipePath += pipeName;
 
-			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);	
+			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);
 			std::wstring labelText = L"";
 
 			if( pipeClient.Connect() )
@@ -286,7 +286,7 @@ namespace pGina
 
 				// Always send hello first, expect hello in return
 				pGina::Protocol::HelloMessage hello;
-				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);		
+				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);
 				cleanup.Add(reply);
 
 				if(reply && reply->Type() != pGina::Protocol::Hello)
@@ -301,14 +301,14 @@ namespace pGina
 					return labelText;
 
 				// Get the reply
-				pGina::Protocol::DynamicLabelResponseMessage * responseMsg = 
+				pGina::Protocol::DynamicLabelResponseMessage * responseMsg =
 					static_cast<pGina::Protocol::DynamicLabelResponseMessage *>(reply);
 				labelText = responseMsg->Text();
 
 				// Send disconnect, expect ack, then close
 				pGina::Protocol::DisconnectMessage disconnect;
 				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, disconnect);
-				cleanup.Add(reply);		
+				cleanup.Add(reply);
 
 				// We close regardless, no need to check reply type..
 				pipeClient.Close();
@@ -329,8 +329,8 @@ namespace pGina
 			std::wstring pipePath = L"\\\\.\\pipe\\";
 			pipePath += pipeName;
 
-			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);	
-			
+			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);
+
 			if( pipeClient.Connect() )
 			{
 				// Start a cleanup pool for messages we collect along the way
@@ -338,7 +338,7 @@ namespace pGina
 
 				// Always send hello first, expect hello in return
 				pGina::Protocol::HelloMessage hello;
-				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);		
+				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);
 				cleanup.Add(reply);
 
 				if(reply && reply->Type() != pGina::Protocol::Hello)
@@ -353,13 +353,13 @@ namespace pGina
 					return UserInformation();
 
 				// Get the reply
-				pGina::Protocol::UserInformationResponseMessage * responseMsg = 
+				pGina::Protocol::UserInformationResponseMessage * responseMsg =
 					static_cast<pGina::Protocol::UserInformationResponseMessage *>(reply);
 
 				// Send disconnect, expect ack, then close
 				pGina::Protocol::DisconnectMessage disconnect;
 				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, disconnect);
-				cleanup.Add(reply);		
+				cleanup.Add(reply);
 
 				// We close regardless, no need to check reply type..
 				pipeClient.Close();
@@ -381,7 +381,7 @@ namespace pGina
 			std::wstring pipePath = L"\\\\.\\pipe\\";
 			pipePath += pipeName;
 
-			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);	
+			pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);
 			std::wstring labelText = L"";
 
 			if( pipeClient.Connect() )
@@ -391,7 +391,7 @@ namespace pGina
 
 				// Always send hello first, expect hello in return
 				pGina::Protocol::HelloMessage hello;
-				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);		
+				pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);
 				cleanup.Add(reply);
 
 				if(reply && reply->Type() != pGina::Protocol::Hello)
@@ -410,7 +410,7 @@ namespace pGina
 				// Send disconnect, expect ack, then close
 				pGina::Protocol::DisconnectMessage disconnect;
 				reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, disconnect);
-				cleanup.Add(reply);		
+				cleanup.Add(reply);
 
 				// We close regardless, no need to check reply type..
 				pipeClient.Close();
@@ -418,10 +418,10 @@ namespace pGina
 			else
 			{
 				Log::Warn(L"Unable to connect to pGina service pipe - LastError: 0x%08x, giving up.", GetLastError());
-			}		
-		}	
+			}
+		}
 
-		ServiceStateThread::ServiceStateThread() :		
+		ServiceStateThread::ServiceStateThread() :
 			m_serviceRunning(false),
 			m_callback(NULL)
 		{
@@ -435,8 +435,8 @@ namespace pGina
 		DWORD ServiceStateThread::ThreadMain()
 		{
 			while(Running())
-			{				
-				bool runningNow = Service::Ping();				
+			{
+				bool runningNow = Service::Ping();
 				bool runningWas = IsServiceRunning();
 				SetServiceRunning(runningNow);
 
@@ -467,26 +467,26 @@ namespace pGina
                 /* static */
                 User::LoginResult User::ProcessChangePasswordForUser(const wchar_t *username, const wchar_t *domain,
                                 const wchar_t *oldPassword, const wchar_t *newPassword)
-                {                        
+                {
                         // Write a log message to the service
                         std::wstring pipeName = pGina::Registry::GetString(L"ServicePipeName", L"Unknown");
                         std::wstring pipePath = L"\\\\.\\pipe\\";
-                        pipePath += pipeName;                                        
+                        pipePath += pipeName;
 
                         // Start a cleanup pool for messages we collect along the way
                         pGina::Memory::ObjectCleanupPool cleanup;
 
-                        pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);                        
+                        pGina::NamedPipes::PipeClient pipeClient(pipePath, 100);
                         if(pipeClient.Connect())
-                        {                                
+                        {
                                 // Always send hello first, expect hello in return
                                 pGina::Protocol::HelloMessage hello;
-                                pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);                
+                                pGina::Protocol::MessageBase * reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, hello);
                                 cleanup.Add(reply);
 
                                 if(reply && reply->Type() != pGina::Protocol::Hello)
                                         return LoginResult();
-                                
+
                                 // Then send a change password request message, expect a loginresult message
                                 pGina::Protocol::ChangePasswordRequestMessage request(username, domain, oldPassword, newPassword);
                                 reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, request);
@@ -497,14 +497,14 @@ namespace pGina
 
                                 pGina::Protocol::ChangePasswordResponseMessage * responseMsg =
                                         static_cast<pGina::Protocol::ChangePasswordResponseMessage *>(reply);
-                                
+
                                 // Send disconnect, expect ack, then close
                                 pGina::Protocol::DisconnectMessage disconnect;
                                 reply = pGina::Protocol::SendRecvPipeMessage(pipeClient, disconnect);
-                                cleanup.Add(reply);                
+                                cleanup.Add(reply);
 
                                 // We close regardless, no need to check reply type..
-                                pipeClient.Close();                
+                                pipeClient.Close();
 
                                 // If a domain was not specified, we must set it to local machine else no u/p will work regardless
                                 if(responseMsg->Domain().length() == 0)
@@ -518,7 +518,7 @@ namespace pGina
                                         responseMsg->Username(),
                                         responseMsg->OldPassword(),
                                         responseMsg->Domain(),
-                                        responseMsg->Message());                                
+                                        responseMsg->Message());
                         }
                         else
                         {

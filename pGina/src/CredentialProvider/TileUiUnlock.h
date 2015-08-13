@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -39,9 +39,9 @@ namespace pGina
 			LOIFI_LOCKED          = 1,
 			LOIFI_USERNAME        = 2,
 			LOIFI_PASSWORD        = 3,
-			LOIFI_SUBMIT          = 4, 
+			LOIFI_SUBMIT          = 4,
 			LOIFI_STATUS		  = 5,
-			LOIFI_NUM_FIELDS      = 6,  
+			LOIFI_NUM_FIELDS      = 6,
 		};
 
 		static const UI_FIELDS s_unlockFields =
@@ -53,11 +53,11 @@ namespace pGina
 			LUIFI_STATUS,			// Status field
 			{
 				//  when to display,               style,             field id,        type,               name           data source  value		callback
-				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LOIFI_TILEIMAGE, CPFT_TILE_IMAGE,    L"Image" },    SOURCE_NONE, NULL,		NULL },	
-				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LOIFI_LOCKED,    CPFT_LARGE_TEXT,    L"Locked" },   SOURCE_NONE, L"Locked",	NULL }, 
-				{ { CPFS_DISPLAY_IN_BOTH,		   CPFIS_NONE },	{ LOIFI_USERNAME,  CPFT_LARGE_TEXT,    L"Username" }, SOURCE_NONE, NULL,		NULL },	
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },	{ LOIFI_PASSWORD,  CPFT_PASSWORD_TEXT, L"Password" }, SOURCE_NONE, NULL,		NULL }, 
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },    { LOIFI_SUBMIT,    CPFT_SUBMIT_BUTTON, L"Submit" },   SOURCE_NONE, NULL,		NULL }, 
+				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LOIFI_TILEIMAGE, CPFT_TILE_IMAGE,    L"Image" },    SOURCE_NONE, NULL,		NULL },
+				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LOIFI_LOCKED,    CPFT_LARGE_TEXT,    L"Locked" },   SOURCE_NONE, L"Locked",	NULL },
+				{ { CPFS_DISPLAY_IN_BOTH,		   CPFIS_NONE },	{ LOIFI_USERNAME,  CPFT_LARGE_TEXT,    L"Username" }, SOURCE_NONE, NULL,		NULL },
+				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },	{ LOIFI_PASSWORD,  CPFT_PASSWORD_TEXT, L"Password" }, SOURCE_NONE, NULL,		NULL },
+				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },    { LOIFI_SUBMIT,    CPFT_SUBMIT_BUTTON, L"Submit" },   SOURCE_NONE, NULL,		NULL },
 				{ { CPFS_DISPLAY_IN_BOTH,		   CPFIS_NONE },    { LOIFI_STATUS,    CPFT_SMALL_TEXT,    L"Status" },   SOURCE_STATUS, L"Status",		NULL },
 			}
 		};

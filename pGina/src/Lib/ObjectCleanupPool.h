@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -86,21 +86,21 @@ namespace pGina
 					CoTaskMemFree(m_memory);
 			}
 		};
-		
+
 		class ObjectCleanupPool
 		{
 		public:
 			ObjectCleanupPool() {}
 			~ObjectCleanupPool()
-			{				
+			{
 				for(std::vector<ObjectCleanupBase *>::iterator itr = m_cleanupVector.begin(); itr != m_cleanupVector.end(); ++itr)
 				{
-					delete *itr;					
+					delete *itr;
 				}
 
 				m_cleanupVector.clear();
 			}
-			
+
 			void AddFree(void *mem)
 			{
 				if(mem)
@@ -121,8 +121,8 @@ namespace pGina
 					m_cleanupVector.push_back(obj);
 				}
 			}
-		
-		private:			
+
+		private:
 			std::vector<ObjectCleanupBase *> m_cleanupVector;
 		};
 	}

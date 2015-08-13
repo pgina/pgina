@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -75,7 +75,7 @@ namespace pGina
 				length = reader.ReadInt32();
 				delete lengthBuffer;	// No longer needed, not that reader() should no longer be used, hence its scoping
 				lengthBuffer = 0;
-			}			
+			}
 
 			if(length <= 0)
 				return 0;
@@ -103,7 +103,7 @@ namespace pGina
 				return 0;
 
 			pGina::Memory::Buffer * buffer = new pGina::Memory::Buffer(size);
-			
+
 			unsigned char * ptr = buffer->Raw();
 			int length = buffer->Length();
 
@@ -146,12 +146,12 @@ namespace pGina
 
 		int PipeClient::Read(unsigned char * buffer, int len)
 		{
-			DWORD bytesRead = 0;			
+			DWORD bytesRead = 0;
 
 			if(ReadFile(m_pipe, buffer, (DWORD) len, &bytesRead, NULL))
 				return bytesRead;
 
-			return 0;	
+			return 0;
 		}
 
 		int PipeClient::Write(unsigned char * buffer, int len)
@@ -161,7 +161,7 @@ namespace pGina
 			if(WriteFile(m_pipe, buffer, (DWORD) len, &bytesWritten, NULL))
 				return bytesWritten;
 
-			return 0;			
+			return 0;
 		}
 
 		void PipeClient::Close()

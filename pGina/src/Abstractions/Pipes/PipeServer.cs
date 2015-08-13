@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -42,7 +42,7 @@ namespace Abstractions.Pipes
     public class PipeServer : Pipe
     {
         public int MaxClients { get; private set; }
-        
+
         private Thread[] m_serverThreads = null;
         private bool m_running = false;
         private bool Running
@@ -50,15 +50,15 @@ namespace Abstractions.Pipes
             get { lock (this) { return m_running; } }
             set { lock (this) { m_running = value; } }
         }
-        
-        public PipeServer(string name, int maxClients, Func<BinaryReader, BinaryWriter, bool> action) 
+
+        public PipeServer(string name, int maxClients, Func<BinaryReader, BinaryWriter, bool> action)
             : base(name, action)
         {
             MaxClients = maxClients;
         }
 
         public PipeServer(string name, int maxClients, Func<IDictionary<string, object>, IDictionary<string, object>> action)
-            : base(name, action) 
+            : base(name, action)
         {
             MaxClients = maxClients;
         }
@@ -97,10 +97,10 @@ namespace Abstractions.Pipes
                 return;
 
             Running = false;
-            
+
             // Some or all of our threads may be blocked waiting for connections,
-            // this is a bit nasty, but since I can't seem to get the async 
-            // wait working, we do this - poke em! 
+            // this is a bit nasty, but since I can't seem to get the async
+            // wait working, we do this - poke em!
             for (int x = 0; x < MaxClients; x++)
             {
                 FakeClientToWakeEmAndShakem();
@@ -111,18 +111,18 @@ namespace Abstractions.Pipes
                 m_serverThreads[x].Join();
             }
 
-            m_serverThreads = null;            
+            m_serverThreads = null;
         }
-        
+
         private void ServerThread()
-        {                        
+        {
             PipeSecurity security = new PipeSecurity();
 
             using (WindowsIdentity myself = WindowsIdentity.GetCurrent())
             {
                 try
                 {
-                    // Anyone can talk to us            
+                    // Anyone can talk to us
                     LibraryLogging.Debug("Setting PipeAccess R/W for world: {0}", Abstractions.Windows.Security.GetWellknownSID(WellKnownSidType.WorldSid));
                     security.AddAccessRule(new PipeAccessRule(Abstractions.Windows.Security.GetWellknownSID(WellKnownSidType.WorldSid), PipeAccessRights.ReadWrite, AccessControlType.Allow));
 
@@ -171,7 +171,7 @@ namespace Abstractions.Pipes
             try
             {
                 PipeClient client = new PipeClient(Name);
-                client.Start(((r, w) => { return false; }), null, 100);                
+                client.Start(((r, w) => { return false; }), null, 100);
             }
             catch { /* intentionally ignored */ }
         }

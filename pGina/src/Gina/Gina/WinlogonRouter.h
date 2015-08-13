@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -45,14 +45,14 @@ namespace pGina
 			static void Interface(WinlogonInterface *pIface) { s_interface = pIface; }
 			static WinlogonInterface * Interface() { return s_interface; }
 
-			static PWLX_DISPATCH_VERSION_1_4 DispatchTable() { return &s_table; }			
+			static PWLX_DISPATCH_VERSION_1_4 DispatchTable() { return &s_table; }
 
 		private:
 			// No instansiation!
 			WinlogonRouter() {}
 
 		private:
-			// Static methods for dispatching back into our winlogon interface from the 
+			// Static methods for dispatching back into our winlogon interface from the
 			//	table we provide to our chained GINA.
 			static void WlxUseCtrlAltDel(HANDLE hWlx);
 			static void WlxSetContextPointer(HANDLE hWlx, void *newContext);
@@ -77,14 +77,14 @@ namespace pGina
 			static void WlxWin31Migrate(HANDLE hWlx);
 			static int  WlxQueryTerminalServicesData(HANDLE hWlx, PWLX_TERMINAL_SERVICES_DATA pTSData, WCHAR *UserName, WCHAR *Domain);
 
-			// These don't have an hWlx param for getting back to us directly, we have to use our global :/			
+			// These don't have an hWlx param for getting back to us directly, we have to use our global :/
 			static bool WlxQueryClientCredentials(PWLX_CLIENT_CREDENTIALS_INFO_V1_0 pCred);
 			static bool WlxQueryInetConnectorCredentials(PWLX_CLIENT_CREDENTIALS_INFO_V1_0 pCred);
-			static bool WlxDisconnect();			
+			static bool WlxDisconnect();
 			static int  WlxQueryConsoleSwitchCredentials(PWLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0 pCred);
 			static bool WlxQueryTsLogonCredentials(PWLX_CLIENT_CREDENTIALS_INFO_V2_0 pCred);
 
-		private:			
+		private:
 			static WinlogonInterface * s_interface;
 			static WLX_DISPATCH_VERSION_1_4 s_table;
 		};

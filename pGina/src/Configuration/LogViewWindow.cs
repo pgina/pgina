@@ -35,6 +35,6 @@ namespace pGina.Configuration
                 MessageBox.Show(string.Format("File saved successfully: {0}", sfd.FileName), "Log Export", MessageBoxButtons.OK);
             }
         }
-        
+
     }
 }

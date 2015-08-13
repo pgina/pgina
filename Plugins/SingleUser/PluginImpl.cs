@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -41,8 +41,8 @@ namespace pGina.Plugin.SingleUser
     public class PluginImpl : IPluginConfiguration, IPluginAuthenticationGateway
     {
         private ILog m_logger = LogManager.GetLogger("SingleUserPlugin");
-        public static Guid PluginUuid = new Guid("{81F8034E-E278-4754-B10C-7066656DE5B7}");        
-        
+        public static Guid PluginUuid = new Guid("{81F8034E-E278-4754-B10C-7066656DE5B7}");
+
         public PluginImpl()
         {
             using(Process me = Process.GetCurrentProcess())
@@ -50,7 +50,7 @@ namespace pGina.Plugin.SingleUser
                 Settings.Init();
                 m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
             }
-        }        
+        }
 
         public string Name
         {
@@ -74,7 +74,7 @@ namespace pGina.Plugin.SingleUser
         {
             get { return PluginUuid; }
         }
-                
+
         public void Configure()
         {
             Configuration conf = new Configuration();

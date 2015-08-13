@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -32,7 +32,7 @@ namespace pGina
 	namespace GINA
 	{
 		WinlogonInterface * WinlogonRouter::s_interface = NULL;
-		WLX_DISPATCH_VERSION_1_4 WinlogonRouter::s_table = 
+		WLX_DISPATCH_VERSION_1_4 WinlogonRouter::s_table =
 		{
 			(PWLX_USE_CTRL_ALT_DEL)					&WinlogonRouter::WlxUseCtrlAltDel,
 			(PWLX_SET_CONTEXT_POINTER)				&WinlogonRouter::WlxSetContextPointer,
@@ -63,164 +63,164 @@ namespace pGina
 			(PWLX_QUERY_TS_LOGON_CREDENTIALS)		&WinlogonRouter::WlxQueryTsLogonCredentials,
 		};
 
-		/*static*/ 
+		/*static*/
 		void WinlogonRouter::WlxUseCtrlAltDel(HANDLE hWlx)
 		{
-			// We could require that the user who'se passed our table to someone 
+			// We could require that the user who'se passed our table to someone
 			//	also pass a ptr to s_interface as hWlx.  Instead, we ignore hWlx
 			//	and always use s_interface.  Simpler that way...
 			if(s_interface)
 				s_interface->WlxUseCtrlAltDel();
 		}
 
-		/*static*/ 
+		/*static*/
 		void WinlogonRouter::WlxSetContextPointer(HANDLE hWlx, void *newContext)
 		{
 			if(s_interface)
 				s_interface->WlxSetContextPointer(newContext);
 		}
 
-		/*static*/ 
+		/*static*/
 		void WinlogonRouter::WlxSasNotify(HANDLE hWlx, DWORD sas)
 		{
 			if(s_interface)
 				s_interface->WlxSasNotify(sas);
 		}
 
-		/*static*/ 
+		/*static*/
 		bool WinlogonRouter::WlxSetTimeout(HANDLE hWlx, DWORD newTimeout)
 		{
 			if(!s_interface) return false;
 			return s_interface->WlxSetTimeout(newTimeout);
 		}
 
-		/*static*/ 
+		/*static*/
 		int  WinlogonRouter::WlxAssignShellProtection(HANDLE hWlx, HANDLE token, HANDLE process, HANDLE thread)
 		{
 			if(!s_interface) return -1;
 			return s_interface->WlxAssignShellProtection(token, process, thread);
 		}
 
-		/*static*/ 
+		/*static*/
 		int  WinlogonRouter::WlxMessageBox(HANDLE hWlx, HWND owner, LPWSTR text, LPWSTR title, UINT style)
 		{
 			if(!s_interface) return -1;
 			return s_interface->WlxMessageBox(owner, text, title, style);
 		}
 
-		/*static*/ 
+		/*static*/
 		int  WinlogonRouter::WlxDialogBox(HANDLE hWlx, HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc)
 		{
 			if(!s_interface) return -1;
 			return s_interface->WlxDialogBox(hInst, lpszTemplate, hwndOwner, dlgprc);
 		}
 
-		/*static*/ 
+		/*static*/
 		int  WinlogonRouter::WlxDialogBoxParam(HANDLE hWlx, HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam)
 		{
 			if(!s_interface) return -1;
 			return s_interface->WlxDialogBoxParam(hInst, lpszTemplate, hwndOwner, dlgprc, dwInitParam);
 		}
 
-		/*static*/ 
+		/*static*/
 		int  WinlogonRouter::WlxDialogBoxIndirect(HANDLE hWlx, HANDLE hInst, LPCDLGTEMPLATE hDialogTemplate, HWND hwndOwner, DLGPROC dlgprc)
 		{
 			if(!s_interface) return -1;
 			return s_interface->WlxDialogBoxIndirect(hInst, hDialogTemplate, hwndOwner, dlgprc);
 		}
-		
-		/*static*/ 
+
+		/*static*/
 		int  WinlogonRouter::WlxDialogBoxIndirectParam(HANDLE hWlx, HANDLE hInst, LPCDLGTEMPLATE hDialogTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam)
 		{
 			if(!s_interface) return -1;
 			return s_interface->WlxDialogBoxIndirectParam(hInst, hDialogTemplate, hwndOwner, dlgprc, dwInitParam);
 		}
 
-		/*static*/ 
+		/*static*/
 		int  WinlogonRouter::WlxSwitchDesktopToUser(HANDLE hWlx)
 		{
 			if(!s_interface) return -1;
 			return s_interface->WlxSwitchDesktopToUser();
 		}
 
-		/*static*/ 
+		/*static*/
 		int  WinlogonRouter::WlxSwitchDesktopToWinlogon(HANDLE hWlx)
 		{
 			if(!s_interface) return -1;
 			return s_interface->WlxSwitchDesktopToWinlogon();
 		}
-		
-		/*static*/ 
+
+		/*static*/
 		int  WinlogonRouter::WlxChangePasswordNotify(HANDLE hWlx, PWLX_MPR_NOTIFY_INFO pMprInfo, DWORD dwChangeInfo)
 		{
 			if(!s_interface) return -1;
 			return s_interface->WlxChangePasswordNotify(pMprInfo, dwChangeInfo);
 		}
 
-		/*static*/ 
+		/*static*/
 		bool WinlogonRouter::WlxGetSourceDesktop(HANDLE hWlx, PWLX_DESKTOP *ppDesktop)
 		{
 			if(!s_interface) return false;
 			return s_interface->WlxGetSourceDesktop(ppDesktop);
 		}
-		
-		/*static*/ 
+
+		/*static*/
 		bool WinlogonRouter::WlxSetReturnDesktop(HANDLE hWlx, PWLX_DESKTOP pDesktop)
 		{
 			if(!s_interface) return false;
 			return s_interface->WlxSetReturnDesktop(pDesktop);
 		}
 
-		/*static*/ 
+		/*static*/
 		bool WinlogonRouter::WlxCreateUserDesktop(HANDLE hWlx, HANDLE hToken, DWORD Flags, PWSTR pszDesktopName, PWLX_DESKTOP *ppDesktop)
 		{
 			if(!s_interface) return false;
 			return s_interface->WlxCreateUserDesktop(hToken, Flags, pszDesktopName, ppDesktop);
 		}
 
-		/*static*/ 
+		/*static*/
 		int  WinlogonRouter::WlxChangePasswordNotifyEx(HANDLE hWlx, PWLX_MPR_NOTIFY_INFO pMprInfo, DWORD dwChangeInfo, PWSTR ProviderName, PVOID Reserved)
 		{
 			if(!s_interface) return -1;
 			return s_interface->WlxChangePasswordNotifyEx(pMprInfo, dwChangeInfo, ProviderName, Reserved);
 		}
 
-		/*static*/ 
+		/*static*/
 		bool WinlogonRouter::WlxCloseUserDesktop(HANDLE hWlx, PWLX_DESKTOP pDesktop, HANDLE hToken)
 		{
 			if(!s_interface) return false;
 			return s_interface->WlxCloseUserDesktop(pDesktop, hToken);
 		}
 
-		/*static*/ 
+		/*static*/
 		bool WinlogonRouter::WlxSetOption(HANDLE hWlx, DWORD Option, ULONG_PTR Value, ULONG_PTR *OldValue)
 		{
 			if(!s_interface) return false;
 			return s_interface->WlxSetOption(Option, Value, OldValue);
 		}
-		
-		/*static*/ 
+
+		/*static*/
 		bool WinlogonRouter::WlxGetOption(HANDLE hWlx, DWORD Option, ULONG_PTR *Value)
 		{
 			if(!s_interface) return false;
 			return s_interface->WlxGetOption(Option, Value);
 		}
 
-		/*static*/ 
+		/*static*/
 		void WinlogonRouter::WlxWin31Migrate(HANDLE hWlx)
 		{
 			s_interface->WlxWin31Migrate();
 		}
 
-		/*static*/ 
+		/*static*/
 		int  WinlogonRouter::WlxQueryTerminalServicesData(HANDLE hWlx, PWLX_TERMINAL_SERVICES_DATA pTSData, WCHAR *UserName, WCHAR *Domain)
 		{
 			if(!s_interface) return -1;
 			return s_interface->WlxQueryTerminalServicesData(pTSData, UserName, Domain);
 		}
 
-		// These don't have an hWlx param for getting back to us directly, we have to use a /*static*/ global :/			
-		/*static*/ 
+		// These don't have an hWlx param for getting back to us directly, we have to use a /*static*/ global :/
+		/*static*/
 		bool WinlogonRouter::WlxQueryClientCredentials(PWLX_CLIENT_CREDENTIALS_INFO_V1_0 pCred)
 		{
 			if(!s_interface) return false;
@@ -234,21 +234,21 @@ namespace pGina
 			return s_interface->WlxQueryInetConnectorCredentials(pCred);
 		}
 
-		/*static*/ 
+		/*static*/
 		bool WinlogonRouter::WlxDisconnect()
 		{
 			if(!s_interface) return false;
 			return s_interface->WlxDisconnect();
 		}
 
-		/*static*/ 
+		/*static*/
 		int  WinlogonRouter::WlxQueryConsoleSwitchCredentials(PWLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0 pCred)
 		{
 			if(!s_interface) return -1;
 			return s_interface->WlxQueryConsoleSwitchCredentials(pCred);
 		}
 
-		/*static*/ 
+		/*static*/
 		bool WinlogonRouter::WlxQueryTsLogonCredentials(PWLX_CLIENT_CREDENTIALS_INFO_V2_0 pCred)
 		{
 			if(!s_interface) return false;

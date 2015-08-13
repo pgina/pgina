@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -40,8 +40,8 @@ namespace pGina
 		{
 		public:
 			// IUnknown
-			IFACEMETHODIMP_(ULONG) AddRef();    
-			IFACEMETHODIMP_(ULONG) Release();    
+			IFACEMETHODIMP_(ULONG) AddRef();
+			IFACEMETHODIMP_(ULONG) Release();
 			IFACEMETHODIMP QueryInterface(__in REFIID riid, __deref_out void** ppv);
 
 			// ICredentialProviderCredential
@@ -60,15 +60,15 @@ namespace pGina
 			IFACEMETHODIMP SetCheckboxValue(__in DWORD dwFieldID, __in BOOL bChecked);
 			IFACEMETHODIMP SetComboBoxSelectedValue(__in DWORD dwFieldID, __in DWORD dwSelectedItem);
 			IFACEMETHODIMP CommandLinkClicked(__in DWORD dwFieldID);
-			IFACEMETHODIMP GetSerialization(__out CREDENTIAL_PROVIDER_GET_SERIALIZATION_RESPONSE* pcpgsr, __out CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs, 
+			IFACEMETHODIMP GetSerialization(__out CREDENTIAL_PROVIDER_GET_SERIALIZATION_RESPONSE* pcpgsr, __out CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs,
 											__deref_out_opt PWSTR* ppwszOptionalStatusText, __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon);
-			IFACEMETHODIMP ReportResult(__in NTSTATUS ntsStatus, __in NTSTATUS ntsSubstatus, __deref_out_opt PWSTR* ppwszOptionalStatusText, 
+			IFACEMETHODIMP ReportResult(__in NTSTATUS ntsStatus, __in NTSTATUS ntsSubstatus, __deref_out_opt PWSTR* ppwszOptionalStatusText,
 										__out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon);
 
 			Credential();
 			virtual ~Credential();
 
-			void	Initialize(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, UI_FIELDS const& fields, 
+			void	Initialize(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, UI_FIELDS const& fields,
 							   DWORD usageFlags, const wchar_t *username, const wchar_t *password);
 
 			virtual void	ServiceStateChanged(bool newState);
@@ -91,7 +91,7 @@ namespace pGina
 			long m_referenceCount;
 			CREDENTIAL_PROVIDER_USAGE_SCENARIO	m_usageScenario;
 			ICredentialProviderCredentialEvents * m_logonUiCallback;
-			UI_FIELDS *m_fields;			
+			UI_FIELDS *m_fields;
 			DWORD	m_usageFlags;
 		};
 	}

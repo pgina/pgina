@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -55,14 +55,14 @@ namespace pGina
 
 		class User
 		{
-		public:			
+		public:
 			class LoginResult
 			{
 				public:
-					LoginResult() 
+					LoginResult()
 						: m_result(false) {}
 					LoginResult(bool result, std::wstring const& user, std::wstring const& pass, std::wstring const& domain, std::wstring const& msg)
-						: m_username(user), m_domain(domain), m_password(pass), m_message(msg), m_result(result) {}						
+						: m_username(user), m_domain(domain), m_password(pass), m_message(msg), m_result(result) {}
 
 					std::wstring Username() { return m_username; }
 					void Username(std::wstring const& v) { m_username = v; }
@@ -72,7 +72,7 @@ namespace pGina
 
 					std::wstring Domain() { return m_domain; }
 					void Domain(std::wstring const& v) { m_domain = v; }
-			
+
 					bool Result() { return m_result; }
 					void Result(bool v) { m_result = v; }
 
@@ -90,12 +90,12 @@ namespace pGina
 					std::wstring m_password;
 					std::wstring m_message;
 					bool m_result;
-			};			
+			};
 
 			static LoginResult ProcessLoginForUser(const wchar_t *username, const wchar_t *domain, const wchar_t *password, pGina::Protocol::LoginRequestMessage::LoginReason reason);
 			static bool LocalLoginForUser(const wchar_t *username, const wchar_t *password);
 
-			static LoginResult ProcessChangePasswordForUser( const wchar_t *username, const wchar_t *domain, const wchar_t *oldPassword, const wchar_t *newPassword ); 
+			static LoginResult ProcessChangePasswordForUser( const wchar_t *username, const wchar_t *domain, const wchar_t *oldPassword, const wchar_t *newPassword );
 		};
 
 		/* Generic transaction for receiving some text for a field in the UI. */
@@ -109,7 +109,7 @@ namespace pGina
 		{
 		public:
 
-			class UserInformation 
+			class UserInformation
 			{
 			public:
 				std::wstring OriginalUsername() { return m_orig_uname; }
@@ -122,7 +122,7 @@ namespace pGina
 				void Domain(std::wstring const& v) { m_domain = v; }
 
 				UserInformation() {}
-				UserInformation(const std::wstring & orig_uname, const std::wstring & uname, const std::wstring& dom): 
+				UserInformation(const std::wstring & orig_uname, const std::wstring & uname, const std::wstring& dom):
 					m_orig_uname(orig_uname), m_username(uname), m_domain(dom) {}
 
 			private:
@@ -134,15 +134,15 @@ namespace pGina
 			static UserInformation GetUserInformation( int session_id );
 			static void Move(const wchar_t *username, const wchar_t *domain, const wchar_t *password, int old_session, int new_session);
 		};
-		
+
 		class ServiceStateThread : public pGina::Threading::Thread
 		{
 		public:
 			typedef void (*NOTIFY_STATE_CHANGE_CALLBACK)(bool newState);
 
-			ServiceStateThread();			
+			ServiceStateThread();
 
-			bool IsServiceRunning();			
+			bool IsServiceRunning();
 			void SetCallback(NOTIFY_STATE_CHANGE_CALLBACK callback);
 
 		protected:
@@ -154,6 +154,6 @@ namespace pGina
 		private:
 			bool m_serviceRunning;
 			NOTIFY_STATE_CHANGE_CALLBACK m_callback;
-		};		
+		};
 	}
 }

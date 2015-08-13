@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -46,8 +46,8 @@ namespace pGina.Core
         public Guid SessionId
         {
             get { return m_sessionId; }
-            set 
-            { 
+            set
+            {
                 m_sessionId = value;
                 m_properties.Id = value;
                 m_properties.AddTrackedObject("SessionId", new Guid(m_sessionId.ToString()));
@@ -67,14 +67,14 @@ namespace pGina.Core
 
         public PluginDriver()
         {
-            m_logger = LogManager.GetLogger(string.Format("PluginDriver:{0}", m_sessionId));            
+            m_logger = LogManager.GetLogger(string.Format("PluginDriver:{0}", m_sessionId));
 
             m_properties = new SessionProperties(m_sessionId);
 
             // Add the user information object we'll be using for this session
             UserInformation userInfo = new UserInformation();
             m_properties.AddTrackedSingle<UserInformation>(userInfo);
-            
+
             // Add the plugin tracking object we'll be using for this session
             PluginActivityInformation pluginInfo = new PluginActivityInformation();
             pluginInfo.LoadedAuthenticationGatewayPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthenticationGateway>();
@@ -148,7 +148,7 @@ namespace pGina.Core
             if (!result.Success)
                 return result;
 
-            result = GatewayProcess();                
+            result = GatewayProcess();
             return result;
         }
 
@@ -173,7 +173,7 @@ namespace pGina.Core
         }
 
         public BooleanResult AuthenticateUser()
-        {            
+        {
             PluginActivityInformation pluginInfo = m_properties.GetTrackedSingle<PluginActivityInformation>();
             List<IPluginAuthentication> plugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthentication>();
 
@@ -227,7 +227,7 @@ namespace pGina.Core
             {
                 m_logger.ErrorFormat("Failed to authenticate {0}, Message: {1}", m_properties.GetTrackedSingle<UserInformation>().Username, finalResult.Message);
             }
-            
+
             return finalResult;
         }
 
@@ -235,7 +235,7 @@ namespace pGina.Core
         {
             PluginActivityInformation pluginInfo = m_properties.GetTrackedSingle<PluginActivityInformation>();
             List<IPluginAuthorization> plugins = PluginLoader.GetOrderedPluginsOfType<IPluginAuthorization>();
-            
+
             m_logger.DebugFormat("Authorizing user {0}, {1} plugins available", m_properties.GetTrackedSingle<UserInformation>().Username, plugins.Count);
 
             // At least one must succeed
@@ -325,6 +325,6 @@ namespace pGina.Core
 
             m_logger.InfoFormat("Successfully processed gateways for {0}", m_properties.GetTrackedSingle<UserInformation>().Username);
             return new BooleanResult() { Success = true };
-        }                    
+        }
     }
 }

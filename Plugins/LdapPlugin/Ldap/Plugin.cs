@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -41,7 +41,7 @@ namespace pGina.Plugin.Ldap
     {
         public static readonly Guid LdapUuid = new Guid("{0F52390B-C781-43AE-BD62-553C77FA4CF7}");
         private ILog m_logger = LogManager.GetLogger("LdapPlugin");
-        
+
         public LdapPlugin()
         {
             using(Process me = Process.GetCurrentProcess())
@@ -62,9 +62,9 @@ namespace pGina.Plugin.Ldap
 
         public string Version
         {
-            get 
-            { 
-                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(); 
+            get
+            {
+                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             }
         }
 
@@ -72,7 +72,7 @@ namespace pGina.Plugin.Ldap
         {
             get { return LdapUuid; }
         }
-        
+
         public BooleanResult AuthenticateUser(Shared.Types.SessionProperties properties)
         {
             // Get the LdapServer object from the session properties (created in BeginChain)
@@ -95,7 +95,7 @@ namespace pGina.Plugin.Ldap
                 if (e is LdapException)
                 {
                     LdapException ldapEx = (e as LdapException);
-                    
+
                     if (ldapEx.ErrorCode == 81)
                     {
                         // Server can't be contacted, set server object to null
@@ -114,7 +114,7 @@ namespace pGina.Plugin.Ldap
                 m_logger.ErrorFormat("Exception in LDAP authentication: {0}", e);
                 throw;  // Allow pGina service to catch and handle exception
             }
-        }        
+        }
 
         public void Configure()
         {
@@ -155,7 +155,7 @@ namespace pGina.Plugin.Ldap
 
             // Get the authz rules from registry
             List<GroupAuthzRule> rules = GroupRuleLoader.GetAuthzRules();
-            
+
             // Get the LDAP server object
             LdapServer serv = properties.GetTrackedSingle<LdapServer>();
 
@@ -166,10 +166,10 @@ namespace pGina.Plugin.Ldap
                 m_logger.ErrorFormat("AuthorizeUser: Internal error, LdapServer object not available.");
 
                 // LdapServer is not available, allow or deny based on settings.
-                return new BooleanResult() 
+                return new BooleanResult()
                 {
-                    Success = Settings.Store.AuthzAllowOnError, 
-                    Message = "LDAP server unavailable." 
+                    Success = Settings.Store.AuthzAllowOnError,
+                    Message = "LDAP server unavailable."
                 };
             }
 
@@ -192,7 +192,7 @@ namespace pGina.Plugin.Ldap
             try
             {
                 UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-                
+
                 // Bind for searching if we have rules to process.  If there's only one, it's the
                 // default rule which doesn't require searching the LDAP tree.
                 if (rules.Count > 0)
@@ -243,20 +243,20 @@ namespace pGina.Plugin.Ldap
                         m_logger.ErrorFormat("Server unavailable: {0}, {1}", ldapEx.ServerErrorMessage, e.Message);
                         serv.Close();
                         properties.AddTrackedSingle<LdapServer>(null);
-                        return new BooleanResult 
-                        { 
-                            Success = Settings.Store.AuthzAllowOnError, 
-                            Message = "Failed to contact LDAP server." 
+                        return new BooleanResult
+                        {
+                            Success = Settings.Store.AuthzAllowOnError,
+                            Message = "Failed to contact LDAP server."
                         };
                     }
                     else if (ldapEx.ErrorCode == 49)
                     {
                         // This is invalid credentials, return false, but server object should remain connected
                         m_logger.ErrorFormat("LDAP bind failed: invalid credentials.");
-                        return new BooleanResult 
-                        { 
-                            Success = false, 
-                            Message = "Authorization via LDAP failed. Invalid credentials." 
+                        return new BooleanResult
+                        {
+                            Success = false,
+                            Message = "Authorization via LDAP failed. Invalid credentials."
                         };
                     }
                 }
@@ -278,10 +278,10 @@ namespace pGina.Plugin.Ldap
             if (serv == null)
             {
                 m_logger.ErrorFormat("AuthenticatedUserGateway: Internal error, LdapServer object not available.");
-                return new BooleanResult() 
-                { 
-                    Success = true, 
-                    Message = "LDAP server not available" 
+                return new BooleanResult()
+                {
+                    Success = true,
+                    Message = "LDAP server not available"
                 };
             }
 
@@ -349,7 +349,7 @@ namespace pGina.Plugin.Ldap
                     {
                         return new BooleanResult { Success = false, Message = "Password change failed: Invalid LDAP username or password." };
                     }
-    
+
                     // Set the password attributes
                     List<AttributeEntry> attribs = CPAttributeSettings.Load();
                     foreach (AttributeEntry entry in attribs)
@@ -357,7 +357,7 @@ namespace pGina.Plugin.Ldap
                         if (entry.Method.HasFlag(Methods.Timestamps) || entry.Method.HasFlag(Methods.Timestampd))
                         {
                             TimeMethod time = TimeMethod.methods[entry.Method];
-    
+
                             m_logger.DebugFormat("Setting attribute {0} using method {1}", entry.Name, time.Name);
                             if (!serv.SetUserAttribute(userInfo.Username, entry.Name, time.time()))
                                 return new BooleanResult { Success = false, Message = "LDAPplugin failed by setting an attribute\nFor more details please consult the log!" };
@@ -365,7 +365,7 @@ namespace pGina.Plugin.Ldap
                         else
                         {
                             AttribMethod hasher = AttribMethod.methods[entry.Method];
-    
+
                             m_logger.DebugFormat("Setting attribute {0} using method {1}", entry.Name, hasher.Name);
                             if (!serv.SetUserAttribute(userInfo.Username, entry.Name, hasher.hash(userInfo.Password)))
                                 return new BooleanResult { Success = false, Message = "LDAPplugin failed by setting an attribute\nFor more details please consult the log!" };

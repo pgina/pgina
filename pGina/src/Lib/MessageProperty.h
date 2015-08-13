@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -50,12 +50,12 @@ namespace pGina
 
 			PropertyType        Type() { return m_type; }
 			void				Type(PropertyType t) { m_type = t; }
-			
+
 		protected:
-			std::wstring m_name;					
+			std::wstring m_name;
 			PropertyType m_type;
 
-			PropertyBase() {}	// Common folk shouldn't be creating me..		
+			PropertyBase() {}	// Common folk shouldn't be creating me..
 			virtual void DummyVirtualForDynamicCastRequirement() {}
 		};
 
@@ -66,14 +66,14 @@ namespace pGina
 			Property(std::wstring const& name, ValueType const& value, PropertyType type) :
 				m_value(value)
 				{
-					m_name = name;				
+					m_name = name;
 					m_type = type;
 				}
-			  			
+
 			ValueType const&    Value() { return m_value; }
 			void			    Value(ValueType const& v) { m_value = v; }
 
-		private:			
+		private:
 			ValueType m_value;
 		};
 	}

@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -39,9 +39,9 @@ namespace pGina
 			LUIFI_MOTD            = 1,
 			LUIFI_USERNAME        = 2,
 			LUIFI_PASSWORD        = 3,
-			LUIFI_SUBMIT          = 4, 
+			LUIFI_SUBMIT          = 4,
 			LUIFI_STATUS		  = 5,
-			LUIFI_NUM_FIELDS      = 6, 
+			LUIFI_NUM_FIELDS      = 6,
 		};
 
 		static const UI_FIELDS s_logonFields =
@@ -53,11 +53,11 @@ namespace pGina
 			LUIFI_STATUS,			// Status field
 			{
 				//  when to display,               style,             field id,        type,               name           data source     value			callback
-				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LUIFI_TILEIMAGE, CPFT_TILE_IMAGE,    L"Image" },    SOURCE_NONE,    NULL,			NULL },	
-			    { { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LUIFI_MOTD,      CPFT_SMALL_TEXT,    L"MOTD" },     SOURCE_DYNAMIC, L"pGina",     NULL }, 
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED }, { LUIFI_USERNAME,  CPFT_EDIT_TEXT,     L"Username" }, SOURCE_NONE,    NULL,			NULL },	
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },	{ LUIFI_PASSWORD,  CPFT_PASSWORD_TEXT, L"Password" }, SOURCE_NONE,    NULL,			NULL }, 
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },    { LUIFI_SUBMIT,    CPFT_SUBMIT_BUTTON, L"Submit" },   SOURCE_NONE,    NULL,			NULL }, 
+				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LUIFI_TILEIMAGE, CPFT_TILE_IMAGE,    L"Image" },    SOURCE_NONE,    NULL,			NULL },
+			    { { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { LUIFI_MOTD,      CPFT_SMALL_TEXT,    L"MOTD" },     SOURCE_DYNAMIC, L"pGina",     NULL },
+				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED }, { LUIFI_USERNAME,  CPFT_EDIT_TEXT,     L"Username" }, SOURCE_NONE,    NULL,			NULL },
+				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },	{ LUIFI_PASSWORD,  CPFT_PASSWORD_TEXT, L"Password" }, SOURCE_NONE,    NULL,			NULL },
+				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },    { LUIFI_SUBMIT,    CPFT_SUBMIT_BUTTON, L"Submit" },   SOURCE_NONE,    NULL,			NULL },
 				{ { CPFS_DISPLAY_IN_BOTH,		   CPFIS_NONE },    { LUIFI_STATUS,    CPFT_SMALL_TEXT,    L"Status" },   SOURCE_STATUS,  L"Status",    NULL },
 			}
 		};

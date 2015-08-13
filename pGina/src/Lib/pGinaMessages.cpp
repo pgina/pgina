@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -29,7 +29,7 @@
 namespace pGina
 {
 	namespace Protocol
-	{						
+	{
 		MessageBase * SendRecvPipeMessage(pGina::NamedPipes::PipeClient &client, MessageBase &msg)
 		{
 			return SendRecvPipeMessage(client, &msg);
@@ -38,7 +38,7 @@ namespace pGina
 		MessageBase * SendRecvPipeMessage(pGina::NamedPipes::PipeClient &client, MessageBase *msg)
 		{
 			MessageBase * reply = 0;
-			pGina::Messaging::Message * dynamicMsg = msg->ToDynamicMessage();			
+			pGina::Messaging::Message * dynamicMsg = msg->ToDynamicMessage();
 			pGina::Memory::Buffer * msgBuffer = pGina::Messaging::Message::Marshal(dynamicMsg);
 
 			if(client.WriteLengthEncodedBuffer(msgBuffer))
@@ -53,7 +53,7 @@ namespace pGina
 						MessageType type = (MessageType) replyMsg->Property<unsigned char>(L"MessageType");
 						switch(type)
 						{
-						case Hello:							
+						case Hello:
 							reply = (MessageBase *) (new HelloMessage());
 							break;
 						case Disconnect:
@@ -106,7 +106,7 @@ namespace pGina
 			delete msgBuffer;
 			delete dynamicMsg;
 
-			return reply;		
+			return reply;
 		}
 	}
 }

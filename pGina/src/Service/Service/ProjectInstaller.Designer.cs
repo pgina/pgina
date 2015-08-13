@@ -7,7 +7,7 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -30,23 +30,23 @@
         {
             this.pGinaServiceProcessInstaller = new System.ServiceProcess.ServiceProcessInstaller();
             this.pGinaServiceProjectInstaller = new System.ServiceProcess.ServiceInstaller();
-            // 
+            //
             // pGinaServiceProcessInstaller
-            // 
+            //
             this.pGinaServiceProcessInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
             this.pGinaServiceProcessInstaller.Password = null;
             this.pGinaServiceProcessInstaller.Username = null;
-            // 
+            //
             // pGinaServiceProjectInstaller
-            // 
+            //
             this.pGinaServiceProjectInstaller.Description = "pGina Management Service";
             this.pGinaServiceProjectInstaller.DisplayName = "pGina Service";
             this.pGinaServiceProjectInstaller.ServiceName = "pGina";
             this.pGinaServiceProjectInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             this.pGinaServiceProjectInstaller.ServicesDependedOn = new string[] { "TermService", "LanmanServer" };
-            // 
+            //
             // ProjectInstaller
-            // 
+            //
             this.Installers.AddRange(new System.Configuration.Install.Installer[] {
             this.pGinaServiceProcessInstaller,
             this.pGinaServiceProjectInstaller});

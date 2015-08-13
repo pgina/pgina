@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -38,7 +38,7 @@ namespace Abstractions.Settings
     public class DynamicSetting : DynamicObject
     {
         private object m_value = null;
-        private string m_name = null;        
+        private string m_name = null;
 
         public DynamicSetting(string name, object value)
         {
@@ -80,7 +80,7 @@ namespace Abstractions.Settings
 
             return base.ToString();
         }
-        
+
         public override bool TryConvert(ConvertBinder binder, out object result)
         {
             result = null;
@@ -88,7 +88,7 @@ namespace Abstractions.Settings
             if (m_value == null)
                 return true;
 
-            // 1:1 conversion 
+            // 1:1 conversion
             Type ourType = m_value.GetType();
             if (binder.Type == ourType)
             {
@@ -96,7 +96,7 @@ namespace Abstractions.Settings
                 return true;
             }
 
-            // If caller wants a bool we have to do a little 
+            // If caller wants a bool we have to do a little
             //  conversion, as there is no native Reg bool type,
             //  instead it saves them as strings.
             if (binder.Type == typeof(bool))
@@ -113,12 +113,12 @@ namespace Abstractions.Settings
                     return true;
                 }
             }
-            
+
             // We could potentially offer some standard conversions here? For now,
             // we just fail.
             return false;
         }
-        
+
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
             Type ourType = m_value.GetType();

@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -40,13 +40,13 @@
 namespace pGina
 {
 	namespace Service
-	{		
+	{
 		class StateHelper
 		{
 		public:
 			static void Start();
 			static void Stop();
-			
+
 			static std::wstring GetStateText();
 			static bool GetState();
 
@@ -54,7 +54,7 @@ namespace pGina
 			static void RemoveTarget(pGina::CredProv::Credential *ptr);
 			static void AddTarget(pGina::CredProv::Provider *ptr);
 			static void RemoveTarget(pGina::CredProv::Provider *ptr);
-			
+
 			static void NotifyStateChanged(bool newState);
 
 		private:

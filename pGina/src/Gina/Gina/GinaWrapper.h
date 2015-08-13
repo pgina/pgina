@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -56,24 +56,24 @@ namespace pGina
 		typedef BOOL (WINAPI * PFWLXDISPLAYSTATUSMESSAGE) (PVOID, HDESK, DWORD, PWSTR, PWSTR);
 		typedef BOOL (WINAPI * PFWLXGETSTATUSMESSAGE) (PVOID, DWORD *, PWSTR, DWORD);
 		typedef BOOL (WINAPI * PFWLXREMOVESTATUSMESSAGE) (PVOID);
-		typedef BOOL (WINAPI * PFWLXGETCONSOLESWITCHCREDENTIALS) (PVOID, PVOID); 
+		typedef BOOL (WINAPI * PFWLXGETCONSOLESWITCHCREDENTIALS) (PVOID, PVOID);
 		typedef VOID (WINAPI * PFWLXRECONNECTNOTIFY) (PVOID);
-		typedef VOID (WINAPI * PFWLXDISCONNECTNOTIFY) (PVOID); 
+		typedef VOID (WINAPI * PFWLXDISCONNECTNOTIFY) (PVOID);
 
-		// Gina implementation that loads another gina dll only (no stubbing/hooking), 
+		// Gina implementation that loads another gina dll only (no stubbing/hooking),
 		//	allowing a caller to 'be' winlogon.
 		class GinaWrapper : public Gina
 		{
-		public:			
+		public:
 			GinaWrapper(const wchar_t * dll);
 			~GinaWrapper();
 
-			DWORD Version() { return m_dllVersion; }			
+			DWORD Version() { return m_dllVersion; }
 
 			// Additional GINA exports that we implement
 			bool Negotiate(DWORD dwWinlogonVersion);
 			bool Initialize(LPWSTR lpWinsta, HANDLE hWlx, PVOID pvReserved, PVOID pWinlogonFunctions);
-			
+
 			// Standard Gina * interfaces, directly map to GINA exports
 			virtual bool IsLockOk();
 			virtual bool IsLogoffOk();
@@ -87,21 +87,21 @@ namespace pGina
 			virtual void DisplayLockedNotice();
 			virtual bool DisplayStatusMessage(HDESK hDesktop, DWORD dwOptions, PWSTR pTitle, PWSTR pMessage);
 			virtual bool GetStatusMessage(DWORD * pdwOptions, PWSTR pMessage, DWORD dwBufferSize);
-			virtual bool RemoveStatusMessage();						
-			virtual int  LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, 
+			virtual bool RemoveStatusMessage();
+			virtual int  LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions,
 									 PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pMprNotifyInfo, PVOID *pProfile);
 			virtual int  LoggedOnSAS(DWORD dwSasType, PVOID pReserved);
 			virtual int  WkstaLockedSAS(DWORD dwSasType);
 			virtual bool ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOID pEnvironment);
 			virtual bool StartApplication(PWSTR pszDesktopName, PVOID pEnvironment, PWSTR pszCmdLine);
-			virtual bool NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo);		
-				
+			virtual bool NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo);
+
 			// Call this to load (and verify it loaded) the wrapped gina
-			bool Load();			
+			bool Load();
 			void Unload();
 			bool IsLoaded() { return m_dll != 0; }
 
-		private:			
+		private:
 			std::wstring m_dllname;
 			void * m_ginaContext;
 			HINSTANCE m_dll;
@@ -128,7 +128,7 @@ namespace pGina
 			PFWLXDISPLAYSTATUSMESSAGE           m_pfWlxDisplayStatusMessage;
 			PFWLXGETSTATUSMESSAGE               m_pfWlxGetStatusMessage;
 			PFWLXREMOVESTATUSMESSAGE      		m_pfWlxRemoveStatusMessage;
-			PFWLXGETCONSOLESWITCHCREDENTIALS	m_pfWlxGetConsoleSwitchCredentials; 
+			PFWLXGETCONSOLESWITCHCREDENTIALS	m_pfWlxGetConsoleSwitchCredentials;
 			PFWLXRECONNECTNOTIFY                m_pfWlxReconnectNotify;
 			PFWLXDISCONNECTNOTIFY               m_pfWlxDisconnectNotify;
 		};

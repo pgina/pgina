@@ -1,6 +1,6 @@
 ﻿/*
 	Written by Evan Horne.
- 
+
     Distributed under the pGina License.
 	All rights reserved.
 
@@ -11,8 +11,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -64,10 +64,10 @@ namespace pGina.Plugin.Email
                 m_settings = new pGinaDynamicSettings(SimpleUuid);
                 m_settings.SetDefault("ShowDescription", true);
                 m_settings.SetDefault("Description", m_defaultDescription);
-                
+
                 m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
             }
-        }        
+        }
 
         public string Name
         {
@@ -91,7 +91,7 @@ namespace pGina.Plugin.Email
         {
             get { return SimpleUuid; }
         }
-        
+
         BooleanResult IPluginAuthentication.AuthenticateUser(SessionProperties properties)
         {
             try
@@ -109,7 +109,7 @@ namespace pGina.Plugin.Email
 
                 // Place credentials into a NetworkCredentials object
                 NetworkCredential creds = new NetworkCredential(username, userInfo.Password);
-                
+
                 string server = Settings.Store.Server;
                 int port = Convert.ToInt32((string)Settings.Store.Port);
                 bool useSsl = Settings.Store.UseSsl;
@@ -189,7 +189,7 @@ namespace pGina.Plugin.Email
 
         /// <summary>
         /// Authenticates against a POP3 server.
-        /// If a timestamp is sent in the initial response, it assumes APOP is supported. 
+        /// If a timestamp is sent in the initial response, it assumes APOP is supported.
         /// </summary>
         /// <param name="stream">Opened stream to POP3 server</param>
         /// <param name="creds">Username/password</param>
@@ -248,7 +248,7 @@ namespace pGina.Plugin.Email
 
         /// <summary>
         /// Authenticates against an IMAP server.
-        /// Presently only supports plain text login. 
+        /// Presently only supports plain text login.
         /// The use of AUTHENTICATE is not yet supported, so SSL is advised.
         /// </summary>
         /// <param name="stream"></param>
@@ -268,7 +268,7 @@ namespace pGina.Plugin.Email
                 writer.Flush();
                 resp = getResponse(reader);
                 m_logger.DebugFormat("IMAP Server: {0}", resp);
-                if (!resp.StartsWith("+")) 
+                if (!resp.StartsWith("+"))
                     throw new EMailAuthException(string.Format("Unexpected response from server: {0}", resp));
 
                 writer.WriteLine("{0} {{{1}}}", creds.UserName, creds.Password.Length);
@@ -301,7 +301,7 @@ namespace pGina.Plugin.Email
 
         /// <summary>
         /// Determines if the POP3 server supports APOP, and returns the authentication
-        /// hash if so. 
+        /// hash if so.
         /// </summary>
         /// <param name="resp">Initial response from the POP3 server</param>
         /// <param name="password">Login password</param>
@@ -336,7 +336,7 @@ namespace pGina.Plugin.Email
         /// <param name="reader"></param>
         /// <returns>Response from the server</returns>
         private string getResponse(System.IO.StreamReader reader)
-        {   
+        {
             try
             {
                 string output = null;

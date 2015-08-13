@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -60,15 +60,15 @@ namespace pGina
 			m_pfWlxReconnectNotify(0),
 			m_pfWlxDisconnectNotify(0)
 		{
-			if(dll) m_dllname = dll;			
+			if(dll) m_dllname = dll;
 		}
-		
+
 		GinaWrapper::~GinaWrapper()
 		{
 			Unload();
 		}
 
-		// TBD: Instead of checking function ptrs, we could just use m_dllVersion to infer which 
+		// TBD: Instead of checking function ptrs, we could just use m_dllVersion to infer which
 		//	*must* be available (at which point crashes would be the chained dll's fault.  That
 		//	seems overly mean though perhaps...
 
@@ -86,7 +86,7 @@ namespace pGina
 			m_initialized = m_pfWlxInitialize(lpWinsta, hWlx, pvReserved, pWinlogonFunctions, &m_ginaContext) ? true : false;
 			return m_initialized;
 		}
-			
+
 		// Standard Gina * interfaces, directly map to GINA exports
 		bool GinaWrapper::IsLockOk()
 		{
@@ -97,7 +97,7 @@ namespace pGina
 		bool GinaWrapper::IsLogoffOk()
 		{
 			if(!m_pfWlxIsLogoffOk || !m_negotiated || !m_initialized) return true;
-			return (m_pfWlxIsLogoffOk(m_ginaContext) ? true : false);			
+			return (m_pfWlxIsLogoffOk(m_ginaContext) ? true : false);
 		}
 
 		bool GinaWrapper::GetConsoleSwitchCredentials(PVOID pCredInfo)
@@ -107,7 +107,7 @@ namespace pGina
 		}
 
 		void GinaWrapper::ReconnectNotify()
-		{			
+		{
 			if(m_pfWlxReconnectNotify && m_negotiated && m_initialized)
 				m_pfWlxReconnectNotify(m_ginaContext);
 		}
@@ -204,10 +204,10 @@ namespace pGina
 		}
 
 		bool GinaWrapper::Load()
-		{			
+		{
 			if(!(m_dll = LoadLibraryW(m_dllname.c_str())))
 				return false;
-			
+
 			m_pfWlxNegotiate = (PFWLXNEGOTIATE) GetProcAddress(m_dll, "WlxNegotiate");
 			m_pfWlxInitialize = (PFWLXINITIALIZE) GetProcAddress(m_dll, "WlxInitialize");
 			m_pfWlxDisplaySASNotice = (PFWLXDISPLAYSASNOTICE) GetProcAddress(m_dll, "WlxDisplaySASNotice");
@@ -263,7 +263,7 @@ namespace pGina
 				m_pfWlxGetConsoleSwitchCredentials = 0;
 				m_pfWlxReconnectNotify = 0;
 				m_pfWlxDisconnectNotify = 0;
-			}			
+			}
 		}
 	}
 }

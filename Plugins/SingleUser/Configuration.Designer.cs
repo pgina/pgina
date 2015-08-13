@@ -44,9 +44,9 @@
             this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.m_dgv)).BeginInit();
             this.SuspendLayout();
-            // 
+            //
             // btnOk
-            // 
+            //
             this.btnOk.Location = new System.Drawing.Point(314, 262);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
@@ -54,9 +54,9 @@
             this.btnOk.Text = "Save";
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
-            // 
+            //
             // btnCancel
-            // 
+            //
             this.btnCancel.Location = new System.Drawing.Point(395, 262);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
@@ -64,59 +64,59 @@
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-            // 
+            //
             // label1
-            // 
+            //
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(13, 25);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(58, 13);
             this.label1.TabIndex = 5;
             this.label1.Text = "Username:";
-            // 
+            //
             // label2
-            // 
+            //
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(13, 51);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(46, 13);
             this.label2.TabIndex = 6;
             this.label2.Text = "Domain:";
-            // 
+            //
             // label3
-            // 
+            //
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(13, 77);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(56, 13);
             this.label3.TabIndex = 7;
             this.label3.Text = "Password:";
-            // 
+            //
             // m_txtUser
-            // 
+            //
             this.m_txtUser.Location = new System.Drawing.Point(88, 22);
             this.m_txtUser.Name = "m_txtUser";
             this.m_txtUser.Size = new System.Drawing.Size(274, 20);
             this.m_txtUser.TabIndex = 8;
-            // 
+            //
             // m_txtDomain
-            // 
+            //
             this.m_txtDomain.Location = new System.Drawing.Point(88, 48);
             this.m_txtDomain.Name = "m_txtDomain";
             this.m_txtDomain.Size = new System.Drawing.Size(274, 20);
             this.m_txtDomain.TabIndex = 9;
-            // 
+            //
             // m_txtPass
-            // 
+            //
             this.m_txtPass.Location = new System.Drawing.Point(88, 74);
             this.m_txtPass.Name = "m_txtPass";
             this.m_txtPass.PasswordChar = '*';
             this.m_txtPass.Size = new System.Drawing.Size(274, 20);
             this.m_txtPass.TabIndex = 10;
             this.m_txtPass.UseSystemPasswordChar = true;
-            // 
+            //
             // m_dgv
-            // 
+            //
             this.m_dgv.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.m_dgv.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.PluginUuid});
@@ -125,15 +125,15 @@
             this.m_dgv.Name = "m_dgv";
             this.m_dgv.Size = new System.Drawing.Size(458, 118);
             this.m_dgv.TabIndex = 12;
-            // 
+            //
             // PluginUuid
-            // 
+            //
             this.PluginUuid.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.PluginUuid.HeaderText = "Plugin Unique ID";
             this.PluginUuid.Name = "PluginUuid";
-            // 
+            //
             // substituteCB
-            // 
+            //
             this.substituteCB.AutoSize = true;
             this.substituteCB.Location = new System.Drawing.Point(12, 115);
             this.substituteCB.Name = "substituteCB";
@@ -142,9 +142,9 @@
             this.substituteCB.Text = "Only substitute if";
             this.substituteCB.UseVisualStyleBackColor = true;
             this.substituteCB.CheckedChanged += new System.EventHandler(this.requirePluginCheckChange);
-            // 
+            //
             // anyRB
-            // 
+            //
             this.anyRB.AutoSize = true;
             this.anyRB.Location = new System.Drawing.Point(117, 114);
             this.anyRB.Name = "anyRB";
@@ -153,9 +153,9 @@
             this.anyRB.TabStop = true;
             this.anyRB.Text = "any";
             this.anyRB.UseVisualStyleBackColor = true;
-            // 
+            //
             // allRB
-            // 
+            //
             this.allRB.AutoSize = true;
             this.allRB.Location = new System.Drawing.Point(161, 114);
             this.allRB.Name = "allRB";
@@ -164,18 +164,18 @@
             this.allRB.TabStop = true;
             this.allRB.Text = "all";
             this.allRB.UseVisualStyleBackColor = true;
-            // 
+            //
             // label4
-            // 
+            //
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(198, 116);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(272, 13);
             this.label4.TabIndex = 16;
             this.label4.Text = "of the following plugins have successfully authenticated.";
-            // 
+            //
             // Configuration
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(482, 297);

@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -53,10 +53,10 @@ namespace pGina
 			ChangePasswordRequest = 0x0c,
 			ChangePasswordResponse = 0x0d,
 		};
-				
-		class MessageBase 
+
+		class MessageBase
 		{
-		public:			
+		public:
 			virtual void FromDynamicMessage(pGina::Messaging::Message * msg)
 			{
 				if(msg->Exists<unsigned char>(L"MessageType"))
@@ -66,7 +66,7 @@ namespace pGina
 			}
 
 			virtual pGina::Messaging::Message * ToDynamicMessage()
-			{				
+			{
 				pGina::Messaging::Message * msg = new pGina::Messaging::Message();
 				msg->Property<unsigned char>(L"MessageType", (unsigned char) Type(), pGina::Messaging::Byte);
 				return msg;
@@ -74,13 +74,13 @@ namespace pGina
 
 			MessageType Type() { return m_type; }
 			void	Type(MessageType t) { m_type = t; }
-			
+
 		protected:
 			MessageType m_type;
 		};
 
-		MessageBase * SendRecvPipeMessage(pGina::NamedPipes::PipeClient &client, MessageBase *msg);		
-		MessageBase * SendRecvPipeMessage(pGina::NamedPipes::PipeClient &client, MessageBase &msg);		
+		MessageBase * SendRecvPipeMessage(pGina::NamedPipes::PipeClient &client, MessageBase *msg);
+		MessageBase * SendRecvPipeMessage(pGina::NamedPipes::PipeClient &client, MessageBase &msg);
 
 		class HelloMessage : public MessageBase
 		{
@@ -90,7 +90,7 @@ namespace pGina
 				Type(Hello);
 			}
 		};
-		
+
 		class  DisconnectMessage : public MessageBase
 		{
 		public:
@@ -108,7 +108,7 @@ namespace pGina
 				Type(Ack);
 			}
 		};
-		
+
 		class LogMessage : public MessageBase
 		{
 		public:
@@ -149,8 +149,8 @@ namespace pGina
 			}
 
 			virtual pGina::Messaging::Message * ToDynamicMessage()
-			{				
-				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();				
+			{
+				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();
 				msg->Property<std::wstring>(L"LoggerName", LoggerName(), pGina::Messaging::String);
 				msg->Property<std::wstring>(L"LoggedMessage", LoggedMessage(), pGina::Messaging::String);
 				msg->Property<std::wstring>(L"Level", Level(), pGina::Messaging::String);
@@ -235,8 +235,8 @@ namespace pGina
 			}
 
 			virtual pGina::Messaging::Message * ToDynamicMessage()
-			{				
-				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();				
+			{
+				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();
 				msg->Property<std::wstring>(L"Username", Username(), pGina::Messaging::String);
 				msg->Property<std::wstring>(L"Domain", Domain(), pGina::Messaging::String);
 				msg->Property<std::wstring>(L"Password", Password(), pGina::Messaging::String);
@@ -287,10 +287,10 @@ namespace pGina
 				}
 
 				virtual pGina::Messaging::Message * ToDynamicMessage()
-				{				
-					pGina::Messaging::Message * msg = LoginRequestMessage::ToDynamicMessage();				
+				{
+					pGina::Messaging::Message * msg = LoginRequestMessage::ToDynamicMessage();
 					msg->Property<std::wstring>(L"Message", Message(), pGina::Messaging::String);
-					msg->Property<bool>(L"Result", Result(), pGina::Messaging::Boolean);					
+					msg->Property<bool>(L"Result", Result(), pGina::Messaging::Boolean);
 					return msg;
 				}
 
@@ -326,8 +326,8 @@ namespace pGina
 			}
 
 			virtual pGina::Messaging::Message * ToDynamicMessage()
-			{				
-				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();				
+			{
+				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();
 				msg->Property<std::wstring>(L"Name", Name(), pGina::Messaging::String);
 				return msg;
 			}
@@ -357,8 +357,8 @@ namespace pGina
 			}
 
 			virtual pGina::Messaging::Message * ToDynamicMessage()
-			{				
-				pGina::Messaging::Message * msg = DynamicLabelRequestMessage::ToDynamicMessage();				
+			{
+				pGina::Messaging::Message * msg = DynamicLabelRequestMessage::ToDynamicMessage();
 				msg->Property<std::wstring>(L"Text", Text(), pGina::Messaging::String);
 				return msg;
 			}
@@ -372,7 +372,7 @@ namespace pGina
 		class UserInformationRequestMessage : public MessageBase
 		{
 		public:
-			UserInformationRequestMessage() 
+			UserInformationRequestMessage()
 			{
 				Type(UserInfoRequest);
 				SessionID(-1);
@@ -396,8 +396,8 @@ namespace pGina
 			}
 
 			virtual pGina::Messaging::Message * ToDynamicMessage()
-			{				
-				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();				
+			{
+				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();
 				msg->Property<int>(L"SessionID", SessionID(), pGina::Messaging::Integer);
 				return msg;
 			}
@@ -437,8 +437,8 @@ namespace pGina
 			}
 
 			virtual pGina::Messaging::Message * ToDynamicMessage()
-			{				
-				pGina::Messaging::Message * msg = UserInformationRequestMessage::ToDynamicMessage();				
+			{
+				pGina::Messaging::Message * msg = UserInformationRequestMessage::ToDynamicMessage();
 				msg->Property<std::wstring>(L"OriginalUsername", OriginalUsername(), pGina::Messaging::String);
 				msg->Property<std::wstring>(L"Username", Username(), pGina::Messaging::String);
 				msg->Property<std::wstring>(L"Domain", Domain(), pGina::Messaging::String);
@@ -453,7 +453,7 @@ namespace pGina
 
 		class LoginInfoChangeMessage : public LoginRequestMessage
 		{
-			public:				
+			public:
 				LoginInfoChangeMessage() :
 				  m_fromSession(0),
 				  m_toSession(0)
@@ -466,9 +466,9 @@ namespace pGina
 					m_fromSession(0),
 				    m_toSession(0)
 				{
-					Type(LoginInfoChange);					
+					Type(LoginInfoChange);
 				}
-				
+
 				int		FromSession() { return m_fromSession; }
 				void	FromSession(int v) { m_fromSession = v; }
 				int		ToSession() { return m_toSession; }
@@ -485,8 +485,8 @@ namespace pGina
 				}
 
 				virtual pGina::Messaging::Message * ToDynamicMessage()
-				{				
-					pGina::Messaging::Message * msg = LoginRequestMessage::ToDynamicMessage();				
+				{
+					pGina::Messaging::Message * msg = LoginRequestMessage::ToDynamicMessage();
 					msg->Property<int>(L"ToSession", ToSession(), pGina::Messaging::Integer);
 					msg->Property<int>(L"FromSession", FromSession(), pGina::Messaging::Integer);
 					return msg;
@@ -557,8 +557,8 @@ namespace pGina
 			}
 
 			virtual pGina::Messaging::Message * ToDynamicMessage()
-			{				
-				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();				
+			{
+				pGina::Messaging::Message * msg = MessageBase::ToDynamicMessage();
 				msg->Property<std::wstring>(L"Username", Username(), pGina::Messaging::String);
 				msg->Property<std::wstring>(L"Domain", Domain(), pGina::Messaging::String);
 				msg->Property<int>(L"Session", Session(), pGina::Messaging::Integer);
@@ -609,10 +609,10 @@ namespace pGina
 				}
 
 				virtual pGina::Messaging::Message * ToDynamicMessage()
-				{				
-					pGina::Messaging::Message * msg = ChangePasswordRequestMessage::ToDynamicMessage();				
+				{
+					pGina::Messaging::Message * msg = ChangePasswordRequestMessage::ToDynamicMessage();
 					msg->Property<std::wstring>(L"Message", Message(), pGina::Messaging::String);
-					msg->Property<bool>(L"Result", Result(), pGina::Messaging::Boolean);					
+					msg->Property<bool>(L"Result", Result(), pGina::Messaging::Boolean);
 					return msg;
 				}
 

@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -38,7 +38,7 @@ namespace pGina.Plugin.UsernameMod.Rules
 {
 
     public enum Stage { Authentication, Authorization, Gateway };
-    
+
     /// <summary>
     /// Represents an action to take on the username.
     /// </summary>
@@ -123,7 +123,7 @@ namespace pGina.Plugin.UsernameMod.Rules
         {
             return string.Format("[{0}] The username will be prepended with \"{1}\"", stage, toPrepend);
         }
-        
+
         public string save()
         {
             return string.Format("{0}\n{1}\n{2}", stage, "Prepend", toPrepend);
@@ -231,7 +231,7 @@ namespace pGina.Plugin.UsernameMod.Rules
 
         public string modify(string username)
         {
-            return Regex.Replace(username, pattern, replaceWith); 
+            return Regex.Replace(username, pattern, replaceWith);
         }
 
         public override string ToString()
@@ -279,7 +279,7 @@ namespace pGina.Plugin.UsernameMod.Rules
         private static dynamic m_settings = new pGinaDynamicSettings(UsernameModPlugin.SimpleUuid);
         public List<IUsernameRule> list { get; private set; }
         private ILog m_logger = LogManager.GetLogger("UsernameModPlugin");
-        
+
         public static string[] Rules = { "Append", "Prepend", "Truncate", "Replace", "RegEx Replace", "Match" };
 
         public ListOfRules()
@@ -308,16 +308,16 @@ namespace pGina.Plugin.UsernameMod.Rules
         }
 
         /// <summary>
-        /// Loads the rules from the register into list. 
+        /// Loads the rules from the register into list.
         /// </summary>
         public void Load()
-        {  
+        {
             string[] rules = (string[])m_settings.rules;
             m_logger.DebugFormat("Loaded rules from registry. {0} lines.", rules.Length);
             try
             {
                 for (int k = 0; k < rules.Length; k++)
-                {   
+                {
                     m_logger.DebugFormat("Rule read: {0}", rules[k]);
                     string[] srule = rules[k].Split('\n');
                     String stage = srule[0];
@@ -326,7 +326,7 @@ namespace pGina.Plugin.UsernameMod.Rules
                     string val2 = null;
                     if (srule.Length > 3)
                         val2 = srule[3];
-                    
+
 
                     IUsernameRule rule = CreateRule(stage, action, val1, val2);
                     m_logger.DebugFormat("Rule created: {0}", rule);
@@ -359,7 +359,7 @@ namespace pGina.Plugin.UsernameMod.Rules
 
         /// <summary>
         /// Moves the rule at the specified index up one (e.g. index=2 becomes index=1).
-        /// 
+        ///
         /// Will not move an item if it's at the top, or if it will be above a rule with an earlier step.
         /// (e.g. A gateway rule can not be above a authorization rule)
         /// </summary>
@@ -381,7 +381,7 @@ namespace pGina.Plugin.UsernameMod.Rules
 
         /// <summary>
         /// Moves the rule at the specified index down one (e.g. index=2 becomes index=3).
-        /// 
+        ///
         /// Will not move an item if it's at the bottom, or if it will be below a rule with a later step.
         /// (e.g. An authorization rule will not move below a gateway rule)
         /// </summary>
@@ -412,7 +412,7 @@ namespace pGina.Plugin.UsernameMod.Rules
         }
 
         /// <summary>
-        /// Creates a IUsernameRule based on the string representation of the stage, action, and values. 
+        /// Creates a IUsernameRule based on the string representation of the stage, action, and values.
         /// </summary>
         /// <param name="stage"></param>
         /// <param name="action"></param>
@@ -470,5 +470,5 @@ namespace pGina.Plugin.UsernameMod.Rules
             }
         }
     }
-    
+
 }

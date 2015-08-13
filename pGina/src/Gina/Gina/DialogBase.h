@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -36,7 +36,7 @@ namespace pGina
 {
 	namespace GINA
 	{
-		// Simple base class that 'ui' dialogs can inherit from, thanks to Keith Brown and his 
+		// Simple base class that 'ui' dialogs can inherit from, thanks to Keith Brown and his
 		//	excellent GINA series for this idea - basically we just proxy all DialogProcs through
 		//  a static proc with a class ptr as user data.  This lets each dialog have its own
 		//  class and handler, without the added work of individual WlxDialogBox() calls all over
@@ -44,16 +44,16 @@ namespace pGina
 		class DialogBase
 		{
 		public:
-			DialogBase(WinlogonInterface * iface, int dialogId);			
+			DialogBase(WinlogonInterface * iface, int dialogId);
 			int ShowDialog();
-			
+
 		protected:
 			virtual void DialogInit() = 0;			// WM_INITDIALOG
 			virtual bool Command(int itemId) = 0;	// WM_COMMAND
 			virtual bool Timer(int timerId) = 0;	// WM_TIMER
 			virtual void Destroy() {} 				// WM_DESTROY
 			virtual INT_PTR DialogProcImpl(UINT msg, WPARAM wparam, LPARAM lparam) = 0;
-			
+
 			// Helpers that subclasses can use to center, get/set data etc
 			void CenterWindow();
 			HWND GetItem(int itemId);

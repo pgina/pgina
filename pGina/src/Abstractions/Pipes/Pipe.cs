@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -46,13 +46,13 @@ namespace Abstractions.Pipes
             Name = name;
         }
 
-        protected Pipe(string name, Func<BinaryReader, BinaryWriter, bool> action) 
+        protected Pipe(string name, Func<BinaryReader, BinaryWriter, bool> action)
             : this(name)
         {
             if (action == null)
                 throw new ArgumentNullException("action", string.Format("Stream action cannot be null, you want us to do *something* with the pipe right?"));
 
-            StreamAction = action;            
+            StreamAction = action;
         }
 
         protected Pipe(string name, Func<IDictionary<string, object>, IDictionary<string, object>> action)
@@ -74,7 +74,7 @@ namespace Abstractions.Pipes
             IDictionary<string, object> msg = PipeMessage.Demarshal(bytes);
             IDictionary<string, object> reply = callback(msg);
             if (reply != null)
-            {                            
+            {
                 WriteMessage(writer, reply);
 
                 if (((IDictionary<String, Object>)reply).ContainsKey("LastMessage"))
@@ -83,7 +83,7 @@ namespace Abstractions.Pipes
                     return false;
                 }
             }
-            
+
             return (reply != null);
         }
 
@@ -95,10 +95,10 @@ namespace Abstractions.Pipes
             writer.Flush();
         }
 
-        protected void HandlePipeConnection(PipeStream pipeStream, IDictionary<string, object> initialMessage) 
+        protected void HandlePipeConnection(PipeStream pipeStream, IDictionary<string, object> initialMessage)
         {
             // You think we'd scope these with using() right? They are IDisposable
-            //  after all... but nope, the implementation of these is such that 
+            //  after all... but nope, the implementation of these is such that
             //  disposing of them also disposes the underlying stream.  Leaving us
             //  with a double (or triple if we close the pipeServer stream ourselves)
             //  close.  Yay.  Instead we abandoned these to the GC knowing that they

@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -39,7 +39,7 @@
 namespace pGina
 {
 	namespace CredProv
-	{		
+	{
 		// Where to get text for a text field/label
 		typedef enum PGINA_FIELD_DATA_SOURCE
 		{
@@ -56,7 +56,7 @@ namespace pGina
 		struct FIELD_STATE_PAIR
 		{
 			CREDENTIAL_PROVIDER_FIELD_STATE fieldState;
-			CREDENTIAL_PROVIDER_FIELD_INTERACTIVE_STATE fieldInteractiveState;		
+			CREDENTIAL_PROVIDER_FIELD_INTERACTIVE_STATE fieldInteractiveState;
 		};
 
 		// Describes the field overall, both its state pair and its field descriptor
@@ -68,10 +68,10 @@ namespace pGina
 			PGINA_FIELD_DATA_SOURCE fieldDataSource;
 			union
 			{
-				PWSTR wstr;				
+				PWSTR wstr;
 			};
 			LABEL_TEXT_CALLBACK_FUNC labelCallback;
-		};		
+		};
 
 		struct UI_FIELDS
 		{

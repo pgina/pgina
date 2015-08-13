@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -58,7 +58,7 @@ namespace pGina
 			// And more crazy ass v-table madness, yay COM again!
 			static const QITAB qit[] =
 			{
-				QITABENT(Credential, ICredentialProviderCredential), 
+				QITABENT(Credential, ICredentialProviderCredential),
 				{0},
 			};
 			return QISearch(this, qit, riid, ppv);
@@ -83,15 +83,15 @@ namespace pGina
 			UnAdvise();
 
 			m_logonUiCallback = pcpce;
-			
+
 			if(m_logonUiCallback)
 			{
-				m_logonUiCallback->AddRef();			
+				m_logonUiCallback->AddRef();
 			}
 
 			return S_OK;
 		}
-		
+
 		IFACEMETHODIMP Credential::UnAdvise()
 		{
 			if(m_logonUiCallback)
@@ -118,7 +118,7 @@ namespace pGina
 		}
 
 		IFACEMETHODIMP Credential::GetFieldState(__in DWORD dwFieldID, __out CREDENTIAL_PROVIDER_FIELD_STATE* pcpfs, __out CREDENTIAL_PROVIDER_FIELD_INTERACTIVE_STATE* pcpfis)
-		{			
+		{
 			if(!m_fields || dwFieldID >= m_fields->fieldCount || !pcpfs || !pcpfis)
 				return E_INVALIDARG;
 
@@ -126,7 +126,7 @@ namespace pGina
 			*pcpfis = m_fields->fields[dwFieldID].fieldStatePair.fieldInteractiveState;
 			return S_OK;
 		}
-		
+
 		IFACEMETHODIMP Credential::GetStringValue(__in DWORD dwFieldID, __deref_out PWSTR* ppwsz)
 		{
 			if(!m_fields || dwFieldID >= m_fields->fieldCount || !ppwsz)
@@ -137,14 +137,14 @@ namespace pGina
 				std::wstring text = GetTextForField(dwFieldID);
 				if( ! text.empty() )
 					return SHStrDupW( text.c_str(), ppwsz );
-			}	
+			}
 
 			// We copy our value with SHStrDupW which uses CoTask alloc, caller owns result
 			if(m_fields->fields[dwFieldID].wstr)
 				return SHStrDupW(m_fields->fields[dwFieldID].wstr, ppwsz);
 
 			*ppwsz = NULL;
-			return S_OK;			
+			return S_OK;
 		}
 
 		IFACEMETHODIMP Credential::GetBitmapValue(__in DWORD dwFieldID, __out HBITMAP* phbmp)
@@ -165,14 +165,14 @@ namespace pGina
 			else
 			{
 				pDEBUG(L"Credential::GetBitmapValue: Loading image from: %s", tileImage.c_str());
-				bitmap = (HBITMAP) LoadImageW((HINSTANCE) NULL, tileImage.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);			
+				bitmap = (HBITMAP) LoadImageW((HINSTANCE) NULL, tileImage.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 			}
 			if (!pGina::Service::StateHelper::GetState())
 				bitmap = LoadBitmap(GetMyInstance(), MAKEINTRESOURCE(IDB_PGINA_ERROR));
-			
+
 			if(!bitmap)
 				return HRESULT_FROM_WIN32(GetLastError());
-			
+
 			*phbmp = bitmap;
 			return S_OK;
 		}
@@ -247,14 +247,14 @@ namespace pGina
 													__deref_out_opt PWSTR* ppwszOptionalStatusText, __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
 		{
 			// Workout what our username, and password are.  Plugins are responsible for parsing out domain\machine name if needed
-			PWSTR username = FindUsernameValue();			
+			PWSTR username = FindUsernameValue();
 			PWSTR password = FindPasswordValue();
 			PWSTR domain = NULL;
 			pGina::Transactions::User::LoginResult loginResult;
 			HWND hdialog;
 			HANDLE hThread_dialog;
 			wchar_t title[128] = {};
-			
+
 			pGina::Protocol::LoginRequestMessage::LoginReason reason = pGina::Protocol::LoginRequestMessage::Login;
 			switch(m_usageScenario)
 			{
@@ -280,7 +280,7 @@ namespace pGina
 			case CPUS_CHANGE_PASSWORD:
 				PWSTR newPassword = NULL;
 				PWSTR newPasswordConfirm = NULL;
-				
+
 				if ( !pGina::Service::StateHelper::GetState() )
 				{
 					pDEBUG(L"Credential::GetSerialization: pGina service is unavailable");
@@ -290,24 +290,24 @@ namespace pGina
 					*pcpsiOptionalStatusIcon = CPSI_ERROR;
 					return S_FALSE;
 				}
-				
+
 				if(m_fields)
 				{
 					newPassword = m_fields->fields[CredProv::CPUIFI_NEW_PASSWORD].wstr;
 					newPasswordConfirm = m_fields->fields[CredProv::CPUIFI_CONFIRM_NEW_PASSWORD].wstr;
 				}
-				
+
 				// Check that the new password and confirmation are exactly the same, if not
 				// return a failure.
 				if( wcscmp(newPassword, newPasswordConfirm ) != 0 ) {
 					SHStrDupW(L"New passwords do not match", ppwszOptionalStatusText);
-					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
+					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 					*pcpsiOptionalStatusIcon = CPSI_ERROR;
 					return S_FALSE;
 				}
 
 				loginResult = pGina::Transactions::User::ProcessChangePasswordForUser( username, L"", password, newPassword );
-				
+
 				if( !loginResult.Result() )
 				{
 					if(loginResult.Message().empty())
@@ -315,7 +315,7 @@ namespace pGina
 						loginResult.Message(L"Failed to change password, no message from plugins.");
 					}
 					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);
-					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
+					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 					*pcpsiOptionalStatusIcon = CPSI_ERROR;
 					return S_FALSE;
 				}
@@ -324,7 +324,7 @@ namespace pGina
 					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);
 				else
 					SHStrDupW(L"pGina: Your password was successfully changed", ppwszOptionalStatusText);
-				
+
 				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 				*pcpsiOptionalStatusIcon = CPSI_SUCCESS;
 				return S_OK;
@@ -357,7 +357,7 @@ namespace pGina
 				pERROR(L"Credential::GetSerialization: Failed attempt");
 				if(loginResult.Message().length() > 0)
 				{
-					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);					
+					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);
 				}
 				else
 				{
@@ -365,8 +365,8 @@ namespace pGina
 				}
 				SetStringValue(m_fields->usernameFieldIdx, (PCWSTR)L"");
 				SetStringValue(m_fields->passwordFieldIdx, (PCWSTR)L"");
-				
-				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
+
+				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 				*pcpsiOptionalStatusIcon = CPSI_ERROR;
 				if (hThread_dialog != NULL)
 				{
@@ -382,14 +382,14 @@ namespace pGina
 
 			username = loginResult.Username().length() > 0 ? _wcsdup(loginResult.Username().c_str()) : NULL;
 			password = loginResult.Password().length() > 0 ? _wcsdup(loginResult.Password().c_str()) : NULL;
-			domain = loginResult.Domain().length() > 0 ? _wcsdup(loginResult.Domain().c_str()) : NULL;			
+			domain = loginResult.Domain().length() > 0 ? _wcsdup(loginResult.Domain().c_str()) : NULL;
 
 			cleanup.AddFree(username);
 			cleanup.AddFree(password);
 			cleanup.AddFree(domain);
 
-			PWSTR protectedPassword = NULL;			
-			HRESULT result = Microsoft::Sample::ProtectIfNecessaryAndCopyPassword(password, m_usageScenario, &protectedPassword);			
+			PWSTR protectedPassword = NULL;
+			HRESULT result = Microsoft::Sample::ProtectIfNecessaryAndCopyPassword(password, m_usageScenario, &protectedPassword);
 			if(!SUCCEEDED(result))
 			{
 				if (hThread_dialog != NULL)
@@ -407,7 +407,7 @@ namespace pGina
 				return result;
 			}
 
-			cleanup.Add(new pGina::Memory::CoTaskMemFreeCleanup(protectedPassword));			
+			cleanup.Add(new pGina::Memory::CoTaskMemFreeCleanup(protectedPassword));
 
 			// CredUI we use CredPackAuthenticationBuffer
 			if(m_usageScenario == CPUS_CREDUI)
@@ -419,7 +419,7 @@ namespace pGina
 				{
 					DWORD size = 0;
 					BYTE* rawbits = NULL;
-					
+
 					if(!CredPackAuthenticationBufferW((CREDUIWIN_PACK_32_WOW & m_usageFlags) ? CRED_PACK_WOW_BUFFER : 0, domainUsername, protectedPassword, rawbits, &size))
 					{
 						if(GetLastError() == ERROR_INSUFFICIENT_BUFFER)
@@ -494,7 +494,7 @@ namespace pGina
 					return result;
 				}
 			}
-			
+
 			ULONG authPackage = 0;
 			result = Microsoft::Sample::RetrieveNegotiateAuthPackage(&authPackage);
 			if(!SUCCEEDED(result))
@@ -513,11 +513,11 @@ namespace pGina
 				}
 				return result;
 			}
-						
+
 			pcpcs->ulAuthenticationPackage = authPackage;
 			pcpcs->clsidCredentialProvider = CLSID_CpGinaProvider;
-			*pcpgsr = CPGSR_RETURN_CREDENTIAL_FINISHED;	    
-	    
+			*pcpgsr = CPGSR_RETURN_CREDENTIAL_FINISHED;
+
 			if (hThread_dialog != NULL)
 			{
 				Credential::Thread_dialog_close(hThread_dialog);
@@ -532,8 +532,8 @@ namespace pGina
 			}
 			return S_OK;
 		}
-    
-		IFACEMETHODIMP Credential::ReportResult(__in NTSTATUS ntsStatus, __in NTSTATUS ntsSubstatus, __deref_out_opt PWSTR* ppwszOptionalStatusText, 
+
+		IFACEMETHODIMP Credential::ReportResult(__in NTSTATUS ntsStatus, __in NTSTATUS ntsSubstatus, __deref_out_opt PWSTR* ppwszOptionalStatusText,
 												__out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
 		{
 			pDEBUG(L"Credential::ReportResult(0x%08x, 0x%08x) called", ntsStatus, ntsSubstatus);
@@ -546,7 +546,7 @@ namespace pGina
 			m_referenceCount(1),
 			m_usageScenario(CPUS_INVALID),
 			m_logonUiCallback(NULL),
-			m_fields(NULL),			
+			m_fields(NULL),
 			m_usageFlags(0)
 		{
 			AddDllReference();
@@ -554,7 +554,7 @@ namespace pGina
 			//if( pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
 				pGina::Service::StateHelper::AddTarget(this);
 		}
-		
+
 		Credential::~Credential()
 		{
 			pGina::Service::StateHelper::RemoveTarget(this);
@@ -604,19 +604,19 @@ namespace pGina
 					{
 						SHStrDup( text.c_str(), &m_fields->fields[x].wstr );
 					}
-				}				
-			}			
+				}
+			}
 
 
 			if(username != NULL)
-			{				
+			{
 				SHStrDupW(username, &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
 
-				// If the username field has focus, hand focus over to the password field 
+				// If the username field has focus, hand focus over to the password field
 				if(m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState == CPFIS_FOCUSED)
-				{ 
-					m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE; 
-					m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED; 
+				{
+					m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
+					m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
 				}
 			}
 			else if(m_usageScenario == CPUS_UNLOCK_WORKSTATION)
@@ -628,9 +628,9 @@ namespace pGina
 
 				// Get user information from service (if available)
 				pDEBUG(L"Retrieving user information from service.");
-				pGina::Transactions::LoginInfo::UserInformation userInfo = 
+				pGina::Transactions::LoginInfo::UserInformation userInfo =
 					pGina::Transactions::LoginInfo::GetUserInformation(mySession);
-				pDEBUG(L"Received: original uname: '%s' uname: '%s' domain: '%s'", 
+				pDEBUG(L"Received: original uname: '%s' uname: '%s' domain: '%s'",
 					userInfo.OriginalUsername().c_str(), userInfo.Username().c_str(), userInfo.Domain().c_str());
 
 				// Grab the domain if available
@@ -648,7 +648,7 @@ namespace pGina
 					username = pGina::Helpers::GetSessionUsername(mySession);
 				if( domain.empty() )
 					domain = pGina::Helpers::GetSessionDomainName(mySession);
-					
+
 
 				if(!domain.empty() && _wcsicmp(domain.c_str(), machineName.c_str()) != 0)
 				{
@@ -657,12 +657,12 @@ namespace pGina
 				}
 
 				usernameFieldValue += username;
-				
+
 				SHStrDupW(usernameFieldValue.c_str(), &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
 			}
 
 			if(password != NULL)
-			{				
+			{
 				SHStrDupW(password, &(m_fields->fields[m_fields->passwordFieldIdx].wstr));
 			}
 
@@ -683,7 +683,7 @@ namespace pGina
 
 		void Credential::ClearZeroAndFreeAnyPasswordFields(bool updateUi)
 		{
-			ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, updateUi);					
+			ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, updateUi);
 		}
 
 		void Credential::ClearZeroAndFreeAnyTextFields(bool updateUi)
@@ -704,7 +704,7 @@ namespace pGina
 					{
 						size_t len = wcslen(m_fields->fields[x].wstr);
 						SecureZeroMemory(m_fields->fields[x].wstr, len * sizeof(wchar_t));
-						CoTaskMemFree(m_fields->fields[x].wstr);						
+						CoTaskMemFree(m_fields->fields[x].wstr);
 						m_fields->fields[x].wstr = NULL;
 
 						// If we've been advised, we can tell the UI so the UI correctly reflects that this
@@ -715,7 +715,7 @@ namespace pGina
 						}
 					}
 				}
-			}	
+			}
 		}
 
 		PWSTR Credential::FindUsernameValue()
@@ -726,7 +726,7 @@ namespace pGina
 
 		PWSTR Credential::FindPasswordValue()
 		{
-			if(!m_fields) return NULL;			
+			if(!m_fields) return NULL;
 			return m_fields->fields[m_fields->passwordFieldIdx].wstr;
 		}
 
@@ -741,7 +741,7 @@ namespace pGina
 			// Retrieve data for dynamic fields
 			return (m_fields->fields[dwFieldID].fieldDataSource == SOURCE_DYNAMIC ||
 					(m_fields->fields[dwFieldID].fieldDataSource == SOURCE_CALLBACK && m_fields->fields[dwFieldID].labelCallback != NULL) ||
-					m_fields->fields[dwFieldID].fieldDataSource == SOURCE_STATUS);			
+					m_fields->fields[dwFieldID].fieldDataSource == SOURCE_STATUS);
 		}
 
 		std::wstring Credential::GetTextForField(DWORD dwFieldID)
@@ -749,11 +749,11 @@ namespace pGina
 			// Retrieve data for dynamic fields
 			if( m_fields->fields[dwFieldID].fieldDataSource == SOURCE_DYNAMIC )
 			{
-				return pGina::Transactions::TileUi::GetDynamicLabel( m_fields->fields[dwFieldID].fieldDescriptor.pszLabel );				
+				return pGina::Transactions::TileUi::GetDynamicLabel( m_fields->fields[dwFieldID].fieldDescriptor.pszLabel );
 			}
 			else if(m_fields->fields[dwFieldID].fieldDataSource == SOURCE_CALLBACK && m_fields->fields[dwFieldID].labelCallback != NULL)
 			{
-				return m_fields->fields[dwFieldID].labelCallback(m_fields->fields[dwFieldID].fieldDescriptor.pszLabel, m_fields->fields[dwFieldID].fieldDescriptor.dwFieldID);				
+				return m_fields->fields[dwFieldID].labelCallback(m_fields->fields[dwFieldID].fieldDescriptor.pszLabel, m_fields->fields[dwFieldID].fieldDescriptor.dwFieldID);
 			}
 			else if(m_fields->fields[dwFieldID].fieldDataSource == SOURCE_STATUS)
 			{
@@ -777,7 +777,7 @@ namespace pGina
 		DWORD WINAPI Credential::Thread_dialog(LPVOID lpParameter)
 		{
 			HWND dialog;
-			
+
 			dialog = CreateWindowEx(WS_EX_TOPMOST, L"Static", (LPWSTR)lpParameter, WS_DLGFRAME, (int)(GetSystemMetrics(SM_CXFULLSCREEN)/2)-115, (int)GetSystemMetrics(SM_CYFULLSCREEN)/2, 225, 15, ::GetForegroundWindow(), NULL, GetMyInstance(), NULL);
 			if(dialog == NULL)
 			{

@@ -57,18 +57,18 @@ namespace pGina.Plugin.UsernameMod
             this.flowLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // label2
-            // 
+            //
             label2.AutoSize = true;
             label2.Location = new System.Drawing.Point(5, 48);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(40, 13);
             label2.TabIndex = 12;
             label2.Text = "Action:";
-            // 
+            //
             // btnOk
-            // 
+            //
             this.btnOk.Location = new System.Drawing.Point(207, 402);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(71, 23);
@@ -76,9 +76,9 @@ namespace pGina.Plugin.UsernameMod
             this.btnOk.Text = "Save";
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnSave_Click);
-            // 
+            //
             // btnCancel
-            // 
+            //
             this.btnCancel.Location = new System.Drawing.Point(279, 402);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
@@ -86,9 +86,9 @@ namespace pGina.Plugin.UsernameMod
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-            // 
+            //
             // authButton
-            // 
+            //
             this.authButton.AutoSize = true;
             this.authButton.Checked = true;
             this.authButton.Location = new System.Drawing.Point(8, 22);
@@ -98,9 +98,9 @@ namespace pGina.Plugin.UsernameMod
             this.authButton.TabStop = true;
             this.authButton.Text = "Authentication";
             this.authButton.UseVisualStyleBackColor = true;
-            // 
+            //
             // authZButton
-            // 
+            //
             this.authZButton.AutoSize = true;
             this.authZButton.Location = new System.Drawing.Point(107, 22);
             this.authZButton.Name = "authZButton";
@@ -109,9 +109,9 @@ namespace pGina.Plugin.UsernameMod
             this.authZButton.TabStop = true;
             this.authZButton.Text = "Authorization";
             this.authZButton.UseVisualStyleBackColor = true;
-            // 
+            //
             // gatewayButton
-            // 
+            //
             this.gatewayButton.AutoSize = true;
             this.gatewayButton.Location = new System.Drawing.Point(199, 22);
             this.gatewayButton.Name = "gatewayButton";
@@ -120,9 +120,9 @@ namespace pGina.Plugin.UsernameMod
             this.gatewayButton.TabStop = true;
             this.gatewayButton.Text = "Gateway";
             this.gatewayButton.UseVisualStyleBackColor = true;
-            // 
+            //
             // actionBox
-            // 
+            //
             this.actionBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.actionBox.FormattingEnabled = true;
             this.actionBox.Location = new System.Drawing.Point(51, 45);
@@ -130,16 +130,16 @@ namespace pGina.Plugin.UsernameMod
             this.actionBox.Size = new System.Drawing.Size(114, 21);
             this.actionBox.TabIndex = 6;
             this.actionBox.SelectionChangeCommitted += new System.EventHandler(this.dropDownActionChange);
-            // 
+            //
             // textBox1
-            // 
+            //
             this.textBox1.Location = new System.Drawing.Point(88, 3);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(71, 20);
             this.textBox1.TabIndex = 7;
-            // 
+            //
             // descLabel2
-            // 
+            //
             this.descLabel2.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.descLabel2.AutoSize = true;
             this.descLabel2.Location = new System.Drawing.Point(3, 6);
@@ -147,16 +147,16 @@ namespace pGina.Plugin.UsernameMod
             this.descLabel2.Size = new System.Drawing.Size(102, 13);
             this.descLabel2.TabIndex = 8;
             this.descLabel2.Text = "will be replaced with";
-            // 
+            //
             // textBox2
-            // 
+            //
             this.textBox2.Location = new System.Drawing.Point(111, 3);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(86, 20);
             this.textBox2.TabIndex = 9;
-            // 
+            //
             // descLabel1
-            // 
+            //
             this.descLabel1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.descLabel1.AutoSize = true;
             this.descLabel1.Location = new System.Drawing.Point(3, 6);
@@ -164,9 +164,9 @@ namespace pGina.Plugin.UsernameMod
             this.descLabel1.Size = new System.Drawing.Size(79, 13);
             this.descLabel1.TabIndex = 10;
             this.descLabel1.Text = "The characters";
-            // 
+            //
             // removeButton
-            // 
+            //
             this.removeButton.Location = new System.Drawing.Point(272, 181);
             this.removeButton.Name = "removeButton";
             this.removeButton.Size = new System.Drawing.Size(75, 23);
@@ -174,9 +174,9 @@ namespace pGina.Plugin.UsernameMod
             this.removeButton.Text = "Remove";
             this.removeButton.UseVisualStyleBackColor = true;
             this.removeButton.Click += new System.EventHandler(this.btnRemRule_Click);
-            // 
+            //
             // groupBox2
-            // 
+            //
             this.groupBox2.Controls.Add(this.flowLayoutPanel2);
             this.groupBox2.Controls.Add(this.flowLayoutPanel1);
             this.groupBox2.Controls.Add(this.gatewayButton);
@@ -191,27 +191,27 @@ namespace pGina.Plugin.UsernameMod
             this.groupBox2.TabIndex = 14;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Add Rule";
-            // 
+            //
             // flowLayoutPanel2
-            // 
+            //
             this.flowLayoutPanel2.Controls.Add(this.descLabel2);
             this.flowLayoutPanel2.Controls.Add(this.textBox2);
             this.flowLayoutPanel2.Location = new System.Drawing.Point(6, 108);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
             this.flowLayoutPanel2.Size = new System.Drawing.Size(341, 27);
             this.flowLayoutPanel2.TabIndex = 14;
-            // 
+            //
             // flowLayoutPanel1
-            // 
+            //
             this.flowLayoutPanel1.Controls.Add(this.descLabel1);
             this.flowLayoutPanel1.Controls.Add(this.textBox1);
             this.flowLayoutPanel1.Location = new System.Drawing.Point(6, 72);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(341, 28);
             this.flowLayoutPanel1.TabIndex = 13;
-            // 
+            //
             // addButton
-            // 
+            //
             this.addButton.Location = new System.Drawing.Point(272, 139);
             this.addButton.Name = "addButton";
             this.addButton.Size = new System.Drawing.Size(75, 23);
@@ -219,9 +219,9 @@ namespace pGina.Plugin.UsernameMod
             this.addButton.Text = "Add Rule";
             this.addButton.UseVisualStyleBackColor = true;
             this.addButton.Click += new System.EventHandler(this.btnAddRule_Click);
-            // 
+            //
             // groupBox1
-            // 
+            //
             this.groupBox1.Controls.Add(this.downButton);
             this.groupBox1.Controls.Add(this.upButton);
             this.groupBox1.Controls.Add(this.rulesListView);
@@ -232,9 +232,9 @@ namespace pGina.Plugin.UsernameMod
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "List of Rules";
-            // 
+            //
             // downButton
-            // 
+            //
             this.downButton.Image = global::pGina.Plugin.UsernameMod.Properties.Resources.DownArrowSolid;
             this.downButton.Location = new System.Drawing.Point(211, 181);
             this.downButton.Name = "downButton";
@@ -242,9 +242,9 @@ namespace pGina.Plugin.UsernameMod
             this.downButton.TabIndex = 15;
             this.downButton.UseVisualStyleBackColor = true;
             this.downButton.Click += new System.EventHandler(this.btnMove_Click);
-            // 
+            //
             // upButton
-            // 
+            //
             this.upButton.Image = global::pGina.Plugin.UsernameMod.Properties.Resources.UpArrowSolid;
             this.upButton.Location = new System.Drawing.Point(241, 181);
             this.upButton.Name = "upButton";
@@ -252,14 +252,14 @@ namespace pGina.Plugin.UsernameMod
             this.upButton.TabIndex = 14;
             this.upButton.UseVisualStyleBackColor = true;
             this.upButton.Click += new System.EventHandler(this.btnMove_Click);
-            // 
+            //
             // rulesHeader
-            // 
+            //
             this.rulesHeader.Text = "Rules";
             this.rulesHeader.Width = 335;
-            // 
+            //
             // rulesListView
-            // 
+            //
             this.rulesListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.rulesHeader});
             this.rulesListView.Location = new System.Drawing.Point(6, 19);
@@ -269,9 +269,9 @@ namespace pGina.Plugin.UsernameMod
             this.rulesListView.TabIndex = 10;
             this.rulesListView.UseCompatibleStateImageBehavior = false;
             this.rulesListView.View = System.Windows.Forms.View.Details;
-            // 
+            //
             // Configuration
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(372, 427);

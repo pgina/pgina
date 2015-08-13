@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -41,7 +41,7 @@ namespace pGina
 		{
 		public:
 			typedef enum DialogResult
-			{				
+			{
 				SAS_ACTION_LOGON =						 WLX_SAS_ACTION_LOGON,
 				SAS_ACTION_NONE =						 WLX_SAS_ACTION_NONE,
 				SAS_ACTION_LOCK_WKSTA =					 WLX_SAS_ACTION_LOCK_WKSTA,
@@ -58,7 +58,7 @@ namespace pGina
 				SAS_ACTION_SHUTDOWN_HIBERNATE =          WLX_SAS_ACTION_SHUTDOWN_HIBERNATE,
 				SAS_ACTION_RECONNECTED =                 WLX_SAS_ACTION_RECONNECTED,
 				SAS_ACTION_DELAYED_FORCE_LOGOFF =        WLX_SAS_ACTION_DELAYED_FORCE_LOGOFF,
-				SAS_ACTION_SWITCH_CONSOLE =              WLX_SAS_ACTION_SWITCH_CONSOLE,			
+				SAS_ACTION_SWITCH_CONSOLE =              WLX_SAS_ACTION_SWITCH_CONSOLE,
 				SAS_ACTION_MIN =						 SAS_ACTION_LOGON,
 				SAS_ACTION_MAX =						 SAS_ACTION_SWITCH_CONSOLE
 			};
@@ -67,9 +67,9 @@ namespace pGina
 			DialogLoggedOutSAS(WinlogonInterface *iface) :
 				DialogBase(iface, IDD_LOGGEDOUT_SAS),
 					m_bitmap(NULL), m_statusTimerId(0)
-				{					
+				{
 				}
-			
+
 			virtual void DialogInit();
 			virtual bool Command(int itemId);
 			virtual bool Timer(int timerId);
@@ -79,7 +79,7 @@ namespace pGina
 			void		 Username(std::wstring const& v) { m_username = v; }
 			std::wstring Password() { return m_password; }
 			void		 Password(std::wstring const& v) { m_password = v; }
-		
+
 		private:
 			void ApplyLogoImage();
 			void SetServiceStatus();

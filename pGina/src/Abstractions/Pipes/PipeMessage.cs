@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -34,12 +34,12 @@ using System.Dynamic;
 namespace Abstractions.Pipes
 {
     public static class PipeMessage
-    {        
+    {
         // Every messages starts with a single byte version marker, which can be used
         //  to facilitate support for older clients if needed.  This value indicates
         //  the most recent version supported by this library.
         public const byte CurrentMessageFormatVersion = 0x01;
-        
+
         private enum DataType
         {
             Byte            = 0x00,
@@ -48,13 +48,13 @@ namespace Abstractions.Pipes
             String          = 0x03,
             EmptyString     = 0x04,
         }
-        
-        public static IDictionary<string, object> Demarshal(byte[] data) 
+
+        public static IDictionary<string, object> Demarshal(byte[] data)
         {
             // Cannot be empty
             if (data.Length == 0)
                 throw new InvalidDataException(string.Format("Empty message provided, invalid format."));
-            
+
             using (BinaryReader br = new BinaryReader(new MemoryStream(data, false), Encoding.Unicode))
             {
                 // For now we support only the one message version
@@ -63,7 +63,7 @@ namespace Abstractions.Pipes
                     throw new InvalidDataException(string.Format("Message format: {0} is not support (library version: {1})", messageFormatVersion, CurrentMessageFormatVersion));
 
                 // Create a dict for the message contents
-                Dictionary<string, object> messageDict = new Dictionary<string, object>(); 
+                Dictionary<string, object> messageDict = new Dictionary<string, object>();
 
                 while (br.BaseStream.Position < br.BaseStream.Length)
                 {
@@ -96,17 +96,17 @@ namespace Abstractions.Pipes
             }
         }
 
-        public static byte[] Marshal(IDictionary<string, object> message) 
+        public static byte[] Marshal(IDictionary<string, object> message)
         {
             using (MemoryStream memory = new MemoryStream())
             {
                 BinaryWriter writer = new BinaryWriter(memory, Encoding.Unicode);
-                
+
                 // Write the version
                 writer.Write(CurrentMessageFormatVersion);
-    
+
                 // Now we just iterate properties and write them out
-                foreach (KeyValuePair<string, object> property in message) 
+                foreach (KeyValuePair<string, object> property in message)
                 {
                     writer.Write(property.Key);
 
@@ -117,15 +117,15 @@ namespace Abstractions.Pipes
                         continue;
                     }
 
-                    System.Type propType = property.Value.GetType();                    
-                    
+                    System.Type propType = property.Value.GetType();
+
                     if (propType == typeof(int))
                     {
-                        writer.Write((byte) DataType.Integer);                        
+                        writer.Write((byte) DataType.Integer);
                         writer.Write((int)property.Value);
                     }
                     else if (propType == typeof(byte))
-                    {                        
+                    {
                         writer.Write((byte)DataType.Byte);
                         writer.Write((byte)property.Value);
                     }
@@ -149,7 +149,7 @@ namespace Abstractions.Pipes
 
                 // Provide our caller a copy in byte[] format
                 return memory.ToArray();
-            }            
-        }        
+            }
+        }
     }
 }

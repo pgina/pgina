@@ -68,25 +68,25 @@
             this.optionsBox.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // label1
-            // 
+            //
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(17, 22);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(32, 13);
             this.label1.TabIndex = 0;
             this.label1.Text = "Host:";
-            // 
+            //
             // hostTB
-            // 
+            //
             this.hostTB.Location = new System.Drawing.Point(92, 19);
             this.hostTB.Name = "hostTB";
             this.hostTB.Size = new System.Drawing.Size(307, 20);
             this.hostTB.TabIndex = 0;
-            // 
+            //
             // okBtn
-            // 
+            //
             this.okBtn.Location = new System.Drawing.Point(430, 394);
             this.okBtn.Name = "okBtn";
             this.okBtn.Size = new System.Drawing.Size(70, 28);
@@ -94,9 +94,9 @@
             this.okBtn.Text = "Save";
             this.okBtn.UseVisualStyleBackColor = true;
             this.okBtn.Click += new System.EventHandler(this.okBtn_Click);
-            // 
+            //
             // cancelBtn
-            // 
+            //
             this.cancelBtn.Location = new System.Drawing.Point(354, 394);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(70, 28);
@@ -104,74 +104,74 @@
             this.cancelBtn.Text = "Cancel";
             this.cancelBtn.UseVisualStyleBackColor = true;
             this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
-            // 
+            //
             // portLabel
-            // 
+            //
             this.portLabel.AutoSize = true;
             this.portLabel.Location = new System.Drawing.Point(17, 48);
             this.portLabel.Name = "portLabel";
             this.portLabel.Size = new System.Drawing.Size(29, 13);
             this.portLabel.TabIndex = 11;
             this.portLabel.Text = "Port:";
-            // 
+            //
             // portTB
-            // 
+            //
             this.portTB.Location = new System.Drawing.Point(92, 45);
             this.portTB.Name = "portTB";
             this.portTB.Size = new System.Drawing.Size(97, 20);
             this.portTB.TabIndex = 1;
-            // 
+            //
             // dbLabel
-            // 
+            //
             this.dbLabel.AutoSize = true;
             this.dbLabel.Location = new System.Drawing.Point(17, 74);
             this.dbLabel.Name = "dbLabel";
             this.dbLabel.Size = new System.Drawing.Size(56, 13);
             this.dbLabel.TabIndex = 12;
             this.dbLabel.Text = "Database:";
-            // 
+            //
             // dbTB
-            // 
+            //
             this.dbTB.Location = new System.Drawing.Point(92, 71);
             this.dbTB.Name = "dbTB";
             this.dbTB.Size = new System.Drawing.Size(307, 20);
             this.dbTB.TabIndex = 2;
-            // 
+            //
             // userLabel
-            // 
+            //
             this.userLabel.AutoSize = true;
             this.userLabel.Location = new System.Drawing.Point(17, 158);
             this.userLabel.Name = "userLabel";
             this.userLabel.Size = new System.Drawing.Size(32, 13);
             this.userLabel.TabIndex = 13;
             this.userLabel.Text = "User:";
-            // 
+            //
             // userTB
-            // 
+            //
             this.userTB.Location = new System.Drawing.Point(92, 155);
             this.userTB.Name = "userTB";
             this.userTB.Size = new System.Drawing.Size(307, 20);
             this.userTB.TabIndex = 5;
-            // 
+            //
             // passwdLabel
-            // 
+            //
             this.passwdLabel.AutoSize = true;
             this.passwdLabel.Location = new System.Drawing.Point(17, 184);
             this.passwdLabel.Name = "passwdLabel";
             this.passwdLabel.Size = new System.Drawing.Size(56, 13);
             this.passwdLabel.TabIndex = 14;
             this.passwdLabel.Text = "Password:";
-            // 
+            //
             // passwdTB
-            // 
+            //
             this.passwdTB.Location = new System.Drawing.Point(92, 181);
             this.passwdTB.Name = "passwdTB";
             this.passwdTB.Size = new System.Drawing.Size(307, 20);
             this.passwdTB.TabIndex = 6;
             this.passwdTB.UseSystemPasswordChar = true;
-            // 
+            //
             // testButton
-            // 
+            //
             this.testButton.Location = new System.Drawing.Point(6, 396);
             this.testButton.Name = "testButton";
             this.testButton.Size = new System.Drawing.Size(67, 27);
@@ -179,9 +179,9 @@
             this.testButton.Text = "Test...";
             this.testButton.UseVisualStyleBackColor = true;
             this.testButton.Click += new System.EventHandler(this.testButton_Click);
-            // 
+            //
             // createTableBtn
-            // 
+            //
             this.createTableBtn.Location = new System.Drawing.Point(79, 396);
             this.createTableBtn.Name = "createTableBtn";
             this.createTableBtn.Size = new System.Drawing.Size(91, 26);
@@ -189,9 +189,9 @@
             this.createTableBtn.Text = "Create Table...";
             this.createTableBtn.UseVisualStyleBackColor = true;
             this.createTableBtn.Click += new System.EventHandler(this.createTableBtn_Click);
-            // 
+            //
             // showPassCB
-            // 
+            //
             this.showPassCB.AutoSize = true;
             this.showPassCB.Location = new System.Drawing.Point(411, 184);
             this.showPassCB.Name = "showPassCB";
@@ -200,9 +200,9 @@
             this.showPassCB.Text = "Show Text";
             this.showPassCB.UseVisualStyleBackColor = true;
             this.showPassCB.CheckedChanged += new System.EventHandler(this.showPassCB_CheckedChanged);
-            // 
+            //
             // eventsBox
-            // 
+            //
             this.eventsBox.Controls.Add(this.remoteDisconnectEvtCB);
             this.eventsBox.Controls.Add(this.remoteConnectEvtCB);
             this.eventsBox.Controls.Add(this.remoteControlEvtCB);
@@ -218,9 +218,9 @@
             this.eventsBox.TabIndex = 2;
             this.eventsBox.TabStop = false;
             this.eventsBox.Text = "Events";
-            // 
+            //
             // remoteDisconnectEvtCB
-            // 
+            //
             this.remoteDisconnectEvtCB.AutoSize = true;
             this.remoteDisconnectEvtCB.Location = new System.Drawing.Point(261, 42);
             this.remoteDisconnectEvtCB.Name = "remoteDisconnectEvtCB";
@@ -228,9 +228,9 @@
             this.remoteDisconnectEvtCB.TabIndex = 7;
             this.remoteDisconnectEvtCB.Text = "Remote Disconnect";
             this.remoteDisconnectEvtCB.UseVisualStyleBackColor = true;
-            // 
+            //
             // remoteConnectEvtCB
-            // 
+            //
             this.remoteConnectEvtCB.AutoSize = true;
             this.remoteConnectEvtCB.Location = new System.Drawing.Point(261, 19);
             this.remoteConnectEvtCB.Name = "remoteConnectEvtCB";
@@ -238,9 +238,9 @@
             this.remoteConnectEvtCB.TabIndex = 6;
             this.remoteConnectEvtCB.Text = "Remote Connect";
             this.remoteConnectEvtCB.UseVisualStyleBackColor = true;
-            // 
+            //
             // remoteControlEvtCB
-            // 
+            //
             this.remoteControlEvtCB.AutoSize = true;
             this.remoteControlEvtCB.Location = new System.Drawing.Point(383, 19);
             this.remoteControlEvtCB.Name = "remoteControlEvtCB";
@@ -248,9 +248,9 @@
             this.remoteControlEvtCB.TabIndex = 8;
             this.remoteControlEvtCB.Text = "Remote Control";
             this.remoteControlEvtCB.UseVisualStyleBackColor = true;
-            // 
+            //
             // consoleDisconnectEvtCB
-            // 
+            //
             this.consoleDisconnectEvtCB.AutoSize = true;
             this.consoleDisconnectEvtCB.Location = new System.Drawing.Point(134, 42);
             this.consoleDisconnectEvtCB.Name = "consoleDisconnectEvtCB";
@@ -258,9 +258,9 @@
             this.consoleDisconnectEvtCB.TabIndex = 5;
             this.consoleDisconnectEvtCB.Text = "Console Disconnect";
             this.consoleDisconnectEvtCB.UseVisualStyleBackColor = true;
-            // 
+            //
             // consoleConnectEvtCB
-            // 
+            //
             this.consoleConnectEvtCB.AutoSize = true;
             this.consoleConnectEvtCB.Location = new System.Drawing.Point(134, 19);
             this.consoleConnectEvtCB.Name = "consoleConnectEvtCB";
@@ -268,9 +268,9 @@
             this.consoleConnectEvtCB.TabIndex = 4;
             this.consoleConnectEvtCB.Text = "Console Connect";
             this.consoleConnectEvtCB.UseVisualStyleBackColor = true;
-            // 
+            //
             // unlockEvtCB
-            // 
+            //
             this.unlockEvtCB.AutoSize = true;
             this.unlockEvtCB.Location = new System.Drawing.Point(68, 42);
             this.unlockEvtCB.Name = "unlockEvtCB";
@@ -278,9 +278,9 @@
             this.unlockEvtCB.TabIndex = 3;
             this.unlockEvtCB.Text = "Unlock";
             this.unlockEvtCB.UseVisualStyleBackColor = true;
-            // 
+            //
             // lockEvtCB
-            // 
+            //
             this.lockEvtCB.AutoSize = true;
             this.lockEvtCB.Location = new System.Drawing.Point(68, 19);
             this.lockEvtCB.Name = "lockEvtCB";
@@ -288,9 +288,9 @@
             this.lockEvtCB.TabIndex = 2;
             this.lockEvtCB.Text = "Lock";
             this.lockEvtCB.UseVisualStyleBackColor = true;
-            // 
+            //
             // logoffEvtCB
-            // 
+            //
             this.logoffEvtCB.AutoSize = true;
             this.logoffEvtCB.Location = new System.Drawing.Point(6, 42);
             this.logoffEvtCB.Name = "logoffEvtCB";
@@ -298,9 +298,9 @@
             this.logoffEvtCB.TabIndex = 1;
             this.logoffEvtCB.Text = "Logoff";
             this.logoffEvtCB.UseVisualStyleBackColor = true;
-            // 
+            //
             // logonEvtCB
-            // 
+            //
             this.logonEvtCB.AutoSize = true;
             this.logonEvtCB.Location = new System.Drawing.Point(6, 19);
             this.logonEvtCB.Name = "logonEvtCB";
@@ -308,9 +308,9 @@
             this.logonEvtCB.TabIndex = 0;
             this.logonEvtCB.Text = "Logon";
             this.logonEvtCB.UseVisualStyleBackColor = true;
-            // 
+            //
             // groupBox2
-            // 
+            //
             this.groupBox2.Controls.Add(this.sessionTableTB);
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.eventTableTB);
@@ -332,25 +332,25 @@
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Server";
-            // 
+            //
             // eventTableTB
-            // 
+            //
             this.eventTableTB.Location = new System.Drawing.Point(91, 96);
             this.eventTableTB.Name = "eventTableTB";
             this.eventTableTB.Size = new System.Drawing.Size(308, 20);
             this.eventTableTB.TabIndex = 3;
-            // 
+            //
             // label2
-            // 
+            //
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(17, 99);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(68, 13);
             this.label2.TabIndex = 16;
             this.label2.Text = "Event Table:";
-            // 
+            //
             // optionsBox
-            // 
+            //
             this.optionsBox.Controls.Add(this.useModNameCB);
             this.optionsBox.Location = new System.Drawing.Point(6, 347);
             this.optionsBox.Name = "optionsBox";
@@ -358,9 +358,9 @@
             this.optionsBox.TabIndex = 3;
             this.optionsBox.TabStop = false;
             this.optionsBox.Text = "Options";
-            // 
+            //
             // useModNameCB
-            // 
+            //
             this.useModNameCB.AutoSize = true;
             this.useModNameCB.Location = new System.Drawing.Point(7, 18);
             this.useModNameCB.Name = "useModNameCB";
@@ -368,9 +368,9 @@
             this.useModNameCB.TabIndex = 0;
             this.useModNameCB.Text = "Use Modified Username";
             this.useModNameCB.UseVisualStyleBackColor = true;
-            // 
+            //
             // groupBox3
-            // 
+            //
             this.groupBox3.Controls.Add(this.sessionModeCB);
             this.groupBox3.Controls.Add(this.eventModeCB);
             this.groupBox3.Location = new System.Drawing.Point(13, 13);
@@ -379,9 +379,9 @@
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Mode";
-            // 
+            //
             // eventModeCB
-            // 
+            //
             this.eventModeCB.AutoSize = true;
             this.eventModeCB.Location = new System.Drawing.Point(73, 11);
             this.eventModeCB.Name = "eventModeCB";
@@ -390,9 +390,9 @@
             this.eventModeCB.Text = "Event Mode";
             this.eventModeCB.UseVisualStyleBackColor = true;
             this.eventModeCB.CheckStateChanged += new System.EventHandler(this.ModeChange);
-            // 
+            //
             // sessionModeCB
-            // 
+            //
             this.sessionModeCB.AutoSize = true;
             this.sessionModeCB.Location = new System.Drawing.Point(318, 11);
             this.sessionModeCB.Name = "sessionModeCB";
@@ -401,25 +401,25 @@
             this.sessionModeCB.Text = "Session Mode";
             this.sessionModeCB.UseVisualStyleBackColor = true;
             this.sessionModeCB.CheckStateChanged += new System.EventHandler(this.ModeChange);
-            // 
+            //
             // label3
-            // 
+            //
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(17, 126);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(77, 13);
             this.label3.TabIndex = 18;
             this.label3.Text = "Session Table:";
-            // 
+            //
             // sessionTableTB
-            // 
+            //
             this.sessionTableTB.Location = new System.Drawing.Point(92, 123);
             this.sessionTableTB.Name = "sessionTableTB";
             this.sessionTableTB.Size = new System.Drawing.Size(307, 20);
             this.sessionTableTB.TabIndex = 4;
-            // 
+            //
             // Configuration
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(512, 437);

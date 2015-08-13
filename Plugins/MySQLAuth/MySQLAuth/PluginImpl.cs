@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -71,7 +71,7 @@ namespace pGina.Plugin.MySQLAuth
                 m_logger.ErrorFormat("Unexpected error: {0}", e);
                 throw;
             }
-            
+
             if (entry != null)
             {
                 m_logger.DebugFormat("Retrieved info for user {0} from MySQL.  Password uses {1}.",
@@ -85,7 +85,7 @@ namespace pGina.Plugin.MySQLAuth
                 }
                 else
                 {
-                    m_logger.DebugFormat("Authentication failed for {0}", userInfo.Username); 
+                    m_logger.DebugFormat("Authentication failed for {0}", userInfo.Username);
                     return new Shared.Types.BooleanResult() { Success = false, Message = "Invalid username or password." };
                 }
             }
@@ -108,12 +108,12 @@ namespace pGina.Plugin.MySQLAuth
 
         public void Starting()
         {
-            
+
         }
 
         public void Stopping()
         {
-            
+
         }
 
         public Guid Uuid
@@ -123,7 +123,7 @@ namespace pGina.Plugin.MySQLAuth
 
         public string Version
         {
-            get 
+            get
             {
                 return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             }
@@ -170,8 +170,8 @@ namespace pGina.Plugin.MySQLAuth
                         Success = false,
                         Message = string.Format("Preventing logon due to server error: {0}", e.Message)
                     };
-                } 
-                else 
+                }
+                else
                 {
                     m_logger.DebugFormat("Encoutered MySQL server error, but returning success anyway.  Error: {0}", e.Message);
                     return new BooleanResult {
@@ -185,7 +185,7 @@ namespace pGina.Plugin.MySQLAuth
                 m_logger.ErrorFormat("Unexpected error: {0}", e);
                 throw;
             }
-            
+
             // Always return success
             return new Shared.Types.BooleanResult { Success = true };
         }
@@ -195,7 +195,7 @@ namespace pGina.Plugin.MySQLAuth
             m_logger.Debug("MySql Plugin Authorization");
 
             bool requireAuth = Settings.Store.AuthzRequireMySqlAuth;
-            
+
             // If we require authentication, and we failed to auth this user, then we
             // fail authorization.
             if (requireAuth)
@@ -225,7 +225,7 @@ namespace pGina.Plugin.MySQLAuth
                     };
                 }
             }
-            
+
             // Get the authz rules from registry
             List<GroupAuthzRule> rules = GroupRuleLoader.GetAuthzRules();
             if (rules.Count == 0)

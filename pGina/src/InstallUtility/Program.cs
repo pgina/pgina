@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -46,7 +46,7 @@ namespace pGina.InstallUtil
         static readonly string PGINA_SERVICE_NAME = "pGina";
         static readonly string PGINA_SERVICE_EXE = "pGina.Service.ServiceHost.exe";
         static readonly string PGINA_CONFIG_EXE = "pGina.Configuration.exe";
-        
+
         // Initalized in the static constructor
         static readonly SecurityIdentifier ADMIN_GROUP;
         static readonly SecurityIdentifier USERS_GROUP;
@@ -54,12 +54,12 @@ namespace pGina.InstallUtil
         static readonly SecurityIdentifier AUTHED_USERS;
         private static readonly string INSTALL_UTIL_PATH;
         private static readonly string PGINA_SERVICE_FULL_PATH;
-        
+
         static Program()
         {
             // Init logging
             pGina.Shared.Logging.Logging.Init();
-            
+
             // Intialize readonly variables
 
             PGINA_SERVICE_FULL_PATH = Path.Combine(
@@ -174,7 +174,7 @@ namespace pGina.InstallUtil
                     m_logger.InfoFormat("Setting ACLs on {0}", key.Name);
 
                     RegistryAccessRule allowRead = new RegistryAccessRule(
-                        USERS_GROUP, RegistryRights.ReadKey, 
+                        USERS_GROUP, RegistryRights.ReadKey,
                         InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
                         PropagationFlags.None, AccessControlType.Allow);
                     RegistryAccessRule adminFull = new RegistryAccessRule(
@@ -185,7 +185,7 @@ namespace pGina.InstallUtil
                         SYSTEM_ACCT, RegistryRights.FullControl,
                         InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
                         PropagationFlags.None, AccessControlType.Allow);
-                    
+
                     RegistrySecurity keySec = key.GetAccessControl();
 
                     if (m_logger.IsDebugEnabled)
@@ -304,14 +304,14 @@ namespace pGina.InstallUtil
         {
             m_logger.InfoFormat("Uninstalling pGina service...");
 
-            // If we can find the .NET installutil.exe, run that, otherwise, use 
+            // If we can find the .NET installutil.exe, run that, otherwise, use
             // ManagedInstallerClass (not recommended by MSDN, but works).
             if (File.Exists(INSTALL_UTIL_PATH))
             {
                 // Need quotes around the path when calling installutil.exe
                 string[] args = { "/u", string.Format("\"{0}\"", PGINA_SERVICE_FULL_PATH) };
                 // Call the .NET installutil.exe
-                CallInstallUtil(args);   
+                CallInstallUtil(args);
             }
             else
             {
@@ -324,7 +324,7 @@ namespace pGina.InstallUtil
         {
             m_logger.InfoFormat("Installing pGina service...");
 
-            // If we can find the .NET installutil.exe, run that, otherwise, use 
+            // If we can find the .NET installutil.exe, run that, otherwise, use
             // ManagedInstallerClass (not recommended by MSDN, but works).
             if (File.Exists(INSTALL_UTIL_PATH))
             {

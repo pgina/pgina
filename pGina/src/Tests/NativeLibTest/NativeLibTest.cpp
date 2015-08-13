@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -43,17 +43,17 @@ class ThreadTest : public pGina::Threading::Thread
 };
 
 int __cdecl _tmain(int argc, _TCHAR* argv[])
-{			
+{
 	// And auth, all in one...
 	pGina::Transactions::User::LoginResult result = pGina::Transactions::User::ProcessLoginForUser(L"Administrator", L"", L"password", pGina::Protocol::LoginRequestMessage::Login);
 	if(result.Result())
 	{
 		pGina::Transactions::Log::Info(L"User: %s login successful!", result.Username().c_str());
 	}
-	
+
 	std::wstring str = pGina::Transactions::TileUi::GetDynamicLabel(L"MOTD");
 	pGina::Transactions::Log::Info(L"TileUi::GetDynamicLabel(\"MOTD\") received: %s", str.c_str());
-	
+
 	ThreadTest ping;
 	ping.Start();
 	Sleep(10000);

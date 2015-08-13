@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -70,7 +70,7 @@ namespace pGina.Configuration
 
         private ServiceController m_pGinaServiceController = null;
         private System.Timers.Timer m_serviceTimer = new System.Timers.Timer();
-        
+
         // Plugin data grid view
         private const string PLUGIN_UUID_COLUMN = "Uuid";
         private const string PLUGIN_VERSION_COLUMN = "Version";
@@ -91,12 +91,12 @@ namespace pGina.Configuration
         private const string CPF_CP_UUID_COLUMN = "Uuid";
 
         private LogViewWindow logWindow = null;
-        
+
         public ConfigurationUI()
         {
             VerifyRegistryAccess();
             Framework.Init();
-           
+
             InitializeComponent();
             InitOptionsTabs();
             InitPluginsDGV();
@@ -113,7 +113,7 @@ namespace pGina.Configuration
             }
 
             InitSimulationTab();
-            LoadGeneralSettings();            
+            LoadGeneralSettings();
         }
 
         private void Form_Load(object sender, EventArgs e)
@@ -455,7 +455,7 @@ namespace pGina.Configuration
             InitPluginOrderDGV(this.gatewayDGV);
             InitPluginOrderDGV(this.eventDGV);
             InitPluginOrderDGV(this.passwdDGV);
-            
+
             // Load order lists from the registry
             LoadPluginOrderListsFromReg();
         }
@@ -521,7 +521,7 @@ namespace pGina.Configuration
                 Name = NOTIFICATION_COLUMN,
                 HeaderText = "Notification",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            });            
+            });
 
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
@@ -569,13 +569,13 @@ namespace pGina.Configuration
                 pluginsDG[e.ColumnIndex, e.RowIndex].ValueType == typeof(bool))
             {
                 DataGridViewCell cell = this.pluginsDG[e.ColumnIndex, e.RowIndex];
-                string uuid = (string)this.pluginsDG.Rows[e.RowIndex].Cells[PLUGIN_UUID_COLUMN].Value;                
+                string uuid = (string)this.pluginsDG.Rows[e.RowIndex].Cells[PLUGIN_UUID_COLUMN].Value;
                 IPluginBase plug = m_plugins[uuid];
                 bool checkBoxState = Convert.ToBoolean(cell.Value);
                 string columnName = pluginsDG.Columns[e.ColumnIndex].Name;
 
                 switch (columnName)
-                {                    
+                {
                     case AUTHENTICATION_COLUMN:
                         SyncStateToList(checkBoxState, plug, authenticateDGV);
                         break;
@@ -587,11 +587,11 @@ namespace pGina.Configuration
                         break;
                     case NOTIFICATION_COLUMN:
                         SyncStateToList(checkBoxState, plug, eventDGV);
-                        break;                    
+                        break;
                     case PASSWORD_COLUMN:
                         SyncStateToList(checkBoxState, plug, passwdDGV);
                         break;
-                }                
+                }
             }
         }
 
@@ -666,7 +666,7 @@ namespace pGina.Configuration
                     this.SetupCheckBoxCell<IPluginAuthentication>(row.Cells[AUTHENTICATION_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginAuthorization>(row.Cells[AUTHORIZATION_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginAuthenticationGateway>(row.Cells[GATEWAY_COLUMN], p);
-                    this.SetupCheckBoxCell<IPluginEventNotifications>(row.Cells[NOTIFICATION_COLUMN], p);                    
+                    this.SetupCheckBoxCell<IPluginEventNotifications>(row.Cells[NOTIFICATION_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginChangePassword>(row.Cells[PASSWORD_COLUMN], p);
                 }
             }
@@ -693,7 +693,7 @@ namespace pGina.Configuration
             LoadPluginOrderListFromReg<IPluginAuthentication>(authenticateDGV);
             LoadPluginOrderListFromReg<IPluginAuthenticationGateway>(gatewayDGV);
             LoadPluginOrderListFromReg<IPluginAuthorization>(authorizeDGV);
-            LoadPluginOrderListFromReg<IPluginEventNotifications>(eventDGV);            
+            LoadPluginOrderListFromReg<IPluginEventNotifications>(eventDGV);
             LoadPluginOrderListFromReg<IPluginChangePassword>(passwdDGV);
         }
 
@@ -716,7 +716,7 @@ namespace pGina.Configuration
                 string uuid = (string)row.Cells[PLUGIN_UUID_COLUMN].Value;
                 IPluginBase plug = m_plugins[uuid];
 
-                if (!row.Cells[AUTHENTICATION_COLUMN].ReadOnly)                
+                if (!row.Cells[AUTHENTICATION_COLUMN].ReadOnly)
                     SyncStateToList((bool)row.Cells[AUTHENTICATION_COLUMN].Value, plug, authenticateDGV);
 
                 if (!row.Cells[AUTHORIZATION_COLUMN].ReadOnly)
@@ -724,9 +724,9 @@ namespace pGina.Configuration
 
                 if (!row.Cells[GATEWAY_COLUMN].ReadOnly)
                     SyncStateToList((bool)row.Cells[GATEWAY_COLUMN].Value, plug, gatewayDGV);
-                
+
                 if (!row.Cells[NOTIFICATION_COLUMN].ReadOnly)
-                    SyncStateToList((bool)row.Cells[NOTIFICATION_COLUMN].Value, plug, eventDGV);                
+                    SyncStateToList((bool)row.Cells[NOTIFICATION_COLUMN].Value, plug, eventDGV);
 
                 if (!row.Cells[PASSWORD_COLUMN].ReadOnly)
                     SyncStateToList((bool)row.Cells[PASSWORD_COLUMN].Value, plug, passwdDGV);
@@ -737,7 +737,7 @@ namespace pGina.Configuration
             this.RemoveAllNotInMainList(authorizeDGV);
             this.RemoveAllNotInMainList(authenticateDGV);
             this.RemoveAllNotInMainList(gatewayDGV);
-            this.RemoveAllNotInMainList(eventDGV);            
+            this.RemoveAllNotInMainList(eventDGV);
             this.RemoveAllNotInMainList(passwdDGV);
         }
 
@@ -793,7 +793,7 @@ namespace pGina.Configuration
 
         private void pluginsDG_PaintCell(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            // Determine if the cell should have a checkbox or not (via the ReadOnly setting), 
+            // Determine if the cell should have a checkbox or not (via the ReadOnly setting),
             // if not, we draw over the checkbox.
             if (e != null && sender != null)
             {
@@ -871,14 +871,14 @@ namespace pGina.Configuration
             SavePluginOrder(authenticateDGV, typeof(IPluginAuthentication));
             SavePluginOrder(authorizeDGV, typeof(IPluginAuthorization));
             SavePluginOrder(gatewayDGV, typeof(IPluginAuthenticationGateway));
-            SavePluginOrder(eventDGV, typeof(IPluginEventNotifications));            
+            SavePluginOrder(eventDGV, typeof(IPluginEventNotifications));
             SavePluginOrder(passwdDGV, typeof(IPluginChangePassword));
         }
 
         private void SavePluginOrder(DataGridView grid, Type pluginType)
         {
             string setting = pluginType.Name + "_Order";
-            List<string> orderedList = new List<string>();            
+            List<string> orderedList = new List<string>();
             foreach (DataGridViewRow row in grid.Rows)
             {
                 orderedList.Add((string)row.Cells[PLUGIN_UUID_COLUMN].Value);
@@ -974,7 +974,7 @@ namespace pGina.Configuration
         }
 
         private void btnOkay_Click(object sender, EventArgs e)
-        {            
+        {
             this.Close();
         }
 
@@ -1031,7 +1031,7 @@ namespace pGina.Configuration
                 catch (DuplicatePluginDetectedException ex)
                 {
                     MessageBox.Show(string.Format("Unable to load full plugin list: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }                
+                }
             }
         }
 
@@ -1050,10 +1050,10 @@ namespace pGina.Configuration
                     configPlugin.Configure();
                 }
             }
-        }        
+        }
 
         private void simMethodChanged(object sender, EventArgs e)
-        {            
+        {
             btnLaunchCredUI.Enabled = (sender == m_radioCredUI);
         }
 
@@ -1091,7 +1091,7 @@ namespace pGina.Configuration
         {
             if (this.gatewayDGV.SelectedRows.Count > 0)
                 MoveDown(this.gatewayDGV, this.gatewayDGV.SelectedRows[0].Index);
-        }        
+        }
 
         private void eventBtnUp_Click(object sender, EventArgs e)
         {
@@ -1166,7 +1166,7 @@ namespace pGina.Configuration
             result.Add("Gateway: " + (string.Join(", ", gatewayPlugins.Select(p => p.Name))));
             result.Add("Notification: " + (string.Join(", ", notePlugins.Select(p => p.Name))));
             result.Add("Change Password: " + (string.Join(", ", passwdPlugins.Select(p => p.Name))));
-            
+
             return result;
         }
 
@@ -1182,7 +1182,7 @@ namespace pGina.Configuration
             if (m_radioUseService.Checked || m_radioCredUI.Checked)
             {
                 this.logWindow.LogTextBox.AppendText("*****" + Environment.NewLine);
-                this.logWindow.LogTextBox.AppendText("***** Log output unavailable when using pGina service or CredUI prompt." + 
+                this.logWindow.LogTextBox.AppendText("***** Log output unavailable when using pGina service or CredUI prompt." +
                     Environment.NewLine);
                 this.logWindow.LogTextBox.AppendText("*****" + Environment.NewLine);
             }
@@ -1202,7 +1202,7 @@ namespace pGina.Configuration
         }
 
         private void btnSimGo_Click(object sender, EventArgs e)
-        {            
+        {
             if (m_radioUseService.Checked)
             {
                 if (MessageBox.Show("Individual plugin results and results for each stage are unavailable when using the pGina service.  Continue?",
@@ -1245,8 +1245,8 @@ namespace pGina.Configuration
                     ((m) =>
                         {
                         MessageType type = (MessageType)Enum.ToObject(typeof(MessageType), m["MessageType"]);
-                        
-                        // Acceptable server responses are Hello, and LoginResponse                        
+
+                        // Acceptable server responses are Hello, and LoginResponse
                         switch (type)
                         {
                             case MessageType.Hello:
@@ -1270,11 +1270,11 @@ namespace pGina.Configuration
                                 // Respond with a disconnect, we're done
                                 return (new EmptyMessage(MessageType.Disconnect).ToDict());
                             case MessageType.Ack:   // Ack to our disconnect
-                                return null;    
+                                return null;
                             default:
                                 m_logger.ErrorFormat("Server responded with invalid message type: {0}", type);
-                                return null;                                
-                        }                                                
+                                return null;
+                        }
                     }),
                 (new EmptyMessage(MessageType.Hello)).ToDict(), 1000);
             }
@@ -1400,7 +1400,7 @@ namespace pGina.Configuration
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 m_tileImageTxt.Text = ofd.FileName;
-                LoadTileImagePreview();                
+                LoadTileImagePreview();
             }
         }
 
@@ -1564,7 +1564,7 @@ namespace pGina.Configuration
             else if (radioSleep.Checked)
                 Settings.Get.SpecialAction = "Sleep";
             else if (radioHibernate.Checked)
-                Settings.Get.SpecialAction = "Hibernate";            
+                Settings.Get.SpecialAction = "Hibernate";
         }
 
         private void SaveCpSettings()

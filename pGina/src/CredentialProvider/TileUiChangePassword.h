@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -41,9 +41,9 @@ namespace pGina
 			CPUIFI_OLD_PASSWORD    = 3,
 			CPUIFI_NEW_PASSWORD    = 4,
 			CPUIFI_CONFIRM_NEW_PASSWORD = 5,
-			CPUIFI_SUBMIT          = 6, 
+			CPUIFI_SUBMIT          = 6,
 			CPUIFI_STATUS		  = 7,
-			CPUIFI_NUM_FIELDS      = 8, 
+			CPUIFI_NUM_FIELDS      = 8,
 		};
 
 		static const UI_FIELDS s_changePasswordFields =
@@ -55,13 +55,13 @@ namespace pGina
 			CPUIFI_STATUS,               // Status field
 			{
 				//  when to display,               style,             field id,        type,               name           data source     value			callback
-				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { CPUIFI_TILEIMAGE, CPFT_TILE_IMAGE,    L"Image" },    SOURCE_NONE,    NULL,			NULL },	
-			    { { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { CPUIFI_MOTD,      CPFT_SMALL_TEXT,    L"MOTD" },     SOURCE_DYNAMIC, L"pGina",     NULL }, 
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED }, { CPUIFI_USERNAME,  CPFT_EDIT_TEXT,     L"Username" }, SOURCE_NONE,    NULL,			NULL },	
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },	{ CPUIFI_OLD_PASSWORD,  CPFT_PASSWORD_TEXT, L"Old Password" }, SOURCE_NONE,    NULL,			NULL }, 
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },	{ CPUIFI_NEW_PASSWORD,  CPFT_PASSWORD_TEXT, L"New Password" }, SOURCE_NONE,    NULL,			NULL }, 
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },	{ CPUIFI_CONFIRM_NEW_PASSWORD,  CPFT_PASSWORD_TEXT, L"Confirm New Password" }, SOURCE_NONE,    NULL,			NULL }, 
-				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },    { CPUIFI_SUBMIT,    CPFT_SUBMIT_BUTTON, L"Submit" },   SOURCE_NONE,    NULL,			NULL }, 
+				{ { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { CPUIFI_TILEIMAGE, CPFT_TILE_IMAGE,    L"Image" },    SOURCE_NONE,    NULL,			NULL },
+			    { { CPFS_DISPLAY_IN_BOTH,          CPFIS_NONE },    { CPUIFI_MOTD,      CPFT_SMALL_TEXT,    L"MOTD" },     SOURCE_DYNAMIC, L"pGina",     NULL },
+				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED }, { CPUIFI_USERNAME,  CPFT_EDIT_TEXT,     L"Username" }, SOURCE_NONE,    NULL,			NULL },
+				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },	{ CPUIFI_OLD_PASSWORD,  CPFT_PASSWORD_TEXT, L"Old Password" }, SOURCE_NONE,    NULL,			NULL },
+				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },	{ CPUIFI_NEW_PASSWORD,  CPFT_PASSWORD_TEXT, L"New Password" }, SOURCE_NONE,    NULL,			NULL },
+				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },	{ CPUIFI_CONFIRM_NEW_PASSWORD,  CPFT_PASSWORD_TEXT, L"Confirm New Password" }, SOURCE_NONE,    NULL,			NULL },
+				{ { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },    { CPUIFI_SUBMIT,    CPFT_SUBMIT_BUTTON, L"Submit" },   SOURCE_NONE,    NULL,			NULL },
 				{ { CPFS_DISPLAY_IN_BOTH,		   CPFIS_NONE },    { CPUIFI_STATUS,    CPFT_SMALL_TEXT,    L"Status" },   SOURCE_STATUS,  L"Status",    NULL },
 			}
 		};

@@ -200,11 +200,11 @@
             this.groupBox9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCredProvFilter)).BeginInit();
             this.SuspendLayout();
-            // 
+            //
             // m_tabs
-            // 
-            this.m_tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.m_tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.m_tabs.Controls.Add(this.m_generalConfigTab);
             this.m_tabs.Controls.Add(this.m_pluginConfigTab);
@@ -218,9 +218,9 @@
             this.m_tabs.Size = new System.Drawing.Size(798, 573);
             this.m_tabs.TabIndex = 0;
             this.m_tabs.Selected += new System.Windows.Forms.TabControlEventHandler(this.m_tabs_Selected);
-            // 
+            //
             // m_generalConfigTab
-            // 
+            //
             this.m_generalConfigTab.Controls.Add(this.groupBox18);
             this.m_generalConfigTab.Controls.Add(this.groupBox4);
             this.m_generalConfigTab.Controls.Add(this.groupBox14);
@@ -234,7 +234,7 @@
             this.m_generalConfigTab.TabIndex = 1;
             this.m_generalConfigTab.Text = "General";
             this.m_generalConfigTab.UseVisualStyleBackColor = true;
-            // 
+            //
             // groupBox18
             //
             this.groupBox18.Controls.Add(this.notify_label_pass);
@@ -341,7 +341,7 @@
             this.notify_smtp.TabIndex = 0;
             //
             // groupBox4
-            // 
+            //
             this.groupBox4.Controls.Add(this.chk_originalUsernameUnlock);
             this.groupBox4.Location = new System.Drawing.Point(17, 411);
             this.groupBox4.Name = "groupBox4";
@@ -349,9 +349,9 @@
             this.groupBox4.TabIndex = 5;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Unlock";
-            // 
+            //
             // chk_originalUsernameUnlock
-            // 
+            //
             this.chk_originalUsernameUnlock.AutoSize = true;
             this.chk_originalUsernameUnlock.Location = new System.Drawing.Point(9, 19);
             this.chk_originalUsernameUnlock.Name = "chk_originalUsernameUnlock";
@@ -359,9 +359,9 @@
             this.chk_originalUsernameUnlock.TabIndex = 4;
             this.chk_originalUsernameUnlock.Text = "Use original username to unlock computer (Windows 7 and later).";
             this.chk_originalUsernameUnlock.UseVisualStyleBackColor = true;
-            // 
+            //
             // groupBox14
-            // 
+            //
             this.groupBox14.Controls.Add(this.cpEnableDisableBtn);
             this.groupBox14.Controls.Add(this.cpRegisterBtn);
             this.groupBox14.Controls.Add(this.cpEnabledTB);
@@ -374,9 +374,9 @@
             this.groupBox14.TabIndex = 3;
             this.groupBox14.TabStop = false;
             this.groupBox14.Text = "Credential Provider/GINA Status";
-            // 
+            //
             // cpEnableDisableBtn
-            // 
+            //
             this.cpEnableDisableBtn.Location = new System.Drawing.Point(210, 58);
             this.cpEnableDisableBtn.Name = "cpEnableDisableBtn";
             this.cpEnableDisableBtn.Size = new System.Drawing.Size(65, 26);
@@ -384,9 +384,9 @@
             this.cpEnableDisableBtn.Text = "Enable";
             this.cpEnableDisableBtn.UseVisualStyleBackColor = true;
             this.cpEnableDisableBtn.Click += new System.EventHandler(this.cpEnableDisableBtn_Click);
-            // 
+            //
             // cpRegisterBtn
-            // 
+            //
             this.cpRegisterBtn.Location = new System.Drawing.Point(210, 26);
             this.cpRegisterBtn.Name = "cpRegisterBtn";
             this.cpRegisterBtn.Size = new System.Drawing.Size(65, 26);
@@ -394,43 +394,43 @@
             this.cpRegisterBtn.Text = "Register";
             this.cpRegisterBtn.UseVisualStyleBackColor = true;
             this.cpRegisterBtn.Click += new System.EventHandler(this.cpRegisterBtn_Click);
-            // 
+            //
             // cpEnabledTB
-            // 
+            //
             this.cpEnabledTB.Location = new System.Drawing.Point(80, 62);
             this.cpEnabledTB.Name = "cpEnabledTB";
             this.cpEnabledTB.ReadOnly = true;
             this.cpEnabledTB.Size = new System.Drawing.Size(124, 20);
             this.cpEnabledTB.TabIndex = 3;
-            // 
+            //
             // cpEnabledLabel
-            // 
+            //
             this.cpEnabledLabel.AutoSize = true;
             this.cpEnabledLabel.Location = new System.Drawing.Point(25, 65);
             this.cpEnabledLabel.Name = "cpEnabledLabel";
             this.cpEnabledLabel.Size = new System.Drawing.Size(49, 13);
             this.cpEnabledLabel.TabIndex = 2;
             this.cpEnabledLabel.Text = "Enabled:";
-            // 
+            //
             // cpRegisteredTB
-            // 
+            //
             this.cpRegisteredTB.Location = new System.Drawing.Point(80, 30);
             this.cpRegisteredTB.Name = "cpRegisteredTB";
             this.cpRegisteredTB.ReadOnly = true;
             this.cpRegisteredTB.Size = new System.Drawing.Size(124, 20);
             this.cpRegisteredTB.TabIndex = 1;
-            // 
+            //
             // label13
-            // 
+            //
             this.label13.AutoSize = true;
             this.label13.Location = new System.Drawing.Point(13, 33);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(61, 13);
             this.label13.TabIndex = 0;
             this.label13.Text = "Registered:";
-            // 
+            //
             // servGB
-            // 
+            //
             this.servGB.Controls.Add(this.logonUiShowServiceStatusCB);
             this.servGB.Controls.Add(this.serviceStopBtn);
             this.servGB.Controls.Add(this.serviceStartBtn);
@@ -442,9 +442,9 @@
             this.servGB.TabIndex = 2;
             this.servGB.TabStop = false;
             this.servGB.Text = "pGina Service";
-            // 
+            //
             // logonUiShowServiceStatusCB
-            // 
+            //
             this.logonUiShowServiceStatusCB.AutoSize = true;
             this.logonUiShowServiceStatusCB.Location = new System.Drawing.Point(12, 19);
             this.logonUiShowServiceStatusCB.Name = "logonUiShowServiceStatusCB";
@@ -452,9 +452,9 @@
             this.logonUiShowServiceStatusCB.TabIndex = 4;
             this.logonUiShowServiceStatusCB.Text = "Show service status in logon UI";
             this.logonUiShowServiceStatusCB.UseVisualStyleBackColor = true;
-            // 
+            //
             // serviceStopBtn
-            // 
+            //
             this.serviceStopBtn.Location = new System.Drawing.Point(139, 69);
             this.serviceStopBtn.Name = "serviceStopBtn";
             this.serviceStopBtn.Size = new System.Drawing.Size(80, 26);
@@ -462,9 +462,9 @@
             this.serviceStopBtn.Text = "Stop";
             this.serviceStopBtn.UseVisualStyleBackColor = true;
             this.serviceStopBtn.Click += new System.EventHandler(this.serviceStopBtn_Click);
-            // 
+            //
             // serviceStartBtn
-            // 
+            //
             this.serviceStartBtn.Location = new System.Drawing.Point(53, 69);
             this.serviceStartBtn.Name = "serviceStartBtn";
             this.serviceStartBtn.Size = new System.Drawing.Size(80, 26);
@@ -472,26 +472,26 @@
             this.serviceStartBtn.Text = "Start";
             this.serviceStartBtn.UseVisualStyleBackColor = true;
             this.serviceStartBtn.Click += new System.EventHandler(this.serviceStartBtn_Click);
-            // 
+            //
             // serviceStatusTB
-            // 
+            //
             this.serviceStatusTB.Location = new System.Drawing.Point(53, 43);
             this.serviceStatusTB.Name = "serviceStatusTB";
             this.serviceStatusTB.ReadOnly = true;
             this.serviceStatusTB.Size = new System.Drawing.Size(166, 20);
             this.serviceStatusTB.TabIndex = 1;
-            // 
+            //
             // servStatusLabel
-            // 
+            //
             this.servStatusLabel.AutoSize = true;
             this.servStatusLabel.Location = new System.Drawing.Point(7, 46);
             this.servStatusLabel.Name = "servStatusLabel";
             this.servStatusLabel.Size = new System.Drawing.Size(40, 13);
             this.servStatusLabel.TabIndex = 0;
             this.servStatusLabel.Text = "Status:";
-            // 
+            //
             // motdGB
-            // 
+            //
             this.motdGB.Controls.Add(this.enableMotdCB);
             this.motdGB.Controls.Add(this.label12);
             this.motdGB.Controls.Add(this.motdTB);
@@ -502,9 +502,9 @@
             this.motdGB.TabIndex = 1;
             this.motdGB.TabStop = false;
             this.motdGB.Text = "MOTD";
-            // 
+            //
             // enableMotdCB
-            // 
+            //
             this.enableMotdCB.AutoSize = true;
             this.enableMotdCB.Location = new System.Drawing.Point(11, 19);
             this.enableMotdCB.Name = "enableMotdCB";
@@ -513,9 +513,9 @@
             this.enableMotdCB.Text = "Enable MOTD";
             this.enableMotdCB.UseVisualStyleBackColor = true;
             this.enableMotdCB.CheckedChanged += new System.EventHandler(this.enableMotdCB_CheckedChanged);
-            // 
+            //
             // label12
-            // 
+            //
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label12.Location = new System.Drawing.Point(53, 66);
@@ -523,25 +523,25 @@
             this.label12.Size = new System.Drawing.Size(532, 26);
             this.label12.TabIndex = 2;
             this.label12.Text = resources.GetString("label12.Text");
-            // 
+            //
             // motdTB
-            // 
+            //
             this.motdTB.Location = new System.Drawing.Point(54, 43);
             this.motdTB.Name = "motdTB";
             this.motdTB.Size = new System.Drawing.Size(667, 20);
             this.motdTB.TabIndex = 1;
-            // 
+            //
             // motdLabel
-            // 
+            //
             this.motdLabel.AutoSize = true;
             this.motdLabel.Location = new System.Drawing.Point(6, 46);
             this.motdLabel.Name = "motdLabel";
             this.motdLabel.Size = new System.Drawing.Size(42, 13);
             this.motdLabel.TabIndex = 0;
             this.motdLabel.Text = "MOTD:";
-            // 
+            //
             // groupBox12
-            // 
+            //
             this.groupBox12.Controls.Add(this.btnImageBrowse);
             this.groupBox12.Controls.Add(this.label11);
             this.groupBox12.Controls.Add(this.m_tileImagePreview);
@@ -553,9 +553,9 @@
             this.groupBox12.TabIndex = 0;
             this.groupBox12.TabStop = false;
             this.groupBox12.Text = "Tile Image";
-            // 
+            //
             // btnImageBrowse
-            // 
+            //
             this.btnImageBrowse.Location = new System.Drawing.Point(457, 28);
             this.btnImageBrowse.Name = "btnImageBrowse";
             this.btnImageBrowse.Size = new System.Drawing.Size(33, 23);
@@ -563,18 +563,18 @@
             this.btnImageBrowse.Text = "...";
             this.btnImageBrowse.UseVisualStyleBackColor = true;
             this.btnImageBrowse.Click += new System.EventHandler(this.btnImageBrowse_Click);
-            // 
+            //
             // label11
-            // 
+            //
             this.label11.AutoSize = true;
             this.label11.Location = new System.Drawing.Point(537, 74);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(48, 13);
             this.label11.TabIndex = 3;
             this.label11.Text = "Preview:";
-            // 
+            //
             // m_tileImagePreview
-            // 
+            //
             this.m_tileImagePreview.Image = global::pGina.Configuration.Properties.Resources.pginalogo;
             this.m_tileImagePreview.Location = new System.Drawing.Point(591, 17);
             this.m_tileImagePreview.Name = "m_tileImagePreview";
@@ -582,25 +582,25 @@
             this.m_tileImagePreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.m_tileImagePreview.TabIndex = 2;
             this.m_tileImagePreview.TabStop = false;
-            // 
+            //
             // m_tileImageTxt
-            // 
+            //
             this.m_tileImageTxt.Location = new System.Drawing.Point(94, 30);
             this.m_tileImageTxt.Name = "m_tileImageTxt";
             this.m_tileImageTxt.Size = new System.Drawing.Size(357, 20);
             this.m_tileImageTxt.TabIndex = 1;
-            // 
+            //
             // label10
-            // 
+            //
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(28, 30);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(58, 13);
             this.label10.TabIndex = 0;
             this.label10.Text = "Tile image:";
-            // 
+            //
             // m_pluginConfigTab
-            // 
+            //
             this.m_pluginConfigTab.Controls.Add(this.pluginsGroupBox);
             this.m_pluginConfigTab.Controls.Add(this.groupBox1);
             this.m_pluginConfigTab.Location = new System.Drawing.Point(4, 22);
@@ -610,11 +610,11 @@
             this.m_pluginConfigTab.TabIndex = 0;
             this.m_pluginConfigTab.Text = "Plugin Selection";
             this.m_pluginConfigTab.UseVisualStyleBackColor = true;
-            // 
+            //
             // pluginsGroupBox
-            // 
-            this.pluginsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.pluginsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pluginsGroupBox.Controls.Add(this.pluginsDG);
             this.pluginsGroupBox.Controls.Add(this.configureButton);
@@ -624,13 +624,13 @@
             this.pluginsGroupBox.TabIndex = 9;
             this.pluginsGroupBox.TabStop = false;
             this.pluginsGroupBox.Text = "Current Plugins";
-            // 
+            //
             // pluginsDG
-            // 
+            //
             this.pluginsDG.AllowUserToAddRows = false;
             this.pluginsDG.AllowUserToDeleteRows = false;
-            this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
@@ -662,9 +662,9 @@
             this.pluginsDG.Size = new System.Drawing.Size(735, 253);
             this.pluginsDG.TabIndex = 10;
             this.pluginsDG.DoubleClick += new System.EventHandler(this.pluginsDG_DoubleClick);
-            // 
+            //
             // configureButton
-            // 
+            //
             this.configureButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.configureButton.Location = new System.Drawing.Point(671, 278);
             this.configureButton.Name = "configureButton";
@@ -673,10 +673,10 @@
             this.configureButton.Text = "Configure...";
             this.configureButton.UseVisualStyleBackColor = true;
             this.configureButton.Click += new System.EventHandler(this.configureButton_Click);
-            // 
+            //
             // groupBox1
-            // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.btnRemove);
             this.groupBox1.Controls.Add(this.btnAdd);
@@ -687,9 +687,9 @@
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Search Directories";
-            // 
+            //
             // btnRemove
-            // 
+            //
             this.btnRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRemove.Location = new System.Drawing.Point(670, 151);
             this.btnRemove.Name = "btnRemove";
@@ -698,9 +698,9 @@
             this.btnRemove.Text = "Remove";
             this.btnRemove.UseVisualStyleBackColor = true;
             this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
-            // 
+            //
             // btnAdd
-            // 
+            //
             this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAdd.Location = new System.Drawing.Point(589, 151);
             this.btnAdd.Name = "btnAdd";
@@ -709,10 +709,10 @@
             this.btnAdd.Text = "Add";
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
-            // 
+            //
             // lstPluginDirs
-            // 
-            this.lstPluginDirs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.lstPluginDirs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lstPluginDirs.Location = new System.Drawing.Point(10, 19);
             this.lstPluginDirs.MultiSelect = false;
@@ -721,9 +721,9 @@
             this.lstPluginDirs.TabIndex = 5;
             this.lstPluginDirs.UseCompatibleStateImageBehavior = false;
             this.lstPluginDirs.View = System.Windows.Forms.View.Details;
-            // 
+            //
             // m_pluginOrderTab
-            // 
+            //
             this.m_pluginOrderTab.Controls.Add(this.groupBox17);
             this.m_pluginOrderTab.Controls.Add(this.groupBox8);
             this.m_pluginOrderTab.Controls.Add(this.groupBox11);
@@ -735,9 +735,9 @@
             this.m_pluginOrderTab.TabIndex = 3;
             this.m_pluginOrderTab.Text = "Plugin Order";
             this.m_pluginOrderTab.UseVisualStyleBackColor = true;
-            // 
+            //
             // groupBox8
-            // 
+            //
             this.groupBox8.Controls.Add(this.gatewayBtnDown);
             this.groupBox8.Controls.Add(this.gatewayBtnUp);
             this.groupBox8.Controls.Add(this.gatewayDGV);
@@ -747,9 +747,9 @@
             this.groupBox8.TabIndex = 18;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "Gateway";
-            // 
+            //
             // gatewayBtnDown
-            // 
+            //
             this.gatewayBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.gatewayBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
             this.gatewayBtnDown.Location = new System.Drawing.Point(330, 89);
@@ -758,9 +758,9 @@
             this.gatewayBtnDown.TabIndex = 16;
             this.gatewayBtnDown.UseVisualStyleBackColor = true;
             this.gatewayBtnDown.Click += new System.EventHandler(this.gatewayBtnDown_Click);
-            // 
+            //
             // gatewayBtnUp
-            // 
+            //
             this.gatewayBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.gatewayBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
             this.gatewayBtnUp.Location = new System.Drawing.Point(330, 56);
@@ -769,19 +769,19 @@
             this.gatewayBtnUp.TabIndex = 15;
             this.gatewayBtnUp.UseVisualStyleBackColor = true;
             this.gatewayBtnUp.Click += new System.EventHandler(this.gatewayBtnUp_Click);
-            // 
+            //
             // gatewayDGV
-            // 
-            this.gatewayDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.gatewayDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gatewayDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gatewayDGV.Location = new System.Drawing.Point(15, 20);
             this.gatewayDGV.Name = "gatewayDGV";
             this.gatewayDGV.Size = new System.Drawing.Size(309, 131);
             this.gatewayDGV.TabIndex = 0;
-            // 
+            //
             // groupBox11
-            // 
+            //
             this.groupBox11.Controls.Add(this.eventBtnDown);
             this.groupBox11.Controls.Add(this.eventBtnUp);
             this.groupBox11.Controls.Add(this.eventDGV);
@@ -791,9 +791,9 @@
             this.groupBox11.TabIndex = 21;
             this.groupBox11.TabStop = false;
             this.groupBox11.Text = "Event Notification";
-            // 
+            //
             // eventBtnDown
-            // 
+            //
             this.eventBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.eventBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
             this.eventBtnDown.Location = new System.Drawing.Point(339, 89);
@@ -802,9 +802,9 @@
             this.eventBtnDown.TabIndex = 16;
             this.eventBtnDown.UseVisualStyleBackColor = true;
             this.eventBtnDown.Click += new System.EventHandler(this.eventBtnDown_Click);
-            // 
+            //
             // eventBtnUp
-            // 
+            //
             this.eventBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.eventBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
             this.eventBtnUp.Location = new System.Drawing.Point(339, 56);
@@ -813,19 +813,19 @@
             this.eventBtnUp.TabIndex = 15;
             this.eventBtnUp.UseVisualStyleBackColor = true;
             this.eventBtnUp.Click += new System.EventHandler(this.eventBtnUp_Click);
-            // 
+            //
             // eventDGV
-            // 
-            this.eventDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.eventDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.eventDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.eventDGV.Location = new System.Drawing.Point(15, 20);
             this.eventDGV.Name = "eventDGV";
             this.eventDGV.Size = new System.Drawing.Size(318, 131);
             this.eventDGV.TabIndex = 0;
-            // 
+            //
             // groupBox2
-            // 
+            //
             this.groupBox2.Controls.Add(this.authorizeBtnDown);
             this.groupBox2.Controls.Add(this.authorizeBtnUp);
             this.groupBox2.Controls.Add(this.authorizeDGV);
@@ -835,9 +835,9 @@
             this.groupBox2.TabIndex = 17;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Authorization";
-            // 
+            //
             // authorizeBtnDown
-            // 
+            //
             this.authorizeBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.authorizeBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
             this.authorizeBtnDown.Location = new System.Drawing.Point(339, 89);
@@ -846,9 +846,9 @@
             this.authorizeBtnDown.TabIndex = 16;
             this.authorizeBtnDown.UseVisualStyleBackColor = true;
             this.authorizeBtnDown.Click += new System.EventHandler(this.authorizeBtnDown_Click);
-            // 
+            //
             // authorizeBtnUp
-            // 
+            //
             this.authorizeBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.authorizeBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
             this.authorizeBtnUp.Location = new System.Drawing.Point(339, 56);
@@ -857,19 +857,19 @@
             this.authorizeBtnUp.TabIndex = 15;
             this.authorizeBtnUp.UseVisualStyleBackColor = true;
             this.authorizeBtnUp.Click += new System.EventHandler(this.authorizeBtnUp_Click);
-            // 
+            //
             // authorizeDGV
-            // 
-            this.authorizeDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.authorizeDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.authorizeDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.authorizeDGV.Location = new System.Drawing.Point(15, 20);
             this.authorizeDGV.Name = "authorizeDGV";
             this.authorizeDGV.Size = new System.Drawing.Size(318, 131);
             this.authorizeDGV.TabIndex = 0;
-            // 
+            //
             // groupBox7
-            // 
+            //
             this.groupBox7.Controls.Add(this.authenticateBtnDown);
             this.groupBox7.Controls.Add(this.authenticateBtnUp);
             this.groupBox7.Controls.Add(this.authenticateDGV);
@@ -879,9 +879,9 @@
             this.groupBox7.TabIndex = 12;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Authentication";
-            // 
+            //
             // authenticateBtnDown
-            // 
+            //
             this.authenticateBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.authenticateBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
             this.authenticateBtnDown.Location = new System.Drawing.Point(330, 89);
@@ -890,9 +890,9 @@
             this.authenticateBtnDown.TabIndex = 16;
             this.authenticateBtnDown.UseVisualStyleBackColor = true;
             this.authenticateBtnDown.Click += new System.EventHandler(this.authenticateBtnDown_Click);
-            // 
+            //
             // authenticateBtnUp
-            // 
+            //
             this.authenticateBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.authenticateBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
             this.authenticateBtnUp.Location = new System.Drawing.Point(330, 56);
@@ -901,19 +901,19 @@
             this.authenticateBtnUp.TabIndex = 15;
             this.authenticateBtnUp.UseVisualStyleBackColor = true;
             this.authenticateBtnUp.Click += new System.EventHandler(this.authenticateBtnUp_Click);
-            // 
+            //
             // authenticateDGV
-            // 
-            this.authenticateDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.authenticateDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.authenticateDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.authenticateDGV.Location = new System.Drawing.Point(15, 20);
             this.authenticateDGV.Name = "authenticateDGV";
             this.authenticateDGV.Size = new System.Drawing.Size(309, 131);
             this.authenticateDGV.TabIndex = 0;
-            // 
+            //
             // groupBox17
-            // 
+            //
             this.groupBox17.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox17.Controls.Add(this.passwdBtnDown);
@@ -925,9 +925,9 @@
             this.groupBox17.TabIndex = 22;
             this.groupBox17.TabStop = false;
             this.groupBox17.Text = "Change Password";
-            // 
+            //
             // passwdBtnDown
-            // 
+            //
             this.passwdBtnDown.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.passwdBtnDown.Image = global::pGina.Configuration.Properties.Resources.DownArrowSolid;
             this.passwdBtnDown.Location = new System.Drawing.Point(339, 89);
@@ -936,9 +936,9 @@
             this.passwdBtnDown.TabIndex = 16;
             this.passwdBtnDown.UseVisualStyleBackColor = true;
             this.passwdBtnDown.Click += new System.EventHandler(this.passwdBtnDown_Click);
-            // 
+            //
             // passwdBtnUp
-            // 
+            //
             this.passwdBtnUp.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.passwdBtnUp.Image = global::pGina.Configuration.Properties.Resources.UpArrowSolid;
             this.passwdBtnUp.Location = new System.Drawing.Point(339, 56);
@@ -947,9 +947,9 @@
             this.passwdBtnUp.TabIndex = 15;
             this.passwdBtnUp.UseVisualStyleBackColor = true;
             this.passwdBtnUp.Click += new System.EventHandler(this.passwdBtnUp_Click);
-            // 
+            //
             // passwdDGV
-            // 
+            //
             this.passwdDGV.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.passwdDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -957,9 +957,9 @@
             this.passwdDGV.Name = "passwdDGV";
             this.passwdDGV.Size = new System.Drawing.Size(318, 131);
             this.passwdDGV.TabIndex = 0;
-            // 
+            //
             // m_simTab
-            // 
+            //
             this.m_simTab.Controls.Add(this.viewLogBtn);
             this.m_simTab.Controls.Add(this.groupBox13);
             this.m_simTab.Controls.Add(this.groupBox10);
@@ -973,9 +973,9 @@
             this.m_simTab.TabIndex = 2;
             this.m_simTab.Text = "Simulation";
             this.m_simTab.UseVisualStyleBackColor = true;
-            // 
+            //
             // viewLogBtn
-            // 
+            //
             this.viewLogBtn.Location = new System.Drawing.Point(688, 511);
             this.viewLogBtn.Name = "viewLogBtn";
             this.viewLogBtn.Size = new System.Drawing.Size(96, 30);
@@ -983,9 +983,9 @@
             this.viewLogBtn.Text = "View Log";
             this.viewLogBtn.UseVisualStyleBackColor = true;
             this.viewLogBtn.Click += new System.EventHandler(this.viewLogBtn_Click);
-            // 
+            //
             // groupBox13
-            // 
+            //
             this.groupBox13.Controls.Add(this.simResultLocalGroupsTB);
             this.groupBox13.Controls.Add(this.label16);
             this.groupBox13.Controls.Add(this.simFinalResultPB);
@@ -999,69 +999,69 @@
             this.groupBox13.TabIndex = 5;
             this.groupBox13.TabStop = false;
             this.groupBox13.Text = "Results";
-            // 
+            //
             // simResultLocalGroupsTB
-            // 
+            //
             this.simResultLocalGroupsTB.Location = new System.Drawing.Point(142, 242);
             this.simResultLocalGroupsTB.Name = "simResultLocalGroupsTB";
             this.simResultLocalGroupsTB.ReadOnly = true;
             this.simResultLocalGroupsTB.Size = new System.Drawing.Size(613, 20);
             this.simResultLocalGroupsTB.TabIndex = 10;
-            // 
+            //
             // label16
-            // 
+            //
             this.label16.AutoSize = true;
             this.label16.Location = new System.Drawing.Point(63, 246);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(73, 13);
             this.label16.TabIndex = 9;
             this.label16.Text = "Local Groups:";
-            // 
+            //
             // simFinalResultPB
-            // 
+            //
             this.simFinalResultPB.Location = new System.Drawing.Point(57, 211);
             this.simFinalResultPB.Name = "simFinalResultPB";
             this.simFinalResultPB.Size = new System.Drawing.Size(20, 20);
             this.simFinalResultPB.TabIndex = 8;
             this.simFinalResultPB.TabStop = false;
-            // 
+            //
             // label15
-            // 
+            //
             this.label15.AutoSize = true;
             this.label15.Location = new System.Drawing.Point(13, 214);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(40, 13);
             this.label15.TabIndex = 7;
             this.label15.Text = "Result:";
-            // 
+            //
             // simFinalResultMessageTB
-            // 
+            //
             this.simFinalResultMessageTB.Location = new System.Drawing.Point(142, 211);
             this.simFinalResultMessageTB.Name = "simFinalResultMessageTB";
             this.simFinalResultMessageTB.ReadOnly = true;
             this.simFinalResultMessageTB.Size = new System.Drawing.Size(613, 20);
             this.simFinalResultMessageTB.TabIndex = 6;
-            // 
+            //
             // simPluginResultsListView
-            // 
+            //
             this.simPluginResultsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.simPluginResultsListView.Location = new System.Drawing.Point(10, 20);
             this.simPluginResultsListView.Name = "simPluginResultsListView";
             this.simPluginResultsListView.Size = new System.Drawing.Size(739, 180);
             this.simPluginResultsListView.TabIndex = 5;
             this.simPluginResultsListView.UseCompatibleStateImageBehavior = false;
-            // 
+            //
             // label9
-            // 
+            //
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(83, 214);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(53, 13);
             this.label9.TabIndex = 4;
             this.label9.Text = "Message:";
-            // 
+            //
             // groupBox10
-            // 
+            //
             this.groupBox10.Controls.Add(this.simGatewayResultPB);
             this.groupBox10.Controls.Add(this.simAuthzResultPB);
             this.groupBox10.Controls.Add(this.simAuthResultPB);
@@ -1074,63 +1074,63 @@
             this.groupBox10.TabIndex = 3;
             this.groupBox10.TabStop = false;
             this.groupBox10.Text = "pGina Stages";
-            // 
+            //
             // simGatewayResultPB
-            // 
+            //
             this.simGatewayResultPB.Image = global::pGina.Configuration.Properties.Resources.grayBar;
             this.simGatewayResultPB.Location = new System.Drawing.Point(84, 74);
             this.simGatewayResultPB.Name = "simGatewayResultPB";
             this.simGatewayResultPB.Size = new System.Drawing.Size(20, 20);
             this.simGatewayResultPB.TabIndex = 5;
             this.simGatewayResultPB.TabStop = false;
-            // 
+            //
             // simAuthzResultPB
-            // 
+            //
             this.simAuthzResultPB.Image = global::pGina.Configuration.Properties.Resources.grayBar;
             this.simAuthzResultPB.Location = new System.Drawing.Point(84, 49);
             this.simAuthzResultPB.Name = "simAuthzResultPB";
             this.simAuthzResultPB.Size = new System.Drawing.Size(20, 20);
             this.simAuthzResultPB.TabIndex = 4;
             this.simAuthzResultPB.TabStop = false;
-            // 
+            //
             // simAuthResultPB
-            // 
+            //
             this.simAuthResultPB.Image = global::pGina.Configuration.Properties.Resources.grayBar;
             this.simAuthResultPB.Location = new System.Drawing.Point(84, 23);
             this.simAuthResultPB.Name = "simAuthResultPB";
             this.simAuthResultPB.Size = new System.Drawing.Size(20, 20);
             this.simAuthResultPB.TabIndex = 3;
             this.simAuthResultPB.TabStop = false;
-            // 
+            //
             // label6
-            // 
+            //
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(6, 26);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(78, 13);
             this.label6.TabIndex = 0;
             this.label6.Text = "Authentication:";
-            // 
+            //
             // label7
-            // 
+            //
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(13, 51);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(71, 13);
             this.label7.TabIndex = 1;
             this.label7.Text = "Authorization:";
-            // 
+            //
             // label8
-            // 
+            //
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(32, 77);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(52, 13);
             this.label8.TabIndex = 2;
             this.label8.Text = "Gateway:";
-            // 
+            //
             // groupBox6
-            // 
+            //
             this.groupBox6.Controls.Add(this.showTextResultPasswordCB);
             this.groupBox6.Controls.Add(this.m_passwordResult);
             this.groupBox6.Controls.Add(this.m_domainResult);
@@ -1144,9 +1144,9 @@
             this.groupBox6.TabIndex = 2;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Final User Data";
-            // 
+            //
             // showTextResultPasswordCB
-            // 
+            //
             this.showTextResultPasswordCB.AutoSize = true;
             this.showTextResultPasswordCB.Location = new System.Drawing.Point(304, 73);
             this.showTextResultPasswordCB.Name = "showTextResultPasswordCB";
@@ -1155,61 +1155,61 @@
             this.showTextResultPasswordCB.Text = "Show Text";
             this.showTextResultPasswordCB.UseVisualStyleBackColor = true;
             this.showTextResultPasswordCB.CheckedChanged += new System.EventHandler(this.showTextResultPasswordCB_CheckedChanged);
-            // 
+            //
             // m_passwordResult
-            // 
+            //
             this.m_passwordResult.Location = new System.Drawing.Point(75, 71);
             this.m_passwordResult.Name = "m_passwordResult";
             this.m_passwordResult.ReadOnly = true;
             this.m_passwordResult.Size = new System.Drawing.Size(220, 20);
             this.m_passwordResult.TabIndex = 13;
             this.m_passwordResult.UseSystemPasswordChar = true;
-            // 
+            //
             // m_domainResult
-            // 
+            //
             this.m_domainResult.Location = new System.Drawing.Point(75, 45);
             this.m_domainResult.Name = "m_domainResult";
             this.m_domainResult.ReadOnly = true;
             this.m_domainResult.Size = new System.Drawing.Size(220, 20);
             this.m_domainResult.TabIndex = 12;
-            // 
+            //
             // m_usernameResult
-            // 
+            //
             this.m_usernameResult.Location = new System.Drawing.Point(75, 19);
             this.m_usernameResult.Name = "m_usernameResult";
             this.m_usernameResult.ReadOnly = true;
             this.m_usernameResult.Size = new System.Drawing.Size(220, 20);
             this.m_usernameResult.TabIndex = 11;
-            // 
+            //
             // label3
-            // 
+            //
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(23, 48);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(46, 13);
             this.label3.TabIndex = 10;
             this.label3.Text = "Domain:";
-            // 
+            //
             // label2
-            // 
+            //
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(13, 74);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(56, 13);
             this.label2.TabIndex = 9;
             this.label2.Text = "Password:";
-            // 
+            //
             // label1
-            // 
+            //
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(11, 22);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(58, 13);
             this.label1.TabIndex = 8;
             this.label1.Text = "Username:";
-            // 
+            //
             // groupBox5
-            // 
+            //
             this.groupBox5.Controls.Add(this.btnSimGo);
             this.groupBox5.Controls.Add(this.m_password);
             this.groupBox5.Controls.Add(this.m_username);
@@ -1222,9 +1222,9 @@
             this.groupBox5.TabIndex = 1;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Simulated LogonUI";
-            // 
+            //
             // btnSimGo
-            // 
+            //
             this.btnSimGo.Image = global::pGina.Configuration.Properties.Resources.arrow_right_3;
             this.btnSimGo.Location = new System.Drawing.Point(307, 184);
             this.btnSimGo.Name = "btnSimGo";
@@ -1232,42 +1232,42 @@
             this.btnSimGo.TabIndex = 5;
             this.btnSimGo.UseVisualStyleBackColor = true;
             this.btnSimGo.Click += new System.EventHandler(this.btnSimGo_Click);
-            // 
+            //
             // m_password
-            // 
+            //
             this.m_password.Location = new System.Drawing.Point(79, 188);
             this.m_password.Name = "m_password";
             this.m_password.Size = new System.Drawing.Size(222, 20);
             this.m_password.TabIndex = 4;
             this.m_password.UseSystemPasswordChar = true;
-            // 
+            //
             // m_username
-            // 
+            //
             this.m_username.Location = new System.Drawing.Point(79, 162);
             this.m_username.Name = "m_username";
             this.m_username.Size = new System.Drawing.Size(222, 20);
             this.m_username.TabIndex = 3;
-            // 
+            //
             // label5
-            // 
+            //
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(15, 191);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(56, 13);
             this.label5.TabIndex = 2;
             this.label5.Text = "Password:";
-            // 
+            //
             // label4
-            // 
+            //
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(15, 165);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(58, 13);
             this.label4.TabIndex = 1;
             this.label4.Text = "Username:";
-            // 
+            //
             // m_tileImage
-            // 
+            //
             this.m_tileImage.Image = global::pGina.Configuration.Properties.Resources.pginalogo;
             this.m_tileImage.Location = new System.Drawing.Point(121, 21);
             this.m_tileImage.Name = "m_tileImage";
@@ -1275,9 +1275,9 @@
             this.m_tileImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.m_tileImage.TabIndex = 0;
             this.m_tileImage.TabStop = false;
-            // 
+            //
             // groupBox3
-            // 
+            //
             this.groupBox3.Controls.Add(this.btnLaunchCredUI);
             this.groupBox3.Controls.Add(this.m_radioCredUI);
             this.groupBox3.Controls.Add(this.m_radioEmulate);
@@ -1288,9 +1288,9 @@
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Simulation Method";
-            // 
+            //
             // btnLaunchCredUI
-            // 
+            //
             this.btnLaunchCredUI.Enabled = false;
             this.btnLaunchCredUI.Image = global::pGina.Configuration.Properties.Resources.arrow_right_3;
             this.btnLaunchCredUI.Location = new System.Drawing.Point(169, 69);
@@ -1299,9 +1299,9 @@
             this.btnLaunchCredUI.TabIndex = 6;
             this.btnLaunchCredUI.UseVisualStyleBackColor = true;
             this.btnLaunchCredUI.Click += new System.EventHandler(this.btnLaunchCredUI_Click);
-            // 
+            //
             // m_radioCredUI
-            // 
+            //
             this.m_radioCredUI.AutoSize = true;
             this.m_radioCredUI.Location = new System.Drawing.Point(21, 74);
             this.m_radioCredUI.Name = "m_radioCredUI";
@@ -1310,9 +1310,9 @@
             this.m_radioCredUI.Text = "Launch a CredUI Prompt";
             this.m_radioCredUI.UseVisualStyleBackColor = true;
             this.m_radioCredUI.CheckedChanged += new System.EventHandler(this.simMethodChanged);
-            // 
+            //
             // m_radioEmulate
-            // 
+            //
             this.m_radioEmulate.AutoSize = true;
             this.m_radioEmulate.Checked = true;
             this.m_radioEmulate.Location = new System.Drawing.Point(21, 28);
@@ -1323,9 +1323,9 @@
             this.m_radioEmulate.Text = "Emulate pGina Service";
             this.m_radioEmulate.UseVisualStyleBackColor = true;
             this.m_radioEmulate.CheckedChanged += new System.EventHandler(this.simMethodChanged);
-            // 
+            //
             // m_radioUseService
-            // 
+            //
             this.m_radioUseService.AutoSize = true;
             this.m_radioUseService.Location = new System.Drawing.Point(21, 51);
             this.m_radioUseService.Name = "m_radioUseService";
@@ -1334,9 +1334,9 @@
             this.m_radioUseService.Text = "Use pGina Service";
             this.m_radioUseService.UseVisualStyleBackColor = true;
             this.m_radioUseService.CheckedChanged += new System.EventHandler(this.simMethodChanged);
-            // 
+            //
             // ginaOptions
-            // 
+            //
             this.ginaOptions.Controls.Add(this.groupBox16);
             this.ginaOptions.Controls.Add(this.groupBox15);
             this.ginaOptions.Location = new System.Drawing.Point(4, 22);
@@ -1346,9 +1346,9 @@
             this.ginaOptions.TabIndex = 4;
             this.ginaOptions.Text = "GINA Options";
             this.ginaOptions.UseVisualStyleBackColor = true;
-            // 
+            //
             // groupBox16
-            // 
+            //
             this.groupBox16.Controls.Add(this.btnGinaBrowse);
             this.groupBox16.Controls.Add(this.m_txtGinaChain);
             this.groupBox16.Controls.Add(this.label14);
@@ -1358,9 +1358,9 @@
             this.groupBox16.TabIndex = 1;
             this.groupBox16.TabStop = false;
             this.groupBox16.Text = "General";
-            // 
+            //
             // btnGinaBrowse
-            // 
+            //
             this.btnGinaBrowse.Location = new System.Drawing.Point(544, 21);
             this.btnGinaBrowse.Name = "btnGinaBrowse";
             this.btnGinaBrowse.Size = new System.Drawing.Size(75, 23);
@@ -1368,25 +1368,25 @@
             this.btnGinaBrowse.Text = "Browse...";
             this.btnGinaBrowse.UseVisualStyleBackColor = true;
             this.btnGinaBrowse.Click += new System.EventHandler(this.btnGinaBrowse_Click);
-            // 
+            //
             // m_txtGinaChain
-            // 
+            //
             this.m_txtGinaChain.Location = new System.Drawing.Point(104, 23);
             this.m_txtGinaChain.Name = "m_txtGinaChain";
             this.m_txtGinaChain.Size = new System.Drawing.Size(434, 20);
             this.m_txtGinaChain.TabIndex = 1;
-            // 
+            //
             // label14
-            // 
+            //
             this.label14.AutoSize = true;
             this.label14.Location = new System.Drawing.Point(19, 26);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(78, 13);
             this.label14.TabIndex = 0;
             this.label14.Text = "Chained GINA:";
-            // 
+            //
             // groupBox15
-            // 
+            //
             this.groupBox15.Controls.Add(this.radioHibernate);
             this.groupBox15.Controls.Add(this.radioSleep);
             this.groupBox15.Controls.Add(this.radioRestart);
@@ -1398,9 +1398,9 @@
             this.groupBox15.TabIndex = 0;
             this.groupBox15.TabStop = false;
             this.groupBox15.Text = "Login UI";
-            // 
+            //
             // radioHibernate
-            // 
+            //
             this.radioHibernate.AutoSize = true;
             this.radioHibernate.Location = new System.Drawing.Point(179, 77);
             this.radioHibernate.Name = "radioHibernate";
@@ -1409,9 +1409,9 @@
             this.radioHibernate.TabStop = true;
             this.radioHibernate.Text = "Hibernate the machine";
             this.radioHibernate.UseVisualStyleBackColor = true;
-            // 
+            //
             // radioSleep
-            // 
+            //
             this.radioSleep.AutoSize = true;
             this.radioSleep.Location = new System.Drawing.Point(179, 54);
             this.radioSleep.Name = "radioSleep";
@@ -1420,9 +1420,9 @@
             this.radioSleep.TabStop = true;
             this.radioSleep.Text = "Put the machine to sleep";
             this.radioSleep.UseVisualStyleBackColor = true;
-            // 
+            //
             // radioRestart
-            // 
+            //
             this.radioRestart.AutoSize = true;
             this.radioRestart.Location = new System.Drawing.Point(39, 77);
             this.radioRestart.Name = "radioRestart";
@@ -1431,9 +1431,9 @@
             this.radioRestart.TabStop = true;
             this.radioRestart.Text = "Restart the machine";
             this.radioRestart.UseVisualStyleBackColor = true;
-            // 
+            //
             // radioShutdown
-            // 
+            //
             this.radioShutdown.AutoSize = true;
             this.radioShutdown.Location = new System.Drawing.Point(39, 54);
             this.radioShutdown.Name = "radioShutdown";
@@ -1442,9 +1442,9 @@
             this.radioShutdown.TabStop = true;
             this.radioShutdown.Text = "Shutdown the machine";
             this.radioShutdown.UseVisualStyleBackColor = true;
-            // 
+            //
             // chkSpecialButton
-            // 
+            //
             this.chkSpecialButton.AutoSize = true;
             this.chkSpecialButton.Location = new System.Drawing.Point(18, 30);
             this.chkSpecialButton.Name = "chkSpecialButton";
@@ -1453,9 +1453,9 @@
             this.chkSpecialButton.Text = "Enable \'Special Action\' Button for:";
             this.chkSpecialButton.UseVisualStyleBackColor = true;
             this.chkSpecialButton.CheckedChanged += new System.EventHandler(this.chkSpecialButton_CheckedChanged);
-            // 
+            //
             // cpOptions
-            // 
+            //
             this.cpOptions.Controls.Add(this.groupBox9);
             this.cpOptions.Location = new System.Drawing.Point(4, 22);
             this.cpOptions.Name = "cpOptions";
@@ -1464,9 +1464,9 @@
             this.cpOptions.TabIndex = 5;
             this.cpOptions.Text = "Credential Provider Options";
             this.cpOptions.UseVisualStyleBackColor = true;
-            // 
+            //
             // groupBox9
-            // 
+            //
             this.groupBox9.Controls.Add(this.label18);
             this.groupBox9.Controls.Add(this.dgvCredProvFilter);
             this.groupBox9.Controls.Add(this.label17);
@@ -1477,35 +1477,35 @@
             this.groupBox9.TabIndex = 0;
             this.groupBox9.TabStop = false;
             this.groupBox9.Text = "Disable Credential Providers";
-            // 
+            //
             // label18
-            // 
+            //
             this.label18.AutoSize = true;
             this.label18.Location = new System.Drawing.Point(13, 312);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(411, 13);
             this.label18.TabIndex = 6;
             this.label18.Text = "To disable the built-in Microsoft credential provider, select \"PasswordProvider\" above.";
-            // 
+            //
             // dgvCredProvFilter
-            // 
+            //
             this.dgvCredProvFilter.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvCredProvFilter.Location = new System.Drawing.Point(13, 38);
             this.dgvCredProvFilter.Name = "dgvCredProvFilter";
             this.dgvCredProvFilter.Size = new System.Drawing.Size(721, 266);
             this.dgvCredProvFilter.TabIndex = 5;
-            // 
+            //
             // label17
-            // 
+            //
             this.label17.AutoSize = true;
             this.label17.Location = new System.Drawing.Point(10, 22);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(240, 13);
             this.label17.TabIndex = 2;
             this.label17.Text = "Mark a checkbox to disable a credential provider:";
-            // 
+            //
             // textBox1
-            // 
+            //
             this.textBox1.BackColor = System.Drawing.Color.Yellow;
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -1516,9 +1516,9 @@
             this.textBox1.Size = new System.Drawing.Size(703, 45);
             this.textBox1.TabIndex = 1;
             this.textBox1.Text = resources.GetString("textBox1.Text");
-            // 
+            //
             // btnApply
-            // 
+            //
             this.btnApply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnApply.Location = new System.Drawing.Point(650, 602);
             this.btnApply.Name = "btnApply";
@@ -1527,9 +1527,9 @@
             this.btnApply.Text = "Apply";
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
-            // 
+            //
             // btnOkay
-            // 
+            //
             this.btnOkay.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOkay.Location = new System.Drawing.Point(731, 602);
             this.btnOkay.Name = "btnOkay";
@@ -1538,9 +1538,9 @@
             this.btnOkay.Text = "Close";
             this.btnOkay.UseVisualStyleBackColor = true;
             this.btnOkay.Click += new System.EventHandler(this.btnOkay_Click);
-            // 
+            //
             // m_pginaVersionLbl
-            // 
+            //
             this.m_pginaVersionLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.m_pginaVersionLbl.AutoSize = true;
             this.m_pginaVersionLbl.Location = new System.Drawing.Point(12, 615);
@@ -1548,9 +1548,9 @@
             this.m_pginaVersionLbl.Size = new System.Drawing.Size(72, 13);
             this.m_pginaVersionLbl.TabIndex = 5;
             this.m_pginaVersionLbl.Text = "pGina version";
-            // 
+            //
             // btnSaveAndClose
-            // 
+            //
             this.btnSaveAndClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSaveAndClose.Location = new System.Drawing.Point(549, 602);
             this.btnSaveAndClose.Name = "btnSaveAndClose";
@@ -1560,9 +1560,9 @@
             this.btnSaveAndClose.UseMnemonic = false;
             this.btnSaveAndClose.UseVisualStyleBackColor = true;
             this.btnSaveAndClose.Click += new System.EventHandler(this.btnSaveAndClose_Click);
-            // 
+            //
             // ConfigurationUI
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(822, 637);

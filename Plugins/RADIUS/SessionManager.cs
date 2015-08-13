@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -40,7 +40,7 @@ namespace pGina.Plugin.RADIUS
         public bool active { get; set; }
 
         public RADIUSClient client { get; set; }
-            
+
         //public DateTime loginTimestamp { get; set; }
         public Packet.Acct_Terminate_Cause? terminate_cause { get; set; }
 
@@ -74,7 +74,7 @@ namespace pGina.Plugin.RADIUS
             this.session_limit = timeout;
 
             //Create timer, signals logoff every 30 seconds after timeout is reached
-            this.session_limit_timer = new Timer(tcb, this, timeout*1000, 30000);            
+            this.session_limit_timer = new Timer(tcb, this, timeout*1000, 30000);
         }
 
         public void Set_Session_Terminate(DateTime time, TimerCallback tcb)

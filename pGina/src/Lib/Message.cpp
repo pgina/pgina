@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -50,7 +50,7 @@ namespace pGina
 
 			m_properties.clear();
 		}
-							
+
 		/* static */
 		Message * Message::Demarshal(pGina::Memory::Buffer *buffer)
 		{
@@ -66,7 +66,7 @@ namespace pGina
 			// Cannot be empty
 			if(buffer.Raw() == 0 || buffer.Length() == 0)
 				return 0;
-			
+
 			pGina::Memory::BinaryReader reader(buffer);
 
 			unsigned char messageFormatVersion = reader.ReadByte();
@@ -78,7 +78,7 @@ namespace pGina
 			{
 				std::wstring propertyName = reader.ReadUnicodeString();
 				PropertyType propertyType = static_cast<PropertyType>(reader.ReadByte());
-				
+
 				switch(propertyType)
 				{
 				case Boolean:
@@ -97,16 +97,16 @@ namespace pGina
 					msg->Property<std::wstring>(propertyName, reader.ReadUnicodeString(), String);
 					break;
 				}
-			}			
+			}
 			return msg;
 		}
-		
+
 		/* static */
 		pGina::Memory::Buffer *  Message::Marshal(Message *msg)
 		{
 			int length = MarshalToBuffer(msg, 0);
 			pGina::Memory::Buffer * buffer = new pGina::Memory::Buffer(length);
-			
+
 			if(MarshalToBuffer(msg, buffer) != length)
 				assert(0);
 
@@ -141,10 +141,10 @@ namespace pGina
 				// Property type
 				writer.Write((unsigned char)propBase->Type());
 
-				// now work out type/value				
+				// now work out type/value
 				switch(propBase->Type())
 				{
-				case Boolean:				
+				case Boolean:
 					{
 						pGina::Messaging::Property<bool> * prop = static_cast<pGina::Messaging::Property<bool> *>(propBase);
 						writer.Write(prop->Value());
@@ -156,16 +156,16 @@ namespace pGina
 						writer.Write(prop->Value());
 					}
 					break;
-				case EmptyString:	
+				case EmptyString:
 					// Do nothing, no value here
 					break;
-				case Integer:					
+				case Integer:
 					{
 						pGina::Messaging::Property<int> * prop = static_cast<pGina::Messaging::Property<int> *>(propBase);
 						writer.Write(prop->Value());
 					}
 					break;
-				case String:					
+				case String:
 					{
 						pGina::Messaging::Property<std::wstring> * prop = static_cast<pGina::Messaging::Property<std::wstring> *>(propBase);
 						writer.Write(prop->Value());
@@ -174,7 +174,7 @@ namespace pGina
 				}
 			}
 
-			return writer.BytesWritten();			
+			return writer.BytesWritten();
 		}
 	}
 }

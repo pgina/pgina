@@ -34,7 +34,7 @@ namespace pGina.Plugin.RADIUS
             int timeout = 0;
             int retry = 0;
             int interim_time = 0;
-            
+
             try
             {
                 authport = Convert.ToInt32(authPortTB.Text.Trim());
@@ -42,7 +42,7 @@ namespace pGina.Plugin.RADIUS
                 timeout = (int)(1000 * Convert.ToDouble(timeoutTB.Text.Trim()));
                 retry = Convert.ToInt32(retryTB.Text.Trim());
                 interim_time = Convert.ToInt32(forceInterimUpdTB.Text.Trim());
-                
+
                 if (authport <= 0 || acctport <= 0 || timeout <= 0 || retry <= 0 || interim_time <= 0)
                     throw new FormatException("Ports, Retry, Timeout and interval values must be values greater than 0");
             }
@@ -94,11 +94,11 @@ namespace pGina.Plugin.RADIUS
             Settings.Store.SendInterimUpdates = sendInterimUpdatesCB.Checked;
             Settings.Store.ForceInterimUpdates = forceInterimUpdCB.Checked;
             Settings.Store.InterimUpdateTime = interim_time;
-               
+
 
             Settings.Store.AllowSessionTimeout = sessionTimeoutCB.Checked;
             Settings.Store.WisprSessionTerminate = wisprTimeoutCB.Checked;
-            
+
             Settings.Store.UseModifiedName = useModifiedNameCB.Checked;
             Settings.Store.IPSuggestion = ipAddrSuggestionTB.Text.Trim();
 
@@ -140,7 +140,7 @@ namespace pGina.Plugin.RADIUS
             //Server Settings
             authPortTB.Enabled = enableAuthCB.Checked;
             acctPortTB.Enabled = enableAcctCB.Checked;
-            
+
             //Authentication options:
             authGB.Enabled = enableAuthCB.Checked;
             sendNasIdentifierTB.Enabled = sendNasIdentifierCB.Checked;
@@ -178,12 +178,12 @@ namespace pGina.Plugin.RADIUS
 
         }
 
-        //Converts value to int, or returns default value. 
+        //Converts value to int, or returns default value.
         /*private int stoi(Object o, int def = 0)
         {
             try{ return (int)o; }
-            catch (InvalidCastException) { 
-               
+            catch (InvalidCastException) {
+
                 return def; }
         }*/
     }

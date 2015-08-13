@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -36,14 +36,14 @@ using Microsoft.Win32;
 namespace Abstractions.Settings
 {
     public class DynamicSettings : DynamicObject
-    {        
+    {
         public static readonly string ROOT_KEY = @"SOFTWARE";
         protected string m_rootKey = ROOT_KEY;
-        
+
         public DynamicSettings()
         {
         }
-        
+
         public DynamicSettings(string root)
         {
             m_rootKey = root;
@@ -73,7 +73,7 @@ namespace Abstractions.Settings
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(m_rootKey))
             {
                 key.SetValue(name, value);
-            }            
+            }
         }
 
         public void SetDefaultEncryptedSetting(string name, string value)
@@ -118,10 +118,10 @@ namespace Abstractions.Settings
             byte[] valueBytes = ProtectedData.Unprotect(protectedBytes, optionalEntropy, DataProtectionScope.LocalMachine);
             return UnicodeEncoding.Default.GetString(valueBytes);
         }
-        
+
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            SetSetting(binder.Name, value);            
+            SetSetting(binder.Name, value);
             return true;
         }
 
@@ -133,12 +133,12 @@ namespace Abstractions.Settings
             {
                 if (key != null)
                 {
-                    // Make sure key exists before requesting it                    
+                    // Make sure key exists before requesting it
                     foreach (string valueName in key.GetValueNames())
                     {
                         if (String.Compare(valueName, name, true) == 0)
                         {
-                            return key.GetValue(name);                            
+                            return key.GetValue(name);
                         }
                     }
 
@@ -167,11 +167,11 @@ namespace Abstractions.Settings
                 return new DynamicSetting(name, def);
             }
         }
-        
+
         public override bool TryGetMember(GetMemberBinder binder, out object result)
-        {            
+        {
             result = GetSetting(binder.Name);
-            return true;            
-        }       
+            return true;
+        }
     }
 }

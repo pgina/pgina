@@ -19,7 +19,7 @@ namespace pGina.Plugin.RADIUS
                 return (short)(20 + avp.toByteArray().Length);
             }
         }
-        
+
         //authenticator changes based on the type of packet (authorization = random 16 octets, accounting = md5 of packet contents+sharedkey)
         public byte[] authenticator { get; private set; }
 
@@ -44,7 +44,7 @@ namespace pGina.Plugin.RADIUS
 
             //Access-Requests use a random authentication code
             if (this.code == Code.Access_Request)
-            {   
+            {
                 //Generate secure bytes for authenticator
                 RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
                 rngCsp.GetBytes(this.authenticator);
@@ -52,7 +52,7 @@ namespace pGina.Plugin.RADIUS
         }
 
         public Packet(Code code, byte identifier, byte[] auth)
-        {   
+        {
             this.code = code;
             this.identifier = identifier;
             this.authenticator = auth;
@@ -61,7 +61,7 @@ namespace pGina.Plugin.RADIUS
         public Packet(byte[] data)
         {
             this.avp = new AVP();
-            
+
             code = (Code)data[0];
             identifier = data[1];
             //length = BitConverter.ToInt16(data, 2);
@@ -82,7 +82,7 @@ namespace pGina.Plugin.RADIUS
 
         }
 
- 
+
         //Adds the specified attribute type and corresponding string data to AVP list
         public void addAttribute(AttributeType type, string value)
         {
@@ -134,7 +134,7 @@ namespace pGina.Plugin.RADIUS
 
         public byte[] getFirstByteArrayAttribute(AttributeType type)
         {
-            return avp.getFirstRawAttribute(type); 
+            return avp.getFirstRawAttribute(type);
         }
 
         public IEnumerable<byte[]> getByteArrayAttributes(AttributeType type, byte[] vsa = null)
@@ -146,7 +146,7 @@ namespace pGina.Plugin.RADIUS
         {
             foreach (byte[] val in avp.getByteArrayAttributes(type, vsa))
             {
-                
+
                 yield return Encoding.UTF8.GetString(val);
             }
         }
@@ -164,11 +164,11 @@ namespace pGina.Plugin.RADIUS
         public bool verifyResponseAuthenticator(byte[] requestAuthenticator, string sharedKey)
         {
             //Accounting MD5(respcode+id+length+reqauth+respattr+sharedkey)
-            
+
             //this.authenticator == MD5(Code+ID+Length+RequestAuth+Attributes+Secret)
             byte[] secretKeyBytes = Encoding.UTF8.GetBytes(sharedKey);
             byte[] verificationBytes = new byte[this.length + secretKeyBytes.Length];
-            
+
             //Copy this packet to the buffer
             System.Buffer.BlockCopy(this.toBytes(), 0, verificationBytes, 0, this.length);
 
@@ -197,14 +197,14 @@ namespace pGina.Plugin.RADIUS
                 byte[] skey = Encoding.UTF8.GetBytes(sharedKey);
                 System.Buffer.BlockCopy(this.convertToBytes(), 0, hashedPacket, 0, this.length);
                 System.Buffer.BlockCopy(skey, 0, hashedPacket, this.length, skey.Length);
-                
+
                 //Set authenticator to MD5 of packet data + shared key
                 this.authenticator = MD5.Create().ComputeHash(hashedPacket);
             }
 
             return convertToBytes();
         }
-        
+
         //Returns a byte array representing this packet
         private byte[] convertToBytes()
         {
@@ -229,9 +229,9 @@ namespace pGina.Plugin.RADIUS
         //Compares two byte arrays for equality, true if equal
         private bool equalByteArrays(byte[] arr1, byte[] arr2)
         {
-            if (arr1.Length != arr2.Length) 
+            if (arr1.Length != arr2.Length)
                 return false;
-            
+
             for (int k = 0; k < arr1.Length; k++)
                 if (arr1[k] != arr2[k])
                     return false;
@@ -397,7 +397,7 @@ namespace pGina.Plugin.RADIUS
             //Returns true if their is at least one instance of the specified attribute type
             public bool containsAttribute(AttributeType type)
             {
-                return AttributeTypeCount(type) > 0; 
+                return AttributeTypeCount(type) > 0;
             }
 
 
@@ -427,8 +427,8 @@ namespace pGina.Plugin.RADIUS
                 }*/
                 foreach (Tuple<AttributeType, byte[]> val in list)
                 {
-                    if (val.Item1 != type)/* || 
-                        !(type == AttributeType.Vendor_Specific && val.Item2[0] ==  vsa[0] && 
+                    if (val.Item1 != type)/* ||
+                        !(type == AttributeType.Vendor_Specific && val.Item2[0] ==  vsa[0] &&
                           val.Item2[1] == vsa[1] && val.Item2[2] == vsa[2] && val.Item2[3] == vsaType))*/
                         continue;
                     yield return val.Item2;
@@ -441,7 +441,7 @@ namespace pGina.Plugin.RADIUS
             {
                 if (this._bytes != null)
                     return _bytes;
-                
+
                 //Figure out total length of data
                 int avpLength = 0;
                 foreach (Tuple<AttributeType, byte[]> data in list)
@@ -475,7 +475,7 @@ namespace pGina.Plugin.RADIUS
                     attributeCounter[type] = 1;
             }
         }
-    
+
         //Static methods for Vendor Specific Attribrutes
         //Bytes 0-3 = vendor-id
         //Byte 4 =  vendor-type
@@ -499,6 +499,6 @@ namespace pGina.Plugin.RADIUS
         {
             return Encoding.UTF8.GetString(val, 6, val.Length - 6);
         }
-    
+
     }
 }

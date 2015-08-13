@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -40,7 +40,7 @@ namespace pGina
 		{
 			if(Running())
 				Stop();
-			
+
 			if(m_threadHandle != 0)
 				CloseHandle(m_threadHandle);
 		}
@@ -76,14 +76,14 @@ namespace pGina
 			ScopedLock lock(m_mutex);
 			m_running = v;
 		}
-			    		
+
 		/* static */
 		DWORD WINAPI Thread::_internal_threadmain(LPVOID arg)
 		{
 			Thread *thread = static_cast<Thread *>(arg);
 			return thread->ThreadMain();
 		}
-			
+
 		Mutex::Mutex()
 		{
 			m_mutexHandle = CreateMutex(NULL, FALSE, NULL);
@@ -94,7 +94,7 @@ namespace pGina
 			DWORD res = WaitForSingleObject(m_mutexHandle, INFINITE);
 			if(res == WAIT_OBJECT_0 || res == WAIT_ABANDONED)
 				return true;
-  
+
 			return false;
 		}
 

@@ -9,8 +9,8 @@
 		* Redistributions in binary form must reproduce the above copyright
 		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the pGina Team nor the names of its contributors 
-		  may be used to endorse or promote products derived from this software without 
+		* Neither the name of the pGina Team nor the names of its contributors
+		  may be used to endorse or promote products derived from this software without
 		  specific prior written permission.
 
 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -190,7 +190,7 @@ namespace pGina.CredentialProvider.Registration
         public override bool Enabled6432()
         {
             return true;
-        }        
+        }
     }
 
     public class DefaultCredProviderManager : CredProviderManager
@@ -217,8 +217,8 @@ namespace pGina.CredentialProvider.Registration
         static readonly string WINDIR = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
 
         // The registry keys
-        string ProviderKey 
-        { 
+        string ProviderKey
+        {
             get { return string.Format(@"{0}\{{{1}}}", PROVIDER_KEY_BASE, CpInfo.ProviderGuid.ToString()); }
         }
         string CredentialProviderFilterKey
@@ -366,7 +366,7 @@ namespace pGina.CredentialProvider.Registration
 
             string dll = GetCpDllPath();
             string dll6432 = GetCpDllPath6432();
-            
+
             if (File.Exists(dll))
             {
                 m_logger.DebugFormat("Deleting: {0}", dll);

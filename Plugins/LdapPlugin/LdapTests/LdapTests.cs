@@ -23,7 +23,7 @@ namespace pGina.Plugin.Ldap.Test
         static readonly string searchPW = "";
 
         static readonly Guid BogusSessionId = new Guid("9B599C0B-08C4-43F0-A2DB-42C73A3C59F5");
-        
+
         private LdapPlugin m_plugin;
         private SessionProperties m_props;
 
@@ -115,18 +115,18 @@ namespace pGina.Plugin.Ldap.Test
             Assert.That(!result.Success, result.Message);
             Assert.That(result.Message, Is.EqualTo("Authentication failed due to empty password."));
         }
-        
+
         [Test]
         public void AuthSimpleFail()
         {
             // Modify settings
             UserInformation userInfo = m_props.GetTrackedSingle<UserInformation>();
             userInfo.Password = "Wrong password";
-            
+
             m_plugin.BeginChain(m_props);
             BooleanResult result = m_plugin.AuthenticateUser(m_props);
             m_plugin.EndChain(m_props);
-            
+
             Assert.That(!result.Success, result.Message);
         }
 
@@ -141,7 +141,7 @@ namespace pGina.Plugin.Ldap.Test
             m_plugin.BeginChain(m_props);
             BooleanResult result = m_plugin.AuthenticateUser(m_props);
             m_plugin.EndChain(m_props);
-            
+
             Assert.That(result.Success, result.Message);
         }
 
@@ -160,7 +160,7 @@ namespace pGina.Plugin.Ldap.Test
             m_plugin.BeginChain(m_props);
             BooleanResult result = m_plugin.AuthenticateUser(m_props);
             m_plugin.EndChain(m_props);
-            
+
             Assert.That(!result.Success, result.Message);
         }
 
@@ -175,7 +175,7 @@ namespace pGina.Plugin.Ldap.Test
             m_plugin.BeginChain(m_props);
             BooleanResult result = m_plugin.AuthenticateUser(m_props);
             m_plugin.EndChain(m_props);
-            
+
             Assert.That(!result.Success, result.Message);
             Assert.That(result.Message, Is.EqualTo("Unable to determine the user's LDAP DN for authentication.") );
         }
