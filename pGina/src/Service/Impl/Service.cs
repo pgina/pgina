@@ -284,6 +284,8 @@ namespace pGina.Service.Impl
                 PluginDriver sessionDriver = new PluginDriver();
                 sessionDriver.UserInformation.Username = (String.IsNullOrEmpty(msg.Username))? "" : msg.Username.Trim().Split('\\').DefaultIfEmpty("").LastOrDefault();
                 sessionDriver.UserInformation.Password = (String.IsNullOrEmpty(msg.Password)) ? "" : msg.Password;
+                // todo
+                // can be of "username@dotted domain name" use winapi DsGetDcName() in UserGet()
                 sessionDriver.UserInformation.Domain = (String.IsNullOrEmpty(msg.Username))? "" : (msg.Username.Trim().Contains('\\')) ? msg.Username.Trim().Split('\\').DefaultIfEmpty("").FirstOrDefault() : "";
 
                 if (String.IsNullOrEmpty(sessionDriver.UserInformation.Username))
@@ -309,6 +311,25 @@ namespace pGina.Service.Impl
 
                     Boolean isLoggedIN = false;
                     Boolean isUACLoggedIN = false;
+
+                    // is this user a local user and was not created by pGina
+                    Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
+                    if (Abstractions.WindowsApi.pInvokes.UserGet(sessionDriver.UserInformation.Username, ref userinfo4))
+                    {
+                        if (!userinfo4.comment.Contains("pGina created"))
+                        {
+                            result.Success = Abstractions.WindowsApi.pInvokes.ValidateCredentials(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password);
+                            return new LoginResponseMessage()
+                            {
+                                Result = result.Success,
+                                Message = (result.Success)? "Local non pGina user" : "Unknown username or bad password",
+                                Username = sessionDriver.UserInformation.Username,
+                                Domain = sessionDriver.UserInformation.Domain,
+                                Password = sessionDriver.UserInformation.Password
+                            };
+                        }
+                    }
+
                     Dictionary<int, List<string>> contextALL = Abstractions.WindowsApi.pInvokes.GetSessionContext();
                     List<string> Users = Abstractions.WindowsApi.pInvokes.GetSessionContextParser(-1, contextALL);
                     List<string> iUsers = Abstractions.WindowsApi.pInvokes.GetInteractiveUserList();
@@ -354,8 +375,8 @@ namespace pGina.Service.Impl
                                         break;
                                     }
                                 }
-				// is this user a local user and was not created by pGina
-                                Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
+                                // is this user a local user and was not created by pGina
+                                /*Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
                                 if (Abstractions.WindowsApi.pInvokes.UserGet(sessionDriver.UserInformation.Username, ref userinfo4))
                                 {
                                     if (!userinfo4.comment.Contains("pGina created"))
@@ -363,7 +384,7 @@ namespace pGina.Service.Impl
                                         m_logger.DebugFormat("User:{0} is local non pGina", sessionDriver.UserInformation.Username);
                                         isUACLoggedIN = true;
                                     }
-                                }
+                                }*/
 
                                 if (!isUACLoggedIN)
                                 {
