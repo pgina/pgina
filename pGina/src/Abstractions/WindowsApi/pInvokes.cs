@@ -1075,10 +1075,10 @@ namespace Abstractions.WindowsApi
                         result.Add(string.Format("{0}\\{1}", sessionInfo.SessionID, user));
                     }
                 }
-                //LibraryLogging.Info("InteractiveUsers:{0}", String.Join<string>(", ", result));
 
                 SafeNativeMethods.WTSFreeMemory(sessionInfoList);
             }
+            //LibraryLogging.Info("InteractiveUsers:{0}", String.Join<string>(", ", result));
 
             return result;
         }
