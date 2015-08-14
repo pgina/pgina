@@ -59,6 +59,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InstallUtility", "InstallUt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallUtil", "InstallUtility\InstallUtil.csproj", "{5F265440-93C2-454C-A3DD-19A027FD0C48}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{B5205049-FDF0-4DE5-A042-FD2F1ED4F869}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "encryptsetting", "tools\encryptsetting\encryptsetting.csproj", "{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -343,6 +347,23 @@ Global
 		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Release|x64.Build.0 = Release|Any CPU
 		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Release|x86.ActiveCfg = Release|Any CPU
 		{5F265440-93C2-454C-A3DD-19A027FD0C48}.Release|x86.Build.0 = Release|Any CPU
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Debug|Win32.ActiveCfg = Debug|x86
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Debug|x64.ActiveCfg = Debug|x86
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Debug|x86.ActiveCfg = Debug|x86
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Debug|x86.Build.0 = Debug|x86
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Release|Win32.ActiveCfg = Release|Any CPU
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Release|Win32.Build.0 = Release|Any CPU
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Release|x64.ActiveCfg = Release|Any CPU
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Release|x64.Build.0 = Release|Any CPU
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Release|x86.ActiveCfg = Release|Any CPU
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -364,5 +385,6 @@ Global
 		{89DCB118-E440-4565-A103-69FE6EAF2B68} = {261D9DA5-DCB5-4BD0-A5B9-3C51A6E00087}
 		{24C3DAD2-BD6B-4ECC-96EE-049B6A4CEF55} = {08267E76-790C-46E0-88C4-E5D0ACE74302}
 		{5F265440-93C2-454C-A3DD-19A027FD0C48} = {71DC20C4-B3F2-4356-8342-13478676195C}
+		{69B947B2-9E5A-48CA-9DE0-05C21F725DD8} = {B5205049-FDF0-4DE5-A042-FD2F1ED4F869}
 	EndGlobalSection
 EndGlobal
