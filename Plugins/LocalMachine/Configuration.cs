@@ -97,7 +97,7 @@ namespace pGina.Plugin.LocalMachine
             toolTip1.ShowAlways = true;
 
             toolTip1.SetToolTip(this.m_chkAlwaysAuth, "When this is checked, the plugin will always attempt to authenticate the user against a local account. If this is not checked, the plugin will only attempt to authenticate when the user has not already been authenticated by a plugin that has executed earlier within the authentication stage.");
-            toolTip1.SetToolTip(this.m_chkMirror, "Load all groups from the local account into the pGina user information store so that the LocalMachineâ€™s Gateway stage (and other subsequent plugins) will see that the user should be a member of those groups.");
+            toolTip1.SetToolTip(this.m_chkMirror, "Load all groups from the local account into the pGina user information store so that the LocalMachine's Gateway stage (and other subsequent plugins) will see that the user should be a member of those groups.");
             toolTip1.SetToolTip(this.m_chkAuthzAll, "When this is checked, the plugin will attempt to authorize all users. Otherwise, the plugin will only authorize users that were authenticated successfully by this plugin.");
             toolTip1.SetToolTip(this.m_chkAuthzLocalAdmin, "Only authorize users that are members of the Administrators group.");
             toolTip1.SetToolTip(this.m_chkAuthzRequireLocal, "Only authorize users that are members of one of the groups listed below this checkbox");
