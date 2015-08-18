@@ -396,8 +396,6 @@ namespace pGina.Plugin.pgSMB
                         {
                             Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows was unable to load the profile");
                         }
-
-                        Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
                     }
                 }
                 else
