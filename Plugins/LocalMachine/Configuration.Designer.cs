@@ -49,12 +49,14 @@
             this.m_btnClose = new System.Windows.Forms.Button();
             this.m_chkScrambleWhenLMFails = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_localGroupDgv)).BeginInit();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_scrambleAllExceptDGV)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.m_groupsDgv)).BeginInit();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             //
             // groupBox1
@@ -150,16 +152,11 @@
             //
             // groupBox3
             //
-            //this.groupBox3.Controls.Add(this.label1);
-            //this.groupBox3.Controls.Add(this.m_chkScrambleWhenLMFails);
-            //this.groupBox3.Controls.Add(this.m_scrambleAllExceptDGV);
-            this.groupBox3.Controls.Add(this.m_chkRemoveProfile);
-            this.groupBox3.Controls.Add(this.m_chkScramble);
             this.groupBox3.Controls.Add(this.m_chkGroupFailIsFAIL);
             this.groupBox3.Controls.Add(this.m_groupsDgv);
             this.groupBox3.Location = new System.Drawing.Point(361, 13);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(343, 393);
+            this.groupBox3.Size = new System.Drawing.Size(343, 310);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Gateway";
@@ -183,23 +180,22 @@
             // m_chkRemoveProfile
             //
             this.m_chkRemoveProfile.AutoSize = true;
-            this.m_chkRemoveProfile.Location = new System.Drawing.Point(15, 42);
+            this.m_chkRemoveProfile.Location = new System.Drawing.Point(15, 19);
             this.m_chkRemoveProfile.Name = "m_chkRemoveProfile";
-            this.m_chkRemoveProfile.Size = new System.Drawing.Size(290, 30);
+            this.m_chkRemoveProfile.Size = new System.Drawing.Size(216, 17);
             this.m_chkRemoveProfile.TabIndex = 8;
-            this.m_chkRemoveProfile.Text = "Remove account and profile after logout when account \r\ndoes not exist prior to lo" +
-    "gon.";
+            this.m_chkRemoveProfile.Text = "Remove account and profile after logout";
             this.m_chkRemoveProfile.UseVisualStyleBackColor = true;
             this.m_chkRemoveProfile.CheckedChanged += new System.EventHandler(this.m_chkRemoveProfile_CheckedChanged);
             //
             // m_chkScramble
             //
             this.m_chkScramble.AutoSize = true;
-            this.m_chkScramble.Location = new System.Drawing.Point(15, 78);
+            this.m_chkScramble.Location = new System.Drawing.Point(15, 42);
             this.m_chkScramble.Name = "m_chkScramble";
-            this.m_chkScramble.Size = new System.Drawing.Size(177, 17);
+            this.m_chkScramble.Size = new System.Drawing.Size(174, 17);
             this.m_chkScramble.TabIndex = 7;
-            this.m_chkScramble.Text = "Scramble password after logout (only pGina created users).";
+            this.m_chkScramble.Text = "Scramble password after logout";
             this.m_chkScramble.UseVisualStyleBackColor = true;
             this.m_chkScramble.CheckedChanged += new System.EventHandler(this.m_chkScramble_CheckedChanged);
             //
@@ -218,9 +214,9 @@
             this.m_groupsDgv.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.m_groupsDgv.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Group});
-            this.m_groupsDgv.Location = new System.Drawing.Point(15, 101);
+            this.m_groupsDgv.Location = new System.Drawing.Point(15, 42);
             this.m_groupsDgv.Name = "m_groupsDgv";
-            this.m_groupsDgv.Size = new System.Drawing.Size(311, 272);
+            this.m_groupsDgv.Size = new System.Drawing.Size(311, 248);
             this.m_groupsDgv.TabIndex = 5;
             //
             // Group
@@ -268,11 +264,23 @@
             this.label1.TabIndex = 13;
             this.label1.Text = "Never scramble the passwords for these accounts:";
             //
+            // groupBox4
+            //
+            this.groupBox4.Controls.Add(this.m_chkScramble);
+            this.groupBox4.Controls.Add(this.m_chkRemoveProfile);
+            this.groupBox4.Location = new System.Drawing.Point(361, 329);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(342, 76);
+            this.groupBox4.TabIndex = 5;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Notification";
+            //
             // Configuration
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(720, 447);
+            this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.m_btnClose);
             this.Controls.Add(this.m_btnSave);
             this.Controls.Add(this.groupBox3);
@@ -290,6 +298,8 @@
             this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_scrambleAllExceptDGV)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.m_groupsDgv)).EndInit();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -317,5 +327,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Username;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox m_chkScrambleWhenLMFails;
+        private System.Windows.Forms.GroupBox groupBox4;
     }
 }
