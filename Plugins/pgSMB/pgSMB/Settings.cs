@@ -54,8 +54,6 @@ namespace pGina.Plugin.pgSMB
             m_settings.SetDefault("MaxStore", 0);
 
             m_settings.SetDefault("ntp", @"ts1.my.domain.com ts2.my.domain.com");
-            m_settings.SetDefault("email", @"mymail@my.domain.com anothermail@my.domain.com");
-            m_settings.SetDefault("smtp", @"smtp.my.domain.com:25 smtp2.my.domain.com:587");
         }
 
         public static dynamic Store

@@ -87,10 +87,6 @@ namespace pGina.Plugin.pgSMB
             this.SMBshare = new System.Windows.Forms.TextBox();
             this.save = new System.Windows.Forms.Button();
             this.close = new System.Windows.Forms.Button();
-            this.email = new System.Windows.Forms.TextBox();
-            this.email_label = new System.Windows.Forms.Label();
-            this.smtp = new System.Windows.Forms.TextBox();
-            this.smtp_label = new System.Windows.Forms.Label();
             this.help = new System.Windows.Forms.Button();
             this.Gateway_group.SuspendLayout();
             this.User_group.SuspendLayout();
@@ -101,10 +97,6 @@ namespace pGina.Plugin.pgSMB
             //
             // Gateway_group
             //
-            this.Gateway_group.Controls.Add(this.smtp);
-            this.Gateway_group.Controls.Add(this.smtp_label);
-            this.Gateway_group.Controls.Add(this.email);
-            this.Gateway_group.Controls.Add(this.email_label);
             this.Gateway_group.Controls.Add(this.ntp);
             this.Gateway_group.Controls.Add(this.Description);
             this.Gateway_group.Controls.Add(this.ntp_label);
@@ -128,7 +120,7 @@ namespace pGina.Plugin.pgSMB
             // Description
             //
             this.Description.AutoSize = true;
-            this.Description.Location = new System.Drawing.Point(333, 325);
+            this.Description.Location = new System.Drawing.Point(333, 244);
             this.Description.Name = "Description";
             this.Description.Size = new System.Drawing.Size(257, 26);
             this.Description.TabIndex = 4;
@@ -437,42 +429,6 @@ namespace pGina.Plugin.pgSMB
             this.close.UseVisualStyleBackColor = true;
             this.close.Click += new System.EventHandler(this.Btn_close);
             //
-            // email
-            //
-            this.email.Location = new System.Drawing.Point(345, 261);
-            this.email.Name = "email";
-            this.email.Size = new System.Drawing.Size(311, 20);
-            this.email.TabIndex = 28;
-            this.email.WordWrap = false;
-            this.email.ReadOnly = true;
-            //
-            // email_label
-            //
-            this.email_label.AutoSize = true;
-            this.email_label.Location = new System.Drawing.Point(342, 244);
-            this.email_label.Name = "email_label";
-            this.email_label.Size = new System.Drawing.Size(151, 13);
-            this.email_label.TabIndex = 29;
-            this.email_label.Text = "space seperated emails (email)";
-            //
-            // smtp
-            //
-            this.smtp.Location = new System.Drawing.Point(345, 300);
-            this.smtp.Name = "smtp";
-            this.smtp.Size = new System.Drawing.Size(311, 20);
-            this.smtp.TabIndex = 30;
-            this.smtp.WordWrap = false;
-            this.smtp.ReadOnly = true;
-            //
-            // smtp_label
-            //
-            this.smtp_label.AutoSize = true;
-            this.smtp_label.Location = new System.Drawing.Point(342, 283);
-            this.smtp_label.Name = "smtp_label";
-            this.smtp_label.Size = new System.Drawing.Size(212, 13);
-            this.smtp_label.TabIndex = 31;
-            this.smtp_label.Text = "space seperated smtp FQDN servers (smtp)";
-            //
             // help
             //
             this.help.Location = new System.Drawing.Point(431, 383);
@@ -542,10 +498,6 @@ namespace pGina.Plugin.pgSMB
         private System.Windows.Forms.Label MaxStore_calc;
         private System.Windows.Forms.TextBox ntp;
         private System.Windows.Forms.Label ntp_label;
-        private System.Windows.Forms.TextBox smtp;
-        private System.Windows.Forms.Label smtp_label;
-        private System.Windows.Forms.TextBox email;
-        private System.Windows.Forms.Label email_label;
         private System.Windows.Forms.Button help;
     }
 }
