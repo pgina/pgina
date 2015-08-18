@@ -656,6 +656,8 @@ namespace pGina.Plugin.pgSMB2
 
         private Boolean SetACL(string dir, string username, string password, uint maxstore, uint retry)
         {
+            m_logger.InfoFormat("modify ACE");
+
             Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
             if (!Abstractions.WindowsApi.pInvokes.UserGet(username, ref userinfo4))
             {
