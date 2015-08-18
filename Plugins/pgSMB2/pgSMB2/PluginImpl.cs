@@ -336,26 +336,21 @@ namespace pGina.Plugin.pgSMB2
 
                 m_logger.DebugFormat("{1} SessionChange SessionLogon for ID:{0}", SessionId, userInfo.Username);
 
-                if (userInfo.Description.EndsWith("pGina created pgSMB2"))
+                if (userInfo.Description.Contains("pGina created pgSMB2"))
                 {
                     Dictionary<string, string> settings = GetSettings(userInfo.Username, userInfo);
 
                     if (!String.IsNullOrEmpty(settings["ScriptPath"]))
                     {
-                        try
+                        if (!Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, settings["ScriptPath"]))
                         {
-                            Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, settings["ScriptPath"]);
-                        }
-                        catch (Exception ex)
-                        {
-                            m_logger.ErrorFormat("{2} Can't run application {0} because {1}", settings["ScriptPath"], ex.ToString(), userInfo.Username);
-                            pInvokes.SendMessageToUser(SessionId, "Can't run application", String.Format("I'm unable to run your LoginScript\n{0}", settings["ScriptPath"]));
+                            m_logger.ErrorFormat("Can't run application {0}", settings["ScriptPath"]);
+                            Abstractions.WindowsApi.pInvokes.SendMessageToUser(SessionId, "Can't run application", String.Format("I'm unable to run your LoginScript\n{0}", settings["ScriptPath"]));
                         }
                     }
 
-                    if (!Abstractions.Windows.User.QueryQuota(pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString()) && Convert.ToUInt32(settings["MaxStore"]) > 0)
+                    if (userInfo.Description.EndsWith("pGina created pgSMB2"))
                     {
-                        m_logger.InfoFormat("{1} no quota GPO settings for user {0}", userInfo.SID.ToString(), userInfo.Username);
                         if (!Abstractions.Windows.User.SetQuota(pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString(), Convert.ToUInt32(settings["MaxStore"])))
                         {
                             m_logger.InfoFormat("{1} failed to set quota GPO for user {0}", userInfo.SID.ToString(), userInfo.Username);
@@ -372,24 +367,22 @@ namespace pGina.Plugin.pgSMB2
                                 m_logger.ErrorFormat("{2} Can't run application {0} because {1}", "proquota.exe", ex.ToString(), userInfo.Username);
                             }
                         }
-                    }
 
-                    IntPtr hToken = Abstractions.WindowsApi.pInvokes.GetUserToken(userInfo.Username, null, userInfo.Password);
-                    if (hToken != IntPtr.Zero)
-                    {
-                        string uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfilePath(hToken);
-                        if (String.IsNullOrEmpty(uprofile))
+                        IntPtr hToken = Abstractions.WindowsApi.pInvokes.GetUserToken(userInfo.Username, null, userInfo.Password);
+                        if (hToken != IntPtr.Zero)
                         {
-                            uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfileDir(hToken);
-                        }
-                        Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
+                            string uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfilePath(hToken);
+                            if (String.IsNullOrEmpty(uprofile))
+                            {
+                                uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfileDir(hToken);
+                            }
+                            Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
 
-                        if (uprofile.Contains(@"\TEMP"))
-                        {
-                            Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows was unable to load the profile");
+                            if (uprofile.Contains(@"\TEMP"))
+                            {
+                                Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows was unable to load the profile");
+                            }
                         }
-
-                        Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
                     }
                 }
                 else
