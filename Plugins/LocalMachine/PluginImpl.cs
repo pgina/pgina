@@ -403,7 +403,10 @@ namespace pGina.Plugin.LocalMachine
                     {
                         foreach (string group in limitToGroupList)
                         {
-                            if (ListedInGroup(group, null, properties))
+                            SecurityIdentifier sid = null;
+                            try { sid = new SecurityIdentifier(group); }
+                            catch { }
+                            if (ListedInGroup(group, sid, properties))
                             {
                                 return new BooleanResult() { Success = true };
                             }
