@@ -170,8 +170,6 @@ namespace pGina.Plugin.pgSMB2
                 {"HomeDir", (!String.IsNullOrEmpty(userInfo.usri4_home_dir)) ? userInfo.usri4_home_dir : Settings.Store.HomeDir.ToString()},
                 {"HomeDirDrive", (!String.IsNullOrEmpty(userInfo.usri4_home_dir_drive)) ? userInfo.usri4_home_dir_drive : Settings.Store.HomeDirDrive.ToString()},
                 {"ScriptPath", (!String.IsNullOrEmpty(userInfo.LoginScript)) ? userInfo.LoginScript : Settings.Store.ScriptPath.ToString()},
-                {"email", Settings.Store.email.ToString()},
-                {"smtp", Settings.Store.smtp.ToString()}
             };
             for (uint x = 0; x <= array.GetUpperBound(0); x++ )
             {

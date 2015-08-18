@@ -58,8 +58,6 @@ namespace pGina.Plugin.pgSMB2
             string ScriptPath = Settings.Store.ScriptPath;
             int MaxStore = Settings.Store.MaxStore;
             string Ntp = Settings.Store.ntp;
-            string Email = Settings.Store.email;
-            string Smtp = Settings.Store.smtp;
 
             this.SMBshare.Text = SMBshare_str;
             this.RoamingSource.Text = RoamingSource;
@@ -75,8 +73,6 @@ namespace pGina.Plugin.pgSMB2
             this.MaxStore.Value = (uint)MaxStore;
             this.MaxStore_calc.Text = ((uint)MaxStore / 1024).ToString("F") + " MByte";
             this.ntp.Text = Ntp;
-            this.email.Text = Email;
-            this.smtp.Text = Smtp;
 
             //MessageBox.Show(Environment.CurrentDirectory.ToString());
             //MessageBox.Show(Environment.ExpandEnvironmentVariables(RoamingDest));
@@ -104,8 +100,6 @@ namespace pGina.Plugin.pgSMB2
             toolTip1.SetToolTip(this.ScriptPath, "The full path to your login script (Runonce regkey!)");
             toolTip1.SetToolTip(this.MaxStore, "Maximum profile size in kbytes\n0 == all space");
             toolTip1.SetToolTip(this.ntp, "space seperated FQDN list of your ntp servers");
-            toolTip1.SetToolTip(this.email, "space seperated FQDN list of email addresses");
-            toolTip1.SetToolTip(this.smtp, "space seperated FQDN list of your smtp servers\nAuthenticated with the login credentials");
         }
 
         private void UiToSettings()
@@ -123,8 +117,6 @@ namespace pGina.Plugin.pgSMB2
             Settings.Store.HomeDirDrive = this.HomeDirDrive.Text.Trim();
             Settings.Store.ScriptPath = this.ScriptPath.Text.Trim();
             Settings.Store.ntp = this.ntp.Text.Trim();
-            Settings.Store.email = this.email.Text.Trim();
-            Settings.Store.smtp = this.smtp.Text.Trim();
         }
 
         private void MaxStore_MB(object sender, EventArgs e)
