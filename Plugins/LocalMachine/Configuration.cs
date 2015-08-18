@@ -202,5 +202,10 @@ namespace pGina.Plugin.LocalMachine
         {
 
         }
+
+        private void m_Help_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation/plugins/local_machine.html");
+        }
     }
 }

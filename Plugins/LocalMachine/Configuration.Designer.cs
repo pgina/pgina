@@ -50,6 +50,7 @@
             this.m_chkScrambleWhenLMFails = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.Help = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_localGroupDgv)).BeginInit();
@@ -275,11 +276,22 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Notification";
             //
+            // Help
+            //
+            this.Help.Location = new System.Drawing.Point(448, 412);
+            this.Help.Name = "Help";
+            this.Help.Size = new System.Drawing.Size(75, 23);
+            this.Help.TabIndex = 6;
+            this.Help.Text = "Help";
+            this.Help.UseVisualStyleBackColor = true;
+            this.Help.Click += new System.EventHandler(this.m_Help_Click);
+            //
             // Configuration
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(720, 447);
+            this.Controls.Add(this.Help);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.m_btnClose);
             this.Controls.Add(this.m_btnSave);
@@ -328,5 +340,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox m_chkScrambleWhenLMFails;
         private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.Button Help;
     }
 }
