@@ -545,13 +545,9 @@ namespace pGina.Plugin.LocalMachine
                 {
                     if (!String.IsNullOrEmpty(userInfo.LoginScript))
                     {
-                        try
+                        if (!Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, userInfo.LoginScript))
                         {
-                            Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, userInfo.LoginScript);
-                        }
-                        catch (Exception ex)
-                        {
-                            m_logger.ErrorFormat("{2} Can't run application {0} because {1}", userInfo.LoginScript, ex.ToString(), userInfo.Username);
+                            m_logger.ErrorFormat("Can't run application {0}", userInfo.LoginScript);
                             Abstractions.WindowsApi.pInvokes.SendMessageToUser(SessionId, "Can't run application", String.Format("I'm unable to run your LoginScript\n{0}", userInfo.LoginScript));
                         }
                     }
