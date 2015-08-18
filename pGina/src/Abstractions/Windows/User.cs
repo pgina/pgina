@@ -192,7 +192,7 @@ namespace Abstractions.Windows
                     if (quota > 0)
                     {
                         key.SetValue("EnableProfileQuota", 1, RegistryValueKind.DWord);
-                        key.SetValue("ProfileQuotaMessage", "\"You have exceeded your profile storage space. Before you can log off, you need to move some items from your profile to network or local storage.\"", RegistryValueKind.String);
+                        //key.SetValue("ProfileQuotaMessage", "You have exceeded your profile storage space. Before you can log off, you need to move some items from your profile to network or local storage.", RegistryValueKind.String);
                         key.SetValue("MaxProfileSize", quota, RegistryValueKind.DWord);
                         key.SetValue("IncludeRegInProQuota", 1, RegistryValueKind.DWord);
                         key.SetValue("WarnUser", 1, RegistryValueKind.DWord);
