@@ -440,15 +440,7 @@ namespace pGina.Plugin.pgSMB2
                 }
 
                 Roaming ro = new Roaming();
-                if (userInfo.Description.Contains(" tmp")) //its a tmp profile do not upload
-                {
-                    m_logger.InfoFormat("{0} has tmp included in his comment \"{1}\" and so the profile is not uploaded", userInfo.Username, userInfo.Description);
-                    if (!ro.DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"])))
-                    {
-                        m_logger.WarnFormat("{1} Can't delete {0}", settings["RoamingDest_real"], userInfo.Username);
-                    }
-                }
-                else // upload the profile
+                if (!userInfo.Description.Contains(" tmp")) //its a tmp profile do not upload
                 {
                     BooleanResult RetBool = ro.put(settings, userInfo.Username, userInfo.Password);
                     if (!RetBool.Success)
