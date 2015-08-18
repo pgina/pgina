@@ -610,5 +610,10 @@ namespace pGina.Plugin.Ldap
                 searchPassTextBox.Enabled = true;
             }
         }
+
+        private void Btn_help(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html");
+        }
     }
 }

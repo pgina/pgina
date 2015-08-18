@@ -101,6 +101,7 @@
             this.tabPageChangePassword = new System.Windows.Forms.TabPage();
             this.label9 = new System.Windows.Forms.Label();
             this.passwordAttributesDGV = new System.Windows.Forms.DataGridView();
+            this.help = new System.Windows.Forms.Button();
             this.ldapServerGroupBox.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.authTabPage.SuspendLayout();
@@ -874,11 +875,22 @@
             this.passwordAttributesDGV.Size = new System.Drawing.Size(648, 238);
             this.passwordAttributesDGV.TabIndex = 0;
             //
+            // help
+            //
+            this.help.Location = new System.Drawing.Point(441, 464);
+            this.help.Name = "help";
+            this.help.Size = new System.Drawing.Size(76, 26);
+            this.help.TabIndex = 7;
+            this.help.Text = "Help";
+            this.help.UseVisualStyleBackColor = true;
+            this.help.Click += new System.EventHandler(this.Btn_help);
+            //
             // Configuration
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(699, 502);
+            this.Controls.Add(this.help);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.ldapServerGroupBox);
@@ -978,5 +990,6 @@
         private System.Windows.Forms.Label AuthFilterLabel;
         private System.Windows.Forms.CheckBox useTlsCheckBox;
         private System.Windows.Forms.CheckBox useAuthBindForAuthzAndGatewayCb;
+        private System.Windows.Forms.Button help;
     }
 }
