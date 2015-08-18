@@ -141,15 +141,6 @@ namespace pGina.Plugin.pgSMB2
                         userDel(settings, username, password);
                         return new BooleanResult() { Success = false, Message = string.Format("Unable to add user {0}", username) };
                     }
-                    if (Directory.Exists(settings["RoamingDest_real"]))
-                    {
-                        DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"]));
-                    }
-                    Roaming ro = new Roaming();
-                    if (!ro.CreateRoamingFolder(settings["RoamingDest_real"], username))
-                    {
-                        return new BooleanResult() { Success = false, Message = string.Format("Unable to create the Roaming folder {0}", settings["RoamingDest_real"]) };
-                    }
                 }
             }
             catch (Exception ex)
@@ -539,8 +530,7 @@ namespace pGina.Plugin.pgSMB2
             }
 
             //fill userinfo
-            if (!String.IsNullOrEmpty(settings["RoamingDest"]))
-                userinfo4.profile = null;// settings["RoamingDest"];
+            userinfo4.profile = null;
             if (!String.IsNullOrEmpty(settings["HomeDir"]))
                 userinfo4.home_dir = settings["HomeDir"];
             if (!String.IsNullOrEmpty(settings["HomeDirDrive"]))
@@ -595,10 +585,6 @@ namespace pGina.Plugin.pgSMB2
             if (!Abstractions.WindowsApi.pInvokes.UserDel(username))
             {
                 m_logger.WarnFormat("Can't delete userAccount {0}", username);
-            }
-            if (Directory.Exists(settings["RoamingDest_real"]))
-            {
-                DirectoryDel(settings["RoamingDest_real"], Convert.ToUInt32(settings["ConnectRetry"]));
             }
 
             return true;

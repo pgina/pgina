@@ -48,7 +48,7 @@ namespace pGina.Plugin.pgSMB2
             string SMBshare_str = Settings.Store.SMBshare;
             string RoamingSource = Settings.Store.RoamingSource;
             string Filename = Settings.Store.Filename;
-            string RoamingDest = Settings.Store.RoamingDest;
+            string TempComp = Settings.Store.TempComp;
             int ConnectRetry = Settings.Store.ConnectRetry;
             string Compressor = Settings.Store.Compressor;
             string UncompressCLI = Settings.Store.UncompressCLI;
@@ -62,7 +62,7 @@ namespace pGina.Plugin.pgSMB2
             this.SMBshare.Text = SMBshare_str;
             this.RoamingSource.Text = RoamingSource;
             this.Filename.Text = Filename;
-            this.RoamingDest.Text = RoamingDest;
+            this.TempComp.Text = TempComp;
             this.ConnectRetry.Value = (uint)ConnectRetry;
             this.Compressor.Text = Compressor;
             this.UncompressCLI.Text = UncompressCLI;
@@ -75,7 +75,7 @@ namespace pGina.Plugin.pgSMB2
             this.ntp.Text = Ntp;
 
             //MessageBox.Show(Environment.CurrentDirectory.ToString());
-            //MessageBox.Show(Environment.ExpandEnvironmentVariables(RoamingDest));
+            //MessageBox.Show(Environment.ExpandEnvironmentVariables(TempComp));
         }
 
 
@@ -90,7 +90,7 @@ namespace pGina.Plugin.pgSMB2
             toolTip1.SetToolTip(this.SMBshare, "The UNC name of the share to connect");
             toolTip1.SetToolTip(this.RoamingSource, "Where to store the compressed profile");
             toolTip1.SetToolTip(this.Filename, "The name of the compressed profile");
-            toolTip1.SetToolTip(this.RoamingDest, "The local path for the extracted Roaming Profile");
+            toolTip1.SetToolTip(this.TempComp, "A local temporarily storage for the compressed Profile");
             toolTip1.SetToolTip(this.ConnectRetry, "How often to retry to connect to the share\n(un)compress the profile");
             toolTip1.SetToolTip(this.Compressor, "The Program to (un)compress the user profile");
             toolTip1.SetToolTip(this.UncompressCLI, "The command to uncompress the profile");
@@ -107,7 +107,7 @@ namespace pGina.Plugin.pgSMB2
             Settings.Store.SMBshare = this.SMBshare.Text.Trim();
             Settings.Store.RoamingSource = this.RoamingSource.Text.Trim();
             Settings.Store.Filename = this.Filename.Text.Trim();
-            Settings.Store.RoamingDest = this.RoamingDest.Text.Trim();
+            Settings.Store.TempComp = this.TempComp.Text.Trim();
             Settings.Store.ConnectRetry = Convert.ToInt32(this.ConnectRetry.Value);
             Settings.Store.Compressor = this.Compressor.Text.Trim();
             Settings.Store.UncompressCLI = this.UncompressCLI.Text.Trim();

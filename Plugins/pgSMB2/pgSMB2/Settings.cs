@@ -42,7 +42,7 @@ namespace pGina.Plugin.pgSMB2
             m_settings.SetDefault("SMBshare", @"\\server.my.domain.com\%u");
             m_settings.SetDefault("RoamingSource", @"%s\profile" );
             m_settings.SetDefault("Filename", @"%u.wim" );
-            m_settings.SetDefault("RoamingDest", @"%PUBLIC%\%u" );
+            m_settings.SetDefault("TempComp", @"%PUBLIC%" );
             m_settings.SetDefault("ConnectRetry", 3);
             m_settings.SetDefault("Compressor", @"imagex.exe" );
             m_settings.SetDefault("UncompressCLI", @"/APPLY ""%r\%f"" 1 ""%d""");

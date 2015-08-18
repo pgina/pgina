@@ -155,8 +155,7 @@ namespace pGina.Plugin.pgSMB2
 
             string[,] array = new string[,]
             {
-                {"RoamingDest", Settings.Store.RoamingDest.ToString()},
-                {"RoamingDest_real", (Environment.OSVersion.Version.Major == 6) ? (verinfo.dwMinorVersion > 3)/*greater than 8.1*/ ? Settings.Store.RoamingDest.ToString()+".V5" : Settings.Store.RoamingDest.ToString()+".V2" : Settings.Store.RoamingDest.ToString() },
+                {"TempComp", Settings.Store.TempComp.ToString()},
                 {"Filename", (!String.IsNullOrEmpty(userInfo.pgSMB_Filename)) ? userInfo.pgSMB_Filename : Settings.Store.Filename.ToString()},
                 {"SMBshare", (!String.IsNullOrEmpty(userInfo.pgSMB_SMBshare)) ? userInfo.pgSMB_SMBshare : Settings.Store.SMBshare.ToString()},
                 {"RoamingSource", (!String.IsNullOrEmpty(userInfo.usri4_profile)) ? userInfo.usri4_profile : Settings.Store.RoamingSource.ToString()},
@@ -201,7 +200,7 @@ namespace pGina.Plugin.pgSMB2
                     settings[key] = settings[key].Replace("%f", settings["Filename"]);
                     settings[key] = settings[key].Replace("%s", settings["SMBshare"]);
                     settings[key] = settings[key].Replace("%r", settings["RoamingSource"]);
-                    settings[key] = settings[key].Replace("%d", settings["RoamingDest_real"]);
+                    settings[key] = settings[key].Replace("%d", settings["TempComp"]);
                 }
             }
 

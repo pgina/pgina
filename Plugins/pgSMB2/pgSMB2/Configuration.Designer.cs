@@ -77,8 +77,8 @@ namespace pGina.Plugin.pgSMB2
             this.Compressor_label = new System.Windows.Forms.Label();
             this.ConnectRetry_label = new System.Windows.Forms.Label();
             this.ConnectRetry = new System.Windows.Forms.NumericUpDown();
-            this.RoamingDest_label = new System.Windows.Forms.Label();
-            this.RoamingDest = new System.Windows.Forms.TextBox();
+            this.TempComp_label = new System.Windows.Forms.Label();
+            this.TempComp = new System.Windows.Forms.TextBox();
             this.Filename_label = new System.Windows.Forms.Label();
             this.Filename = new System.Windows.Forms.TextBox();
             this.RoamingSource_label = new System.Windows.Forms.Label();
@@ -245,8 +245,8 @@ namespace pGina.Plugin.pgSMB2
             this.Roaming_group.Controls.Add(this.Compressor_label);
             this.Roaming_group.Controls.Add(this.ConnectRetry_label);
             this.Roaming_group.Controls.Add(this.ConnectRetry);
-            this.Roaming_group.Controls.Add(this.RoamingDest_label);
-            this.Roaming_group.Controls.Add(this.RoamingDest);
+            this.Roaming_group.Controls.Add(this.TempComp_label);
+            this.Roaming_group.Controls.Add(this.TempComp);
             this.Roaming_group.Controls.Add(this.Filename_label);
             this.Roaming_group.Controls.Add(this.Filename);
             this.Roaming_group.Controls.Add(this.RoamingSource_label);
@@ -342,22 +342,22 @@ namespace pGina.Plugin.pgSMB2
             0,
             0});
             //
-            // RoamingDest_label
+            // TempComp_label
             //
-            this.RoamingDest_label.AutoSize = true;
-            this.RoamingDest_label.Location = new System.Drawing.Point(3, 134);
-            this.RoamingDest_label.Name = "RoamingDest_label";
-            this.RoamingDest_label.Size = new System.Drawing.Size(226, 13);
-            this.RoamingDest_label.TabIndex = 10;
-            this.RoamingDest_label.Text = "Where to extract the Profile (RoamingDest) %d";
+            this.TempComp_label.AutoSize = true;
+            this.TempComp_label.Location = new System.Drawing.Point(3, 134);
+            this.TempComp_label.Name = "TempComp_label";
+            this.TempComp_label.Size = new System.Drawing.Size(226, 13);
+            this.TempComp_label.TabIndex = 10;
+            this.TempComp_label.Text = "Where temporarily store the compressed profile (TempComp) %d";
             //
-            // RoamingDest
+            // TempComp
             //
-            this.RoamingDest.Location = new System.Drawing.Point(6, 150);
-            this.RoamingDest.Name = "RoamingDest";
-            this.RoamingDest.Size = new System.Drawing.Size(315, 20);
-            this.RoamingDest.TabIndex = 9;
-            this.RoamingDest.WordWrap = false;
+            this.TempComp.Location = new System.Drawing.Point(6, 150);
+            this.TempComp.Name = "TempComp";
+            this.TempComp.Size = new System.Drawing.Size(315, 20);
+            this.TempComp.TabIndex = 9;
+            this.TempComp.WordWrap = false;
             //
             // Filename_label
             //
@@ -472,8 +472,8 @@ namespace pGina.Plugin.pgSMB2
         private System.Windows.Forms.GroupBox User_group;
         private System.Windows.Forms.Label ConnectRetry_label;
         private System.Windows.Forms.NumericUpDown ConnectRetry;
-        private System.Windows.Forms.Label RoamingDest_label;
-        private System.Windows.Forms.TextBox RoamingDest;
+        private System.Windows.Forms.Label TempComp_label;
+        private System.Windows.Forms.TextBox TempComp;
         private System.Windows.Forms.Label Filename_label;
         private System.Windows.Forms.TextBox Filename;
         private System.Windows.Forms.Label RoamingSource_label;
