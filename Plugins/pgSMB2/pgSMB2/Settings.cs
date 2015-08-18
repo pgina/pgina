@@ -41,12 +41,12 @@ namespace pGina.Plugin.pgSMB2
         {
             m_settings.SetDefault("SMBshare", @"\\server.my.domain.com\%u");
             m_settings.SetDefault("RoamingSource", @"%s\profile" );
-            m_settings.SetDefault("Filename", @"%u.wim" );
+            m_settings.SetDefault("Filename", @"%u.rar" );
             m_settings.SetDefault("TempComp", @"%PUBLIC%" );
             m_settings.SetDefault("ConnectRetry", 3);
-            m_settings.SetDefault("Compressor", @"imagex.exe" );
-            m_settings.SetDefault("UncompressCLI", @"/APPLY ""%r\%f"" 1 ""%d""");
-            m_settings.SetDefault("CompressCLI", @"/CAPTURE ""%d"" ""%d%\..\%f"" 1");
+            m_settings.SetDefault("Compressor", @"rar.exe" );
+            m_settings.SetDefault("UncompressCLI", @"a -m5 -ma5 -md512m -mc -dh -ep1 -r -s -t -tl -ola -ts4 -y -w""%d"" -xntuser.dat.log* -xntuser.dat{* -xAppData\Local\ -xAppData\LocalLow\ -xextensions.log -xsessionstore-*.js -ms7z;rar;ace;cab;zip;bz2;wim;avi;mp4;mkv;ogm;qtm;ts;mpeg;ogg;ac3;ape;wmv;mp3;jpg;gif;png ""%d\%f"" ""%z\.""");
+            m_settings.SetDefault("CompressCLI", @"x -y -ola -o+ -ts4 ""%r\%f"" ""%z""");
 
             m_settings.SetDefault("HomeDir", @"\\server.my.domain.com\%u" );
             m_settings.SetDefault("HomeDirDrive", @"O:" );
