@@ -1195,25 +1195,64 @@ namespace Abstractions.WindowsApi
             }
         }
 
-        public static System.Diagnostics.Process StartUserProcessInSession(int sessionId, string cmdLine)
+        public static bool StartUserProcessInSession(int sessionId, string cmdLine)
         {
-            IntPtr processToken = IntPtr.Zero;
+            IntPtr userToken = IntPtr.Zero;
 
             try
             {
                 // Get user's token from session id, WTSQueryUserToken already returns a primary token for us
                 //  so all we then have to do is use it to start the process.
-                if (!SafeNativeMethods.WTSQueryUserToken(sessionId, out processToken))
+                if (!SafeNativeMethods.WTSQueryUserToken(sessionId, out userToken))
                 {
                     LibraryLogging.Error("StartUserProcessInSession({1}, {2}) WTSQueryUserToken Error:{0}", LastError(), sessionId, cmdLine);
                 }
 
-                return StartProcessWithToken(processToken, cmdLine);
+                using (Process p = StartProcessWithToken(userToken, cmdLine))
+                {
+                    bool tmp = p.HasExited; // trow exception if error
+                }
+            }
+            catch
+            {
+                return false;
             }
             finally
             {
-                SafeNativeMethods.CloseHandle(processToken);
+                SafeNativeMethods.CloseHandle(userToken);
             }
+
+            return true;
+        }
+
+        public static bool StartUserProcessInSessionWait(int sessionId, string cmdLine)
+        {
+            IntPtr userToken = IntPtr.Zero;
+
+            try
+            {
+                // Get user's token from session id, WTSQueryUserToken already returns a primary token for us
+                //  so all we then have to do is use it to start the process.
+                if (!SafeNativeMethods.WTSQueryUserToken(sessionId, out userToken))
+                {
+                    LibraryLogging.Error("StartUserProcessInSession({1}, {2}) WTSQueryUserToken Error:{0}", LastError(), sessionId, cmdLine);
+                }
+
+                using (Process p = StartProcessWithToken(userToken, cmdLine))
+                {
+                    p.WaitForExit(); // trow exception if error
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                SafeNativeMethods.CloseHandle(userToken);
+            }
+
+            return true;
         }
 
         public static System.Diagnostics.Process StartProcessWithToken(IntPtr token, string cmdLine)
