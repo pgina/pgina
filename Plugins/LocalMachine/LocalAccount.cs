@@ -752,7 +752,7 @@ namespace pGina.Plugin.LocalMachine
                 m_logger.WarnFormat("Can't load regfile {0}", userInfo.usri4_profile + ProfileExtension/*.V2|.V5*/ + "\\NTUSER.DAT");
                 return false;
             }
-            if (!Abstractions.Windows.Security.RegSec(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, userInfo.Username))
+            if (!Abstractions.Windows.Security.RegSec(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE, userInfo.Username, userInfo.Username))
             {
                 m_logger.WarnFormat("Can't set ACL for regkey {0}\\{1}", Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_LOCAL_MACHINE.ToString(), userInfo.Username);
                 return false;
