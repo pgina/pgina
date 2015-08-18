@@ -88,6 +88,25 @@ namespace pGina.Plugin.LocalMachine
             MaskGatewayUi();
         }
 
+        private void Form_Load(object sender, EventArgs e)
+        {
+            ToolTip toolTip1 = new ToolTip();
+            toolTip1.AutoPopDelay = 10000;
+            toolTip1.InitialDelay = 0;
+            toolTip1.ReshowDelay = 0;
+            toolTip1.ShowAlways = true;
+
+            toolTip1.SetToolTip(this.m_chkAlwaysAuth, "When this is checked, the plugin will always attempt to authenticate the user against a local account. If this is not checked, the plugin will only attempt to authenticate when the user has not already been authenticated by a plugin that has executed earlier within the authentication stage.");
+            toolTip1.SetToolTip(this.m_chkMirror, "Load all groups from the local account into the pGina user information store so that the LocalMachineâ€™s Gateway stage (and other subsequent plugins) will see that the user should be a member of those groups.");
+            toolTip1.SetToolTip(this.m_chkAuthzAll, "When this is checked, the plugin will attempt to authorize all users. Otherwise, the plugin will only authorize users that were authenticated successfully by this plugin.");
+            toolTip1.SetToolTip(this.m_chkAuthzLocalAdmin, "Only authorize users that are members of the Administrators group.");
+            toolTip1.SetToolTip(this.m_chkAuthzRequireLocal, "Only authorize users that are members of one of the groups listed below this checkbox");
+            toolTip1.SetToolTip(this.m_chkGroupFailIsFAIL, "hen this is checked, the plugin will register failure if it is unable to create or join the local groups that are requested.");
+            toolTip1.SetToolTip(this.m_groupsDgv, "The local account is added to these local groups if not already a member");
+            toolTip1.SetToolTip(this.m_chkRemoveProfile, "When this is selected, the plugin will attempt to remove the account and its profile after logout when the account did not exist prior to logon.");
+            toolTip1.SetToolTip(this.m_chkScramble, "When this is checked, the plugin will attempt to scramble the password of the local account after logout");
+        }
+
         public void UiToSettings()
         {
             Settings.Store.AlwaysAuthenticate = m_chkAlwaysAuth.Checked;

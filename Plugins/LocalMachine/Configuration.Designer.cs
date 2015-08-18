@@ -280,6 +280,7 @@
             this.Controls.Add(this.groupBox1);
             this.Name = "Configuration";
             this.Text = "LocalMachine Plugin Configuration";
+            this.Load += new System.EventHandler(this.Form_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
