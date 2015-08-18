@@ -124,7 +124,9 @@ namespace pGina.Plugin.pgSMB
             this.Description.Name = "Description";
             this.Description.Size = new System.Drawing.Size(257, 26);
             this.Description.TabIndex = 4;
-            this.Description.Text = "Macro %u = UserName\r\nany other Environment Varaiable will also be resolved";
+            this.Description.Text = "Macros:\r\n" +
+                                    "  %u = UserName\r\n" +
+                                    "  any other Environment Varaiable will also be resolved";
             //
             // ntp_label
             //
