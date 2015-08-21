@@ -35,6 +35,7 @@ using Microsoft.Win32;
 using System.Diagnostics;
 using System.Threading;
 using System.Net;
+using System.Text.RegularExpressions;
 
 using Abstractions;
 using pGina.Shared.Types;
@@ -182,6 +183,29 @@ namespace pGina.Plugin.pgSMB2
         {
             int ret_code = -1;
 
+            string uPath = GetExistingUserProfile(username, password);
+            if (!File.Exists(uPath + "\\NTUSER.DAT"))
+            {
+                m_logger.ErrorFormat("Unable to find \"{0}\"", uPath + "\\NTUSER.DAT");
+                return false;
+            }
+
+            if (!settings["MaxStore"].Equals("0"))
+            {
+                long uPath_size = GetDirectorySize(uPath, @".*(\\AppData\\)(Local|LocalLow)$");
+                if (uPath_size == 0)
+                {
+                    m_logger.ErrorFormat("User directory:{0} size returned:0", uPath);
+                    return false;
+                }
+                uPath_size = Convert.ToInt64(uPath_size / 1024);
+                if (uPath_size > Convert.ToInt64(settings["MaxStore"]))
+                {
+                    m_logger.ErrorFormat("User directory:{0} MaxStore:{1} kbyte exceeded:{2} kbyte", uPath, Convert.ToInt64(settings["MaxStore"]), uPath_size);
+                    return false;
+                }
+            }
+
             //crappy windows cant open 2 connection to the same server
             //we need to fool win to think the server is a different one
             //simply by using IP or FQDN
@@ -214,13 +238,6 @@ namespace pGina.Plugin.pgSMB2
                 {
                     m_logger.InfoFormat("can't fool windows to think {0} is a different server. I will try to continue but the upload my fail with System Error 1219", server[0]);
                 }
-            }
-
-            string uPath = GetExistingUserProfile(username, password);
-            if (!File.Exists(uPath + "\\NTUSER.DAT"))
-            {
-                m_logger.ErrorFormat("Unable to find \"{0}\"", uPath + "\\NTUSER.DAT");
-                return false;
             }
 
             for (uint x = 0; x < Convert.ToUInt32(settings["ConnectRetry"]); x++)
@@ -965,6 +982,61 @@ namespace pGina.Plugin.pgSMB2
             }
 
             return ret.TrimEnd();
+        }
+        private List<string> GetDirectories(string d, string exclude)
+        {
+            List<string> ret = new List<string>();
+
+            try
+            {
+                string[] dirs = Directory.GetDirectories(d, "*", System.IO.SearchOption.TopDirectoryOnly);
+                foreach (string dir in dirs)
+                {
+                    DirectoryInfo dirInfo = new DirectoryInfo(dir);
+                    if (!dirInfo.Attributes.HasFlag(FileAttributes.ReparsePoint))
+                    {
+                        if (!Regex.IsMatch(dir, exclude))
+                        {
+                            ret.Add(dir);
+                            ret.AddRange(GetDirectories(dir, exclude));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.ErrorFormat("GetDirectories() error:", ex.Message);
+            }
+
+            return ret;
+        }
+
+        private long GetDirectorySize(string d, string exclude)
+        {
+            List<string> dirs = new List<string>() { d };
+            dirs.AddRange(GetDirectories(d, exclude));
+            List<string> filesL = new List<string>();
+
+            long ret = 0;
+
+            try
+            {
+                foreach (string dir in dirs)
+                {
+                    //Console.WriteLine("dir:{0}", dir);
+                    string[] files = Directory.GetFiles(dir, "*", System.IO.SearchOption.TopDirectoryOnly);
+                    foreach (string file in files)
+                    {
+                        ret += new FileInfo(file).Length;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.ErrorFormat("GetDirectorySize() error:", ex.Message);
+            }
+
+            return ret;
         }
     }
 }
