@@ -104,6 +104,7 @@
             this.gtwRuleConditionCB = new System.Windows.Forms.ComboBox();
             this.tabPage6 = new System.Windows.Forms.TabPage();
             this.m_preventLogonWhenServerUnreachableCb = new System.Windows.Forms.CheckBox();
+            this.helpButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.tabControlDBSchema.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -874,11 +875,22 @@
             this.m_preventLogonWhenServerUnreachableCb.Text = "Prevent logon on server error.";
             this.m_preventLogonWhenServerUnreachableCb.UseVisualStyleBackColor = true;
             //
+            // helpButton
+            //
+            this.helpButton.Location = new System.Drawing.Point(269, 317);
+            this.helpButton.Name = "helpButton";
+            this.helpButton.Size = new System.Drawing.Size(98, 25);
+            this.helpButton.TabIndex = 17;
+            this.helpButton.Text = "help";
+            this.helpButton.UseVisualStyleBackColor = true;
+            this.helpButton.Click += new System.EventHandler(this.btnhelp);
+            //
             // Configuration
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(574, 352);
+            this.Controls.Add(this.helpButton);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.testBtn);
             this.Controls.Add(this.createTableBtn);
@@ -990,5 +1002,6 @@
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.TabPage tabPage6;
         private System.Windows.Forms.CheckBox m_preventLogonWhenServerUnreachableCb;
+        private System.Windows.Forms.Button helpButton;
     }
 }

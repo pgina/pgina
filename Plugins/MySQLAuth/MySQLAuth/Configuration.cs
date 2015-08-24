@@ -647,5 +647,10 @@ namespace pGina.Plugin.MySQLAuth
                 this.listBoxAuthzRules.SelectedIndex = idx + 1;
             }
         }
+
+        private void btnhelp(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation/plugins/mysql_auth.html");
+        }
     }
 }
