@@ -129,5 +129,9 @@ namespace pGina.Plugin.Email
                 portTextBox.Text = (sslCheckBox.Checked ? imapSslPort : imapPort);
         }
 
+        private void Btn_help(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation/plugins/email_auth.html");
+        }
     }
 }

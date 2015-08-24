@@ -45,6 +45,7 @@
             this.domainAppendCheckBox = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.tbTimeout = new System.Windows.Forms.TextBox();
+            this.btnhelp = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -218,12 +219,23 @@
             this.tbTimeout.Size = new System.Drawing.Size(91, 20);
             this.tbTimeout.TabIndex = 15;
             //
+            // btnhelp
+            //
+            this.btnhelp.Location = new System.Drawing.Point(57, 164);
+            this.btnhelp.Name = "btnhelp";
+            this.btnhelp.Size = new System.Drawing.Size(75, 23);
+            this.btnhelp.TabIndex = 16;
+            this.btnhelp.Text = "Help";
+            this.btnhelp.UseVisualStyleBackColor = true;
+            this.btnhelp.Click += new System.EventHandler(this.Btn_help);
+            //
             // Configuration
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(306, 202);
             this.ControlBox = false;
+            this.Controls.Add(this.btnhelp);
             this.Controls.Add(this.tbTimeout);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.groupBox2);
@@ -268,5 +280,6 @@
         private System.Windows.Forms.Label domainLabel;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox tbTimeout;
+        private System.Windows.Forms.Button btnhelp;
     }
 }
