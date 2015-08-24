@@ -63,6 +63,7 @@
             this.sessionModeCB = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.sessionTableTB = new System.Windows.Forms.TextBox();
+            this.helpBtn = new System.Windows.Forms.Button();
             this.eventsBox.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.optionsBox.SuspendLayout();
@@ -418,12 +419,22 @@
             this.sessionTableTB.Size = new System.Drawing.Size(307, 20);
             this.sessionTableTB.TabIndex = 4;
             //
+            // helpBtn
+            //
+            this.helpBtn.Location = new System.Drawing.Point(278, 394);
+            this.helpBtn.Name = "helpBtn";
+            this.helpBtn.Size = new System.Drawing.Size(70, 28);
+            this.helpBtn.TabIndex = 8;
+            this.helpBtn.Text = "Help";
+            this.helpBtn.UseVisualStyleBackColor = true;
+            //
             // Configuration
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(512, 437);
             this.ControlBox = false;
+            this.Controls.Add(this.helpBtn);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.optionsBox);
             this.Controls.Add(this.groupBox2);
@@ -437,6 +448,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.Text = "MySQL Logger Plugin Configuration";
+            this.Click += new System.EventHandler(this.Btn_help);
             this.eventsBox.ResumeLayout(false);
             this.eventsBox.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -486,5 +498,6 @@
         private System.Windows.Forms.CheckBox eventModeCB;
         private System.Windows.Forms.TextBox sessionTableTB;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button helpBtn;
     }
 }

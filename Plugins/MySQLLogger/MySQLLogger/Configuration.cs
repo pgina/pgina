@@ -248,7 +248,9 @@ namespace pGina.Plugin.MySqlLogger
             updateUIOnModeChange();
         }
 
-
-
+        private void Btn_help(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation/plugins/mysql_logger.html");
+        }
     }
 }
