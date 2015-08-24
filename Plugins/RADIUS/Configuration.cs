@@ -178,6 +178,11 @@ namespace pGina.Plugin.RADIUS
 
         }
 
+        private void Btn_help(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation/plugins/radius.html");
+        }
+
         //Converts value to int, or returns default value.
         /*private int stoi(Object o, int def = 0)
         {

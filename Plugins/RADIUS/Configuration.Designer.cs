@@ -67,6 +67,7 @@
             this.enableAcctCB = new System.Windows.Forms.CheckBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.acctingForAllUsersCB = new System.Windows.Forms.CheckBox();
+            this.btnHelp = new System.Windows.Forms.Button();
             this.authGB.SuspendLayout();
             this.acctGB.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -448,11 +449,22 @@
             this.acctingForAllUsersCB.Text = "Perform accounting for non-RADIUS users";
             this.acctingForAllUsersCB.UseVisualStyleBackColor = true;
             //
+            // btnHelp
+            //
+            this.btnHelp.Location = new System.Drawing.Point(215, 471);
+            this.btnHelp.Name = "btnHelp";
+            this.btnHelp.Size = new System.Drawing.Size(75, 23);
+            this.btnHelp.TabIndex = 26;
+            this.btnHelp.Text = "Help";
+            this.btnHelp.UseVisualStyleBackColor = true;
+            this.btnHelp.Click += new System.EventHandler(this.Btn_help);
+            //
             // Configuration
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(464, 506);
+            this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label10);
@@ -523,5 +535,6 @@
         private System.Windows.Forms.TextBox forceInterimUpdTB;
         private System.Windows.Forms.CheckBox forceInterimUpdCB;
         private System.Windows.Forms.CheckBox acctingForAllUsersCB;
+        private System.Windows.Forms.Button btnHelp;
     }
 }
