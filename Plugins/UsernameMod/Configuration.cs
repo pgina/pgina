@@ -261,5 +261,10 @@ namespace pGina.Plugin.UsernameMod
                 rulesListView.Items.Add(lvi);
             }
         }
+
+        private void Btn_help(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation/plugins/username_mod.html");
+        }
     }
 }

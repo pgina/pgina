@@ -51,6 +51,7 @@ namespace pGina.Plugin.UsernameMod
             this.upButton = new System.Windows.Forms.Button();
             this.rulesHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.rulesListView = new System.Windows.Forms.ListView();
+            this.btnHelp = new System.Windows.Forms.Button();
             label2 = new System.Windows.Forms.Label();
             this.groupBox2.SuspendLayout();
             this.flowLayoutPanel2.SuspendLayout();
@@ -69,7 +70,7 @@ namespace pGina.Plugin.UsernameMod
             //
             // btnOk
             //
-            this.btnOk.Location = new System.Drawing.Point(207, 402);
+            this.btnOk.Location = new System.Drawing.Point(202, 402);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(71, 23);
             this.btnOk.TabIndex = 3;
@@ -270,11 +271,22 @@ namespace pGina.Plugin.UsernameMod
             this.rulesListView.UseCompatibleStateImageBehavior = false;
             this.rulesListView.View = System.Windows.Forms.View.Details;
             //
+            // btnHelp
+            //
+            this.btnHelp.Location = new System.Drawing.Point(125, 402);
+            this.btnHelp.Name = "btnHelp";
+            this.btnHelp.Size = new System.Drawing.Size(71, 23);
+            this.btnHelp.TabIndex = 16;
+            this.btnHelp.Text = "Help";
+            this.btnHelp.UseVisualStyleBackColor = true;
+            this.btnHelp.Click += new System.EventHandler(this.Btn_help);
+            //
             // Configuration
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(372, 427);
+            this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.btnCancel);
@@ -282,6 +294,7 @@ namespace pGina.Plugin.UsernameMod
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "Configuration";
             this.Text = "Modify Username Plugin Configuration";
+            this.Load += new System.EventHandler(this.Configuration_Load);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.flowLayoutPanel2.ResumeLayout(false);
@@ -315,5 +328,6 @@ namespace pGina.Plugin.UsernameMod
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private ListView rulesListView;
         private ColumnHeader rulesHeader;
+        private Button btnHelp;
     }
 }
