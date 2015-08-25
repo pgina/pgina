@@ -13,7 +13,7 @@ namespace pGina.Plugin.HttpAuth
     public class HttpAccessor
     {
         static Dictionary<string, UInfo> resps = new Dictionary<string, UInfo>();
-        private static ILog s_logger = LogManager.GetLogger("HttpAuthAccessor");    
+        private static ILog s_logger = LogManager.GetLogger("HttpAuthAccessor");
         private static string loginServer;
 
         static HttpAccessor()
@@ -153,6 +153,6 @@ namespace pGina.Plugin.HttpAuth
             }
             resps.TryGetValue(uname, out uinfo);
         }
-        
+
     }
 }

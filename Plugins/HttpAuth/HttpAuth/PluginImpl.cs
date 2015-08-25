@@ -33,7 +33,7 @@ namespace pGina.Plugin.HttpAuth
                 }
                 else
                 {
-                    return new BooleanResult() { 
+                    return new BooleanResult() {
                         Success = false, Message = uinfo.whyCannotLogin
                     };
                 }
