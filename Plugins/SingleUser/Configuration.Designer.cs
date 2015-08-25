@@ -42,6 +42,7 @@
             this.anyRB = new System.Windows.Forms.RadioButton();
             this.allRB = new System.Windows.Forms.RadioButton();
             this.label4 = new System.Windows.Forms.Label();
+            this.btnHelp = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.m_dgv)).BeginInit();
             this.SuspendLayout();
             //
@@ -174,11 +175,21 @@
             this.label4.TabIndex = 16;
             this.label4.Text = "of the following plugins have successfully authenticated.";
             //
+            // btnHelp
+            //
+            this.btnHelp.Location = new System.Drawing.Point(233, 262);
+            this.btnHelp.Name = "btnHelp";
+            this.btnHelp.Size = new System.Drawing.Size(75, 23);
+            this.btnHelp.TabIndex = 17;
+            this.btnHelp.Text = "Help";
+            this.btnHelp.UseVisualStyleBackColor = true;
+            //
             // Configuration
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(482, 297);
+            this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.allRB);
             this.Controls.Add(this.anyRB);
@@ -194,6 +205,7 @@
             this.Controls.Add(this.btnOk);
             this.Name = "Configuration";
             this.Text = "Single User Login Plugin Configuration";
+            this.Click += new System.EventHandler(this.Btn_help);
             ((System.ComponentModel.ISupportInitialize)(this.m_dgv)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -216,5 +228,6 @@
         private System.Windows.Forms.RadioButton anyRB;
         private System.Windows.Forms.RadioButton allRB;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button btnHelp;
     }
 }

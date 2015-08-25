@@ -86,5 +86,10 @@ namespace pGina.Plugin.SingleUser
             allRB.Enabled = substituteCB.Checked;
             m_dgv.Enabled = substituteCB.Checked;
         }
+
+        private void Btn_help(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation/plugins/single_user.html");
+        }
     }
 }
