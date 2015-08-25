@@ -33,6 +33,7 @@
             this.save = new System.Windows.Forms.Button();
             this.description = new System.Windows.Forms.Label();
             this.cancel = new System.Windows.Forms.Button();
+            this.help = new System.Windows.Forms.Button();
             this.SuspendLayout();
             //
             // label1
@@ -79,11 +80,21 @@
             this.cancel.UseVisualStyleBackColor = true;
             this.cancel.Click += new System.EventHandler(this.cancel_Click);
             //
+            // help
+            //
+            this.help.Location = new System.Drawing.Point(23, 94);
+            this.help.Name = "help";
+            this.help.Size = new System.Drawing.Size(75, 23);
+            this.help.TabIndex = 5;
+            this.help.Text = "Help";
+            this.help.UseVisualStyleBackColor = true;
+            //
             // Configuration
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(269, 129);
+            this.Controls.Add(this.help);
             this.Controls.Add(this.cancel);
             this.Controls.Add(this.description);
             this.Controls.Add(this.save);
@@ -91,6 +102,7 @@
             this.Controls.Add(this.label1);
             this.Name = "Configuration";
             this.Text = "KRB5 Realm Configuration";
+            this.Click += new System.EventHandler(this.Btn_help);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -103,5 +115,6 @@
         private System.Windows.Forms.Button save;
         private System.Windows.Forms.Label description;
         private System.Windows.Forms.Button cancel;
+        private System.Windows.Forms.Button help;
     }
 }

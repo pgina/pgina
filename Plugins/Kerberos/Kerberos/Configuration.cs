@@ -39,5 +39,10 @@ namespace pGina.Plugin.Kerberos
         {
             this.Close();
         }
+
+        private void Btn_help(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation/plugins/kerberos.html");
+        }
     }
 }
