@@ -33,6 +33,7 @@
             this.globalLimitTB = new System.Windows.Forms.TextBox();
             this.globalLimitLbl = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.helpButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             //
             // saveButton
@@ -80,11 +81,21 @@
             this.label1.TabIndex = 4;
             this.label1.Text = "A value of 0 means sessions will not be logged off.";
             //
+            // helpButton
+            //
+            this.helpButton.Location = new System.Drawing.Point(53, 100);
+            this.helpButton.Name = "helpButton";
+            this.helpButton.Size = new System.Drawing.Size(81, 26);
+            this.helpButton.TabIndex = 5;
+            this.helpButton.Text = "Help";
+            this.helpButton.UseVisualStyleBackColor = true;
+            //
             // Configuration
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(320, 138);
+            this.Controls.Add(this.helpButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.globalLimitLbl);
             this.Controls.Add(this.globalLimitTB);
@@ -92,6 +103,7 @@
             this.Controls.Add(this.saveButton);
             this.Name = "Configuration";
             this.Text = "Session Limit Plugin Configuration";
+            this.Click += new System.EventHandler(this.Btn_help);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -104,5 +116,6 @@
         private System.Windows.Forms.TextBox globalLimitTB;
         private System.Windows.Forms.Label globalLimitLbl;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button helpButton;
     }
 }
