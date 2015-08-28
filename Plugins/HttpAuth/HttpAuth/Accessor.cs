@@ -45,7 +45,7 @@ namespace pGina.Plugin.HttpAuth
         private static string _urlByEnvVar() {
             try
             {
-                return Environment.GetEnvironmentVariable("PGINALOGINSERVER");
+                return Settings.Store.Loginserver;
             }
             catch (Exception)
             {
