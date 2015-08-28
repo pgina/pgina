@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using pGina.Shared.Types;
 using System.IO;
-using log4net;
 using System.Collections;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+
+using pGina.Shared.Types;
+using log4net;
 
 namespace pGina.Plugin.HttpAuth
 {
     public class HttpAccessor
     {
-        static Dictionary<string, UInfo> resps = new Dictionary<string, UInfo>();
-        private static ILog s_logger = LogManager.GetLogger("HttpAuthAccessor");
+        private static Dictionary<string, UInfo> resps = new Dictionary<string, UInfo>();
+        private static ILog m_logger = LogManager.GetLogger("HttpAuthAccessor");
         private static string loginServer;
 
         static HttpAccessor()
@@ -35,7 +36,7 @@ namespace pGina.Plugin.HttpAuth
                 }
                 catch (Exception dnsex)
                 {
-                    s_logger.ErrorFormat("Response: {0}", dnsex.ToString());
+                    m_logger.ErrorFormat("Response: {0}", dnsex.ToString());
                     loginServer = "http://pginaloginserver/login";
                 }
             }
@@ -82,77 +83,81 @@ namespace pGina.Plugin.HttpAuth
             return txtRecords;
         }
 
-
         public static BooleanResult getResponse(String uname, String pwd)
         {
-            var cli = new WebClient();
-            cli.Headers[HttpRequestHeader.ContentType] = "application/json";
-            var data = "{\"username\":\"" + uname + "\",\"password\":\"" + pwd + "\"}";
-
-            try
+            using (WebClient cli = new WebClient())
             {
-                string response = cli.UploadString(loginServer, data);
+                cli.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string data = "{\"username\":\"" + uname + "\",\"password\":\"" + pwd + "\"}";
 
-                s_logger.InfoFormat("Response: {0}", response);
-
-                // save it for later use
-                if(resps.ContainsKey(uname))
+                try
                 {
-                    resps.Remove(uname);
-                }
-                resps.Add(uname, UInfo.parseResponse(response));
+                    string response = cli.UploadString(loginServer, data);
 
-                // Successful authentication
-                return new BooleanResult() { Success = true };
-            }
-            catch (WebException we)
-            {
-                s_logger.ErrorFormat("Bad Response: {0}", we.ToString());
+                    m_logger.InfoFormat("Response: {0}", response);
 
-                // Authentication failure
-                HttpWebResponse res = (HttpWebResponse)we.Response;
-                string m;
-
-                if (res != null)
-                {
-                    var resReader = new StreamReader(res.GetResponseStream());
-                    var responseBody = resReader.ReadLine();
-                    if (responseBody.Length > 0)
+                    // save it for later use
+                    if (resps.ContainsKey(uname))
                     {
-                        m = responseBody;
+                        resps.Remove(uname);
                     }
-                    else
-                    {
-                        m = res.StatusCode + ": " + res.StatusDescription;
-                    }
-                }
-                else
-                {
-                    m = we.ToString();
-                }
+                    resps.Add(uname, UInfo.parseResponse(response));
 
-                return new BooleanResult() { Success = false, Message = m };
-            }
-            catch (Exception e)
-            {
-                // very bad scenario
-                return new BooleanResult() { Success = false, Message = e.StackTrace };
+                    // Successful authentication
+                    return new BooleanResult() { Success = true };
+                }
+                catch (WebException we)
+                {
+                    m_logger.ErrorFormat("Bad Response: {0}", we.ToString());
+                    string m;
+
+                    // Authentication failure
+                    using (HttpWebResponse res = (HttpWebResponse)we.Response)
+                    {
+
+                        if (res != null)
+                        {
+                            using (StreamReader resReader = new StreamReader(res.GetResponseStream()))
+                            {
+                                string responseBody = resReader.ReadLine();
+                                if (responseBody.Length > 0)
+                                {
+                                    m = responseBody;
+                                }
+                                else
+                                {
+                                    m = res.StatusCode + ": " + res.StatusDescription;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            m = we.ToString();
+                        }
+                    }
+
+                    return new BooleanResult() { Success = false, Message = m };
+                }
+                catch (Exception e)
+                {
+                    // very bad scenario
+                    return new BooleanResult() { Success = false, Message = e.StackTrace };
+                }
             }
         }
 
-        public static void getUserInfo(String uname, String pwd, out UInfo uinfo)
+        public static BooleanResult getUserInfo(String uname, String pwd, out UInfo uinfo)
         {
+            BooleanResult ret = new BooleanResult() { Success = false, Message = "" };
+
             if (! resps.ContainsKey(uname))
             {
                 // wee need to getResponse first
-                BooleanResult res = getResponse(uname, pwd);
-                if (! res.Success)
-                {
-                    throw new Exception(res.Message);
-                }
+                ret = getResponse(uname, pwd);
             }
             resps.TryGetValue(uname, out uinfo);
-        }
 
+            return ret;
+        }
     }
 }

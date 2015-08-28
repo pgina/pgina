@@ -1,14 +1,65 @@
 ﻿using System;
-using log4net;
+using System.DirectoryServices.AccountManagement;
+using System.Diagnostics;
 
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
-using System.DirectoryServices.AccountManagement;
+using log4net;
 
 namespace pGina.Plugin.HttpAuth
 {
-    public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway
+    public class PluginImpl : IPluginConfiguration, IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway
     {
+        private static ILog m_logger = LogManager.GetLogger("HttpAuth");
+
+        #region Init-plugin
+        public static Guid PluginUuid
+        {
+            get { return new Guid("{C4FF794F-5843-4BEF-90BA-B5E4E488C662}"); }
+        }
+
+        public PluginImpl()
+        {
+            using (Process me = Process.GetCurrentProcess())
+            {
+                m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
+            }
+        }
+
+        public string Name
+        {
+            get { return "HttpAuth"; }
+        }
+
+        public string Description
+        {
+            get { return "Uses http(s) request to obtain user info"; }
+        }
+
+        public Guid Uuid
+        {
+            get { return PluginUuid; }
+        }
+
+        public string Version
+        {
+            get
+            {
+                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            }
+        }
+        #endregion
+
+        public void Starting() { }
+
+        public void Stopping() { }
+
+        public void Configure()
+        {
+            Configuration dialog = new Configuration();
+            dialog.ShowDialog();
+        }
+
         public BooleanResult AuthenticateUser(SessionProperties properties)
         {
             // this method shall say if our credentials are valid
@@ -22,26 +73,9 @@ namespace pGina.Plugin.HttpAuth
             // this method shall say if we are allowed to login
             // so just look at userinfo if we are ... :)
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-            UInfo uinfo;
+            UInfo uinfo = new UInfo();
 
-            try
-            {
-                HttpAccessor.getUserInfo(userInfo.Username, userInfo.Password, out uinfo);
-                if (uinfo.whyCannotLogin.Length == 0)
-                {
-                    return new BooleanResult() { Success = true };
-                }
-                else
-                {
-                    return new BooleanResult() {
-                        Success = false, Message = uinfo.whyCannotLogin
-                    };
-                }
-            }
-            catch (Exception e)
-            {
-                return new BooleanResult() { Success = false, Message = e.Message };
-            }
+            return HttpAccessor.getUserInfo(userInfo.Username, userInfo.Password, out uinfo);
         }
 
         public BooleanResult AuthenticatedUserGateway(SessionProperties properties)
@@ -50,62 +84,22 @@ namespace pGina.Plugin.HttpAuth
 
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
             UInfo uinfo;
+            BooleanResult ret = new BooleanResult() { Success = false, Message = "" };
 
-            try
+            ret = HttpAccessor.getUserInfo(userInfo.Username, userInfo.Password, out uinfo);
+            if (!ret.Success)
             {
-                HttpAccessor.getUserInfo(userInfo.Username, userInfo.Password, out uinfo);
-            }
-            catch (Exception e)
-            {
-                s_logger.ErrorFormat("getUserInfo failed: {0}. Next processing aborted :(", e.Message);
-                return new BooleanResult() { Success = false, Message = e.Message };
+                return ret;
             }
 
-            PrincipalContext ctx = new PrincipalContext(ContextType.Machine);
-            GroupPrincipal grp;
-
-            //  like group m-ship ...
-            foreach (string g in uinfo.groups)
+            foreach (string group in uinfo.groups)
             {
-                grp = GroupPrincipal.FindByIdentity(ctx, IdentityType.Name, g);
-                if (grp != null)
-                {
-                    userInfo.Groups.Add(new GroupInformation { Name = g, SID = grp.Sid });
-                }
+                userInfo.AddGroup(new GroupInformation() { Name = group });
             }
+            properties.AddTrackedSingle<UserInformation>(userInfo);
 
             // and what else ??? :)
             return new BooleanResult() { Success = true };
         }
-
-        private static ILog s_logger = LogManager.GetLogger("HttpAuth");
-
-        public string Description
-        {
-            get { return "Uses http(s) request to obtain user info"; }
-        }
-
-        public string Name
-        {
-            get { return "HttpAuth"; }
-        }
-
-        public static readonly Guid PluginUuid = new Guid("{C4FF794F-5843-4BEF-90BA-B5E4E488C662}");
-        public Guid Uuid
-        {
-            get { return PluginUuid; }
-        }
-
-        public string Version
-        {
-            get
-            {
-                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            }
-        }
-
-        public void Starting() { }
-
-        public void Stopping() { }
     }
 }

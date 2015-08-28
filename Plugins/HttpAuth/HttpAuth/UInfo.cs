@@ -16,21 +16,25 @@ namespace pGina.Plugin.HttpAuth
 
         public static UInfo parseResponse(string res)
         {
-            StringReader strReader = new StringReader(res);
             UInfo u = new UInfo();
-            // reason why could not login (empty = can login)
-            u.whyCannotLogin = strReader.ReadLine();
-            u.uname = strReader.ReadLine();
-            if (u.uname == null)
+            using (StringReader strReader = new StringReader(res))
             {
-                throw new Exception("Bad response arrived: " + res);
+                // reason why could not login (empty = can login)
+                u.whyCannotLogin = strReader.ReadLine();
+                u.uname = strReader.ReadLine();
+                if (u.uname == null)
+                {
+                    throw new Exception("Bad response arrived: " + res);
+                }
+                u.fullName = strReader.ReadLine();
+                u.email = strReader.ReadLine();
+                u.groups = strReader.ReadLine().Split(';');
+                if (u.groups.Length == 1 && u.groups[0].Contains(";"))
+                {
+                    throw new Exception("Bad response arrived (groups wrong): " + res);
+                }
             }
-            u.fullName = strReader.ReadLine();
-            u.email = strReader.ReadLine();
-            u.groups = strReader.ReadLine().Split(';');
-            if(u.groups.Length == 1 && u.groups[0].Contains(";")) {
-                throw new Exception("Bad response arrived (groups wrong): " + res);
-            }
+
             return u;
         }
     }
