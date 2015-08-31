@@ -403,7 +403,23 @@ namespace pGina.Service.Impl
                         }
                     }
                     if (!isLoggedIN)
+                    {
                         result = sessionDriver.PerformLoginProcess();
+                    }
+                    else
+                    {
+                        if (!Abstractions.WindowsApi.pInvokes.ValidateCredentials(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password))
+                        {
+                            return new LoginResponseMessage()
+                            {
+                                Result = false,
+                                Message = "Bad password",
+                                Username = sessionDriver.UserInformation.Username,
+                                Domain = sessionDriver.UserInformation.Domain,
+                                Password = sessionDriver.UserInformation.Password
+                            };
+                        }
+                    }
 
                     if (result.Success && (!isLoggedIN || msg.Reason == LoginRequestMessage.LoginReason.CredUI || isUACLoggedIN))
                     {
