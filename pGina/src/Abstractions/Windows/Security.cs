@@ -73,41 +73,26 @@ namespace Abstractions.Windows
         {
             try
             {
-                bool result = false;
                 IdentityReference UserIRef = new NTAccount(String.Format("{0}\\{1}", Environment.MachineName, username));
+                SecurityIdentifier UserSid = (SecurityIdentifier)UserIRef.Translate(typeof(SecurityIdentifier));
 
                 using (RegistryKey key = pInvokes.GetRegistryLocation(where).OpenSubKey(keyname, true))
                 {
                     RegistrySecurity keySecurity = key.GetAccessControl(AccessControlSections.Access);
+                    string SDDL = keySecurity.GetSecurityDescriptorSddlForm(AccessControlSections.All);
+                    //LibraryLogging.Info(SDDL);
 
-                    // delete unknown users
                     foreach (RegistryAccessRule user in keySecurity.GetAccessRules(true, true, typeof(System.Security.Principal.NTAccount)))
                     {
-                        //LibraryLogging.Debug("registry ACE user: {0}", user.IdentityReference.Value);
+                        //LibraryLogging.Info("registry ACE user: {0} {1} {2}", key.Name, user.InheritanceFlags.ToString(), user.IdentityReference.Value);
                         if (user.IdentityReference.Value.StartsWith("S-1-5-21-") && !user.IdentityReference.Value.Equals(UserIRef.Value))
                         {
-                            //LibraryLogging.Info("mod registry ACE:{2} from unknown user:{0} to {1}", user.IdentityReference.Value, username, key.Name);
+                            //LibraryLogging.Info("mod registry ACE:{0} from unknown user:{1} to {2} {3} {4}", key.Name, user.IdentityReference.Value, username, user.RegistryRights.ToString(), user.AccessControlType.ToString());
 
-                            RegistryAccessRule accessRule = new RegistryAccessRule(UserIRef, user.RegistryRights, user.InheritanceFlags, user.PropagationFlags, user.AccessControlType);
-                            keySecurity.ModifyAccessRule(AccessControlModification.Add, accessRule, out result);
-                            if (result)
-                            {
-                                keySecurity.ModifyAccessRule(AccessControlModification.Remove, user, out result);
-                                if (result)
-                                {
-                                    key.SetAccessControl(keySecurity);
-                                }
-                                else
-                                {
-                                    LibraryLogging.Error("unable to add User:{0} registry ACE {1} {2}", username, result, pInvokes.LastError());
-                                    return false;
-                                }
-                            }
-                            else
-                            {
-                                LibraryLogging.Error("unable to delete registry ACE from unknown user: {0}", user.IdentityReference.Value, result, pInvokes.LastError());
-                                return false;
-                            }
+                            SDDL = SDDL.Replace(user.IdentityReference.Value, UserSid.Value);
+                            //LibraryLogging.Info(SDDL);
+                            keySecurity.SetSecurityDescriptorSddlForm(SDDL);
+                            key.SetAccessControl(keySecurity);
 
                             break;
                         }
@@ -124,7 +109,6 @@ namespace Abstractions.Windows
             catch (SystemException ex)
             {
                 LibraryLogging.Warn("RegSec:{0} Warning {1}", keyname, ex.Message);
-                return true;
             }
             catch (Exception ex)
             {
