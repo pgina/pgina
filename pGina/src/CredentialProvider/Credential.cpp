@@ -660,6 +660,15 @@ namespace pGina
 
 				SHStrDupW(usernameFieldValue.c_str(), &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
 			}
+			else if( CPUS_CHANGE_PASSWORD == m_usageScenario )
+			{
+				DWORD mySession = pGina::Helpers::GetCurrentSessionId();
+				std::wstring sessionUname = pGina::Helpers::GetSessionUsername(mySession);
+				SHStrDupW(sessionUname.c_str(), &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
+
+				m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldState = CPFS_HIDDEN;
+				m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
+			}
 
 			if(password != NULL)
 			{
