@@ -294,7 +294,6 @@ namespace pGina.Plugin.UsernameMod
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "Configuration";
             this.Text = "Modify Username Plugin Configuration";
-            this.Load += new System.EventHandler(this.Configuration_Load);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.flowLayoutPanel2.ResumeLayout(false);
