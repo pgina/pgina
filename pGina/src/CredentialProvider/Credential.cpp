@@ -677,8 +677,12 @@ namespace pGina
 
 			// Hide MOTD field if not enabled
 			if( ! pGina::Registry::GetBool(L"EnableMotd", true) )
+			{
 				if( m_usageScenario == CPUS_LOGON )
 					m_fields->fields[CredProv::LUIFI_MOTD].fieldStatePair.fieldState = CPFS_HIDDEN;
+				if( m_usageScenario == CPUS_CHANGE_PASSWORD )
+					m_fields->fields[CredProv::CPUIFI_MOTD].fieldStatePair.fieldState = CPFS_HIDDEN;
+			}
 
 			// Hide service status if configured to do so
 			if( ! pGina::Registry::GetBool(L"ShowServiceStatusInLogonUi", true) )
