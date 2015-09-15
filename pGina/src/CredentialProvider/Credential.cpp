@@ -687,6 +687,8 @@ namespace pGina
 					m_fields->fields[CredProv::LOIFI_STATUS].fieldStatePair.fieldState = CPFS_HIDDEN;
 				else if( m_usageScenario == CPUS_LOGON )
 					m_fields->fields[CredProv::LUIFI_STATUS].fieldStatePair.fieldState = CPFS_HIDDEN;
+				else if( m_usageScenario == CPUS_CHANGE_PASSWORD )
+					m_fields->fields[CredProv::CPUIFI_STATUS].fieldStatePair.fieldState = CPFS_HIDDEN;
 			}
 		}
 
