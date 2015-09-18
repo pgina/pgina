@@ -44,7 +44,7 @@ namespace encryptsetting
                 else
                     m_settings = new pGina.Shared.Settings.pGinaDynamicSettings();
 
-                m_settings.SetDefaultEncryptedSetting(args[0], args[1]);
+                m_settings.SetEncryptedSetting(args[0], args[1]);
                 Abstractions.Settings.DynamicSettings setting = m_settings;
 
                 if (!setting.GetEncryptedSetting(args[0]).Equals(args[1]))
