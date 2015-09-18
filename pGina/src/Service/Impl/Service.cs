@@ -115,6 +115,7 @@ namespace pGina.Service.Impl
             {
                 string pipeName = Core.Settings.Get.ServicePipeName;
                 int maxClients = Core.Settings.Get.MaxClients;
+                m_logger.InfoFormat("pGina version: {0}", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 m_logger.DebugFormat("Service created - PipeName: {0} MaxClients: {1}", pipeName, maxClients);
                 m_logger.DebugFormat("System Info: {0}", Abstractions.Windows.OsInfo.OsDescription());
                 m_server = new PipeServer(pipeName, maxClients, (Func<IDictionary<string, object>, IDictionary<string, object>>)HandleMessage);
