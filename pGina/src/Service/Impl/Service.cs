@@ -283,6 +283,8 @@ namespace pGina.Service.Impl
             try
             {
                 PluginDriver sessionDriver = new PluginDriver();
+                bool LastUsernameEnable = Settings.Get.LastUsernameEnable;
+
                 sessionDriver.UserInformation.Username = (String.IsNullOrEmpty(msg.Username))? "" : msg.Username.Trim().Split('\\').DefaultIfEmpty("").LastOrDefault();
                 sessionDriver.UserInformation.Password = (String.IsNullOrEmpty(msg.Password)) ? "" : msg.Password;
                 // todo
@@ -320,6 +322,13 @@ namespace pGina.Service.Impl
                         if (!userinfo4.comment.Contains("pGina created"))
                         {
                             result.Success = Abstractions.WindowsApi.pInvokes.ValidateCredentials(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password);
+                            if (result.Success)
+                            {
+                                if (LastUsernameEnable)
+                                {
+                                    Settings.s_settings.SetSetting("LastUsername", String.Format("{0}", sessionDriver.UserInformation.Username));
+                                }
+                            }
                             return new LoginResponseMessage()
                             {
                                 Result = result.Success,
@@ -474,6 +483,10 @@ namespace pGina.Service.Impl
                     m_logger.DebugFormat("Parse Request for: {0} in session: {1} reason: {2}", sessionDriver.UserInformation.Username, msg.Session, msg.Reason);
                 }
 
+                if (LastUsernameEnable)
+                {
+                    Settings.s_settings.SetSetting("LastUsername", String.Format("{0}", sessionDriver.UserInformation.Username));
+                }
                 return new LoginResponseMessage()
                 {
                     Result = result.Success,

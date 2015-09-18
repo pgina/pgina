@@ -304,6 +304,9 @@ namespace pGina.Configuration
             // Load the unlock setting
             chk_originalUsernameUnlock.Checked = Settings.Get.UseOriginalUsernameInUnlockScenario;
 
+            // Display last username in logon screen
+            chk_lastusername.Checked = Settings.Get.LastUsernameEnable;
+
             // email notification
             this.notify_smtp.Text = Settings.Get.GetSetting("notify_smtp");
             this.notify_email.Text = Settings.Get.GetSetting("notify_email");
@@ -934,6 +937,9 @@ namespace pGina.Configuration
 
             // Save unlock setting
             Settings.Get.UseOriginalUsernameInUnlockScenario = chk_originalUsernameUnlock.Checked;
+
+            // Display last username in logon screen
+            Settings.Get.LastUsernameEnable = chk_lastusername.Checked;
 
             if (Abstractions.Windows.OsInfo.IsVistaOrLater())
                 this.SaveCpSettings();

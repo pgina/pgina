@@ -34,6 +34,8 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
+            this.groupLogon = new System.Windows.Forms.GroupBox();
+            this.chk_lastusername = new System.Windows.Forms.CheckBox();
             this.groupBox18 = new System.Windows.Forms.GroupBox();
             this.notify_label_pass = new System.Windows.Forms.Label();
             this.notify_label_user = new System.Windows.Forms.Label();
@@ -222,6 +224,7 @@
             //
             // m_generalConfigTab
             //
+            this.m_generalConfigTab.Controls.Add(this.groupLogon);
             this.m_generalConfigTab.Controls.Add(this.groupBox18);
             this.m_generalConfigTab.Controls.Add(this.groupBox4);
             this.m_generalConfigTab.Controls.Add(this.groupBox14);
@@ -235,6 +238,26 @@
             this.m_generalConfigTab.TabIndex = 1;
             this.m_generalConfigTab.Text = "General";
             this.m_generalConfigTab.UseVisualStyleBackColor = true;
+            //
+            // groupLogon
+            //
+            this.groupLogon.Controls.Add(this.chk_lastusername);
+            this.groupLogon.Location = new System.Drawing.Point(448, 411);
+            this.groupLogon.Name = "groupLogon";
+            this.groupLogon.Size = new System.Drawing.Size(318, 47);
+            this.groupLogon.TabIndex = 8;
+            this.groupLogon.TabStop = false;
+            this.groupLogon.Text = "Logon";
+            //
+            // chk_lastusername
+            //
+            this.chk_lastusername.AutoSize = true;
+            this.chk_lastusername.Location = new System.Drawing.Point(9, 19);
+            this.chk_lastusername.Name = "chk_lastusername";
+            this.chk_lastusername.Size = new System.Drawing.Size(206, 17);
+            this.chk_lastusername.TabIndex = 7;
+            this.chk_lastusername.Text = "Display last user name in logon screen";
+            this.chk_lastusername.UseVisualStyleBackColor = true;
             //
             // groupBox18
             //
@@ -346,7 +369,7 @@
             this.groupBox4.Controls.Add(this.chk_originalUsernameUnlock);
             this.groupBox4.Location = new System.Drawing.Point(17, 411);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(543, 47);
+            this.groupBox4.Size = new System.Drawing.Size(419, 47);
             this.groupBox4.TabIndex = 5;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Unlock";
@@ -1777,5 +1800,7 @@
         private System.Windows.Forms.TextBox notify_email;
         private System.Windows.Forms.TextBox notify_smtp;
         private System.Windows.Forms.Button help;
+        private System.Windows.Forms.GroupBox groupLogon;
+        private System.Windows.Forms.CheckBox chk_lastusername;
     }
 }

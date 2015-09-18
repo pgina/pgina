@@ -669,6 +669,19 @@ namespace pGina
 				m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldState = CPFS_HIDDEN;
 				m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
 			}
+			else if( CPUS_LOGON == m_usageScenario )
+			{
+				if( pGina::Registry::GetBool(L"LastUsernameEnable", true) )
+				{
+					std::wstring sessionUname = pGina::Registry::GetString( L"LastUsername", L"");
+					if (!sessionUname.empty())
+					{
+						SHStrDupW(sessionUname.c_str(), &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
+						m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
+						m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
+					}
+				}
+			}
 
 			if(password != NULL)
 			{
@@ -787,6 +800,25 @@ namespace pGina
 			{
 				std::wstring text = pGina::Service::StateHelper::GetStateText();
 				m_logonUiCallback->SetFieldString(this, FindStatusId(), text.c_str());
+			}
+
+			if( CPUS_LOGON == m_usageScenario )
+			{
+				if( pGina::Registry::GetBool(L"LastUsernameEnable", true) )
+				{
+					std::wstring sessionUname = pGina::Registry::GetString( L"LastUsername", L"");
+					if (!sessionUname.empty())
+					{
+						SHStrDupW(sessionUname.c_str(), &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
+						m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
+						m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
+					}
+				}
+				else
+				{
+					m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
+					m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
+				}
 			}
 		}
 		DWORD WINAPI Credential::Thread_dialog(LPVOID lpParameter)
