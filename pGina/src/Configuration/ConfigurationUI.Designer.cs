@@ -163,6 +163,7 @@
             this.help = new System.Windows.Forms.Button();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
+            this.groupLogon.SuspendLayout();
             this.groupBox18.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox14.SuspendLayout();
@@ -1613,6 +1614,8 @@
             this.Load += new System.EventHandler(this.Form_Load);
             this.m_tabs.ResumeLayout(false);
             this.m_generalConfigTab.ResumeLayout(false);
+            this.groupLogon.ResumeLayout(false);
+            this.groupLogon.PerformLayout();
             this.groupBox18.ResumeLayout(false);
             this.groupBox18.PerformLayout();
             this.groupBox4.ResumeLayout(false);
