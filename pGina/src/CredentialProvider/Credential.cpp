@@ -253,7 +253,7 @@ namespace pGina
 			pGina::Transactions::User::LoginResult loginResult;
 			HWND hdialog;
 			HANDLE hThread_dialog;
-			wchar_t title[128] = {};
+			std::wstring title;
 
 			pGina::Protocol::LoginRequestMessage::LoginReason reason = pGina::Protocol::LoginRequestMessage::Login;
 			switch(m_usageScenario)
@@ -291,6 +291,18 @@ namespace pGina
 					return S_FALSE;
 				}
 
+				title = L"Processing password change for ";
+				title.append(username);
+				hdialog = CreateWindowEx(WS_EX_TOPMOST, L"Static", title.c_str(), WS_DLGFRAME, (int)(GetSystemMetrics(SM_CXFULLSCREEN)/2)-137, (int)GetSystemMetrics(SM_CYFULLSCREEN)/2, 275, 15, ::GetForegroundWindow(), NULL, GetMyInstance(), NULL);
+				if(hdialog != NULL)
+				{
+					ShowWindow(hdialog, SW_SHOW);
+				}
+				else
+				{
+					BlockInput(true);
+				}
+
 				if(m_fields)
 				{
 					newPassword = m_fields->fields[CredProv::CPUIFI_NEW_PASSWORD].wstr;
@@ -303,6 +315,14 @@ namespace pGina
 					SHStrDupW(L"New passwords do not match", ppwszOptionalStatusText);
 					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 					*pcpsiOptionalStatusIcon = CPSI_ERROR;
+					if (hdialog != NULL)
+					{
+						DestroyWindow(hdialog);
+					}
+					else
+					{
+						BlockInput(false);
+					}
 					return S_FALSE;
 				}
 
@@ -317,6 +337,14 @@ namespace pGina
 					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);
 					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 					*pcpsiOptionalStatusIcon = CPSI_ERROR;
+					if (hdialog != NULL)
+					{
+						DestroyWindow(hdialog);
+					}
+					else
+					{
+						BlockInput(false);
+					}
 					return S_FALSE;
 				}
 
@@ -327,14 +355,24 @@ namespace pGina
 
 				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 				*pcpsiOptionalStatusIcon = CPSI_SUCCESS;
+				if (hdialog != NULL)
+				{
+					DestroyWindow(hdialog);
+				}
+				else
+				{
+					BlockInput(false);
+				}
 				return S_OK;
 				break;
 			}
 
 			if (m_usageScenario == CPUS_CREDUI)
 			{
-				swprintf(title, 128, L"%s %s", L"Processing UAC for", (LPWSTR)username);
-				hdialog = CreateWindowEx(WS_EX_TOPMOST, L"Static", title, WS_DLGFRAME, (int)(GetSystemMetrics(SM_CXFULLSCREEN)/2)-115, (int)GetSystemMetrics(SM_CYFULLSCREEN)/2, 225, 15, ::GetForegroundWindow(), NULL, GetMyInstance(), NULL);
+				//swprintf(title, 128, L"%s %s", L"Processing UAC for", (LPWSTR)username);
+				title = L"Processing UAC for ";
+				title.append(username);
+				hdialog = CreateWindowEx(WS_EX_TOPMOST, L"Static", title.c_str(), WS_DLGFRAME, (int)(GetSystemMetrics(SM_CXFULLSCREEN)/2)-137, (int)GetSystemMetrics(SM_CYFULLSCREEN)/2, 275, 15, ::GetForegroundWindow(), NULL, GetMyInstance(), NULL);
 				if(hdialog != NULL)
 				{
 					ShowWindow(hdialog, SW_SHOW);
@@ -346,8 +384,10 @@ namespace pGina
 			}
 			else
 			{
-				swprintf(title, 128, L"%s %s", L"Processing Login for", (LPWSTR)username);
-				hThread_dialog = CreateThread(NULL, 0, Credential::Thread_dialog, (LPVOID) title, 0, NULL);
+				//swprintf(title, 128, L"%s %s", L"Processing Login for", (LPWSTR)username);
+				title = L"Processing logon for ";
+				title.append(username);
+				hThread_dialog = CreateThread(NULL, 0, Credential::Thread_dialog, (LPVOID) title.c_str(), 0, NULL);
 			}
 
 			pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);
@@ -825,7 +865,7 @@ namespace pGina
 		{
 			HWND dialog;
 
-			dialog = CreateWindowEx(WS_EX_TOPMOST, L"Static", (LPWSTR)lpParameter, WS_DLGFRAME, (int)(GetSystemMetrics(SM_CXFULLSCREEN)/2)-115, (int)GetSystemMetrics(SM_CYFULLSCREEN)/2, 225, 15, ::GetForegroundWindow(), NULL, GetMyInstance(), NULL);
+			dialog = CreateWindowEx(WS_EX_TOPMOST, L"Static", (LPWSTR)lpParameter, WS_DLGFRAME, (int)(GetSystemMetrics(SM_CXFULLSCREEN)/2)-137, (int)GetSystemMetrics(SM_CYFULLSCREEN)/2, 275, 15, ::GetForegroundWindow(), NULL, GetMyInstance(), NULL);
 			if(dialog == NULL)
 			{
 				pDEBUG(L"Credential::Thread_dialog: CreateWindowEx Error %X", HRESULT_FROM_WIN32(::GetLastError()));
