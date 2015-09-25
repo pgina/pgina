@@ -523,6 +523,12 @@ namespace Abstractions.WindowsApi
 
             [DllImport("Netapi32.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
             internal static extern int NetUserChangePassword([MarshalAs(UnmanagedType.LPWStr)] string domainname, [MarshalAs(UnmanagedType.LPWStr)] string username, [MarshalAs(UnmanagedType.LPWStr)] string oldpassword, [MarshalAs(UnmanagedType.LPWStr)] string newpassword);
+
+            [DllImport("Netapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            internal static extern int DsGetDcName([MarshalAs(UnmanagedType.LPTStr)] string ComputerName, [MarshalAs(UnmanagedType.LPTStr)] string DomainName, [In] int DomainGuid, [MarshalAs(UnmanagedType.LPTStr)] string SiteName, [MarshalAs(UnmanagedType.U4)] DSGETDCNAME_FLAGS flags, out IntPtr pDOMAIN_CONTROLLER_INFO);
+
+            [DllImport("netapi32.dll", SetLastError = true)]
+            internal static extern int NetWkstaGetInfo(string servername, int level, out IntPtr bufptr);
             #endregion
 
             #region wtsapi32.dll
@@ -729,6 +735,58 @@ namespace Abstractions.WindowsApi
             internal struct SERVICE_PRESHUTDOWN_INFO
             {
                 internal UInt32 dwPreshutdownTimeout;
+            }
+
+            [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+            internal struct DOMAIN_CONTROLLER_INFO
+            {
+                [MarshalAs(UnmanagedType.LPTStr)]
+                public string DomainControllerName;
+                [MarshalAs(UnmanagedType.LPTStr)]
+                public string DomainControllerAddress;
+                public uint DomainControllerAddressType;
+                public Guid DomainGuid;
+                [MarshalAs(UnmanagedType.LPTStr)]
+                public string DomainName;
+                [MarshalAs(UnmanagedType.LPTStr)]
+                public string DnsForestName;
+                public uint Flags;
+                [MarshalAs(UnmanagedType.LPTStr)]
+                public string DcSiteName;
+                [MarshalAs(UnmanagedType.LPTStr)]
+                public string ClientSiteName;
+            }
+
+            [Flags]
+            internal enum DSGETDCNAME_FLAGS : uint
+            {
+                DS_FORCE_REDISCOVERY = 0x00000001,
+                DS_DIRECTORY_SERVICE_REQUIRED = 0x00000010,
+                DS_DIRECTORY_SERVICE_PREFERRED = 0x00000020,
+                DS_GC_SERVER_REQUIRED = 0x00000040,
+                DS_PDC_REQUIRED = 0x00000080,
+                DS_BACKGROUND_ONLY = 0x00000100,
+                DS_IP_REQUIRED = 0x00000200,
+                DS_KDC_REQUIRED = 0x00000400,
+                DS_TIMESERV_REQUIRED = 0x00000800,
+                DS_WRITABLE_REQUIRED = 0x00001000,
+                DS_GOOD_TIMESERV_PREFERRED = 0x00002000,
+                DS_AVOID_SELF = 0x00004000,
+                DS_ONLY_LDAP_NEEDED = 0x00008000,
+                DS_IS_FLAT_NAME = 0x00010000,
+                DS_IS_DNS_NAME = 0x00020000,
+                DS_RETURN_DNS_NAME = 0x40000000,
+                DS_RETURN_FLAT_NAME = 0x80000000
+            }
+
+            [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+            internal struct WKSTA_INFO_100
+            {
+                public int platform_id;
+                public string computer_name;
+                public string lan_group;
+                public int ver_major;
+                public int ver_minor;
             }
 
             internal static Boolean RegistryLoadPrivilegeSet = false;
@@ -1730,16 +1788,27 @@ namespace Abstractions.WindowsApi
         /// return true if a local user exists
         /// </summary>
         /// <param name="username"></param>
+        /// <param name="domain"></param>
         /// <returns></returns>
-        public static Boolean UserExists(string username)
+        public static Boolean UserExists(string username, string domain)
         {
             structenums.USER_INFO_4 userinfo4 = new structenums.USER_INFO_4();
-            if (UserGet(username, ref userinfo4))
+            if (UserGet(username, domain, ref userinfo4))
             {
                 return true;
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// return true if a local user exists
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        public static Boolean UserExists(string username)
+        {
+            return UserExists(username, null);
         }
 
         /// <summary>
@@ -1803,9 +1872,22 @@ namespace Abstractions.WindowsApi
         /// <returns>bool true 4 success</returns>
         public static Boolean UserGet(string username, ref structenums.USER_INFO_4 userinfo4)
         {
+            return UserGet(username, null, ref userinfo4);
+        }
+
+        /// <summary>
+        /// returns local user settings as a ref of an USER_INFO_4 struct
+        /// based on http://social.msdn.microsoft.com/forums/en-us/csharpgeneral/thread/B70B79D9-971F-4D6F-8462-97FC126DE0AD
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="domain"></param>
+        /// <param name="userinfo4">a ref of an USER_INFO_4 struct</param>
+        /// <returns>bool true 4 success</returns>
+        public static Boolean UserGet(string username, string domain, ref structenums.USER_INFO_4 userinfo4)
+        {
             IntPtr bufPtr;
 
-            int lngReturn = SafeNativeMethods.NetUserGetInfo(null, username, 4, out bufPtr);
+            int lngReturn = SafeNativeMethods.NetUserGetInfo((String.IsNullOrEmpty(domain)) ? null : domain, username, 4, out bufPtr);
             if (lngReturn == 0)
             {
                 userinfo4 = (structenums.USER_INFO_4)Marshal.PtrToStructure(bufPtr, typeof(structenums.USER_INFO_4));
@@ -1848,6 +1930,18 @@ namespace Abstractions.WindowsApi
             }
 
             return true;
+        }
+
+        public static string UserChangePassword(string domainname, string username, string oldpassword, string newpassword)
+        {
+            int result = pInvokes.SafeNativeMethods.NetUserChangePassword((String.IsNullOrEmpty(domainname))? Environment.MachineName : domainname, username, oldpassword, newpassword);
+            if (result != 0)
+            {
+                LibraryLogging.Error("NetUserChangePassword({0}, {1}, {2}, {3}) Error:{4} {5}", (String.IsNullOrEmpty(domainname)) ? Environment.MachineName : domainname, username, "***", "***", result, LastError(result));
+                return String.Format("Password change failed for user {0} with error {1}\n{2}", username, result, LastError(result));
+            }
+
+            return "";
         }
 
         /// <summary>
@@ -2150,6 +2244,77 @@ namespace Abstractions.WindowsApi
             }
 
             return true;
+        }
+        /// <summary>
+        /// query if the domain is part of a domain tree in which the local computer is a member of
+        /// </summary>
+        /// <param name="domain"></param>
+        /// <returns></returns>
+        public static bool DomainMember(string domain)
+        {
+            if (String.IsNullOrEmpty(domain))
+                return false;
+
+            return !String.IsNullOrEmpty(GetDomainInfo(domain).DomainName);
+        }
+
+        internal static pInvokes.SafeNativeMethods.DOMAIN_CONTROLLER_INFO GetDomainInfo(string domain)
+        {
+            pInvokes.SafeNativeMethods.DOMAIN_CONTROLLER_INFO domainInfo = new pInvokes.SafeNativeMethods.DOMAIN_CONTROLLER_INFO();
+            IntPtr pDCI = IntPtr.Zero;
+
+            int ret = pInvokes.SafeNativeMethods.DsGetDcName(null, domain, 0, "", 0, out pDCI);
+            if (ret == 0)
+            {
+                domainInfo = (pInvokes.SafeNativeMethods.DOMAIN_CONTROLLER_INFO)Marshal.PtrToStructure(pDCI, typeof(pInvokes.SafeNativeMethods.DOMAIN_CONTROLLER_INFO));
+            }
+            else
+            {
+                LibraryLogging.Error("GetDomainInfo({0}) Error:{1} {2}", domain, ret, LastError(ret));
+            }
+
+            if (pDCI != IntPtr.Zero)
+            {
+                pInvokes.SafeNativeMethods.NetApiBufferFree(pDCI);
+            }
+
+            return domainInfo;
+        }
+
+        /// <summary>
+        /// get local machine domain membership as DNS name
+        /// </summary>
+        /// <returns></returns>
+        public static string GetMachineDomainMembershipEX()
+        {
+            return GetDomainInfo("").DomainName;
+        }
+
+        /// <summary>
+        /// get local machine domain membership as NETBIOS name
+        /// </summary>
+        /// <returns></returns>
+        public static string GetMachineDomainMembership()
+        {
+            IntPtr buffer = IntPtr.Zero;
+            pInvokes.SafeNativeMethods.WKSTA_INFO_100 wksta_info = new pInvokes.SafeNativeMethods.WKSTA_INFO_100();
+
+            int result = pInvokes.SafeNativeMethods.NetWkstaGetInfo(null, 100, out buffer);
+            if (result == 0)
+            {
+                wksta_info = (pInvokes.SafeNativeMethods.WKSTA_INFO_100)Marshal.PtrToStructure(buffer, typeof(pInvokes.SafeNativeMethods.WKSTA_INFO_100));
+            }
+            else
+            {
+                LibraryLogging.Error("GetMachineDomainMembership() Error:{0} {1}", result, LastError(result));
+            }
+
+            if (buffer != IntPtr.Zero)
+            {
+                pInvokes.SafeNativeMethods.NetApiBufferFree(buffer);
+            }
+
+            return wksta_info.lan_group;
         }
 
         /// <summary>

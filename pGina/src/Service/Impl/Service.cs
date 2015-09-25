@@ -285,11 +285,29 @@ namespace pGina.Service.Impl
                 PluginDriver sessionDriver = new PluginDriver();
                 bool LastUsernameEnable = Settings.Get.LastUsernameEnable;
 
-                sessionDriver.UserInformation.Username = (String.IsNullOrEmpty(msg.Username))? "" : msg.Username.Trim().Split('\\').DefaultIfEmpty("").LastOrDefault();
+                sessionDriver.UserInformation.Username = msg.Username.Trim();
                 sessionDriver.UserInformation.Password = (String.IsNullOrEmpty(msg.Password)) ? "" : msg.Password;
-                // todo
-                // can be of "username@dotted domain name" use winapi DsGetDcName() in UserGet()
-                sessionDriver.UserInformation.Domain = (String.IsNullOrEmpty(msg.Username))? "" : (msg.Username.Trim().Contains('\\')) ? msg.Username.Trim().Split('\\').DefaultIfEmpty("").FirstOrDefault() : "";
+                sessionDriver.UserInformation.Domain = "";
+                if (sessionDriver.UserInformation.Username.Contains("\\"))
+                {
+                    sessionDriver.UserInformation.Username = msg.Username.Trim().Split('\\').DefaultIfEmpty("").LastOrDefault();
+                    sessionDriver.UserInformation.Domain =   msg.Username.Trim().Split('\\').DefaultIfEmpty("").FirstOrDefault();
+                }
+                else if (sessionDriver.UserInformation.Username.Contains("@"))
+                {
+                    sessionDriver.UserInformation.Username = msg.Username.Trim().Split('@').DefaultIfEmpty("").FirstOrDefault();
+                    sessionDriver.UserInformation.Domain =   msg.Username.Trim().Split('@').DefaultIfEmpty("").LastOrDefault();
+                }
+                else
+                {
+                    sessionDriver.UserInformation.Domain = "";
+                }
+                m_logger.InfoFormat("domain:{0}", sessionDriver.UserInformation.Domain);
+                if (sessionDriver.UserInformation.Domain.Equals("localhost", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    sessionDriver.UserInformation.Domain = Environment.MachineName;
+                }
+                m_logger.InfoFormat("domain:{0}", sessionDriver.UserInformation.Domain);
 
                 if (String.IsNullOrEmpty(sessionDriver.UserInformation.Username))
                 {
@@ -304,7 +322,76 @@ namespace pGina.Service.Impl
                         thisUserLogoff = true;
                 }
                 if (thisUserLogoff)
+                {
                     return new LoginResponseMessage() { Result = false, Message = String.Format("Still logoff work to do for user {0}\nWait a view seconds and retry", sessionDriver.UserInformation.Username) };
+                }
+
+                // do the domain logon
+                string domainmember = Abstractions.WindowsApi.pInvokes.GetMachineDomainMembershipEX();
+                m_logger.InfoFormat("domain check:[{0}] [{1}] [{2}]", Regex.IsMatch(msg.Username, "\\|@"), !String.IsNullOrEmpty(domainmember), !sessionDriver.UserInformation.Domain.Equals(Environment.MachineName, StringComparison.CurrentCultureIgnoreCase));
+                if ((Regex.IsMatch(msg.Username, "\\|@") || !String.IsNullOrEmpty(domainmember)) && !sessionDriver.UserInformation.Domain.Equals(Environment.MachineName, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    m_logger.DebugFormat("domain logon: Username:{0} domainmember:{1} domain:{2}", msg.Username, domainmember, sessionDriver.UserInformation.Domain);
+                    // if domain was provided by username and it got messed up ...
+                    if (String.IsNullOrEmpty(sessionDriver.UserInformation.Domain) && Regex.IsMatch(msg.Username, "\\|@"))
+                    {
+                        return new LoginResponseMessage() { Result = false, Message = String.Format("No Domainname supplied\n\n'{0}' was entered and parsed to '{1}'", msg.Username, sessionDriver.UserInformation.Domain) };
+                    }
+
+                    if (Abstractions.WindowsApi.pInvokes.DomainMember(sessionDriver.UserInformation.Domain))
+                    {
+                        m_logger.InfoFormat("DomainMember");
+                        // pc is member of this domain provided by the username field
+                        if (Abstractions.WindowsApi.pInvokes.ValidateCredentials(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password))
+                        {
+                            if (LastUsernameEnable)
+                            {
+                                Settings.s_settings.SetSetting("LastUsername", String.Format("{0}\\{1}", sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Username));
+                            }
+                            return new LoginResponseMessage()
+                            {
+                                Result = true,
+                                Message = "",
+                                Username = sessionDriver.UserInformation.Username,
+                                Domain = sessionDriver.UserInformation.Domain,
+                                Password = sessionDriver.UserInformation.Password
+                            };
+                        }
+                        else
+                        {
+                            return new LoginResponseMessage()
+                            {
+                                Result = false,
+                                Message = String.Format("The provided account:{0} name does not exist on:{1} or the password is wrong", sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain),
+                                Username = sessionDriver.UserInformation.Username,
+                                Domain = sessionDriver.UserInformation.Domain,
+                                Password = sessionDriver.UserInformation.Password
+                            };
+                        }
+                    }
+                    else if (!String.IsNullOrEmpty(domainmember))
+                    {
+                        m_logger.InfoFormat("GetMachineDomainMembership");
+                        // pc is member of a domain
+                        sessionDriver.UserInformation.Domain = domainmember;
+                        if (Abstractions.WindowsApi.pInvokes.ValidateCredentials(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password))
+                        {
+                            if (LastUsernameEnable)
+                            {
+                                Settings.s_settings.SetSetting("LastUsername", String.Format("{0}", sessionDriver.UserInformation.Username));
+                            }
+                            return new LoginResponseMessage()
+                            {
+                                Result = true,
+                                Message = "",
+                                Username = sessionDriver.UserInformation.Username,
+                                Domain = sessionDriver.UserInformation.Domain,
+                                Password = sessionDriver.UserInformation.Password
+                            };
+                        }
+                        sessionDriver.UserInformation.Domain = Environment.MachineName;
+                    }
+                }
 
                 BooleanResult result = new BooleanResult() { Success = true, Message = "" };
 
@@ -1042,7 +1129,20 @@ namespace pGina.Service.Impl
             {
                 m_logger.DebugFormat("Processing ChangePasswordRequest for: {0} domain: {1} session: {2}", msg.Username, msg.Domain, msg.Session);
 
-                SessionProperties properties = m_sessionPropertyCache.Get(msg.Session).First();
+                SessionProperties properties = m_sessionPropertyCache.Get(msg.Session).DefaultIfEmpty(new SessionProperties(Guid.Empty)).FirstOrDefault();
+                if (properties.Id == Guid.Empty)
+                {
+                    m_logger.DebugFormat("no SessionProperties cached for user:{0}", msg.Username);
+
+                    string result = Abstractions.WindowsApi.pInvokes.UserChangePassword(msg.Domain, msg.Username, msg.OldPassword, msg.NewPassword);
+                    return new ChangePasswordResponseMessage()
+                    {
+                        Result = (String.IsNullOrEmpty(result))? true : false,
+                        Message = result,
+                        Username = msg.Username,
+                        Domain = msg.Domain
+                    };
+                }
                 UserInformation userinfo = properties.GetTrackedSingle<UserInformation>();
                 userinfo.oldPassword = msg.OldPassword;
                 userinfo.Password = msg.NewPassword;

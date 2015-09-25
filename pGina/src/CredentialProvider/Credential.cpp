@@ -326,7 +326,10 @@ namespace pGina
 					return S_FALSE;
 				}
 
-				loginResult = pGina::Transactions::User::ProcessChangePasswordForUser( username, L"", password, newPassword );
+				DWORD mySession = pGina::Helpers::GetCurrentSessionId();
+				std::wstring d = pGina::Helpers::GetSessionDomainName(mySession);
+				domain = const_cast<PWSTR>(d.c_str());
+				loginResult = pGina::Transactions::User::ProcessChangePasswordForUser( username, domain, password, newPassword );
 
 				if( !loginResult.Result() )
 				{
