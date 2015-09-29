@@ -327,6 +327,27 @@ namespace pGina
 					return S_FALSE;
 				}
 
+				HANDLE hToken;
+				if (!LogonUser(username, domain, password, LOGON32_LOGON_NETWORK, LOGON32_PROVIDER_DEFAULT, &hToken))
+				{
+					SHStrDupW(L"Your old password does not match", ppwszOptionalStatusText);
+					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
+					*pcpsiOptionalStatusIcon = CPSI_ERROR;
+					if (hdialog != NULL)
+					{
+						DestroyWindow(hdialog);
+					}
+					else
+					{
+						BlockInput(false);
+					}
+					return S_FALSE;
+				}
+				else
+				{
+					CloseHandle(hToken);
+				}
+
 				DWORD mySession = pGina::Helpers::GetCurrentSessionId();
 				std::wstring d = pGina::Helpers::GetSessionDomainName(mySession);
 				domain = const_cast<PWSTR>(d.c_str());
