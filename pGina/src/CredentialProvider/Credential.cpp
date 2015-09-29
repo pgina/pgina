@@ -311,7 +311,8 @@ namespace pGina
 
 				// Check that the new password and confirmation are exactly the same, if not
 				// return a failure.
-				if( wcscmp(newPassword, newPasswordConfirm ) != 0 ) {
+				if( (newPassword == NULL || newPasswordConfirm == NULL) || wcscmp(newPassword, newPasswordConfirm ) != 0 )
+				{
 					SHStrDupW(L"New passwords do not match", ppwszOptionalStatusText);
 					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 					*pcpsiOptionalStatusIcon = CPSI_ERROR;
