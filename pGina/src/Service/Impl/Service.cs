@@ -1144,7 +1144,7 @@ namespace pGina.Service.Impl
                     };
                 }
                 UserInformation userinfo = properties.GetTrackedSingle<UserInformation>();
-                userinfo.oldPassword = msg.OldPassword;
+                userinfo.oldPassword = userinfo.Password; // msg.OldPassword;
                 userinfo.Password = msg.NewPassword;
                 properties.AddTrackedSingle<UserInformation>(userinfo);
 
@@ -1152,8 +1152,7 @@ namespace pGina.Service.Impl
                 pluginInfo.LoadedPlugins = PluginLoader.GetOrderedPluginsOfType<IPluginChangePassword>();
                 BooleanResult Result = new BooleanResult();
 
-                // One success means the final result is a success, and we return the message from
-                // the last success. Otherwise, we return the message from the last failure.
+                // Once a failure is encountered a failure is returned
                 foreach ( IPluginChangePassword plug in PluginLoader.GetOrderedPluginsOfType<IPluginChangePassword>() )
                 {
                     // Execute the plugin
@@ -1164,7 +1163,7 @@ namespace pGina.Service.Impl
 
                     if (!Result.Success)
                     {
-                        userinfo.Password = msg.OldPassword;
+                        userinfo.Password = userinfo.oldPassword;
                         properties.AddTrackedSingle<UserInformation>(userinfo);
                         break;
                     }
