@@ -8,7 +8,7 @@ using log4net;
 
 namespace pGina.Plugin.HttpAuth
 {
-    public class PluginImpl : IPluginConfiguration, IPluginAuthentication, IPluginAuthenticationGateway
+    public class PluginImpl : IPluginConfiguration, IPluginAuthentication, IPluginAuthenticationGateway, IPluginChangePassword
     {
         private static ILog m_logger = LogManager.GetLogger("HttpAuth");
 
@@ -89,6 +89,25 @@ namespace pGina.Plugin.HttpAuth
             }
 
             return new BooleanResult() { Success = true };
+        }
+
+        public BooleanResult ChangePassword(SessionProperties properties, ChangePasswordPluginActivityInfo pluginInfo)
+        {
+            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+
+            m_logger.DebugFormat("ChangePassword(): {0}", userInfo.ToString());
+
+            // Verify the old password
+            if (Abstractions.WindowsApi.pInvokes.ValidateCredentials(userInfo.Username, userInfo.oldPassword))
+            {
+                m_logger.DebugFormat("Authenticated via old password: {0}", userInfo.Username);
+            }
+            else
+            {
+                return new BooleanResult { Success = false, Message = "Current password or username is not valid." };
+            }
+
+            return HttpAccessor.getPwChangeResponse(userInfo.Username, userInfo.Password, userInfo.oldPassword);
         }
     }
 }

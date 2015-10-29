@@ -93,6 +93,75 @@ namespace pGina.Plugin.HttpAuth
             
         }
 
+        public static BooleanResult getPwChangeResponse(String uname, String pwd, String old)
+        {
+            try
+            {
+                // Create a request using a URL that can receive a post. 
+                WebRequest request = WebRequest.Create(Settings.resolveSettings());
+                // Set the Method property of the request to POST.
+                request.Method = "POST";
+                request.Timeout = 2000;
+                // Create POST data and convert it to a byte array.
+                string postData = "{\"username\":\"" + uname + "\",\"password\":\"" + pwd + "\",\"old\":\"" + pwd + "\"}";
+                byte[] byteArray = Encoding.UTF8.GetBytes(postData);
+                // Set the ContentType property of the WebRequest.
+                request.ContentType = "application/json";
+                // Set the ContentLength property of the WebRequest.
+                request.ContentLength = byteArray.Length;
+
+                using (Stream dataStream = request.GetRequestStream())
+                {
+                    dataStream.Write(byteArray, 0, byteArray.Length);
+                }
+
+                // Get the response.
+                using (WebResponse response = request.GetResponse())
+                {
+                    using (Stream dataStream = response.GetResponseStream())
+                    {
+                        // Open the stream using a StreamReader for easy access.
+                        using (StreamReader reader = new StreamReader(dataStream))
+                        {
+                            // Read the content.
+                            string responseFromServer = reader.ReadToEnd();
+                            // Display the content.
+                            m_logger.InfoFormat("PWDCHResponse: {0}", responseFromServer);
+                            return new BooleanResult() { Success = true, Message = responseFromServer };
+                        }
+                    }
+                }
+            }
+            catch (WebException webx)
+            {
+                m_logger.ErrorFormat("PWDCHAccessor.WebException: {0}", webx.Message);
+
+                using (HttpWebResponse res = (HttpWebResponse)webx.Response)
+                {
+                    if (res != null)
+                    {
+                        using (StreamReader resReader = new StreamReader(res.GetResponseStream()))
+                        {
+                            string responseBody = resReader.ReadLine();
+                            if (responseBody.Length > 0)
+                            {
+                                return new BooleanResult() { Success = false, Message = responseBody };
+                            }
+                        }
+                    }
+                }
+
+                return new BooleanResult() { Success = false, Message = webx.Message };
+            }
+            catch (Exception e)
+            {
+                // very bad scenario
+                m_logger.ErrorFormat("PWDCHAccessor.Exception: {0}", e.StackTrace);
+                return new BooleanResult() { Success = false, Message = e.Message };
+            }
+
+        }
+
         public static UInfo getUserInfo(String uname)
         {
             if (! resps.ContainsKey(uname))
