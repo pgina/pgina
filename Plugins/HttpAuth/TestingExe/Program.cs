@@ -28,9 +28,6 @@ namespace TestingExe
             var authResult = plugin.AuthenticateUser(properties);
             Debug.Assert(authResult.Success == true, "auth should succeed!");
 
-            var authorResult = plugin.AuthorizeUser(properties);
-            Debug.Assert(authResult.Success == true, "author should succeed!");
-
             var gatewayResult = plugin.AuthenticatedUserGateway(properties);
             Debug.Assert(authResult.Success == true, "gateway should succeed!");
 

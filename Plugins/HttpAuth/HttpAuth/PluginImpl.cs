@@ -8,7 +8,7 @@ using log4net;
 
 namespace pGina.Plugin.HttpAuth
 {
-    public class PluginImpl : IPluginConfiguration, IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway
+    public class PluginImpl : IPluginConfiguration, IPluginAuthentication, IPluginAuthenticationGateway
     {
         private static ILog m_logger = LogManager.GetLogger("HttpAuth");
 
@@ -68,37 +68,26 @@ namespace pGina.Plugin.HttpAuth
             return HttpAccessor.getResponse(userInfo.Username, userInfo.Password);
         }
 
-        public BooleanResult AuthorizeUser(SessionProperties properties)
-        {
-            // this method shall say if we are allowed to login
-            // so just look at userinfo if we are ... :)
-            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-            UInfo uinfo = new UInfo();
-
-            return HttpAccessor.getUserInfo(userInfo.Username, userInfo.Password, out uinfo);
-        }
-
         public BooleanResult AuthenticatedUserGateway(SessionProperties properties)
         {
             // this method shall perform some other tasks ...
 
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-            UInfo uinfo;
-            BooleanResult ret = new BooleanResult() { Success = false, Message = "" };
 
-            ret = HttpAccessor.getUserInfo(userInfo.Username, userInfo.Password, out uinfo);
-            if (!ret.Success)
+            UInfo uinfo = HttpAccessor.getUserInfo(userInfo.Username);
+            if (uinfo != null)
             {
-                return ret;
+                m_logger.DebugFormat("AuthenticatedUserGateway: Uinfo: {0}", uinfo.ToString());
+                foreach (string group in uinfo.groups)
+                {
+                    userInfo.AddGroup(new GroupInformation() { Name = group });
+                }
+                properties.AddTrackedSingle<UserInformation>(userInfo);
+
+                // and what else ??? :)
+                
             }
 
-            foreach (string group in uinfo.groups)
-            {
-                userInfo.AddGroup(new GroupInformation() { Name = group });
-            }
-            properties.AddTrackedSingle<UserInformation>(userInfo);
-
-            // and what else ??? :)
             return new BooleanResult() { Success = true };
         }
     }
