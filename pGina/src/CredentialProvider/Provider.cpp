@@ -238,6 +238,23 @@ namespace pGina
 			// Up ref count as we hold a pointer to this guy
 			if(m_logonUiCallbackEvents)
 			{
+				if (pGina::Service::StateHelper::GetLoginChangePassword())
+				{
+					if (m_usageScenario != CPUS_CHANGE_PASSWORD)
+					{
+						m_credential = new Credential();
+						m_credential->Initialize(m_usageScenario, s_logonFields, m_usageFlags, NULL, NULL);
+					}
+					else
+					{
+						if (m_credential)
+						{
+							m_credential->Initialize(m_usageScenario, s_changePasswordFields, m_usageFlags, pGina::Service::StateHelper::GetUsername().c_str(), pGina::Service::StateHelper::GetPassword().c_str());
+						}
+					}
+					m_logonUiCallbackEvents->CredentialsChanged(m_logonUiCallbackContext);
+				}
+
 				pDEBUG(L"Provider::Advise(%p, %p) - provider events callback reference added", pcpe, upAdviseContext);
 				m_logonUiCallbackEvents->AddRef();
 			}
@@ -312,7 +329,7 @@ namespace pGina
 
 			// If we were given creds via SetSerialization, and they appear complete, then we can
 			//  make that credential our default and attempt an autologon.
-			if(SerializedUserNameAvailable() && SerializedPasswordAvailable())
+			if(SerializedUserNameAvailable() && SerializedPasswordAvailable() && !pGina::Service::StateHelper::GetLoginChangePassword())
 			{
 				*pdwDefault = 0;
 				*pbAutoLogonWithDefault = TRUE;
@@ -362,7 +379,7 @@ namespace pGina
 
 			// Alright... QueryIface for ICredentialProviderCredential
 			return m_credential->QueryInterface(IID_ICredentialProviderCredential, reinterpret_cast<void **>(ppcpc));
-    	}
+		}
 
 		IFACEMETHODIMP Provider::GetFieldDescriptorForUi(UI_FIELDS const& fields, DWORD index, CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR **ppcpfd)
 		{
@@ -449,20 +466,36 @@ namespace pGina
 
 		void Provider::GetSerializedCredentials(PWSTR *username, PWSTR *password, PWSTR *domain)
 		{
-			if(username)
+			if (username)
 			{
-				if(SerializedUserNameAvailable())
+				if (SerializedUserNameAvailable())
 				{
-					*username = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.UserName.Length + sizeof(wchar_t));
-					CopyMemory(*username, m_setSerialization->Logon.UserName.Buffer, m_setSerialization->Logon.UserName.Length);
+					if (SerializedDomainNameAvailable())
+					{
+						*username = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.UserName.Length + sizeof(wchar_t) + m_setSerialization->Logon.LogonDomainName.Length + sizeof(wchar_t));
+
+						HLOCAL u = LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.UserName.Length + sizeof(wchar_t));
+						CopyMemory(u, m_setSerialization->Logon.UserName.Buffer, m_setSerialization->Logon.UserName.Length);
+						HLOCAL d = LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.LogonDomainName.Length + sizeof(wchar_t));
+						CopyMemory(d, m_setSerialization->Logon.LogonDomainName.Buffer, m_setSerialization->Logon.LogonDomainName.Length);
+						std::wstring t = (PWSTR)u + std::wstring(L"@") + (PWSTR)d;
+						CopyMemory(*username, t.c_str(), m_setSerialization->Logon.UserName.Length + sizeof(wchar_t) + m_setSerialization->Logon.LogonDomainName.Length);
+						LocalFree(u);
+						LocalFree(d);
+					}
+					else
+					{
+						*username = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.UserName.Length + sizeof(wchar_t));
+						CopyMemory(*username, m_setSerialization->Logon.UserName.Buffer, m_setSerialization->Logon.UserName.Length);
+					}
 				}
 				else
 					*username = NULL;
 			}
 
-			if(password)
+			if (password)
 			{
-				if(SerializedPasswordAvailable())
+				if (SerializedPasswordAvailable())
 				{
 					*password = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.Password.Length + sizeof(wchar_t));
 					CopyMemory(*password, m_setSerialization->Logon.Password.Buffer, m_setSerialization->Logon.Password.Length);
@@ -471,9 +504,9 @@ namespace pGina
 					*password = NULL;
 			}
 
-			if(domain)
+			if (domain)
 			{
-				if(SerializedDomainNameAvailable())
+				if (SerializedDomainNameAvailable())
 				{
 					*domain = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.LogonDomainName.Length + sizeof(wchar_t));
 					CopyMemory(*domain, m_setSerialization->Logon.LogonDomainName.Buffer, m_setSerialization->Logon.LogonDomainName.Length);

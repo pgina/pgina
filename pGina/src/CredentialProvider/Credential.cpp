@@ -327,39 +327,85 @@ namespace pGina
 					return S_FALSE;
 				}
 
+				pGina::Service::StateHelper::PushUsername(username, password, pGina::Service::StateHelper::GetLoginChangePassword());
+
+				std::wstring dom = username;
+				size_t pos = dom.find(L"\\");
+				if (pos != std::wstring::npos)
+				{
+					// Down-Level Logon Name
+					// LogonUser wants username as user principal name if domain is null
+					// split the Down-Level Logon Name username into username and domain
+					std::wstring user = dom.substr(pos+1, dom.size()-pos-1);
+					dom = dom.substr(0,pos);
+					if (_wcsicmp(dom.c_str(), L"localhost") == 0)
+					{
+						dom = L".";
+					}
+					pDEBUG(L"Subst domain from username %s %s", user.c_str(), dom.c_str());
+					username = _wcsdup(user.c_str());
+					domain = _wcsdup(dom.c_str());
+				}
+				else
+				{
+					// ctrl+alt+entf event
+					DWORD mySession = pGina::Helpers::GetCurrentSessionId();
+					dom = pGina::Helpers::GetSessionDomainName(mySession);
+					domain = _wcsdup(dom.c_str());
+				}
+
 				HANDLE hToken;
 				if (!LogonUser(username, domain, password, LOGON32_LOGON_NETWORK, LOGON32_PROVIDER_DEFAULT, &hToken))
 				{
-					SHStrDupW(L"Your old password does not match", ppwszOptionalStatusText);
-					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
-					*pcpsiOptionalStatusIcon = CPSI_ERROR;
-					if (hdialog != NULL)
+					// ERROR_PASSWORD_EXPIRED 1330
+					// ERROR_PASSWORD_MUST_CHANGE 1907
+					int passwdChangeRequired[3] = {GetLastError(), ERROR_PASSWORD_EXPIRED, ERROR_PASSWORD_MUST_CHANGE};
+					pERROR(L"Credential::GetSerialization: CPUS_CHANGE_PASSWORD LogonUser failed:%i", passwdChangeRequired[0]);
+					for (int x = 1; x < 3; x++)
 					{
-						DestroyWindow(hdialog);
+						if (passwdChangeRequired[0] == passwdChangeRequired[x])
+						{
+							pERROR(L"Credential::GetSerialization: CPUS_CHANGE_PASSWORD LogonUser failed converted to success %d", passwdChangeRequired[0]);
+							passwdChangeRequired[0] = 0;
+							break;
+						}
+					}
+					if (passwdChangeRequired[0] == 0)
+					{
+						CloseHandle(hToken);
 					}
 					else
 					{
-						BlockInput(false);
+						SHStrDupW(L"Your old password does not match", ppwszOptionalStatusText);
+						pDEBUG(L"Your old password does not match");
+						*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
+						*pcpsiOptionalStatusIcon = CPSI_ERROR;
+						if (hdialog != NULL)
+						{
+							DestroyWindow(hdialog);
+						}
+						else
+						{
+							BlockInput(false);
+						}
+						return S_FALSE;
 					}
-					return S_FALSE;
 				}
 				else
 				{
 					CloseHandle(hToken);
 				}
 
-				DWORD mySession = pGina::Helpers::GetCurrentSessionId();
-				std::wstring d = pGina::Helpers::GetSessionDomainName(mySession);
-				domain = const_cast<PWSTR>(d.c_str());
 				loginResult = pGina::Transactions::User::ProcessChangePasswordForUser( username, domain, password, newPassword );
-
 				if( !loginResult.Result() )
 				{
 					if(loginResult.Message().empty())
 					{
 						loginResult.Message(L"Failed to change password, no message from plugins.");
+						pDEBUG(L"Failed to change password, no message from plugins.");
 					}
 					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);
+					pDEBUG(L"pGina::Transactions::User::ProcessChangePasswordForUser failed: %s", loginResult.Message().c_str());
 					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 					*pcpsiOptionalStatusIcon = CPSI_ERROR;
 					if (hdialog != NULL)
@@ -372,6 +418,8 @@ namespace pGina
 					}
 					return S_FALSE;
 				}
+
+				pGina::Service::StateHelper::PushUsername(pGina::Service::StateHelper::GetUsername(), newPassword, pGina::Service::StateHelper::GetLoginChangePassword());
 
 				if(loginResult.Message().length() > 0)
 					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);
@@ -388,6 +436,9 @@ namespace pGina
 				{
 					BlockInput(false);
 				}
+
+				pDEBUG(L"change password success");
+
 				return S_OK;
 				break;
 			}
@@ -442,6 +493,8 @@ namespace pGina
 
 			// At this point the info has passed to the service and been validated, so now we have to pack it up and provide it back to
 			// LogonUI/Winlogon as a serialized/packed logon structure.
+
+			pGina::Service::StateHelper::PushUsername(username, password, pGina::Service::StateHelper::GetLoginChangePassword());
 
 			pGina::Memory::ObjectCleanupPool cleanup;
 
@@ -601,10 +654,25 @@ namespace pGina
 		IFACEMETHODIMP Credential::ReportResult(__in NTSTATUS ntsStatus, __in NTSTATUS ntsSubstatus, __deref_out_opt PWSTR* ppwszOptionalStatusText,
 												__out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
 		{
-			pDEBUG(L"Credential::ReportResult(0x%08x, 0x%08x) called", ntsStatus, ntsSubstatus);
-			/**ppwszOptionalStatusText = NULL;
-			*pcpsiOptionalStatusIcon = CPSI_NONE;*/
-			return E_NOTIMPL;
+			// ERROR_PASSWORD_EXPIRED 1330
+			// ERROR_PASSWORD_MUST_CHANGE 1907
+			// ERROR_PASSWORD_CHANGE_REQUIRED 1938
+			pDEBUG(L"Credential::ReportResult(0x%08x, 0x%08x)", ntsStatus, ntsSubstatus);
+			*ppwszOptionalStatusText = NULL;
+			*pcpsiOptionalStatusIcon = CPSI_NONE;
+
+			if (ntsStatus == STATUS_PASSWORD_MUST_CHANGE || (ntsStatus == STATUS_ACCOUNT_RESTRICTION && ntsSubstatus == STATUS_PASSWORD_EXPIRED))
+			{
+				pGina::Service::StateHelper::PushUsername(pGina::Service::StateHelper::GetUsername().c_str(), pGina::Service::StateHelper::GetPassword().c_str(), true);
+				m_usageScenario = CPUS_CHANGE_PASSWORD;
+				pGina::Service::StateHelper::SetProvScenario(m_usageScenario);
+			}
+			if (SUCCEEDED(HRESULT_FROM_NT(ntsStatus)))
+			{
+				pGina::Service::StateHelper::PushUsername(L"", L"", false);
+			}
+
+			return S_OK;
 		}
 
 		Credential::Credential() :

@@ -1427,7 +1427,7 @@ namespace Abstractions.WindowsApi
         /// <returns>True if the account credentials are valid</returns>
         public static bool ValidateCredentials(string username, string password)
         {
-            return ValidateCredentials(username,"",password);
+            return ValidateCredentials(username, "", password);
         }
 
         /// <summary>
@@ -1440,15 +1440,54 @@ namespace Abstractions.WindowsApi
         /// <returns>True if the account credentials are valid</returns>
         public static bool ValidateCredentials(string username, string domain, string password)
         {
+            int ret = LogonUser(username, domain, password);
+            if (ret == 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Attempts to validate the user's credentials using
+        /// a pInvoke to LogonUser but ignores password change response.
+        /// </summary>
+        /// <param name="username">The username</param>
+        /// <param name="domain">The domain</param>
+        /// <param name="password">The password</param>
+        /// <returns>True if the account credentials are valid</returns>
+        public static bool ValidateUser(string username, string domain, string password)
+        {
+            int ret = LogonUser(username, domain, password);
+            // ERROR_PASSWORD_EXPIRED 1330
+            // ERROR_PASSWORD_MUST_CHANGE 1907
+            // ERROR_PASSWORD_CHANGE_REQUIRED 1938
+            if (new int[] { 0, 1330, 1907, 1938 }.Any(a => a == ret))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        internal static int LogonUser(string username, string domain, string password)
+        {
+            int error = 0;
             IntPtr hToken = IntPtr.Zero;
             bool result = SafeNativeMethods.LogonUser(username, domain, password,
                 (int)SafeNativeMethods.LogonType.LOGON32_LOGON_NETWORK,
                 (int)SafeNativeMethods.LogonProvider.LOGON32_PROVIDER_DEFAULT,
                 out hToken);
+            if (!result)
+            {
+                error = Marshal.GetLastWin32Error();
+                Abstractions.Logging.LibraryLogging.Debug("LogonUser:{0} {1} {2}", result, error, LastError());
+            }
 
             if (hToken != IntPtr.Zero) CloseHandle(hToken);
 
-            return result;
+            return error;
         }
 
         public static bool WTSRegister(IntPtr handle)

@@ -285,29 +285,10 @@ namespace pGina.Service.Impl
                 PluginDriver sessionDriver = new PluginDriver();
                 bool LastUsernameEnable = Settings.Get.LastUsernameEnable;
 
-                sessionDriver.UserInformation.Username = msg.Username.Trim();
+                msg = SplitDomainfromUsername(msg);
+                sessionDriver.UserInformation.Username = msg.Username;
                 sessionDriver.UserInformation.Password = (String.IsNullOrEmpty(msg.Password)) ? "" : msg.Password;
-                sessionDriver.UserInformation.Domain = "";
-                if (sessionDriver.UserInformation.Username.Contains("\\"))
-                {
-                    sessionDriver.UserInformation.Username = msg.Username.Trim().Split('\\').DefaultIfEmpty("").LastOrDefault();
-                    sessionDriver.UserInformation.Domain =   msg.Username.Trim().Split('\\').DefaultIfEmpty("").FirstOrDefault();
-                }
-                else if (sessionDriver.UserInformation.Username.Contains("@"))
-                {
-                    sessionDriver.UserInformation.Username = msg.Username.Trim().Split('@').DefaultIfEmpty("").FirstOrDefault();
-                    sessionDriver.UserInformation.Domain =   msg.Username.Trim().Split('@').DefaultIfEmpty("").LastOrDefault();
-                }
-                else
-                {
-                    sessionDriver.UserInformation.Domain = "";
-                }
-                m_logger.InfoFormat("domain:{0}", sessionDriver.UserInformation.Domain);
-                if (sessionDriver.UserInformation.Domain.Equals("localhost", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    sessionDriver.UserInformation.Domain = Environment.MachineName;
-                }
-                m_logger.InfoFormat("domain:{0}", sessionDriver.UserInformation.Domain);
+                sessionDriver.UserInformation.Domain = msg.Domain;
 
                 if (String.IsNullOrEmpty(sessionDriver.UserInformation.Username))
                 {
@@ -342,12 +323,13 @@ namespace pGina.Service.Impl
                     {
                         m_logger.InfoFormat("DomainMember");
                         // pc is member of this domain provided by the username field
-                        if (Abstractions.WindowsApi.pInvokes.ValidateCredentials(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password))
+                        if (Abstractions.WindowsApi.pInvokes.ValidateUser(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password))
                         {
-                            if (LastUsernameEnable)
+                            if (LastUsernameEnable && msg.Reason == LoginRequestMessage.LoginReason.Login)
                             {
                                 Settings.s_settings.SetSetting("LastUsername", String.Format("{0}\\{1}", sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Username));
                             }
+                            m_logger.InfoFormat("Sucess");
                             return new LoginResponseMessage()
                             {
                                 Result = true,
@@ -359,10 +341,12 @@ namespace pGina.Service.Impl
                         }
                         else
                         {
+                            string message = String.Format("The provided account:{0} name does not exist on:{1} or the password is wrong", sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain);
+                            m_logger.InfoFormat(message);
                             return new LoginResponseMessage()
                             {
                                 Result = false,
-                                Message = String.Format("The provided account:{0} name does not exist on:{1} or the password is wrong", sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain),
+                                Message = message,
                                 Username = sessionDriver.UserInformation.Username,
                                 Domain = sessionDriver.UserInformation.Domain,
                                 Password = sessionDriver.UserInformation.Password
@@ -374,12 +358,13 @@ namespace pGina.Service.Impl
                         m_logger.InfoFormat("GetMachineDomainMembership");
                         // pc is member of a domain
                         sessionDriver.UserInformation.Domain = domainmember;
-                        if (Abstractions.WindowsApi.pInvokes.ValidateCredentials(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password))
+                        if (Abstractions.WindowsApi.pInvokes.ValidateUser(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password))
                         {
-                            if (LastUsernameEnable)
+                            if (LastUsernameEnable && msg.Reason == LoginRequestMessage.LoginReason.Login)
                             {
-                                Settings.s_settings.SetSetting("LastUsername", String.Format("{0}", sessionDriver.UserInformation.Username));
+                                Settings.s_settings.SetSetting("LastUsername", String.Format("{0}\\{1}", sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Username));
                             }
+                            m_logger.InfoFormat("Sucess");
                             return new LoginResponseMessage()
                             {
                                 Result = true,
@@ -389,13 +374,17 @@ namespace pGina.Service.Impl
                                 Password = sessionDriver.UserInformation.Password
                             };
                         }
-                        sessionDriver.UserInformation.Domain = Environment.MachineName;
+                        else
+                        {
+                            m_logger.InfoFormat("Failed, query Remote({0}) SAM", domainmember);
+                            sessionDriver.UserInformation.Domain = Environment.MachineName;
+                        }
                     }
                 }
 
                 BooleanResult result = new BooleanResult() { Success = true, Message = "" };
 
-                if (new[] {LoginRequestMessage.LoginReason.Login, LoginRequestMessage.LoginReason.CredUI}.Contains(msg.Reason))
+                if (new[] { LoginRequestMessage.LoginReason.Login, LoginRequestMessage.LoginReason.CredUI }.Contains(msg.Reason))
                 {
                     m_logger.DebugFormat("Processing LoginRequest for: {0} in session: {1} reason: {2}", sessionDriver.UserInformation.Username, msg.Session, msg.Reason);
 
@@ -408,10 +397,10 @@ namespace pGina.Service.Impl
                     {
                         if (!userinfo4.comment.Contains("pGina created"))
                         {
-                            result.Success = Abstractions.WindowsApi.pInvokes.ValidateCredentials(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password);
+                            result.Success = Abstractions.WindowsApi.pInvokes.ValidateUser(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password);
                             if (result.Success)
                             {
-                                if (LastUsernameEnable)
+                                if (LastUsernameEnable && msg.Reason == LoginRequestMessage.LoginReason.Login)
                                 {
                                     Settings.s_settings.SetSetting("LastUsername", String.Format("{0}", sessionDriver.UserInformation.Username));
                                 }
@@ -419,7 +408,7 @@ namespace pGina.Service.Impl
                             return new LoginResponseMessage()
                             {
                                 Result = result.Success,
-                                Message = (result.Success)? "Local non pGina user" : "Unknown username or bad password",
+                                Message = (result.Success) ? "Local non pGina user" : "Unknown username or bad password",
                                 Username = sessionDriver.UserInformation.Username,
                                 Domain = sessionDriver.UserInformation.Domain,
                                 Password = sessionDriver.UserInformation.Password
@@ -505,8 +494,10 @@ namespace pGina.Service.Impl
                     }
                     else
                     {
-                        if (!Abstractions.WindowsApi.pInvokes.ValidateCredentials(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password))
+                        // testing. ValidateCredentials would be correct here
+                        if (!Abstractions.WindowsApi.pInvokes.ValidateUser(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password))
                         {
+                            m_logger.ErrorFormat("Query local SAM: Bad password");
                             return new LoginResponseMessage()
                             {
                                 Result = false,
@@ -570,7 +561,7 @@ namespace pGina.Service.Impl
                     m_logger.DebugFormat("Parse Request for: {0} in session: {1} reason: {2}", sessionDriver.UserInformation.Username, msg.Session, msg.Reason);
                 }
 
-                if (LastUsernameEnable)
+                if (LastUsernameEnable && msg.Reason == LoginRequestMessage.LoginReason.Login)
                 {
                     Settings.s_settings.SetSetting("LastUsername", String.Format("{0}", sessionDriver.UserInformation.Username));
                 }
@@ -1128,20 +1119,56 @@ namespace pGina.Service.Impl
             try
             {
                 m_logger.DebugFormat("Processing ChangePasswordRequest for: {0} domain: {1} session: {2}", msg.Username, msg.Domain, msg.Session);
+                msg = SplitDomainfromUsername(msg);
 
                 SessionProperties properties = m_sessionPropertyCache.Get(msg.Session).DefaultIfEmpty(new SessionProperties(Guid.Empty)).FirstOrDefault();
                 if (properties.Id == Guid.Empty)
                 {
                     m_logger.DebugFormat("no SessionProperties cached for user:{0}", msg.Username);
 
-                    string result = Abstractions.WindowsApi.pInvokes.UserChangePassword(msg.Domain, msg.Username, msg.OldPassword, msg.NewPassword);
-                    return new ChangePasswordResponseMessage()
+                    ChangePasswordResponseMessage message = new ChangePasswordResponseMessage();
+                    string domainmember = Abstractions.WindowsApi.pInvokes.GetMachineDomainMembershipEX();
+                    if (msg.Domain.Equals(Environment.MachineName, StringComparison.CurrentCultureIgnoreCase) || Abstractions.WindowsApi.pInvokes.DomainMember(msg.Domain))
                     {
-                        Result = (String.IsNullOrEmpty(result))? true : false,
-                        Message = result,
-                        Username = msg.Username,
-                        Domain = msg.Domain
-                    };
+                        m_logger.InfoFormat("DomainMember");
+                        // pc is member of this domain provided by the username field
+                        message.Message = Abstractions.WindowsApi.pInvokes.UserChangePassword(msg.Domain, msg.Username, msg.OldPassword, msg.NewPassword);
+                        message.Result = (String.IsNullOrEmpty(message.Message)) ? true : false;
+                        message.Domain = msg.Domain;
+                        // abort
+                        return message;
+                    }
+                    else if (!String.IsNullOrEmpty(domainmember))
+                    {
+                        m_logger.InfoFormat("GetMachineDomainMembership");
+                        // pc is member of a domain
+                        message.Message = Abstractions.WindowsApi.pInvokes.UserChangePassword(domainmember, msg.Username, msg.OldPassword, msg.NewPassword);
+                        message.Domain = domainmember;
+                        if (String.IsNullOrEmpty(message.Message))
+                        {
+                            message.Result = true;
+                            return message;
+                        }
+                        else
+                        {
+                            message.Message = String.Format("Remote({0}) Error:{1}\n\n", domainmember, message.Message);
+                        }
+                    }
+
+                    // local
+                    string mess = Abstractions.WindowsApi.pInvokes.UserChangePassword(Environment.MachineName, msg.Username, msg.OldPassword, msg.NewPassword);
+                    message.Result = (String.IsNullOrEmpty(mess)) ? true : false;
+                    message.Domain = Environment.MachineName;
+                    if (!message.Result)
+                    {
+                        message.Message += "Local Error:" + mess;
+                    }
+                    else
+                    {
+                        message.Message = mess;
+                    }
+
+                    return message;
                 }
                 UserInformation userinfo = properties.GetTrackedSingle<UserInformation>();
                 userinfo.oldPassword = userinfo.Password; // msg.OldPassword;
@@ -1182,6 +1209,63 @@ namespace pGina.Service.Impl
                 m_logger.ErrorFormat("Internal error, unexpected exception while handling change password request: {0}", e);
                 return new ChangePasswordResponseMessage() { Result = false, Message = "Internal error" };
             }
+        }
+
+        private ChangePasswordRequestMessage SplitDomainfromUsername(ChangePasswordRequestMessage msg)
+        {
+            ChangePasswordRequestMessage ret = msg;
+            Dictionary<string, string> split = SplitDomainfromUsername(msg.Username, msg.Domain);
+            ret.Username = split["username"];
+            ret.Domain = split["domain"];
+
+            return ret;
+        }
+
+        private LoginRequestMessage SplitDomainfromUsername(LoginRequestMessage msg)
+        {
+            LoginRequestMessage ret = msg;
+            Dictionary<string, string> split = SplitDomainfromUsername(msg.Username, msg.Domain);
+            ret.Username = split["username"];
+            ret.Domain = split["domain"];
+
+            return ret;
+        }
+
+        private Dictionary<string, string> SplitDomainfromUsername(string username, string domain)
+        {
+            Dictionary<string, string> ret = new Dictionary<string, string>()
+            {
+                {"username", username},
+                {"domain", domain}
+            };
+
+            if (username.Contains("\\"))
+            {
+                ret["username"] = username.Trim().Split('\\').DefaultIfEmpty("").LastOrDefault();
+                ret["domain"] = username.Trim().Split('\\').DefaultIfEmpty("").FirstOrDefault();
+            }
+            else if (username.Contains("@"))
+            {
+                ret["username"] = username.Trim().Split('@').DefaultIfEmpty("").FirstOrDefault();
+                ret["domain"] = username.Trim().Split('@').DefaultIfEmpty("").LastOrDefault();
+            }
+            else
+            {
+                if (String.IsNullOrEmpty(domain))
+                {
+                    ret["username"] = username;
+                    ret["domain"] = "";
+                }
+            }
+
+            m_logger.InfoFormat("domain:{0}", ret["domain"]);
+            if (new List<string>() { ".", "localhost" }.Any(a => a.Equals(ret["domain"], StringComparison.CurrentCultureIgnoreCase)))
+            {
+                ret["domain"] = Environment.MachineName;
+            }
+            m_logger.InfoFormat("domain:{0}", ret["domain"]);
+
+            return ret;
         }
     }
 }

@@ -31,6 +31,9 @@ namespace pGina
 {
 	namespace Service
 	{
+		/* static */ bool StateHelper::s_LoginChangePassword;
+		/* static */ std::wstring StateHelper::s_password;
+		/* static */ std::wstring StateHelper::s_username;
 		/* static */ pGina::Threading::Mutex StateHelper::s_mutex;
 		/* static */ pGina::Transactions::ServiceStateThread StateHelper::s_serviceStateThread;
 		/* static */ std::list<pGina::CredProv::Provider *> StateHelper::s_providers;
@@ -119,6 +122,54 @@ namespace pGina
 			{
 				pGina::CredProv::Provider * ptr = *itr;
 				ptr->ServiceStateChanged(newState);
+			}
+		}
+
+		/* static */
+		std::wstring StateHelper::GetUsername()
+		{
+			pGina::Threading::ScopedLock lock(s_mutex);
+			//pDEBUG(L"StateHelper::GetUsername:(%s)", StateHelper::s_username.c_str());
+			return StateHelper::s_username;
+		}
+
+		/* static */
+		std::wstring StateHelper::GetPassword()
+		{
+			pGina::Threading::ScopedLock lock(s_mutex);
+			//pDEBUG(L"StateHelper::GetPassword:(%s)", StateHelper::s_password.c_str());
+			return StateHelper::s_password;
+		}
+
+		/* static */
+		bool StateHelper::GetLoginChangePassword()
+		{
+			pGina::Threading::ScopedLock lock(s_mutex);
+			//pDEBUG(L"StateHelper::GetLoginChangePassword:(%i)", StateHelper::s_LoginChangePassword);
+			return StateHelper::s_LoginChangePassword;
+		}
+
+		/* static */
+		void StateHelper::PushUsername(std::wstring username, std::wstring password, bool Login)
+		{
+			pGina::Threading::ScopedLock lock(s_mutex);
+			StateHelper::s_username.clear();
+			StateHelper::s_password.clear();
+			StateHelper::s_username = username;
+			StateHelper::s_password = password;
+			StateHelper::s_LoginChangePassword = Login;
+			//pDEBUG(L"StateHelper::PushUsername:(%s,%s,%i)", StateHelper::s_username.c_str(), StateHelper::s_password.c_str(), StateHelper::s_LoginChangePassword);
+		}
+
+		/* static */
+		void StateHelper::SetProvScenario(CREDENTIAL_PROVIDER_USAGE_SCENARIO Scenario)
+		{
+			pGina::Threading::ScopedLock lock(s_mutex);
+			for(std::list<pGina::CredProv::Provider *>::iterator itr = s_providers.begin();
+				itr != s_providers.end(); ++itr)
+			{
+				pGina::CredProv::Provider * ptr = *itr;
+				ptr->m_usageScenario = Scenario;
 			}
 		}
 	}

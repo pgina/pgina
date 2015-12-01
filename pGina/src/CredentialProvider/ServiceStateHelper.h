@@ -56,12 +56,19 @@ namespace pGina
 			static void RemoveTarget(pGina::CredProv::Provider *ptr);
 
 			static void NotifyStateChanged(bool newState);
-
+			static std::wstring GetUsername();
+			static std::wstring GetPassword();
+			static bool GetLoginChangePassword();
+			static void PushUsername(std::wstring username, std::wstring password, bool Login);
+			static void StateHelper::SetProvScenario(CREDENTIAL_PROVIDER_USAGE_SCENARIO Scenario);
 		private:
 			static pGina::Transactions::ServiceStateThread s_serviceStateThread;
 			static std::list<pGina::CredProv::Provider *> s_providers;
 			static std::list<pGina::CredProv::Credential *> s_creds;
 			static pGina::Threading::Mutex s_mutex;
+			static std::wstring s_username;
+			static std::wstring s_password;
+			static bool s_LoginChangePassword;
 		};
 	}
 }
