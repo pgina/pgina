@@ -361,6 +361,8 @@ namespace pGina.Plugin.LocalMachine
                     user.SetPassword(userInfo.Password);
                     user.Description = "pGina created";
                     userInfo.Description = user.Description;
+                    if (userInfo.PasswordEXP)
+                        user.ExpirePasswordNow();
                     user.Save();
 
                     // Sync via DE
@@ -389,6 +391,7 @@ namespace pGina.Plugin.LocalMachine
                 if (!info.Description.Contains("pgSMB"))
                     if (!string.IsNullOrEmpty(info.usri4_profile)) userDe.Properties["Profile"].Value = info.usri4_profile;
                 userDe.Invoke("SetPassword", new object[] { info.Password });
+                userDe.Properties["PasswordExpired"].Value = Convert.ToInt32(info.PasswordEXP);
                 userDe.CommitChanges();
             }
         }

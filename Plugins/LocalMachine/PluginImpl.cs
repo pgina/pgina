@@ -162,7 +162,7 @@ namespace pGina.Plugin.LocalMachine
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
 
             // Verify the old password
-            if (Abstractions.WindowsApi.pInvokes.ValidateCredentials(userInfo.Username, userInfo.oldPassword))
+            if (Abstractions.WindowsApi.pInvokes.ValidateUser(userInfo.Username, "", userInfo.oldPassword))
             {
                 m_logger.DebugFormat("Authenticated via old password: {0}", userInfo.Username);
             }
@@ -541,52 +541,60 @@ namespace pGina.Plugin.LocalMachine
 
                 m_logger.DebugFormat("{1} SessionChange SessionLogon for ID:{0}", SessionId, userInfo.Username);
 
-                if (userInfo.Description.Contains("pGina created") && !userInfo.Description.Contains("pgSMB"))
+                if (userInfo.Description.Contains("pGina created"))
                 {
-                    if (!String.IsNullOrEmpty(userInfo.LoginScript))
+                    if (!userInfo.Description.Contains("pgSMB"))
                     {
-                        if (!Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, userInfo.LoginScript))
+                        if (!String.IsNullOrEmpty(userInfo.LoginScript))
                         {
-                            m_logger.ErrorFormat("Can't run application {0}", userInfo.LoginScript);
-                            Abstractions.WindowsApi.pInvokes.SendMessageToUser(SessionId, "Can't run application", String.Format("I'm unable to run your LoginScript\n{0}", userInfo.LoginScript));
+                            if (!Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, userInfo.LoginScript))
+                            {
+                                m_logger.ErrorFormat("Can't run application {0}", userInfo.LoginScript);
+                                Abstractions.WindowsApi.pInvokes.SendMessageToUser(SessionId, "Can't run application", String.Format("I'm unable to run your LoginScript\n{0}", userInfo.LoginScript));
+                            }
+                        }
+
+                        if (!Abstractions.Windows.User.QueryQuota(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString()) && Convert.ToUInt32(userInfo.usri4_max_storage) > 0)
+                        {
+                            m_logger.InfoFormat("{1} no quota GPO settings for user {0}", userInfo.SID.ToString(), userInfo.Username);
+                            if (!Abstractions.Windows.User.SetQuota(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString(), Convert.ToUInt32(userInfo.usri4_max_storage)))
+                            {
+                                m_logger.InfoFormat("{1} failed to set quota GPO for user {0}", userInfo.SID.ToString(), userInfo.Username);
+                            }
+                            else
+                            {
+                                m_logger.InfoFormat("{1} done quota GPO settings for user {0}", userInfo.SID.ToString(), userInfo.Username);
+                                try
+                                {
+                                    Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, "proquota.exe");
+                                }
+                                catch (Exception ex)
+                                {
+                                    m_logger.ErrorFormat("{2} Can't run application {0} because {1}", "proquota.exe", ex.ToString(), userInfo.Username);
+                                }
+                            }
+                        }
+
+                        IntPtr hToken = Abstractions.WindowsApi.pInvokes.GetUserToken(userInfo.Username, null, userInfo.Password);
+                        if (hToken != IntPtr.Zero)
+                        {
+                            string uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfilePath(hToken);
+                            if (String.IsNullOrEmpty(uprofile))
+                            {
+                                uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfileDir(hToken);
+                            }
+                            Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
+
+                            if (uprofile.Contains(@"\TEMP"))
+                            {
+                                Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows was unable to load the profile");
+                            }
                         }
                     }
 
-                    if (!Abstractions.Windows.User.QueryQuota(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString()) && Convert.ToUInt32(userInfo.usri4_max_storage) > 0)
+                    if (userInfo.PasswordEXPcntr.Ticks > 0)
                     {
-                        m_logger.InfoFormat("{1} no quota GPO settings for user {0}", userInfo.SID.ToString(), userInfo.Username);
-                        if (!Abstractions.Windows.User.SetQuota(Abstractions.WindowsApi.pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString(), Convert.ToUInt32(userInfo.usri4_max_storage)))
-                        {
-                            m_logger.InfoFormat("{1} failed to set quota GPO for user {0}", userInfo.SID.ToString(), userInfo.Username);
-                        }
-                        else
-                        {
-                            m_logger.InfoFormat("{1} done quota GPO settings for user {0}", userInfo.SID.ToString(), userInfo.Username);
-                            try
-                            {
-                                Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, "proquota.exe");
-                            }
-                            catch (Exception ex)
-                            {
-                                m_logger.ErrorFormat("{2} Can't run application {0} because {1}", "proquota.exe", ex.ToString(), userInfo.Username);
-                            }
-                        }
-                    }
-
-                    IntPtr hToken = Abstractions.WindowsApi.pInvokes.GetUserToken(userInfo.Username, null, userInfo.Password);
-                    if (hToken != IntPtr.Zero)
-                    {
-                        string uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfilePath(hToken);
-                        if (String.IsNullOrEmpty(uprofile))
-                        {
-                            uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfileDir(hToken);
-                        }
-                        Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
-
-                        if (uprofile.Contains(@"\TEMP"))
-                        {
-                            Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows was unable to load the profile");
-                        }
+                        Abstractions.WindowsApi.pInvokes.SendMessageToUser(SessionId, "Password expiration warning", String.Format("Your password will expire in {0} days {1} hours {2} minutes", userInfo.PasswordEXPcntr.Days, userInfo.PasswordEXPcntr.Hours, userInfo.PasswordEXPcntr.Minutes));
                     }
                 }
                 else
