@@ -60,6 +60,7 @@ namespace pGina
 			friend class pGina::COM::CClassFactory;
 
 			virtual void	ServiceStateChanged(bool newState);
+			CREDENTIAL_PROVIDER_USAGE_SCENARIO	m_usageScenario;
 		protected:
 			Provider();
 			__override ~Provider();
@@ -72,7 +73,6 @@ namespace pGina
 
 		private:
 			long m_referenceCount;
-			CREDENTIAL_PROVIDER_USAGE_SCENARIO	m_usageScenario;
 			ICredentialProviderEvents *			m_logonUiCallbackEvents;
 			UINT_PTR							m_logonUiCallbackContext;
 			Credential *						m_credential;
