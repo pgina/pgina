@@ -34,6 +34,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
+            this.ntpservers_group = new System.Windows.Forms.GroupBox();
             this.groupLogon = new System.Windows.Forms.GroupBox();
             this.chk_lastusername = new System.Windows.Forms.CheckBox();
             this.groupBox18 = new System.Windows.Forms.GroupBox();
@@ -161,8 +162,10 @@
             this.m_pginaVersionLbl = new System.Windows.Forms.Label();
             this.btnSaveAndClose = new System.Windows.Forms.Button();
             this.help = new System.Windows.Forms.Button();
+            this.ntpservers = new System.Windows.Forms.RichTextBox();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
+            this.ntpservers_group.SuspendLayout();
             this.groupLogon.SuspendLayout();
             this.groupBox18.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -225,6 +228,7 @@
             //
             // m_generalConfigTab
             //
+            this.m_generalConfigTab.Controls.Add(this.ntpservers_group);
             this.m_generalConfigTab.Controls.Add(this.groupLogon);
             this.m_generalConfigTab.Controls.Add(this.groupBox18);
             this.m_generalConfigTab.Controls.Add(this.groupBox4);
@@ -239,6 +243,16 @@
             this.m_generalConfigTab.TabIndex = 1;
             this.m_generalConfigTab.Text = "General";
             this.m_generalConfigTab.UseVisualStyleBackColor = true;
+            //
+            // ntpservers_group
+            //
+            this.ntpservers_group.Controls.Add(this.ntpservers);
+            this.ntpservers_group.Location = new System.Drawing.Point(572, 299);
+            this.ntpservers_group.Name = "ntpservers_group";
+            this.ntpservers_group.Size = new System.Drawing.Size(194, 106);
+            this.ntpservers_group.TabIndex = 9;
+            this.ntpservers_group.TabStop = false;
+            this.ntpservers_group.Text = "NTP Servers";
             //
             // groupLogon
             //
@@ -1597,6 +1611,15 @@
             this.help.UseVisualStyleBackColor = true;
             this.help.Click += new System.EventHandler(this.Btn_help);
             //
+            // ntpservers
+            //
+            this.ntpservers.Location = new System.Drawing.Point(6, 19);
+            this.ntpservers.Name = "ntpservers";
+            this.ntpservers.Size = new System.Drawing.Size(182, 81);
+            this.ntpservers.TabIndex = 2;
+            this.ntpservers.Text = "";
+            this.ntpservers.WordWrap = false;
+            //
             // ConfigurationUI
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1614,6 +1637,7 @@
             this.Load += new System.EventHandler(this.Form_Load);
             this.m_tabs.ResumeLayout(false);
             this.m_generalConfigTab.ResumeLayout(false);
+            this.ntpservers_group.ResumeLayout(false);
             this.groupLogon.ResumeLayout(false);
             this.groupLogon.PerformLayout();
             this.groupBox18.ResumeLayout(false);
@@ -1805,5 +1829,7 @@
         private System.Windows.Forms.Button help;
         private System.Windows.Forms.GroupBox groupLogon;
         private System.Windows.Forms.CheckBox chk_lastusername;
+        private System.Windows.Forms.GroupBox ntpservers_group;
+        private System.Windows.Forms.RichTextBox ntpservers;
     }
 }

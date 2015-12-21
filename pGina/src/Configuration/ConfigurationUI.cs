@@ -130,6 +130,7 @@ namespace pGina.Configuration
             toolTip1.SetToolTip(this.notify_pass, "smtp password");
             toolTip1.SetToolTip(this.notify_cred, "prefer Login credentials instead of smtp username and password");
             toolTip1.SetToolTip(this.notify_ssl, "use encrypted smtp connection");
+            toolTip1.SetToolTip(this.ntpservers, "list of NTP servers");
         }
 
         private void VerifyRegistryAccess()
@@ -306,6 +307,11 @@ namespace pGina.Configuration
 
             // Display last username in logon screen
             chk_lastusername.Checked = Settings.Get.LastUsernameEnable;
+
+            //ntp server
+            //this.ntpservers = Settings.Get.GetGetSetting("ntpservers");
+            string[] ntpserverList = Settings.Get.ntpservers;
+            this.ntpservers.Text = String.Join("\n", ntpserverList);
 
             // email notification
             this.notify_smtp.Text = Settings.Get.GetSetting("notify_smtp");
@@ -945,6 +951,9 @@ namespace pGina.Configuration
                 this.SaveCpSettings();
             else
                 this.SaveGinaSettings();
+
+            // ntp server
+            Settings.Get.ntpservers = this.ntpservers.Text.Split('\n');
 
             // email notification
             Settings.Get.notify_smtp = this.notify_smtp.Text;
