@@ -420,6 +420,7 @@ namespace pGina.Plugin.Ldap
                 // Attempt to bind with the user's LDAP credentials
                 m_logger.DebugFormat("Attempting to bind with DN {0}", userDN);
                 NetworkCredential ldapCredential = new NetworkCredential(userDN, password);
+                UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
 
                 try
                 {
@@ -486,7 +487,6 @@ namespace pGina.Plugin.Ldap
                         Dictionary<string, List<string>> search = GetUserAttribValue(userDN, "(objectClass=*)", SearchScope.Subtree, Convert_attribs.Values.ToArray());
                         if (search.Count > 0)
                         {
-                            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
                             foreach (KeyValuePair<string, List<string>> search_p in search)
                             {
                                 foreach (KeyValuePair<string, string> Convert_attribs_p in Convert_attribs)
