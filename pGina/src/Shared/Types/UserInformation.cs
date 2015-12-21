@@ -148,6 +148,27 @@ namespace pGina.Shared.Types
         private string _oldPassword;
 
         /// <summary>
+        /// Is password expired
+        /// </summary>
+        public bool PasswordEXP
+        {
+            get
+            {
+                return (_PasswordEXP) ? true : false;
+            }
+            set
+            {
+                _PasswordEXP = value;
+            }
+        }
+        private bool _PasswordEXP;
+
+        /// <summary>
+        /// how long until the password does expire
+        /// </summary>
+        public TimeSpan PasswordEXPcntr { get; set; }
+
+        /// <summary>
         /// Description of this user
         /// </summary>
         public string Description
@@ -311,6 +332,136 @@ namespace pGina.Shared.Types
             }
         }
         private string _pgSMB_SMBshare;
+
+        public string script_authe_sys
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_script_authe_sys)) ? "" : _script_authe_sys;
+            }
+            set
+            {
+                _script_authe_sys = value;
+            }
+        }
+        private string _script_authe_sys;
+
+        public string script_authe_usr
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_script_authe_usr)) ? "" : _script_authe_usr;
+            }
+            set
+            {
+                _script_authe_usr = value;
+            }
+        }
+        private string _script_authe_usr;
+
+        public string script_autho_sys
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_script_autho_sys)) ? "" : _script_autho_sys;
+            }
+            set
+            {
+                _script_autho_sys = value;
+            }
+        }
+        private string _script_autho_sys;
+
+        public string script_autho_usr
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_script_autho_usr)) ? "" : _script_autho_usr;
+            }
+            set
+            {
+                _script_autho_usr = value;
+            }
+        }
+        private string _script_autho_usr;
+
+        public string script_gateway_sys
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_script_gateway_sys)) ? "" : _script_gateway_sys;
+            }
+            set
+            {
+                _script_gateway_sys = value;
+            }
+        }
+        private string _script_gateway_sys;
+
+        public string script_gateway_usr
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_script_gateway_usr)) ? "" : _script_gateway_usr;
+            }
+            set
+            {
+                _script_gateway_usr = value;
+            }
+        }
+        private string _script_gateway_usr;
+
+        public string script_notication_sys
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_script_notication_sys)) ? "" : _script_notication_sys;
+            }
+            set
+            {
+                _script_notication_sys = value;
+            }
+        }
+        private string _script_notication_sys;
+
+        public string script_notication_usr
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_script_notication_usr)) ? "" : _script_notication_usr;
+            }
+            set
+            {
+                _script_notication_usr = value;
+            }
+        }
+        private string _script_notication_usr;
+
+        public string script_changepwd_sys
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_script_changepwd_sys)) ? "" : _script_changepwd_sys;
+            }
+            set
+            {
+                _script_changepwd_sys = value;
+            }
+        }
+        private string _script_changepwd_sys;
+
+        public string script_changepwd_usr
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_script_changepwd_usr)) ? "" : _script_changepwd_usr;
+            }
+            set
+            {
+                _script_changepwd_usr = value;
+            }
+        }
+        private string _script_changepwd_usr;
 
         public UserInformation()
         {
