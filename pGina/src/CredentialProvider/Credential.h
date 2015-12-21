@@ -36,6 +36,7 @@ namespace pGina
 {
 	namespace CredProv
 	{
+		class Provider;
 		class Credential : public ICredentialProviderCredential
 		{
 		public:
