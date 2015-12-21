@@ -74,6 +74,8 @@ namespace pGina.Plugin.Ldap
         /// </summary>
         private X509Certificate2 m_cert;
 
+        private Dictionary<string, string> pGinaSettings = new Dictionary<string, string>();
+
         /// <summary>
         /// The number of seconds to wait for a connection before giving up.
         /// </summary>
@@ -107,6 +109,8 @@ namespace pGina.Plugin.Ldap
 
             m_logger.DebugFormat("Initializing LdapServer host(s): [{0}], port: {1}, useSSL = {2}, useTLS = {3}, verifyCert = {4}",
                 string.Join(", ", hosts), port, m_useSsl, m_useTls, m_verifyCert);
+
+            pGinaSettings = pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" });
 
             this.Connect();
         }
@@ -426,6 +430,14 @@ namespace pGina.Plugin.Ldap
                     // 49 is invalid credentials
                     if (e.ErrorCode == 49)
                     {
+                        if (PWDexpired(uname, password).Success)
+                        {
+                            m_logger.InfoFormat("Password expired");
+                            userInfo.PasswordEXP = true;
+                            properties.AddTrackedSingle<UserInformation>(userInfo);
+                            return new BooleanResult { Message = "Password expired", Success = true };
+                        }
+
                         m_logger.ErrorFormat("LDAP bind failed: invalid credentials.");
                         return new BooleanResult { Success = false, Message = "Authentication via LDAP failed. Invalid credentials." };
                     }
@@ -441,6 +453,20 @@ namespace pGina.Plugin.Ldap
 
                 // If we get here, the authentication was successful, we're done!
                 m_logger.DebugFormat("LDAP DN {0} successfully bound to server, return success", ldapCredential.UserName);
+
+                BooleanResultEx pwd = PWDexpired(uname, password);
+                if (pwd.Success) //samba ldap may not throw exception 49
+                {
+                    m_logger.InfoFormat("Password expired");
+                    userInfo.PasswordEXP = true;
+                    properties.AddTrackedSingle<UserInformation>(userInfo);
+                    return new BooleanResult { Message = "Password expired", Success = true };
+                }
+                else
+                {
+                    userInfo.PasswordEXPcntr = new TimeSpan(pwd.Int64);
+                    properties.AddTrackedSingle<UserInformation>(userInfo);
+                }
 
                 try
                 {
@@ -509,6 +535,191 @@ namespace pGina.Plugin.Ldap
             }
         }
 
+        internal BooleanResultEx PWDexpired(string uname, string password)
+        {
+            //m_logger.InfoFormat("PWDexpired");
+
+            string userDN = GetUserDN(uname);
+            if (userDN == null)
+            {
+                return new BooleanResultEx { Success = false };
+            }
+            //m_logger.InfoFormat("userDN={0}", userDN);
+
+            List<string> ntps = m_serverIdentifier.Servers.ToList();
+            ntps.AddRange(pGinaSettings["ntpservers"].Split('\n').ToList());
+            m_logger.InfoFormat("ntplist:{0}", String.Join(" ", ntps));
+
+            Dictionary<string, List<string>> search = GetUserAttribValue(userDN, "(objectClass=*)", System.DirectoryServices.Protocols.SearchScope.Base, new string[] { "shadowMax", "sambaPwdMustChange", "userAccountControl", "msDS-User-Account-Control-Computed", "msDS-UserPasswordExpiryTimeComputed", "pwdLastSet", "memberOf", "msDS-PSOApplied" });
+            #region samba
+            if (search.ContainsKey("shadowmax"))
+            {
+                //m_logger.InfoFormat("shadowmax found={0}", search["shadowmax"].First());
+                int shadowmax = -1;
+                try
+                {
+                    shadowmax = Convert.ToInt32(search["shadowmax"].First());
+                }
+                catch (Exception e)
+                {
+                    m_logger.FatalFormat("Unable to convert \"{0}\" return from GetUserAttribValue to int {1}", "shadowmax", e.Message);
+                }
+
+                if (shadowmax == -1 /*samba DONT_EXPIRE_PASSWD*/)
+                {
+                    return new BooleanResultEx { Success = false };
+                }
+
+                try
+                {
+                    shadowmax = Convert.ToInt32(new TimeSpan(shadowmax, 0, 0, 0).TotalSeconds);
+                }
+                catch (Exception e)
+                {
+                    m_logger.FatalFormat("Unable to convert \"{0}\" to seconds {1}", "shadowmax", e.Message);
+                    return new BooleanResultEx { Success = false };
+                }
+                //m_logger.InfoFormat("shadowmax={0}", shadowmax);
+
+                if (search.ContainsKey("sambapwdmustchange"))
+                {
+                    //m_logger.InfoFormat("sambapwdmustchange found");
+                    int sambapwdmustchange = 0;
+                    try
+                    {
+                        sambapwdmustchange = Convert.ToInt32(search["sambapwdmustchange"].First());
+                    }
+                    catch (Exception e)
+                    {
+                        m_logger.FatalFormat("Unable to convert \"{0}\" return from GetUserAttribValue to int {1}", "sambapwdmustchange", e.Message);
+                    }
+
+                    if (sambapwdmustchange == 0)
+                    {
+                        return new BooleanResultEx { Success = false };
+                    }
+                    //m_logger.InfoFormat("sambapwdmustchange={0}", sambapwdmustchange);
+
+                    int DateNowSec = 0;
+                    DateTime NTPtime = DateTime.MaxValue;
+                    try
+                    {
+                        DateTime time = Abstractions.Windows.Networking.GetNetworkTime(ntps.ToArray());
+                        //m_logger.InfoFormat("NTP {0}", time);
+                        if (time == DateTime.MinValue)
+                        {
+                            m_logger.InfoFormat("can't get time from {0}", String.Join(" ", ntps));
+                            NTPtime = DateTime.MaxValue;
+                        }
+                        else
+                        {
+                            NTPtime = time;
+                            DateNowSec = Convert.ToInt32((NTPtime - new DateTime(1970, 1, 1, 0, 0, 0, 0)).TotalSeconds);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        m_logger.FatalFormat("Unable to convert NTP time to ticks {0}", e);
+                    }
+
+                    if (NTPtime != DateTime.MaxValue)
+                    {
+                        m_logger.InfoFormat("{0} > {1}", DateNowSec, sambapwdmustchange);
+                        if (DateNowSec > sambapwdmustchange)
+                        {
+                            m_logger.InfoFormat("pwd expired");
+                            return new BooleanResultEx { Success = true, Message = "Password expired" };
+                        }
+
+                        TimeSpan PWDlasts = new TimeSpan((long)(sambapwdmustchange - DateNowSec) * (long)10000000);
+                        if (PWDlasts < new TimeSpan(5, 0, 0, 0))
+                        {
+                            m_logger.InfoFormat("password will expire in less than 5 days, to be exact:{0:c}", PWDlasts);
+                            return new BooleanResultEx { Success = false, Int64 = PWDlasts.Ticks };
+                        }
+                    }
+                }
+            }
+            #endregion
+            #region AD
+            if (search.ContainsKey("msds-user-account-control-computed"))
+            {
+                //m_logger.InfoFormat("msds-user-account-control-computed found={0}", search["msds-user-account-control-computed"].First());
+                int msdsuseraccountcontrolcomputed = -1;
+                try
+                {
+                    msdsuseraccountcontrolcomputed = Convert.ToInt32(search["msds-user-account-control-computed"].First());
+                }
+                catch (Exception e)
+                {
+                    m_logger.FatalFormat("Unable to convert \"{0}\" return from GetUserAttribValue to int {1}", "msds-user-account-control-computed", e.Message);
+                }
+
+                if (((int)Abstractions.WindowsApi.pInvokes.structenums.UserFlags.UF_DONT_EXPIRE_PASSWD & msdsuseraccountcontrolcomputed) == (int)Abstractions.WindowsApi.pInvokes.structenums.UserFlags.UF_DONT_EXPIRE_PASSWD || ((int)Abstractions.WindowsApi.pInvokes.structenums.UserFlags.UF_PASSWD_CANT_CHANGE & msdsuseraccountcontrolcomputed) == (int)Abstractions.WindowsApi.pInvokes.structenums.UserFlags.UF_PASSWD_CANT_CHANGE)
+                {
+                    m_logger.InfoFormat("userAccountControl contain UF_DONT_EXPIRE_PASSWD and or UF_PASSWD_CANT_CHANGE");
+                    return new BooleanResultEx { Success = false };
+                }
+
+                if (((int)Abstractions.WindowsApi.pInvokes.structenums.UserFlags.UF_PASSWORD_EXPIRED & msdsuseraccountcontrolcomputed) == (int)Abstractions.WindowsApi.pInvokes.structenums.UserFlags.UF_PASSWORD_EXPIRED)
+                {
+                    m_logger.InfoFormat("userAccountControl contain UF_PASSWORD_EXPIRED");
+                    return new BooleanResultEx { Success = true, Message = "Password expired" };
+                }
+
+                DateTime msdsuserpasswordexpirytimecomputed = DateTime.MaxValue;
+                if (search.ContainsKey("msds-userpasswordexpirytimecomputed"))
+                {
+                    //m_logger.InfoFormat("msds-userpasswordexpirytimecomputed={0}", search["msds-userpasswordexpirytimecomputed"].First());
+                    try
+                    {
+                        msdsuserpasswordexpirytimecomputed = DateTime.FromFileTimeUtc(Convert.ToInt64(search["msds-userpasswordexpirytimecomputed"].First()));
+                    }
+                    catch (Exception e)
+                    {
+                        m_logger.FatalFormat("Unable to convert \"{0}\" return from GetUserAttribValue to int {1}", "msds-userpasswordexpirytimecomputed", e.Message);
+                        return new BooleanResultEx { Success = false };
+                    }
+                }
+                if (msdsuserpasswordexpirytimecomputed == DateTime.MaxValue)
+                {
+                    return new BooleanResultEx { Success = false };
+                }
+
+                DateTime NTPtime = DateTime.MaxValue;
+                try
+                {
+                    NTPtime = Abstractions.Windows.Networking.GetNetworkTime(ntps.ToArray());
+                    //m_logger.InfoFormat("NTP {0:yyyy.MM.dd.HH:mm:ss}", NTPtime);
+                    if (NTPtime == DateTime.MinValue)
+                    {
+                        m_logger.InfoFormat("can't get time from {0}", String.Join(" ", ntps));
+                        NTPtime = DateTime.MaxValue;
+                    }
+                }
+                catch (Exception e)
+                {
+                    m_logger.FatalFormat("Unable to convert NTP time to ticks {0}", e);
+                }
+                if (NTPtime != DateTime.MaxValue)
+                {
+                    m_logger.InfoFormat("{0:yyyy.MM.dd.HH:mm:ss}-{1:yyyy.MM.dd.HH:mm:ss}", msdsuserpasswordexpirytimecomputed, NTPtime);
+                    TimeSpan PWDlasts = msdsuserpasswordexpirytimecomputed - NTPtime;
+                    //m_logger.InfoFormat("PWDlasts:{0:c}", PWDlasts);
+                    if (PWDlasts < new TimeSpan(5, 0, 0, 0))
+                    {
+                        m_logger.InfoFormat("password will expire in less than 5 days, to be exact:{0:c}", PWDlasts);
+                        return new BooleanResultEx { Success = false, Int64 = PWDlasts.Ticks };
+                    }
+                }
+
+                return new BooleanResultEx { Success = false };
+            }
+            #endregion
+
+            return new BooleanResultEx { Success = false };
+        }
+
         public string GetUserDN(string uname)
         {
             bool doSearch = Settings.Store.DoSearch;
@@ -528,6 +739,7 @@ namespace pGina.Plugin.Ldap
         /// <para>string array of attributes to search at</para>
         /// <para>Searchscope</para>
         /// <para>Filter</para>
+        /// return key ToLower()
         /// </summary>
         /// <returns></returns>
         public Dictionary<string, List<string>> GetUserAttribValue(string path, string filter, SearchScope scope, string[] Attrib)
@@ -548,14 +760,36 @@ namespace pGina.Plugin.Ldap
                     foreach (String name in entry.Attributes.AttributeNames)
                     {
                         List<string> values = new List<string>();
-                        foreach (object val in entry.Attributes[name].GetValues(typeof(string)))
+                        for (int x = 0; x < entry.Attributes[name].Count; x++)
                         {
-                            string value = val.ToString();
-                            if (!String.IsNullOrEmpty(value))
-                                values.Add(value);
+                            object res = entry.Attributes[name][x];
+                            if (res == null)
+                            {
+                                break;
+                            }
+
+                            string str = "";
+                            if (res.GetType() == typeof(byte[]))
+                            {
+                                foreach (byte b in (byte[])res)
+                                {
+                                    str += String.Format("{0:X2}", b);
+                                }
+                            }
+                            else
+                            {
+                                str = res.ToString();
+                            }
+
+                            if (!String.IsNullOrEmpty(str))
+                            {
+                                values.Add(str);
+                            }
                         }
                         if (values.Count > 0)
+                        {
                             ret.Add(name.ToLower(),values);
+                        }
                     }
                 }
             }

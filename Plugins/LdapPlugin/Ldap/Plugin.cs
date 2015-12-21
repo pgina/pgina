@@ -343,6 +343,8 @@ namespace pGina.Plugin.Ldap
             {
                 try
                 {
+                    string[] hosts = Settings.Store.LdapHost;
+
                     // Authenticate using old password
                     BooleanResult result = serv.Authenticate(userInfo.Username, userInfo.oldPassword, properties);
                     if (!result.Success)
@@ -354,7 +356,19 @@ namespace pGina.Plugin.Ldap
                     List<AttributeEntry> attribs = CPAttributeSettings.Load();
                     foreach (AttributeEntry entry in attribs)
                     {
-                        if (entry.Method.HasFlag(Methods.Timestamps) || entry.Method.HasFlag(Methods.Timestampd))
+                        if (entry.Method.HasFlag(Methods.ADPWD))
+                        {
+                            foreach (string server in hosts)
+                            {
+                                if (Abstractions.WindowsApi.pInvokes.UserChangePassword(server, userInfo.Username, userInfo.oldPassword, userInfo.Password) == "")
+                                {
+                                    break;
+                                }
+                            }
+                            continue;
+                        }
+
+                        if (entry.Method.HasFlag(Methods.Timestamps) || entry.Method.HasFlag(Methods.Timestampd) || entry.Method.HasFlag(Methods.Timestampt))
                         {
                             TimeMethod time = TimeMethod.methods[entry.Method];
 

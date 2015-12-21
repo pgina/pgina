@@ -47,6 +47,14 @@ namespace pGina.Plugin.Ldap
         LM,
         Timestamps,
         Timestampd,
+        Timestampt,
+        SHA256,
+        SSHA256,
+        SHA384,
+        SSHA384,
+        SHA512,
+        SSHA512,
+        ADPWD,
     }
 
     class AttribConvert
@@ -61,7 +69,17 @@ namespace pGina.Plugin.Ldap
                 "Email",
                 "LoginScript",
                 "pgSMB_Filename",
-                "pgSMB_SMBshare"
+                "pgSMB_SMBshare",
+                "script_authe_sys",
+                "script_authe_usr",
+                "script_autho_sys",
+                "script_autho_usr",
+                "script_gateway_sys",
+                "script_gateway_usr",
+                "script_notification_sys",
+                "script_notification_usr",
+                "script_changepwd_sys",
+                "script_changepwd_usr"
             });
     }
 
@@ -85,8 +103,15 @@ namespace pGina.Plugin.Ldap
             methods.Add(Methods.SMD5, new PasswordHashMethodSMD5());
             methods.Add(Methods.SHA1, new PasswordHashMethodSHA1());
             methods.Add(Methods.SSHA1, new PasswordHashMethodSSHA1());
+            methods.Add(Methods.SHA256, new PasswordHashMethodSHA256());
+            methods.Add(Methods.SSHA256, new PasswordHashMethodSSHA256());
+            methods.Add(Methods.SHA384, new PasswordHashMethodSHA384());
+            methods.Add(Methods.SSHA384, new PasswordHashMethodSSHA384());
+            methods.Add(Methods.SHA512, new PasswordHashMethodSHA512());
+            methods.Add(Methods.SSHA512, new PasswordHashMethodSSHA512());
             methods.Add(Methods.NTLM, new PasswordHashMethodNTLM());
             methods.Add(Methods.LM, new PasswordHashMethodLM());
+            methods.Add(Methods.ADPWD, new PasswordADPWD());
         }
 
         public abstract string hash(string pw);
@@ -141,11 +166,26 @@ namespace pGina.Plugin.Ldap
             methods = new Dictionary<Methods, TimeMethod>();
             methods.Add(Methods.Timestamps, new PasswordTimestampUNIX());
             methods.Add(Methods.Timestampd, new PasswordTimestampSHADOW());
+            methods.Add(Methods.Timestampt, new PasswordTimestampNT());
         }
 
         public abstract string time();
 
         public abstract string time(TimeSpan add);
+    }
+
+    class PasswordADPWD : AttribMethod
+    {
+        public PasswordADPWD()
+        {
+            m_name = "Select to change an AD password";
+            m_method = Methods.ADPWD;
+        }
+
+        public override string hash(string pw)
+        {
+            return pw;
+        }
     }
 
     class PasswordHashMethodPlain : AttribMethod
@@ -277,6 +317,183 @@ namespace pGina.Plugin.Ldap
             }
 
             return "{SSHA}" + Convert.ToBase64String(ssha);
+        }
+    }
+
+    class PasswordHashMethodSHA256 : AttribMethod
+    {
+        public PasswordHashMethodSHA256()
+        {
+            m_name = "SHA256";
+            m_method = Methods.SHA256;
+        }
+
+        public override string hash(string password)
+        {
+            byte[] sha = null;
+
+            try
+            {
+                using (HashAlgorithm algorithm = new SHA256Managed())
+                {
+                    sha = algorithm.ComputeHash(Encoding.UTF8.GetBytes(password));
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.FatalFormat("SHA Error:", ex.Message);
+            }
+
+            return "{SHA256}" + Convert.ToBase64String(sha);
+        }
+    }
+
+    class PasswordHashMethodSSHA256 : AttribMethod
+    {
+        public PasswordHashMethodSSHA256()
+        {
+            m_name = "SSHA256 (Salted SHA256)";
+            m_method = Methods.SSHA256;
+        }
+
+        public override string hash(string password)
+        {
+            byte[] ssha = null;
+            byte[] salt = GenerateSalt(16);
+
+            try
+            {
+                using (HashAlgorithm algorithm = new SHA256Managed())
+                {
+                    byte[] combine = Appendbytes(Encoding.UTF8.GetBytes(password), salt);
+                    ssha = algorithm.ComputeHash(combine);
+                    ssha = Appendbytes(ssha, salt);
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.FatalFormat("SSHA Error:", ex.Message);
+            }
+
+            return "{SSHA256}" + Convert.ToBase64String(ssha);
+        }
+    }
+
+    class PasswordHashMethodSHA384 : AttribMethod
+    {
+        public PasswordHashMethodSHA384()
+        {
+            m_name = "SHA384";
+            m_method = Methods.SHA384;
+        }
+
+        public override string hash(string password)
+        {
+            byte[] sha = null;
+
+            try
+            {
+                using (HashAlgorithm algorithm = new SHA384Managed())
+                {
+                    sha = algorithm.ComputeHash(Encoding.UTF8.GetBytes(password));
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.FatalFormat("SHA Error:", ex.Message);
+            }
+
+            return "{SHA384}" + Convert.ToBase64String(sha);
+        }
+    }
+
+    class PasswordHashMethodSSHA384 : AttribMethod
+    {
+        public PasswordHashMethodSSHA384()
+        {
+            m_name = "SSHA384 (Salted SHA384)";
+            m_method = Methods.SSHA384;
+        }
+
+        public override string hash(string password)
+        {
+            byte[] ssha = null;
+            byte[] salt = GenerateSalt(16);
+
+            try
+            {
+                using (HashAlgorithm algorithm = new SHA384Managed())
+                {
+                    byte[] combine = Appendbytes(Encoding.UTF8.GetBytes(password), salt);
+                    ssha = algorithm.ComputeHash(combine);
+                    ssha = Appendbytes(ssha, salt);
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.FatalFormat("SSHA Error:", ex.Message);
+            }
+
+            return "{SSHA384}" + Convert.ToBase64String(ssha);
+        }
+    }
+
+    class PasswordHashMethodSHA512 : AttribMethod
+    {
+        public PasswordHashMethodSHA512()
+        {
+            m_name = "SHA512";
+            m_method = Methods.SHA512;
+        }
+
+        public override string hash(string password)
+        {
+            byte[] sha = null;
+
+            try
+            {
+                using (HashAlgorithm algorithm = new SHA512Managed())
+                {
+                    sha = algorithm.ComputeHash(Encoding.UTF8.GetBytes(password));
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.FatalFormat("SHA Error:", ex.Message);
+            }
+
+            return "{SHA512}" + Convert.ToBase64String(sha);
+        }
+    }
+
+    class PasswordHashMethodSSHA512 : AttribMethod
+    {
+        public PasswordHashMethodSSHA512()
+        {
+            m_name = "SSHA512 (Salted SHA512)";
+            m_method = Methods.SSHA512;
+        }
+
+        public override string hash(string password)
+        {
+            byte[] ssha = null;
+            byte[] salt = GenerateSalt(16);
+
+            try
+            {
+                using (HashAlgorithm algorithm = new SHA512Managed())
+                {
+                    byte[] combine = Appendbytes(Encoding.UTF8.GetBytes(password), salt);
+                    ssha = algorithm.ComputeHash(combine);
+                    ssha = Appendbytes(ssha, salt);
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.FatalFormat("SSHA Error:", ex.Message);
+            }
+
+            return "{SSHA512}" + Convert.ToBase64String(ssha);
         }
     }
 
@@ -672,6 +889,49 @@ namespace pGina.Plugin.Ldap
             }
 
             return Convert.ToInt32(span.TotalDays).ToString();
+        }
+    }
+
+    class PasswordTimestampNT : TimeMethod
+    {
+        public PasswordTimestampNT()
+        {
+            m_name = "Timestamp ticks since 1601";
+            m_method = Methods.Timestampt;
+        }
+
+        public override string time()
+        {
+            TimeSpan span = new TimeSpan();
+
+            try
+            {
+                span = (DateTime.UtcNow - new DateTime(1601, 1, 1, 0, 0, 0, 0));
+            }
+            catch (Exception ex)
+            {
+                m_logger.FatalFormat("PasswordTimestampNT Error:{0}", ex.Message);
+            }
+
+            return Convert.ToInt64(span.Ticks).ToString();
+        }
+
+        public override string time(TimeSpan add)
+        {
+            TimeSpan span = new TimeSpan();
+
+            try
+            {
+                span = (DateTime.UtcNow - new DateTime(1601, 1, 1, 0, 0, 0, 0));
+                span += add;
+
+            }
+            catch (Exception ex)
+            {
+                m_logger.FatalFormat("PasswordTimestampNT Error:{0}", ex.Message);
+            }
+
+            return Convert.ToInt64(span.Ticks).ToString();
         }
     }
 }
