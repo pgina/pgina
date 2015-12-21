@@ -346,12 +346,14 @@ namespace pGina
 
 				pGina::Memory::ObjectCleanupPool cleanup;
 
-				PWSTR serializedUser, serializedPass;
-				GetSerializedCredentials(&serializedUser, &serializedPass, NULL);
+				PWSTR serializedUser, serializedPass, serializedDomain;
+				GetSerializedCredentials(&serializedUser, &serializedPass, &serializedDomain);
 				if(serializedUser != NULL)
 					cleanup.Add(new pGina::Memory::LocalFreeCleanup(serializedUser));
 				if(serializedPass != NULL)
 					cleanup.Add(new pGina::Memory::LocalFreeCleanup(serializedPass));
+				if(serializedDomain != NULL)
+					cleanup.Add(new pGina::Memory::LocalFreeCleanup(serializedDomain));
 
 				switch(m_usageScenario)
 				{
