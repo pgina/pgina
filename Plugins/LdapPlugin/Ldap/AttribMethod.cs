@@ -821,7 +821,7 @@ namespace pGina.Plugin.Ldap
 
             try
             {
-                span = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0).ToUniversalTime());
+                span = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0));
             }
             catch (Exception ex)
             {
@@ -837,7 +837,7 @@ namespace pGina.Plugin.Ldap
 
             try
             {
-                span = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0).ToUniversalTime());
+                span = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0));
                 span += add;
 
             }
@@ -864,7 +864,7 @@ namespace pGina.Plugin.Ldap
 
             try
             {
-                span = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0).ToUniversalTime());
+                span = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0));
             }
             catch (Exception ex)
             {
@@ -880,7 +880,7 @@ namespace pGina.Plugin.Ldap
 
             try
             {
-                span = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0).ToUniversalTime());
+                span = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0));
                 span += add;
             }
             catch (Exception ex)
