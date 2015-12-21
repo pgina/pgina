@@ -36,6 +36,110 @@ namespace pGina.Shared.Types
     public struct BooleanResult
     {
         public bool Success { get; set; }
-        public string Message { get; set; }
+        public string Message
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_Message)) ? "" : _Message;
+            }
+            set
+            {
+                _Message = value;
+            }
+        }
+        private string _Message;
+
+        public BooleanResultEx ToBooleanResultEx()
+        {
+            return new BooleanResultEx { Success = Success, Message = Message };
+        }
+
+        public DBBooleanResult ToDBBooleanResult()
+        {
+            return new DBBooleanResult { Success = Success, Message = Message };
+        }
+
+        public DBBooleanResultEx ToDBBooleanResultEx()
+        {
+            return new DBBooleanResultEx { Success = Success, Message = Message };
+        }
+    }
+
+    public struct DBBooleanResult
+    {
+        public bool? Success { get; set; }
+        public string Message
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_Message)) ? "" : _Message;
+            }
+            set
+            {
+                _Message = value;
+            }
+        }
+        private string _Message;
+
+        public DBBooleanResultEx ToDBBooleanResultEx()
+        {
+            return new DBBooleanResultEx { Success = Success, Message = Message };
+        }
+    }
+
+    public struct BooleanResultEx
+    {
+        public bool Success { get; set; }
+        public string Message
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_Message)) ? "" : _Message;
+            }
+            set
+            {
+                _Message = value;
+            }
+        }
+        private string _Message;
+        public long Int64 { get; set; }
+
+        public BooleanResult ToBooleanResult()
+        {
+            return new BooleanResult { Success = Success, Message = Message };
+        }
+
+        public DBBooleanResult ToDBBooleanResult()
+        {
+            return new DBBooleanResult { Success = Success, Message = Message };
+        }
+
+        public DBBooleanResultEx ToDBBooleanResultEx()
+        {
+            return new DBBooleanResultEx { Success = Success, Message = Message };
+        }
+    }
+
+    public struct DBBooleanResultEx
+    {
+        public bool? Success { get; set; }
+        public string Message
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_Message)) ? "" : _Message;
+            }
+            set
+            {
+                _Message = value;
+            }
+        }
+        private string _Message;
+        public long Int64 { get; set; }
+
+        public DBBooleanResult ToDBBooleanResult()
+        {
+            return new DBBooleanResult { Success = Success, Message = Message };
+        }
     }
 }
