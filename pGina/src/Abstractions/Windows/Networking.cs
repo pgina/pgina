@@ -45,6 +45,8 @@ namespace Abstractions.Windows
                     IPEndPoint ipEndPoint = new IPEndPoint(addresses[0], 123);
                     //NTP uses UDP
                     Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                    socket.ReceiveTimeout = 3 * 1000;
+                    socket.SendTimeout = 3 * 1000;
 
                     socket.Connect(ipEndPoint);
 
