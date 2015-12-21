@@ -411,31 +411,31 @@ namespace pGina.Shared.Types
         }
         private string _script_gateway_usr;
 
-        public string script_notication_sys
+        public string script_notification_sys
         {
             get
             {
-                return (string.IsNullOrEmpty(_script_notication_sys)) ? "" : _script_notication_sys;
+                return (string.IsNullOrEmpty(_script_notification_sys)) ? "" : _script_notification_sys;
             }
             set
             {
-                _script_notication_sys = value;
+                _script_notification_sys = value;
             }
         }
-        private string _script_notication_sys;
+        private string _script_notification_sys;
 
-        public string script_notication_usr
+        public string script_notification_usr
         {
             get
             {
-                return (string.IsNullOrEmpty(_script_notication_usr)) ? "" : _script_notication_usr;
+                return (string.IsNullOrEmpty(_script_notification_usr)) ? "" : _script_notification_usr;
             }
             set
             {
-                _script_notication_usr = value;
+                _script_notification_usr = value;
             }
         }
-        private string _script_notication_usr;
+        private string _script_notification_usr;
 
         public string script_changepwd_sys
         {
