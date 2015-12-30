@@ -57,7 +57,16 @@ namespace pGina.Plugin.pgSMB2
             string HomeDirDrive = Settings.Store.HomeDirDrive;
             string ScriptPath = Settings.Store.ScriptPath;
             int MaxStore = Settings.Store.MaxStore;
-            string Ntp = Settings.Store.ntp;
+            string Ntp = "";
+            Dictionary<string, string> ntps = pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "" });
+            if (!ntps.ContainsKey("ntpservers") || String.IsNullOrEmpty(ntps["ntpservers"]))
+            {
+                MessageBox.Show(this, "Setup at least one Ntp server in the global configuration", "Global Ntp Server missing");
+            }
+            else
+            {
+                Ntp = ntps["ntpservers"].Replace('\n', ' ');
+            }
 
             this.SMBshare.Text = SMBshare_str;
             this.RoamingSource.Text = RoamingSource;
@@ -99,7 +108,7 @@ namespace pGina.Plugin.pgSMB2
             toolTip1.SetToolTip(this.HomeDirDrive, "The user home drive");
             toolTip1.SetToolTip(this.ScriptPath, "The full path to your login script (Runonce regkey!)");
             toolTip1.SetToolTip(this.MaxStore, "Maximum profile size in kbytes\n0 == all space");
-            toolTip1.SetToolTip(this.ntp, "space seperated FQDN list of your ntp servers");
+            toolTip1.SetToolTip(this.ntp, "global imported space seperated list of ntp servers");
         }
 
         private void UiToSettings()
@@ -116,7 +125,11 @@ namespace pGina.Plugin.pgSMB2
             Settings.Store.HomeDir = this.HomeDir.Text.Trim();
             Settings.Store.HomeDirDrive = this.HomeDirDrive.Text.Trim();
             Settings.Store.ScriptPath = this.ScriptPath.Text.Trim();
-            Settings.Store.ntp = this.ntp.Text.Trim();
+            Dictionary<string, string> ntps = pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "" });
+            if (!ntps.ContainsKey("ntpservers") || String.IsNullOrEmpty(ntps["ntpservers"]))
+            {
+                MessageBox.Show(this, "No ntp server given!\nSet at least one NTP server in the global configuration!", "Warning NTP server needed");
+            }
         }
 
         private void MaxStore_MB(object sender, EventArgs e)

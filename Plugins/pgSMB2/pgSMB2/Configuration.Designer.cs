@@ -116,6 +116,7 @@ namespace pGina.Plugin.pgSMB2
             this.ntp.Size = new System.Drawing.Size(311, 20);
             this.ntp.TabIndex = 26;
             this.ntp.WordWrap = false;
+            this.ntp.ReadOnly = true;
             //
             // Description
             //
@@ -136,7 +137,7 @@ namespace pGina.Plugin.pgSMB2
             this.ntp_label.Name = "ntp_label";
             this.ntp_label.Size = new System.Drawing.Size(198, 13);
             this.ntp_label.TabIndex = 27;
-            this.ntp_label.Text = "space seperated ntp FQDN servers (ntp)";
+            this.ntp_label.Text = "space seperated ntp servers (FQDN)";
             //
             // User_group
             //
@@ -260,7 +261,7 @@ namespace pGina.Plugin.pgSMB2
             this.Roaming_group.Size = new System.Drawing.Size(327, 337);
             this.Roaming_group.TabIndex = 2;
             this.Roaming_group.TabStop = false;
-            this.Roaming_group.Text = "Roaming Profile";
+            this.Roaming_group.Text = "System";
             //
             // CompressCLI
             //

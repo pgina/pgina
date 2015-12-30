@@ -91,6 +91,19 @@ namespace pGina.Plugin.pgSMB2
 
                     // is there a local roaming profile (there shouldnt be any)
                     string ProfDir = GetExistingUserProfile(username, password);
+                    // is this a temp profile
+                    if (!String.IsNullOrEmpty(ProfDir))
+                    {
+                        Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
+                        if (Abstractions.WindowsApi.pInvokes.UserGet(username, ref userinfo4))
+                        {
+                            if (userinfo4.comment.EndsWith(" tmp"))
+                            {
+                                m_logger.InfoFormat("delete temp profile {0}", ProfDir);
+                                DirectoryDel(ProfDir, 3);
+                            }
+                        }
+                    }
                     if (File.Exists(ProfDir + "\\ntuser.dat")) //worst case "\\ntuser.dat"
                     {
                         // there is a local profile of this user
@@ -866,7 +879,7 @@ namespace pGina.Plugin.pgSMB2
                         if (!Abstractions.WindowsApi.pInvokes.MapNetworkDrive(share, dusername, password))
                         {
                             m_logger.ErrorFormat("Failed to connect to share {0}", share);
-                            Thread.Sleep(new TimeSpan(0, 1, 0));
+                            Thread.Sleep(new TimeSpan(0, 0, 30));
                             continue;
                         }
                         if (Directory.Exists(share))

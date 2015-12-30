@@ -152,6 +152,7 @@ namespace pGina.Plugin.pgSMB2
                 verinfo.dwMinorVersion = Environment.OSVersion.Version.Minor;
                 verinfo.dwPlatformId = Environment.OSVersion.Version.Build;
             }
+            Dictionary<string,string> global_settings = pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "" });
 
             string[,] array = new string[,]
             {
@@ -164,7 +165,7 @@ namespace pGina.Plugin.pgSMB2
                 {"UncompressCLI", Settings.Store.UncompressCLI.ToString()},
                 {"CompressCLI", Settings.Store.CompressCLI.ToString()},
                 {"MaxStore", (userInfo.usri4_max_storage > 0) ? userInfo.usri4_max_storage.ToString() : Settings.Store.MaxStore.ToString()},
-                {"ntp", Settings.Store.ntp.ToString()},
+                {"ntp", (global_settings.ContainsKey("ntpservers")? global_settings["ntpservers"].Replace('\n',' ') : "")},
                 /*maybe emty*/
                 {"HomeDir", (!String.IsNullOrEmpty(userInfo.usri4_home_dir)) ? userInfo.usri4_home_dir : Settings.Store.HomeDir.ToString()},
                 {"HomeDirDrive", (!String.IsNullOrEmpty(userInfo.usri4_home_dir_drive)) ? userInfo.usri4_home_dir_drive : Settings.Store.HomeDirDrive.ToString()},
@@ -380,6 +381,26 @@ namespace pGina.Plugin.pgSMB2
 
                             if (uprofile.Contains(@"\TEMP"))
                             {
+                                m_logger.InfoFormat("TEMP profile detected");
+
+                                userInfo.Description = "pGina created pgSMB2 tmp";
+                                properties.AddTrackedSingle<UserInformation>(userInfo);
+
+                                pInvokes.structenums.USER_INFO_4 userinfo4 = new pInvokes.structenums.USER_INFO_4();
+                                if (pInvokes.UserGet(userInfo.Username, ref userinfo4))
+                                {
+                                    userinfo4.logon_hours = IntPtr.Zero;
+                                    userinfo4.comment = userInfo.Description;
+                                    if (!pInvokes.UserMod(userInfo.Username, userinfo4))
+                                    {
+                                        m_logger.ErrorFormat("Can't modify userinformation {0}", userInfo.Username);
+                                    }
+                                }
+                                else
+                                {
+                                    m_logger.ErrorFormat("Can't get userinformation {0}", userInfo.Username);
+                                }
+
                                 Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows was unable to load the profile");
                             }
                         }
@@ -433,7 +454,7 @@ namespace pGina.Plugin.pgSMB2
                 }
 
                 Roaming ro = new Roaming();
-                if (!userInfo.Description.Contains(" tmp")) //its a tmp profile do not upload
+                if (!userInfo.Description.EndsWith(" tmp")) //its a tmp profile do not upload
                 {
                     BooleanResult RetBool = ro.put(settings, userInfo.Username, userInfo.Password);
                     if (!RetBool.Success)
