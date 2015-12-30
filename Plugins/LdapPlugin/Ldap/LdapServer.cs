@@ -333,7 +333,7 @@ namespace pGina.Plugin.Ldap
         /// <returns>The DN of the first match, or null if no matches are found.</returns>
         public string FindFirstDN(string searchBase, string filter)
         {
-            SearchRequest req = new SearchRequest(searchBase, filter, System.DirectoryServices.Protocols.SearchScope.Subtree, null);
+            SearchRequest req = new SearchRequest(searchBase, filter, SearchScope.Subtree, null);
             SearchResponse resp = (SearchResponse)m_conn.SendRequest(req);
 
             if (resp.Entries.Count > 0)
@@ -550,7 +550,7 @@ namespace pGina.Plugin.Ldap
             ntps.AddRange(pGinaSettings["ntpservers"].Split('\n').ToList());
             m_logger.InfoFormat("ntplist:{0}", String.Join(" ", ntps));
 
-            Dictionary<string, List<string>> search = GetUserAttribValue(userDN, "(objectClass=*)", System.DirectoryServices.Protocols.SearchScope.Base, new string[] { "shadowMax", "sambaPwdMustChange", "userAccountControl", "msDS-User-Account-Control-Computed", "msDS-UserPasswordExpiryTimeComputed", "pwdLastSet", "memberOf", "msDS-PSOApplied" });
+            Dictionary<string, List<string>> search = GetUserAttribValue(userDN, "(objectClass=*)", SearchScope.Base, new string[] { "shadowMax", "sambaPwdMustChange", "userAccountControl", "msDS-User-Account-Control-Computed", "msDS-UserPasswordExpiryTimeComputed", "pwdLastSet", "memberOf", "msDS-PSOApplied" });
             #region samba
             if (search.ContainsKey("shadowmax"))
             {
