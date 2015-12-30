@@ -129,7 +129,6 @@ namespace pGina
 		std::wstring StateHelper::GetUsername()
 		{
 			pGina::Threading::ScopedLock lock(s_mutex);
-			//pDEBUG(L"StateHelper::GetUsername:(%s)", StateHelper::s_username.c_str());
 			return StateHelper::s_username;
 		}
 
@@ -137,7 +136,6 @@ namespace pGina
 		std::wstring StateHelper::GetPassword()
 		{
 			pGina::Threading::ScopedLock lock(s_mutex);
-			//pDEBUG(L"StateHelper::GetPassword:(%s)", StateHelper::s_password.c_str());
 			return StateHelper::s_password;
 		}
 
@@ -145,7 +143,6 @@ namespace pGina
 		bool StateHelper::GetLoginChangePassword()
 		{
 			pGina::Threading::ScopedLock lock(s_mutex);
-			//pDEBUG(L"StateHelper::GetLoginChangePassword:(%i)", StateHelper::s_LoginChangePassword);
 			return StateHelper::s_LoginChangePassword;
 		}
 
@@ -158,7 +155,6 @@ namespace pGina
 			StateHelper::s_username = username;
 			StateHelper::s_password = password;
 			StateHelper::s_LoginChangePassword = Login;
-			//pDEBUG(L"StateHelper::PushUsername:(%s,%s,%i)", StateHelper::s_username.c_str(), StateHelper::s_password.c_str(), StateHelper::s_LoginChangePassword);
 		}
 
 		/* static */

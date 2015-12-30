@@ -242,6 +242,7 @@ namespace pGina
 				{
 					if (m_usageScenario != CPUS_CHANGE_PASSWORD)
 					{
+						pGina::Transactions::LoginInfo::Move(pGina::Service::StateHelper::GetUsername().c_str(), L"", L"", pGina::Helpers::GetCurrentSessionId(), -1);
 						m_credential = new Credential();
 						m_credential->Initialize(m_usageScenario, s_logonFields, m_usageFlags, NULL, NULL);
 					}

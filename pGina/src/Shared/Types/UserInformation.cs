@@ -67,6 +67,8 @@ namespace pGina.Shared.Types
             }
         }
 
+        public int SessionID { get; set; }
+
         /// <summary>
         /// The username provided by the user.
         /// </summary>
@@ -346,19 +348,6 @@ namespace pGina.Shared.Types
         }
         private string _script_authe_sys;
 
-        public string script_authe_usr
-        {
-            get
-            {
-                return (string.IsNullOrEmpty(_script_authe_usr)) ? "" : _script_authe_usr;
-            }
-            set
-            {
-                _script_authe_usr = value;
-            }
-        }
-        private string _script_authe_usr;
-
         public string script_autho_sys
         {
             get
@@ -372,19 +361,6 @@ namespace pGina.Shared.Types
         }
         private string _script_autho_sys;
 
-        public string script_autho_usr
-        {
-            get
-            {
-                return (string.IsNullOrEmpty(_script_autho_usr)) ? "" : _script_autho_usr;
-            }
-            set
-            {
-                _script_autho_usr = value;
-            }
-        }
-        private string _script_autho_usr;
-
         public string script_gateway_sys
         {
             get
@@ -397,19 +373,6 @@ namespace pGina.Shared.Types
             }
         }
         private string _script_gateway_sys;
-
-        public string script_gateway_usr
-        {
-            get
-            {
-                return (string.IsNullOrEmpty(_script_gateway_usr)) ? "" : _script_gateway_usr;
-            }
-            set
-            {
-                _script_gateway_usr = value;
-            }
-        }
-        private string _script_gateway_usr;
 
         public string script_notification_sys
         {

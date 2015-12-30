@@ -289,6 +289,7 @@ namespace pGina.Service.Impl
                 sessionDriver.UserInformation.Username = msg.Username;
                 sessionDriver.UserInformation.Password = (String.IsNullOrEmpty(msg.Password)) ? "" : msg.Password;
                 sessionDriver.UserInformation.Domain = msg.Domain;
+                sessionDriver.UserInformation.SessionID = msg.Session;
 
                 if (String.IsNullOrEmpty(sessionDriver.UserInformation.Username))
                 {
@@ -537,6 +538,7 @@ namespace pGina.Service.Impl
                                     UserInformation ui = FindUserInfoInPropertyCache(sessionDriver.UserInformation.Username);
                                     if (ui != null)
                                     {
+                                        ui.SessionID = msg.Session;
                                         sessionDriver.SessionProperties.AddTrackedSingle<UserInformation>(ui);
                                     }
                                 }
@@ -622,7 +624,10 @@ namespace pGina.Service.Impl
             {
                 if (m_sessionPropertyCache.Exists(msg.FromSession))
                 {
-                    m_sessionPropertyCache.Add(msg.ToSession, m_sessionPropertyCache.Get(msg.FromSession));
+                    if (msg.ToSession != -1)
+                    {
+                        m_sessionPropertyCache.Add(msg.ToSession, m_sessionPropertyCache.Get(msg.FromSession));
+                    }
                     m_sessionPropertyCache.Remove(msg.FromSession);
                 }
             }
