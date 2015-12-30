@@ -395,6 +395,10 @@ namespace Abstractions.WindowsApi
                 /// NOTE: Windows 2000/NT:   The default security provider is NTLM.
                 /// </summary>
                 LOGON32_PROVIDER_DEFAULT = 0,
+                LOGON32_PROVIDER_WINNT35 = 1,
+                LOGON32_PROVIDER_WINNT40 = 2,
+                LOGON32_PROVIDER_WINNT50 = 3,
+                LOGON32_PROVIDER_VIRTUAL = 4
             }
             #endregion
 
@@ -1253,6 +1257,23 @@ namespace Abstractions.WindowsApi
                 SafeNativeMethods.CloseHandle(processToken);
                 SafeNativeMethods.CloseHandle(duplicateToken);
             }
+        }
+
+        public static bool StartProcessInSessionWait(int sessionId, string cmdLine)
+        {
+            try
+            {
+                using (Process p = StartProcessInSession(sessionId, cmdLine))
+                {
+                    p.WaitForExit(); // trow exception if error
+                }
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public static bool StartUserProcessInSession(int sessionId, string cmdLine)
