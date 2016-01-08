@@ -625,7 +625,7 @@ namespace pGina.Plugin.Ldap
                     if (NTPtime != DateTime.MaxValue)
                     {
                         m_logger.InfoFormat("{0} > {1}", DateNowSec, sambapwdmustchange);
-                        if (DateNowSec > sambapwdmustchange)
+                        if (DateNowSec + 86400 /*one day in future*/ > sambapwdmustchange)
                         {
                             m_logger.InfoFormat("pwd expired");
                             return new BooleanResultEx { Success = true, Message = "Password expired" };
@@ -706,6 +706,10 @@ namespace pGina.Plugin.Ldap
                     m_logger.InfoFormat("{0:yyyy.MM.dd.HH:mm:ss}-{1:yyyy.MM.dd.HH:mm:ss}", msdsuserpasswordexpirytimecomputed, NTPtime);
                     TimeSpan PWDlasts = msdsuserpasswordexpirytimecomputed - NTPtime;
                     //m_logger.InfoFormat("PWDlasts:{0:c}", PWDlasts);
+                    if (PWDlasts < new TimeSpan(1, 0, 0, 0))
+                    {
+                        return new BooleanResultEx { Success = true, Message = "Password expired" };
+                    }
                     if (PWDlasts < new TimeSpan(5, 0, 0, 0))
                     {
                         m_logger.InfoFormat("password will expire in less than 5 days, to be exact:{0:c}", PWDlasts);
