@@ -92,6 +92,8 @@ namespace pGina
 		Provider::~Provider()
 		{
 			pDEBUG(L"Stopping service state helper thread (if necessary)");
+			if (pGina::Service::StateHelper::GetLoginChangePassword())
+				pGina::Transactions::LoginInfo::Move(pGina::Service::StateHelper::GetUsername().c_str(), L"", L"", pGina::Helpers::GetCurrentSessionId(), -1);
 			pGina::Service::StateHelper::RemoveTarget(this);
 			pGina::Service::StateHelper::Stop();
 
@@ -243,6 +245,7 @@ namespace pGina
 					if (m_usageScenario != CPUS_CHANGE_PASSWORD)
 					{
 						pGina::Transactions::LoginInfo::Move(pGina::Service::StateHelper::GetUsername().c_str(), L"", L"", pGina::Helpers::GetCurrentSessionId(), -1);
+						pGina::Service::StateHelper::PushUsername(L"", L"", false);
 						m_credential = new Credential();
 						m_credential->Initialize(m_usageScenario, s_logonFields, m_usageFlags, NULL, NULL);
 					}

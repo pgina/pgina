@@ -324,7 +324,6 @@ namespace pGina
 					{
 						BlockInput(false);
 					}
-					pGina::Transactions::LoginInfo::Move(username, L"", L"", pGina::Helpers::GetCurrentSessionId(), -1);
 					return S_FALSE;
 				}
 
@@ -389,7 +388,6 @@ namespace pGina
 						{
 							BlockInput(false);
 						}
-						pGina::Transactions::LoginInfo::Move(username, L"", L"", pGina::Helpers::GetCurrentSessionId(), -1);
 						return S_FALSE;
 					}
 				}
@@ -418,7 +416,6 @@ namespace pGina
 					{
 						BlockInput(false);
 					}
-					pGina::Transactions::LoginInfo::Move(username, L"", L"", pGina::Helpers::GetCurrentSessionId(), -1);
 					return S_FALSE;
 				}
 
@@ -441,7 +438,6 @@ namespace pGina
 				}
 
 				pDEBUG(L"change password success");
-				pGina::Transactions::LoginInfo::Move(username, L"", L"", pGina::Helpers::GetCurrentSessionId(), -1);
 
 				return S_OK;
 				break;
@@ -588,6 +584,7 @@ namespace pGina
 					{
 						BlockInput(false);
 					}
+					pGina::Transactions::LoginInfo::Move(username, L"", L"", pGina::Helpers::GetCurrentSessionId(), -1);
 					return result;
 				}
 			}

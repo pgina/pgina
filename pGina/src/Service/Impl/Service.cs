@@ -627,8 +627,29 @@ namespace pGina.Service.Impl
                     if (msg.ToSession != -1)
                     {
                         m_sessionPropertyCache.Add(msg.ToSession, m_sessionPropertyCache.Get(msg.FromSession));
+                        m_sessionPropertyCache.Remove(msg.FromSession);
                     }
-                    m_sessionPropertyCache.Remove(msg.FromSession);
+                    else
+                    {
+                        List<SessionProperties> props = m_sessionPropertyCache.Get(msg.FromSession);
+                        for (int x = props.Count-1; x >= 0 ; x--)
+                        {
+                            UserInformation uInfo = props[x].GetTrackedSingle<UserInformation>();
+                            if (uInfo.Username.Equals(msg.Username, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                if (x == 0)
+                                {
+                                    m_sessionPropertyCache.Remove(msg.FromSession);
+                                    break;
+                                }
+                                else
+                                {
+                                    props.RemoveAt(x);
+                                    m_sessionPropertyCache.Add(msg.FromSession, props);
+                                }
+                            }
+                        }
+                    }
                 }
             }
             return new EmptyMessage(MessageType.Ack);
