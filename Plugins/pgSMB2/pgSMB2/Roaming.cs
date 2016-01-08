@@ -879,7 +879,8 @@ namespace pGina.Plugin.pgSMB2
                         if (!Abstractions.WindowsApi.pInvokes.MapNetworkDrive(share, dusername, password))
                         {
                             m_logger.ErrorFormat("Failed to connect to share {0}", share);
-                            Thread.Sleep(new TimeSpan(0, 0, 30));
+                            if (x < retry)
+                                Thread.Sleep(new TimeSpan(0, 0, 30));
                             continue;
                         }
                         if (Directory.Exists(share))
