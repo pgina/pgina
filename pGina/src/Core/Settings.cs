@@ -64,6 +64,7 @@ namespace pGina.Core
             s_settings.SetDefaultEncryptedSetting("notify_pass", ""); //used in Abstractions.Windows.Networking
             s_settings.SetDefault("notify_cred", false); //used in Abstractions.Windows.Networking
             s_settings.SetDefault("notify_ssl", false); //used in Abstractions.Windows.Networking
+            s_settings.SetDefault("ntpservers", new string[] { "" });
             s_settings.SetDefault("LastUsername", "");
             s_settings.SetDefault("LastUsernameEnable", false);
 
