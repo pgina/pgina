@@ -54,6 +54,7 @@
             this.groupDNPattern = new System.Windows.Forms.TextBox();
             this.allowEmptyPwCB = new System.Windows.Forms.CheckBox();
             this.dnPatternTextBox = new System.Windows.Forms.TextBox();
+            this.authzApplyToAllUsersCB = new System.Windows.Forms.CheckBox();
             this.ldapServerGroupBox = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
             this.m_encryptionMethodCb = new System.Windows.Forms.ComboBox();
@@ -282,7 +283,7 @@
             // authzRequireAuthCB
             // 
             this.authzRequireAuthCB.AutoSize = true;
-            this.authzRequireAuthCB.Location = new System.Drawing.Point(181, 9);
+            this.authzRequireAuthCB.Location = new System.Drawing.Point(366, 7);
             this.authzRequireAuthCB.Name = "authzRequireAuthCB";
             this.authzRequireAuthCB.Size = new System.Drawing.Size(202, 17);
             this.authzRequireAuthCB.TabIndex = 19;
@@ -293,7 +294,7 @@
             // authzAllowOnErrorCB
             // 
             this.authzAllowOnErrorCB.AutoSize = true;
-            this.authzAllowOnErrorCB.Location = new System.Drawing.Point(400, 9);
+            this.authzAllowOnErrorCB.Location = new System.Drawing.Point(181, 32);
             this.authzAllowOnErrorCB.Name = "authzAllowOnErrorCB";
             this.authzAllowOnErrorCB.Size = new System.Drawing.Size(184, 17);
             this.authzAllowOnErrorCB.TabIndex = 20;
@@ -348,6 +349,16 @@
             this.dnPatternTextBox.TabIndex = 1;
             this.descriptionToolTip.SetToolTip(this.dnPatternTextBox, "Pattern used to generate a DN from a user name.  Use\r\n%u as a placeholder for the" +
         " user name.");
+            // 
+            // authzApplyToAllUsersCB
+            // 
+            this.authzApplyToAllUsersCB.AutoSize = true;
+            this.authzApplyToAllUsersCB.Location = new System.Drawing.Point(181, 9);
+            this.authzApplyToAllUsersCB.Name = "authzApplyToAllUsersCB";
+            this.authzApplyToAllUsersCB.Size = new System.Drawing.Size(179, 17);
+            this.authzApplyToAllUsersCB.TabIndex = 21;
+            this.authzApplyToAllUsersCB.Text = "Authorize all authenticated users";
+            this.authzApplyToAllUsersCB.UseVisualStyleBackColor = true;
             // 
             // ldapServerGroupBox
             // 
@@ -592,6 +603,7 @@
             // 
             // authzTabPage
             // 
+            this.authzTabPage.Controls.Add(this.authzApplyToAllUsersCB);
             this.authzTabPage.Controls.Add(this.authzAllowOnErrorCB);
             this.authzTabPage.Controls.Add(this.authzRequireAuthCB);
             this.authzTabPage.Controls.Add(this.authzRuleDeleteBtn);
@@ -616,7 +628,7 @@
             // authzRuleDeleteBtn
             // 
             this.authzRuleDeleteBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.delete;
-            this.authzRuleDeleteBtn.Location = new System.Drawing.Point(583, 82);
+            this.authzRuleDeleteBtn.Location = new System.Drawing.Point(577, 105);
             this.authzRuleDeleteBtn.Name = "authzRuleDeleteBtn";
             this.authzRuleDeleteBtn.Size = new System.Drawing.Size(32, 34);
             this.authzRuleDeleteBtn.TabIndex = 18;
@@ -626,7 +638,7 @@
             // authzRuleDownBtn
             // 
             this.authzRuleDownBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.DownArrowSolid;
-            this.authzRuleDownBtn.Location = new System.Drawing.Point(583, 123);
+            this.authzRuleDownBtn.Location = new System.Drawing.Point(577, 146);
             this.authzRuleDownBtn.Name = "authzRuleDownBtn";
             this.authzRuleDownBtn.Size = new System.Drawing.Size(32, 34);
             this.authzRuleDownBtn.TabIndex = 17;
@@ -636,7 +648,7 @@
             // authzRuleUpBtn
             // 
             this.authzRuleUpBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.UpArrowSolid;
-            this.authzRuleUpBtn.Location = new System.Drawing.Point(583, 42);
+            this.authzRuleUpBtn.Location = new System.Drawing.Point(577, 65);
             this.authzRuleUpBtn.Name = "authzRuleUpBtn";
             this.authzRuleUpBtn.Size = new System.Drawing.Size(32, 34);
             this.authzRuleUpBtn.TabIndex = 16;
@@ -676,7 +688,7 @@
             // 
             // authzRuleAddButton
             // 
-            this.authzRuleAddButton.Location = new System.Drawing.Point(503, 185);
+            this.authzRuleAddButton.Location = new System.Drawing.Point(497, 208);
             this.authzRuleAddButton.Name = "authzRuleAddButton";
             this.authzRuleAddButton.Size = new System.Drawing.Size(71, 23);
             this.authzRuleAddButton.TabIndex = 12;
@@ -687,7 +699,7 @@
             // authzRulesListBox
             // 
             this.authzRulesListBox.FormattingEnabled = true;
-            this.authzRulesListBox.Location = new System.Drawing.Point(6, 32);
+            this.authzRulesListBox.Location = new System.Drawing.Point(0, 55);
             this.authzRulesListBox.Name = "authzRulesListBox";
             this.authzRulesListBox.Size = new System.Drawing.Size(571, 147);
             this.authzRulesListBox.TabIndex = 11;
@@ -699,14 +711,14 @@
             this.authzRuleActionComboBox.Items.AddRange(new object[] {
             "allow.",
             "deny."});
-            this.authzRuleActionComboBox.Location = new System.Drawing.Point(432, 185);
+            this.authzRuleActionComboBox.Location = new System.Drawing.Point(426, 208);
             this.authzRuleActionComboBox.Name = "authzRuleActionComboBox";
             this.authzRuleActionComboBox.Size = new System.Drawing.Size(65, 21);
             this.authzRuleActionComboBox.TabIndex = 6;
             // 
             // authzRuleGroupTB
             // 
-            this.authzRuleGroupTB.Location = new System.Drawing.Point(194, 185);
+            this.authzRuleGroupTB.Location = new System.Drawing.Point(188, 208);
             this.authzRuleGroupTB.Name = "authzRuleGroupTB";
             this.authzRuleGroupTB.Size = new System.Drawing.Size(232, 20);
             this.authzRuleGroupTB.TabIndex = 5;
@@ -718,7 +730,7 @@
             this.authzRuleMemberComboBox.Items.AddRange(new object[] {
             "If member of LDAP group:",
             "If not member of LDAP group:"});
-            this.authzRuleMemberComboBox.Location = new System.Drawing.Point(11, 185);
+            this.authzRuleMemberComboBox.Location = new System.Drawing.Point(5, 208);
             this.authzRuleMemberComboBox.Name = "authzRuleMemberComboBox";
             this.authzRuleMemberComboBox.Size = new System.Drawing.Size(177, 21);
             this.authzRuleMemberComboBox.TabIndex = 4;
@@ -949,5 +961,6 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.CheckBox m_useAuthBindForAuthzAndGatewayCb;
+        private System.Windows.Forms.CheckBox authzApplyToAllUsersCB;
     }
 }

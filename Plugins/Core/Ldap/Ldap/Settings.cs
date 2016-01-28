@@ -76,6 +76,7 @@ namespace pGina.Plugin.Ldap
             m_settings.SetDefault("GroupAuthzRules", new string[] { (new GroupAuthzRule(true)).ToRegString() });
             m_settings.SetDefault("AuthzRequireAuth", false);
             m_settings.SetDefault("AuthzAllowOnError", true);
+            m_settings.SetDefault("AuthzApplyToAllUsers", true); // Authorize *all* users according to above rules, if false - group checks are only done for users *we* authenticated
 
             // Gateway
             m_settings.SetDefault("GroupGatewayRules", new string[] { });
