@@ -777,11 +777,14 @@ namespace pGina
 				// Replace occurences of %u with the username
 				std::wstring unameCopy = username;
 				std::wstring::size_type unameSize = unameCopy.size();
-				for (std::wstring::size_type pos = 0;
-					(pos = message.find(L"%u", pos)) != std::wstring::npos;
-					pos += unameSize)
+				if (unameSize > 0)
 				{
-					message.replace(pos, unameSize, unameCopy);
+					for (std::wstring::size_type pos = 0;
+					(pos = message.find(L"%u", pos)) != std::wstring::npos;
+						pos += unameSize)
+					{
+						message.replace(pos, unameSize, unameCopy);
+					}
 				}
 
 				pqcws->SetStatusMessage(message.c_str());
