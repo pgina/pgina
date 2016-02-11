@@ -348,6 +348,26 @@ namespace pGina
 				}
 				else
 				{
+					// User Principal Name
+					// LogonUser wants username as user principal name if domain is null
+					// split the Down-Level Logon Name username into username and domain
+					pos = dom.find(L"@");
+					if (pos != std::wstring::npos)
+					{
+						std::wstring user = dom.substr(0, pos);
+						dom = dom.substr(pos+1, dom.size()-pos-1);
+						if (_wcsicmp(dom.c_str(), L"@localhost") == 0)
+						{
+							dom = L".";
+						}
+						pDEBUG(L"Subst domain from username %s %s", user.c_str(), dom.c_str());
+						username = _wcsdup(user.c_str());
+						domain = _wcsdup(dom.c_str());
+					}
+				}
+
+				if (pos == std::wstring::npos)
+				{
 					// ctrl+alt+entf event
 					DWORD mySession = pGina::Helpers::GetCurrentSessionId();
 					dom = pGina::Helpers::GetSessionDomainName(mySession);
