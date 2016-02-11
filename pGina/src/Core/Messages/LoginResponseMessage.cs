@@ -35,7 +35,18 @@ namespace pGina.Core.Messages
     public class LoginResponseMessage : LoginRequestMessage
     {
         public bool Result { get; set; }
-        public string Message { get; set; }
+        public string Message
+        {
+            get
+            {
+                return (String.IsNullOrEmpty(_Message)) ? "" : _Message;
+            }
+            set
+            {
+                _Message = value;
+            }
+        }
+        private string _Message;
 
         public LoginResponseMessage(IDictionary<string, object> expandoVersion)
         {

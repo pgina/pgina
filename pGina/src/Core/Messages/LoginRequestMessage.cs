@@ -42,9 +42,45 @@ namespace pGina.Core.Messages
             CredUI
         }
 
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string Domain { get; set; }
+        public string Username
+        {
+            get
+            {
+                return (String.IsNullOrEmpty(_Username)) ? "" : _Username;
+            }
+            set
+            {
+                _Username = value;
+            }
+        }
+        private string _Username;
+
+        public string Password
+        {
+            get
+            {
+                return (String.IsNullOrEmpty(_Password)) ? "" : _Password;
+            }
+            set
+            {
+                _Password = value;
+            }
+        }
+        private string _Password;
+
+        public string Domain
+        {
+            get
+            {
+                return (String.IsNullOrEmpty(_Domain)) ? "" : _Domain;
+            }
+            set
+            {
+                _Domain = value;
+            }
+        }
+        private string _Domain;
+
         public int Session { get; set; }
         public LoginReason Reason { get; set; }
 
