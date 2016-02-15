@@ -81,6 +81,8 @@ namespace pGina.Service.Impl
                 ILog logger = LogManager.GetLogger("pGina.Service.Exception");
                 Exception e = args.ExceptionObject as Exception;
                 logger.ErrorFormat("CurrentDomain_UnhandledException: {0}", e);
+
+                Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), "", "", String.Format("pGina: CurrentDomain_UnhandledException {0}", Environment.MachineName), e.ToString());
             }
             catch
             {
@@ -1222,6 +1224,11 @@ namespace pGina.Service.Impl
                     }
                 }
 
+                if (!Result.Success)
+                {
+                    Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), userinfo.Username, userinfo.Password, String.Format("pGina: Password change error for {0} from {1}", msg.Username, Environment.MachineName), Result.Message);
+                }
+
                 return new ChangePasswordResponseMessage()
                 {
                     Result = Result.Success,
@@ -1233,6 +1240,7 @@ namespace pGina.Service.Impl
             catch (Exception e)
             {
                 m_logger.ErrorFormat("Internal error, unexpected exception while handling change password request: {0}", e);
+                Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), "", "", String.Format("pGina: Password change error for {0} from {1}", msg.Username, Environment.MachineName), e.ToString());
                 return new ChangePasswordResponseMessage() { Result = false, Message = "Internal error" };
             }
         }
