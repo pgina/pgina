@@ -165,12 +165,21 @@ namespace Abstractions.Windows
         /// </summary>
         /// <param name="username"></param>
         /// <param name="password"></param>
+        /// <param name="sid"></param>
         /// <returns></returns>
-        public static string GetProfileDir(string username, string password)
+        public static string GetProfileDir(string username, string password, SecurityIdentifier sid)
         {
             IntPtr hToken = Abstractions.WindowsApi.pInvokes.GetUserToken(username, "", password);
-            string ret = Abstractions.WindowsApi.pInvokes.GetUserProfileDir(hToken);
-            Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
+            string ret = "";
+            if (hToken != IntPtr.Zero)
+            {
+                ret = Abstractions.WindowsApi.pInvokes.GetUserProfileDir(hToken);
+                Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
+            }
+            if (String.IsNullOrEmpty(ret))
+            {
+                ret = GetProfileDir(sid).DefaultIfEmpty("").FirstOrDefault();
+            }
 
             return ret;
         }
