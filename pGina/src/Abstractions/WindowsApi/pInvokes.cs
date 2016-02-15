@@ -1763,7 +1763,7 @@ namespace Abstractions.WindowsApi
             IntPtr hToken = GetUserToken(username, domain, password);
             if (hToken == IntPtr.Zero)
             {
-                LibraryLogging.Error("GetUserProfileDir can't get userToken");
+                LibraryLogging.Error("GetOrSetUserProfileDir can't get userToken");
                 return "";
             }
 
