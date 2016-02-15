@@ -563,7 +563,7 @@ namespace pGina.Service.Impl
                     m_logger.DebugFormat("Parse Request for: {0} in session: {1} reason: {2}", sessionDriver.UserInformation.Username, msg.Session, msg.Reason);
                 }
 
-                if (LastUsernameEnable && msg.Reason == LoginRequestMessage.LoginReason.Login)
+                if (LastUsernameEnable && msg.Reason == LoginRequestMessage.LoginReason.Login && result.Success)
                 {
                     Settings.s_settings.SetSetting("LastUsername", String.Format("{0}", sessionDriver.UserInformation.Username));
                 }

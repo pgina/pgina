@@ -499,7 +499,17 @@ namespace pGina
 				{
 					SHStrDupW(L"Plugins did not provide a specific error message", ppwszOptionalStatusText);
 				}
-				SetStringValue(m_fields->usernameFieldIdx, (PCWSTR)L"");
+				if (m_usageScenario != CPUS_LOGON && pGina::Registry::GetBool(L"LastUsernameEnable", false))
+				{
+					SetStringValue(m_fields->usernameFieldIdx, (PCWSTR)L"");
+					m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
+					m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
+				}
+				else
+				{
+					m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
+					m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
+				}
 				SetStringValue(m_fields->passwordFieldIdx, (PCWSTR)L"");
 
 				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
@@ -825,7 +835,7 @@ namespace pGina
 			}
 			else if( CPUS_LOGON == m_usageScenario )
 			{
-				if( pGina::Registry::GetBool(L"LastUsernameEnable", true) )
+				if( pGina::Registry::GetBool(L"LastUsernameEnable", false) )
 				{
 					std::wstring sessionUname = pGina::Registry::GetString( L"LastUsername", L"");
 					if (!sessionUname.empty())
@@ -958,7 +968,7 @@ namespace pGina
 
 			if( CPUS_LOGON == m_usageScenario )
 			{
-				if( pGina::Registry::GetBool(L"LastUsernameEnable", true) )
+				if( pGina::Registry::GetBool(L"LastUsernameEnable", false) )
 				{
 					std::wstring sessionUname = pGina::Registry::GetString( L"LastUsername", L"");
 					if (!sessionUname.empty())
