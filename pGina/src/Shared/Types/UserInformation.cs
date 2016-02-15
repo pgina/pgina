@@ -235,6 +235,22 @@ namespace pGina.Shared.Types
         private string _LoginScript;
 
         /// <summary>
+        /// The Local Profile Path associated with this user account.
+        /// </summary>
+        public string LocalProfilePath
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_LocalProfilePath)) ? "" : _LocalProfilePath;
+            }
+            set
+            {
+                _LocalProfilePath = value;
+            }
+        }
+        private string _LocalProfilePath;
+
+        /// <summary>
         /// User Profile: Full Name
         /// </summary>
         public string usri4_full_name

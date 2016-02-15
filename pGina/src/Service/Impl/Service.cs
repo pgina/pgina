@@ -544,6 +544,20 @@ namespace pGina.Service.Impl
                                         sessionDriver.SessionProperties.AddTrackedSingle<UserInformation>(ui);
                                     }
                                 }
+                                else
+                                {
+                                    // add local profile path
+                                    // its not sure that the profile realy ends up there
+                                    // a win profile loading error can redirect the path to a temp path too
+                                    UserInformation ui = sessionDriver.SessionProperties.GetTrackedSingle<UserInformation>();
+                                    if (ui != null)
+                                    {
+                                        // worst case empty string
+                                        ui.LocalProfilePath = Abstractions.Windows.User.GetProfileDir(ui.Username, ui.Password, ui.SID);
+                                        sessionDriver.SessionProperties.AddTrackedSingle<UserInformation>(ui);
+                                        m_logger.InfoFormat("ses add LocalProfilePath:[{0}]", ui.LocalProfilePath);
+                                    }
+                                }
                                 if (msg.Reason == LoginRequestMessage.LoginReason.CredUI)
                                 {
                                     sessionDriver.SessionProperties.CREDUI = true;
