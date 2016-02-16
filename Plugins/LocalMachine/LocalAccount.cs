@@ -538,93 +538,80 @@ namespace pGina.Plugin.LocalMachine
 
         public void RemoveUserAndProfile(string user, int sessionID)
         {
-            using (UserPrincipal userPrincipal = GetUserPrincipal(user))
+            // First we have to work out where the users profile is on disk.
+            try
             {
-                // First we have to work out where the users profile is on disk.
-                try
+                if (!String.IsNullOrEmpty(UserInfo.LocalProfilePath))
                 {
-                    List<string> usersProfileDirs = Abstractions.Windows.User.GetProfileDir(userPrincipal.Sid);
-                    foreach (string usersProfileDir in usersProfileDirs)
+                    // instead of while (true)
+                    if (File.Exists(UserInfo.LocalProfilePath + "\\NTUSER.DAT"))
                     {
-                        if (!string.IsNullOrEmpty(usersProfileDir))
+                        bool inuse = true;
+                        for (int x = 0; x < 60; x++)
                         {
-                            // instead of while (true)
-                            if (File.Exists(usersProfileDir + "\\NTUSER.DAT"))
+                            try
                             {
-                                bool inuse = true;
-                                for (int x = 0; x < 60; x++)
+                                using (FileStream isunloaded = File.Open(UserInfo.LocalProfilePath + "\\NTUSER.DAT", FileMode.Open, FileAccess.Read))
                                 {
-                                    try
-                                    {
-                                        using (FileStream isunloaded = File.Open(usersProfileDir + "\\NTUSER.DAT", FileMode.Open, FileAccess.Read))
-                                        {
-                                            inuse = false;
-                                            break;
-                                        }
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        m_logger.DebugFormat("loop{1}:{0}", ex.Message, x);
-                                        Thread.Sleep(1000);
-                                    }
-                                }
-                                if (inuse)
-                                {
-                                    return;
+                                    inuse = false;
+                                    break;
                                 }
                             }
-                            m_logger.DebugFormat("User {0} has profile in {1}, giving myself delete permission", user, usersProfileDir);
-                            try { Directory.Delete(usersProfileDir, true); }
-                            catch { }
-                            RecurseDelete(usersProfileDir);
+                            catch (Exception ex)
+                            {
+                                m_logger.DebugFormat("loop{1}:{0}", ex.Message, x);
+                                Thread.Sleep(1000);
+                            }
+                        }
+                        if (inuse)
+                        {
+                            return;
                         }
                     }
-                    // Now remove it from the registry as well
-                    Abstractions.WindowsApi.pInvokes.DeleteProfile(userPrincipal.Sid);
-                    Abstractions.Windows.User.DelProfileList(userPrincipal.Sid.ToString());
+                    m_logger.DebugFormat("User {0} has profile in {1}, giving myself delete permission", user, UserInfo.LocalProfilePath);
+                    try { Directory.Delete(UserInfo.LocalProfilePath, true); }
+                    catch { }
+                    RecurseDelete(UserInfo.LocalProfilePath);
                 }
-                catch (KeyNotFoundException)
-                {
-                    m_logger.DebugFormat("User {0} has no disk profile, just removing principal", user);
-                }
+                // Now remove it from the registry as well
+                Abstractions.WindowsApi.pInvokes.DeleteProfile(UserInfo.SID);
+                Abstractions.Windows.User.DelProfileList(UserInfo.SID.ToString());
+            }
+            catch (KeyNotFoundException)
+            {
+                m_logger.DebugFormat("User {0} has no disk profile, just removing principal", user);
+            }
 
-                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\SessionData\" + sessionID.ToString() + "'");
-                try
-                {
-                    Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\SessionData\" + sessionID.ToString(), false);
-                } catch { }
-                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\NetCache\PurgeAtNextLogoff\" + userPrincipal.Sid + "'");
-                try
-                {
-                    Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\NetCache\PurgeAtNextLogoff\", true).DeleteValue(userPrincipal.Sid.ToString(), false);
-                } catch { }
-                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\Status\" + userPrincipal.Sid + "'");
-                try
-                {
-                    Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\Status\" + userPrincipal.Sid, false);
-                } catch { }
-                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\" + userPrincipal.Sid + "'");
-                try
-                {
-                    Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\" + userPrincipal.Sid, false);
-                } catch { }
-                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\" + userPrincipal.Sid + "'");
-                try
-                {
-                    Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\" + userPrincipal.Sid, false);
-                } catch { }
-                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\" + userPrincipal.Sid + "'");
-                try
-                {
-                    Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\" + userPrincipal.Sid, false);
-                } catch { }
-                m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\IdentityStore\Cache\" + userPrincipal.Sid + "'");
-                try
-                {
-                    Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\IdentityStore\Cache\" + userPrincipal.Sid, false);
-                }
-                catch { }
+            m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\SessionData\" + sessionID.ToString() + "'");
+            try{Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\SessionData\" + sessionID.ToString(), false);}
+            catch {}
 
+            m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\NetCache\PurgeAtNextLogoff\" + UserInfo.SID + "'");
+            try{Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\NetCache\PurgeAtNextLogoff\", true).DeleteValue(UserInfo.SID.ToString(), false);}
+            catch {}
+
+            m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\Status\" + UserInfo.SID + "'");
+            try{Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\Status\" + UserInfo.SID, false);}
+            catch {}
+
+            m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\" + UserInfo.SID + "'");
+            try{Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\" + UserInfo.SID, false);}
+            catch {}
+
+            m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\" + UserInfo.SID + "'");
+            try{Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\" + UserInfo.SID, false);}
+            catch {}
+
+            m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\" + UserInfo.SID + "'");
+            try {Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\" + UserInfo.SID, false);}
+            catch {}
+
+            m_logger.Debug(@"removing SessionData 'SOFTWARE\Microsoft\IdentityStore\Cache\" + UserInfo.SID + "'");
+            try {Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\IdentityStore\Cache\" + UserInfo.SID, false);}
+            catch {}
+
+            using (UserPrincipal userPrincipal = GetUserPrincipal(user))
+            {
                 try
                 {
                     userPrincipal.Delete();
