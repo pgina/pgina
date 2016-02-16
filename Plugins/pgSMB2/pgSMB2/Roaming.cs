@@ -535,7 +535,7 @@ namespace pGina.Plugin.pgSMB2
                 m_logger.DebugFormat("Error in FixProfileList {0}", userSID);
             }
 
-            return Abstractions.Windows.User.GetProfileDir(username, password);
+            return Abstractions.Windows.User.GetProfileDir(username, password, new SecurityIdentifier(userinfo4.user_sid));
         }
 
         public Boolean userAdd(Dictionary<string,string> settings, string username, string password, string comment)
