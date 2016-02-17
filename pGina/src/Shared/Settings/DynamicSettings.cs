@@ -35,7 +35,7 @@ namespace pGina.Shared.Settings
 {
     public class pGinaDynamicSettings : Abstractions.Settings.DynamicSettings
     {
-        public const string pGinaRoot = @"SOFTWARE\pGina3.fork";
+        public static string pGinaRoot = Abstractions.Settings.DynamicSettings.ROOT_KEY;
         public pGinaDynamicSettings() :
             base(pGinaRoot)
         {
@@ -110,67 +110,8 @@ namespace pGina.Shared.Settings
         /// <returns></returns>
         public static Dictionary<string, string> GetSettings(string subKey, string[] encypted)
         {
-            Dictionary<string, string> result = new Dictionary<string, string>();
-            foreach (string s in encypted)
-            {
-            }
-
-            try
-            {
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(subKey, false))
-                {
-                    if (key != null)
-                    {
-                        string[] names = key.GetValueNames();
-                        foreach (string n in names)
-                        {
-                            object type = key.GetValue(n);
-                            string value = "";
-                            switch (key.GetValueKind(n))
-                            {
-                                case RegistryValueKind.String:
-                                case RegistryValueKind.ExpandString:
-                                    value += type;
-                                    break;
-                                case RegistryValueKind.Binary:
-                                    foreach (byte b in (byte[])type)
-                                    {
-                                        value += b;
-                                    }
-                                    Console.WriteLine();
-                                    break;
-                                case RegistryValueKind.DWord:
-                                    value += Convert.ToString((Int32)type);
-                                    break;
-                                case RegistryValueKind.QWord:
-                                    value += Convert.ToString((Int64)type);
-                                    break;
-                                case RegistryValueKind.MultiString:
-                                    foreach (string s in (string[])type)
-                                    {
-                                        value += String.Format("{0}\n", s);
-                                    }
-                                    value = value.TrimEnd();
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            if (encypted.Any(s => s.Equals(n, StringComparison.CurrentCultureIgnoreCase)))
-                            {
-                                value = DecryptSetting(subKey, n);
-                            }
-                            result.Add(n, value);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Abstractions.Logging.LibraryLogging.Error("GetSettings({0}, {{1}}) failed:{2}", subKey, String.Join(", ", encypted), ex.Message);
-            }
-
-            return result;
+            dynamic s_settings = new Abstractions.Settings.DynamicSettings(subKey);
+            return s_settings.GetSettings(encypted);
         }
 
         /// <summary>

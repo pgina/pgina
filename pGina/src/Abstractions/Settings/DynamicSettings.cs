@@ -37,7 +37,7 @@ namespace Abstractions.Settings
 {
     public class DynamicSettings : DynamicObject
     {
-        public static readonly string ROOT_KEY = @"SOFTWARE";
+        public static readonly string ROOT_KEY = @"SOFTWARE\pGina3.fork";
         protected string m_rootKey = ROOT_KEY;
 
         public DynamicSettings()
@@ -149,6 +149,74 @@ namespace Abstractions.Settings
                     throw new KeyNotFoundException(string.Format("Unable to open registry key"));
                 }
             }
+        }
+
+        /// <summary>
+        /// Get a dictionary containing all values of the pgina registry
+        /// key.  The Dictionary key is the sub-key name, the value is a pGinaDynamicSettings object
+        /// corresponding to the sub-key.
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<string, string> GetSettings(string[] encypted)
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>();
+
+            try
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_rootKey, false))
+                {
+                    if (key != null)
+                    {
+                        string[] names = key.GetValueNames();
+                        foreach (string n in names)
+                        {
+                            object type = key.GetValue(n);
+                            string value = "";
+                            switch (key.GetValueKind(n))
+                            {
+                                case RegistryValueKind.String:
+                                case RegistryValueKind.ExpandString:
+                                    value += type;
+                                    break;
+                                case RegistryValueKind.Binary:
+                                    foreach (byte b in (byte[])type)
+                                    {
+                                        value += b;
+                                    }
+                                    Console.WriteLine();
+                                    break;
+                                case RegistryValueKind.DWord:
+                                    value += Convert.ToString((Int32)type);
+                                    break;
+                                case RegistryValueKind.QWord:
+                                    value += Convert.ToString((Int64)type);
+                                    break;
+                                case RegistryValueKind.MultiString:
+                                    foreach (string s in (string[])type)
+                                    {
+                                        value += String.Format("{0}\n", s);
+                                    }
+                                    value = value.TrimEnd();
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            if (encypted.Any(s => s.Equals(n, StringComparison.CurrentCultureIgnoreCase)))
+                            {
+                                value = GetEncryptedSetting(n);
+                            }
+                            result.Add(n, value);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Abstractions.Logging.LibraryLogging.Error("GetSettings({0}, {{1}}) failed:{2}", m_rootKey, String.Join(", ", encypted), ex.Message);
+            }
+
+            return result;
         }
 
         public DynamicSetting GetSetting(string name)
