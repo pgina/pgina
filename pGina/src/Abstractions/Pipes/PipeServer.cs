@@ -161,7 +161,11 @@ namespace Abstractions.Pipes
                 catch (Exception e)
                 {
                     LibraryLogging.Error("Error while trying to open pipe server: {0}", e);
-                    //Thread.Sleep(500);
+                    if (Running)
+                    {
+                        dynamic s_settings = new Abstractions.Settings.DynamicSettings();
+                        Abstractions.Windows.Networking.sendMail(s_settings.GetSettings(new string[] { "notify_pass" }), "", "", String.Format("pGina: PipeServer error {0}", Environment.MachineName), e.ToString());
+                    }
                 }
             }
         }
