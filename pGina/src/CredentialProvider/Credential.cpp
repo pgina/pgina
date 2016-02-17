@@ -499,18 +499,18 @@ namespace pGina
 				{
 					SHStrDupW(L"Plugins did not provide a specific error message", ppwszOptionalStatusText);
 				}
-				if (m_usageScenario != CPUS_LOGON && pGina::Registry::GetBool(L"LastUsernameEnable", false))
-				{
-					SetStringValue(m_fields->usernameFieldIdx, (PCWSTR)L"");
-					m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
-					m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
-				}
-				else
+				if (pGina::Registry::GetBool(L"LastUsernameEnable", false))
 				{
 					m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
 					m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
 				}
-				SetStringValue(m_fields->passwordFieldIdx, (PCWSTR)L"");
+				else
+				{
+					ClearZeroAndFreeFields(CPFT_EDIT_TEXT, false);
+					m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
+					m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
+				}
+				ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, false);
 
 				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 				*pcpsiOptionalStatusIcon = CPSI_ERROR;
@@ -958,31 +958,15 @@ namespace pGina
 		void Credential::ServiceStateChanged(bool newState)
 		{
 			ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, true);
-			ClearZeroAndFreeFields(CPFT_EDIT_TEXT, true);
+			if( !pGina::Registry::GetBool(L"LastUsernameEnable", false) )
+			{
+				ClearZeroAndFreeFields(CPFT_EDIT_TEXT, true);
+			}
 
 			if(m_logonUiCallback)
 			{
 				std::wstring text = pGina::Service::StateHelper::GetStateText();
 				m_logonUiCallback->SetFieldString(this, FindStatusId(), text.c_str());
-			}
-
-			if( CPUS_LOGON == m_usageScenario )
-			{
-				if( pGina::Registry::GetBool(L"LastUsernameEnable", false) )
-				{
-					std::wstring sessionUname = pGina::Registry::GetString( L"LastUsername", L"");
-					if (!sessionUname.empty())
-					{
-						SHStrDupW(sessionUname.c_str(), &(m_fields->fields[m_fields->usernameFieldIdx].wstr));
-						m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
-						m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
-					}
-				}
-				else
-				{
-					m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
-					m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
-				}
 			}
 		}
 		DWORD WINAPI Credential::Thread_dialog(LPVOID lpParameter)
