@@ -412,7 +412,15 @@ namespace pGina.Plugin.Ldap
             }
 
             // Get the user's DN
-            string userDN = GetUserDN(uname);
+            string userDN = "";
+            try
+            {
+                userDN = GetUserDN(uname);
+            }
+            catch (Exception ex)
+            {
+                return new BooleanResult { Success = false, Message = ex.Message };
+            }
 
             // If we've got a userDN, attempt to authenticate the user
             if (userDN != null)
