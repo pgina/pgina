@@ -133,6 +133,7 @@ namespace pGina.Core
                 // We catch exceptions at a high level here and report failure in these cases,
                 //  with the exception details as our message for now
                 m_logger.ErrorFormat("Exception during login process: {0}", e);
+                Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), "", "", String.Format("pGina: PerformLoginProcess Exception {0}", Environment.MachineName), e.ToString());
                 return new BooleanResult() { Success = false, Message = string.Format("Unhandled exception during login: {0}", e) };
             }
         }
