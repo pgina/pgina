@@ -1255,7 +1255,7 @@ namespace pGina.Service.Impl
             {
                 m_logger.ErrorFormat("Internal error, unexpected exception while handling change password request: {0}", e);
                 Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), "", "", String.Format("pGina: Password change error for {0} from {1}", msg.Username, Environment.MachineName), e.ToString());
-                return new ChangePasswordResponseMessage() { Result = false, Message = "Internal error" };
+                return new ChangePasswordResponseMessage() { Result = false, Message = e.Message };
             }
         }
 

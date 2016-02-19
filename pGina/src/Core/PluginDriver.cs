@@ -214,6 +214,7 @@ namespace pGina.Core
                 catch (Exception e)
                 {
                     m_logger.ErrorFormat("{0} Threw an unexpected exception, assuming failure: {1}", plugin.Uuid, e);
+                    finalResult = new BooleanResult() { Message = e.Message, Success = false };
                 }
             }
 
@@ -276,7 +277,7 @@ namespace pGina.Core
                 catch (Exception e)
                 {
                     m_logger.ErrorFormat("{0} Threw an unexpected exception, treating this as failure: {1}", plugin.Uuid, e);
-                    return pluginResult;
+                    return new BooleanResult() { Message = e.Message, Success = false };
                 }
             }
 
@@ -322,7 +323,7 @@ namespace pGina.Core
                 catch (Exception e)
                 {
                     m_logger.ErrorFormat("{0} Threw an unexpected exception, treating this as failure: {1}", plugin.Uuid, e);
-                    return pluginResult;
+                    return new BooleanResult() { Message = e.Message, Success = false };
                 }
             }
 
