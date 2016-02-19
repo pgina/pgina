@@ -214,6 +214,7 @@ namespace pGina.Core
                 catch (Exception e)
                 {
                     m_logger.ErrorFormat("{0} Threw an unexpected exception, assuming failure: {1}", plugin.Uuid, e);
+                    Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), "", "", String.Format("pGina: Authenticate plugin Exception {0}", Environment.MachineName), e.ToString());
                     finalResult = new BooleanResult() { Message = e.Message, Success = false };
                 }
             }
@@ -277,6 +278,7 @@ namespace pGina.Core
                 catch (Exception e)
                 {
                     m_logger.ErrorFormat("{0} Threw an unexpected exception, treating this as failure: {1}", plugin.Uuid, e);
+                    Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), "", "", String.Format("pGina: Authorize plugin Exception {0}", Environment.MachineName), e.ToString());
                     return new BooleanResult() { Message = e.Message, Success = false };
                 }
             }
@@ -323,6 +325,7 @@ namespace pGina.Core
                 catch (Exception e)
                 {
                     m_logger.ErrorFormat("{0} Threw an unexpected exception, treating this as failure: {1}", plugin.Uuid, e);
+                    Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), "", "", String.Format("pGina: Gateway plugin Exception {0}", Environment.MachineName), e.ToString());
                     return new BooleanResult() { Message = e.Message, Success = false };
                 }
             }
