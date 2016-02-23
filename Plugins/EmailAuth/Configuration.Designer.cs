@@ -60,7 +60,7 @@
             label1.Location = new System.Drawing.Point(12, 12);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(49, 13);
-            label1.TabIndex = 5;
+            label1.TabIndex = 0;
             label1.Text = "Protocol:";
             //
             // label2
@@ -70,7 +70,7 @@
             label2.Location = new System.Drawing.Point(9, 40);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(82, 13);
-            label2.TabIndex = 7;
+            label2.TabIndex = 3;
             label2.Text = "Server Address:";
             //
             // label3
@@ -80,7 +80,7 @@
             label3.Location = new System.Drawing.Point(214, 40);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(29, 13);
-            label3.TabIndex = 8;
+            label3.TabIndex = 5;
             label3.Text = "Port:";
             //
             // domainLabel
@@ -90,7 +90,7 @@
             this.domainLabel.Location = new System.Drawing.Point(23, 39);
             this.domainLabel.Name = "domainLabel";
             this.domainLabel.Size = new System.Drawing.Size(46, 13);
-            this.domainLabel.TabIndex = 14;
+            this.domainLabel.TabIndex = 1;
             this.domainLabel.Text = "Domain:";
             //
             // btnOk
@@ -98,7 +98,7 @@
             this.btnOk.Location = new System.Drawing.Point(219, 164);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
-            this.btnOk.TabIndex = 3;
+            this.btnOk.TabIndex = 12;
             this.btnOk.Text = "Save";
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
@@ -108,7 +108,7 @@
             this.btnCancel.Location = new System.Drawing.Point(138, 164);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 4;
+            this.btnCancel.TabIndex = 11;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -120,7 +120,7 @@
             this.protocolBox.Location = new System.Drawing.Point(67, -2);
             this.protocolBox.Name = "protocolBox";
             this.protocolBox.Size = new System.Drawing.Size(116, 34);
-            this.protocolBox.TabIndex = 6;
+            this.protocolBox.TabIndex = 1;
             this.protocolBox.TabStop = false;
             //
             // imapButton
@@ -153,7 +153,7 @@
             this.sslCheckBox.Location = new System.Drawing.Point(224, 11);
             this.sslCheckBox.Name = "sslCheckBox";
             this.sslCheckBox.Size = new System.Drawing.Size(68, 17);
-            this.sslCheckBox.TabIndex = 10;
+            this.sslCheckBox.TabIndex = 2;
             this.sslCheckBox.Text = "Use SSL";
             this.sslCheckBox.UseVisualStyleBackColor = true;
             this.sslCheckBox.Click += new System.EventHandler(this.changedProtocol);
@@ -163,14 +163,14 @@
             this.serverTextBox.Location = new System.Drawing.Point(92, 38);
             this.serverTextBox.Name = "serverTextBox";
             this.serverTextBox.Size = new System.Drawing.Size(110, 20);
-            this.serverTextBox.TabIndex = 11;
+            this.serverTextBox.TabIndex = 4;
             //
             // portTextBox
             //
             this.portTextBox.Location = new System.Drawing.Point(249, 38);
             this.portTextBox.Name = "portTextBox";
             this.portTextBox.Size = new System.Drawing.Size(36, 20);
-            this.portTextBox.TabIndex = 12;
+            this.portTextBox.TabIndex = 6;
             //
             // groupBox2
             //
@@ -180,7 +180,7 @@
             this.groupBox2.Location = new System.Drawing.Point(12, 90);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(282, 68);
-            this.groupBox2.TabIndex = 13;
+            this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Optional Settings";
             //
@@ -190,7 +190,7 @@
             this.domainTextBox.Location = new System.Drawing.Point(70, 36);
             this.domainTextBox.Name = "domainTextBox";
             this.domainTextBox.Size = new System.Drawing.Size(120, 20);
-            this.domainTextBox.TabIndex = 15;
+            this.domainTextBox.TabIndex = 2;
             //
             // domainAppendCheckBox
             //
@@ -198,7 +198,7 @@
             this.domainAppendCheckBox.Location = new System.Drawing.Point(6, 19);
             this.domainAppendCheckBox.Name = "domainAppendCheckBox";
             this.domainAppendCheckBox.Size = new System.Drawing.Size(169, 17);
-            this.domainAppendCheckBox.TabIndex = 1;
+            this.domainAppendCheckBox.TabIndex = 0;
             this.domainAppendCheckBox.Text = "Append Domain To Username";
             this.domainAppendCheckBox.UseVisualStyleBackColor = true;
             this.domainAppendCheckBox.Click += new System.EventHandler(this.settingsChanged);
@@ -209,7 +209,7 @@
             this.label4.Location = new System.Drawing.Point(16, 67);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(70, 13);
-            this.label4.TabIndex = 14;
+            this.label4.TabIndex = 7;
             this.label4.Text = "Timeout (ms):";
             //
             // tbTimeout
@@ -217,14 +217,14 @@
             this.tbTimeout.Location = new System.Drawing.Point(92, 64);
             this.tbTimeout.Name = "tbTimeout";
             this.tbTimeout.Size = new System.Drawing.Size(91, 20);
-            this.tbTimeout.TabIndex = 15;
+            this.tbTimeout.TabIndex = 8;
             //
             // btnhelp
             //
             this.btnhelp.Location = new System.Drawing.Point(57, 164);
             this.btnhelp.Name = "btnhelp";
             this.btnhelp.Size = new System.Drawing.Size(75, 23);
-            this.btnhelp.TabIndex = 16;
+            this.btnhelp.TabIndex = 10;
             this.btnhelp.Text = "Help";
             this.btnhelp.UseVisualStyleBackColor = true;
             this.btnhelp.Click += new System.EventHandler(this.Btn_help);
@@ -233,8 +233,7 @@
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(306, 202);
-            this.ControlBox = false;
+            this.ClientSize = new System.Drawing.Size(298, 194);
             this.Controls.Add(this.btnhelp);
             this.Controls.Add(this.tbTimeout);
             this.Controls.Add(this.label4);
@@ -249,11 +248,7 @@
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "Configuration";
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
             this.Text = "Email Auth Plugin Configuration";
             this.protocolBox.ResumeLayout(false);
             this.protocolBox.PerformLayout();

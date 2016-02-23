@@ -23,7 +23,7 @@ namespace pGina.Plugin.Email
             // Set default values for settings (if not already set)
             m_settings.SetDefault("Server", "");
             m_settings.SetDefault("UseSsl", true);
-            m_settings.SetDefault("Protocol", "");
+            m_settings.SetDefault("Protocol", "POP3");
             m_settings.SetDefault("Port", "");
             m_settings.SetDefault("AppendDomain", false);
             m_settings.SetDefault("Domain", "");
