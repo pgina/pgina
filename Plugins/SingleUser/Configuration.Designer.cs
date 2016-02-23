@@ -48,20 +48,20 @@
             //
             // btnOk
             //
-            this.btnOk.Location = new System.Drawing.Point(314, 262);
+            this.btnOk.Location = new System.Drawing.Point(395, 262);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
-            this.btnOk.TabIndex = 3;
+            this.btnOk.TabIndex = 13;
             this.btnOk.Text = "Save";
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
             //
             // btnCancel
             //
-            this.btnCancel.Location = new System.Drawing.Point(395, 262);
+            this.btnCancel.Location = new System.Drawing.Point(314, 262);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 4;
+            this.btnCancel.TabIndex = 12;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -72,7 +72,7 @@
             this.label1.Location = new System.Drawing.Point(13, 25);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(58, 13);
-            this.label1.TabIndex = 5;
+            this.label1.TabIndex = 0;
             this.label1.Text = "Username:";
             //
             // label2
@@ -81,7 +81,7 @@
             this.label2.Location = new System.Drawing.Point(13, 51);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(46, 13);
-            this.label2.TabIndex = 6;
+            this.label2.TabIndex = 2;
             this.label2.Text = "Domain:";
             //
             // label3
@@ -90,7 +90,7 @@
             this.label3.Location = new System.Drawing.Point(13, 77);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(56, 13);
-            this.label3.TabIndex = 7;
+            this.label3.TabIndex = 4;
             this.label3.Text = "Password:";
             //
             // m_txtUser
@@ -98,14 +98,14 @@
             this.m_txtUser.Location = new System.Drawing.Point(88, 22);
             this.m_txtUser.Name = "m_txtUser";
             this.m_txtUser.Size = new System.Drawing.Size(274, 20);
-            this.m_txtUser.TabIndex = 8;
+            this.m_txtUser.TabIndex = 1;
             //
             // m_txtDomain
             //
             this.m_txtDomain.Location = new System.Drawing.Point(88, 48);
             this.m_txtDomain.Name = "m_txtDomain";
             this.m_txtDomain.Size = new System.Drawing.Size(274, 20);
-            this.m_txtDomain.TabIndex = 9;
+            this.m_txtDomain.TabIndex = 3;
             //
             // m_txtPass
             //
@@ -113,7 +113,7 @@
             this.m_txtPass.Name = "m_txtPass";
             this.m_txtPass.PasswordChar = '*';
             this.m_txtPass.Size = new System.Drawing.Size(274, 20);
-            this.m_txtPass.TabIndex = 10;
+            this.m_txtPass.TabIndex = 5;
             this.m_txtPass.UseSystemPasswordChar = true;
             //
             // m_dgv
@@ -125,7 +125,7 @@
             this.m_dgv.Location = new System.Drawing.Point(12, 138);
             this.m_dgv.Name = "m_dgv";
             this.m_dgv.Size = new System.Drawing.Size(458, 118);
-            this.m_dgv.TabIndex = 12;
+            this.m_dgv.TabIndex = 10;
             //
             // PluginUuid
             //
@@ -139,7 +139,7 @@
             this.substituteCB.Location = new System.Drawing.Point(12, 115);
             this.substituteCB.Name = "substituteCB";
             this.substituteCB.Size = new System.Drawing.Size(103, 17);
-            this.substituteCB.TabIndex = 13;
+            this.substituteCB.TabIndex = 6;
             this.substituteCB.Text = "Only substitute if";
             this.substituteCB.UseVisualStyleBackColor = true;
             this.substituteCB.CheckedChanged += new System.EventHandler(this.requirePluginCheckChange);
@@ -150,7 +150,7 @@
             this.anyRB.Location = new System.Drawing.Point(117, 114);
             this.anyRB.Name = "anyRB";
             this.anyRB.Size = new System.Drawing.Size(42, 17);
-            this.anyRB.TabIndex = 14;
+            this.anyRB.TabIndex = 7;
             this.anyRB.TabStop = true;
             this.anyRB.Text = "any";
             this.anyRB.UseVisualStyleBackColor = true;
@@ -161,7 +161,7 @@
             this.allRB.Location = new System.Drawing.Point(161, 114);
             this.allRB.Name = "allRB";
             this.allRB.Size = new System.Drawing.Size(35, 17);
-            this.allRB.TabIndex = 15;
+            this.allRB.TabIndex = 8;
             this.allRB.TabStop = true;
             this.allRB.Text = "all";
             this.allRB.UseVisualStyleBackColor = true;
@@ -172,7 +172,7 @@
             this.label4.Location = new System.Drawing.Point(198, 116);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(272, 13);
-            this.label4.TabIndex = 16;
+            this.label4.TabIndex = 9;
             this.label4.Text = "of the following plugins have successfully authenticated.";
             //
             // btnHelp
@@ -180,7 +180,7 @@
             this.btnHelp.Location = new System.Drawing.Point(233, 262);
             this.btnHelp.Name = "btnHelp";
             this.btnHelp.Size = new System.Drawing.Size(75, 23);
-            this.btnHelp.TabIndex = 17;
+            this.btnHelp.TabIndex = 11;
             this.btnHelp.Text = "Help";
             this.btnHelp.UseVisualStyleBackColor = true;
             //
