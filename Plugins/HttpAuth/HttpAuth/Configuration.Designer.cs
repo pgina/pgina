@@ -58,7 +58,7 @@
             this.save_button.Location = new System.Drawing.Point(174, 142);
             this.save_button.Name = "save_button";
             this.save_button.Size = new System.Drawing.Size(75, 23);
-            this.save_button.TabIndex = 2;
+            this.save_button.TabIndex = 5;
             this.save_button.Text = "Save";
             this.save_button.UseVisualStyleBackColor = true;
             this.save_button.Click += new System.EventHandler(this.Btn_Save);
@@ -69,7 +69,7 @@
             this.cancel_button.Location = new System.Drawing.Point(93, 142);
             this.cancel_button.Name = "cancel_button";
             this.cancel_button.Size = new System.Drawing.Size(75, 23);
-            this.cancel_button.TabIndex = 3;
+            this.cancel_button.TabIndex = 4;
             this.cancel_button.Text = "Cancel";
             this.cancel_button.UseVisualStyleBackColor = true;
             this.cancel_button.Click += new System.EventHandler(this.Btn_Cancel);
@@ -80,7 +80,7 @@
             this.help_button.Location = new System.Drawing.Point(12, 142);
             this.help_button.Name = "help_button";
             this.help_button.Size = new System.Drawing.Size(75, 23);
-            this.help_button.TabIndex = 4;
+            this.help_button.TabIndex = 3;
             this.help_button.Text = "Help";
             this.help_button.UseVisualStyleBackColor = true;
             this.help_button.Click += new System.EventHandler(this.Btn_help);
@@ -90,10 +90,9 @@
             this.Description.AutoSize = true;
             this.Description.Location = new System.Drawing.Point(12, 58);
             this.Description.Name = "Description";
-            this.Description.Size = new System.Drawing.Size(35, 13);
-            this.Description.TabIndex = 5;
-            this.Description.Text = "Macros:\r\n" +
-                         "  %u = UserName\r\n";
+            this.Description.Size = new System.Drawing.Size(89, 26);
+            this.Description.TabIndex = 2;
+            this.Description.Text = "Macros:\r\n  %u = UserName\r\n";
             //
             // Configuration
             //
