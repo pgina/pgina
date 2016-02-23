@@ -63,20 +63,20 @@
             //
             // btnOk
             //
-            this.btnOk.Location = new System.Drawing.Point(212, 98);
+            this.btnOk.Location = new System.Drawing.Point(293, 98);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
-            this.btnOk.TabIndex = 3;
+            this.btnOk.TabIndex = 4;
             this.btnOk.Text = "Save";
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
             //
             // btnCancel
             //
-            this.btnCancel.Location = new System.Drawing.Point(293, 98);
+            this.btnCancel.Location = new System.Drawing.Point(212, 98);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 4;
+            this.btnCancel.TabIndex = 3;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
