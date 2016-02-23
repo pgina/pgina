@@ -99,7 +99,7 @@
             this.tab_pages.Name = "tab_pages";
             this.tab_pages.SelectedIndex = 0;
             this.tab_pages.Size = new System.Drawing.Size(857, 410);
-            this.tab_pages.TabIndex = 5;
+            this.tab_pages.TabIndex = 0;
             //
             // tab_authentication
             //
@@ -118,7 +118,7 @@
             this.authentication_sys.Location = new System.Drawing.Point(6, 6);
             this.authentication_sys.Name = "authentication_sys";
             this.authentication_sys.Size = new System.Drawing.Size(837, 372);
-            this.authentication_sys.TabIndex = 7;
+            this.authentication_sys.TabIndex = 0;
             this.authentication_sys.TabStop = false;
             this.authentication_sys.Text = "system context";
             //
@@ -166,7 +166,7 @@
             this.authorization_sys.Location = new System.Drawing.Point(6, 6);
             this.authorization_sys.Name = "authorization_sys";
             this.authorization_sys.Size = new System.Drawing.Size(837, 372);
-            this.authorization_sys.TabIndex = 8;
+            this.authorization_sys.TabIndex = 0;
             this.authorization_sys.TabStop = false;
             this.authorization_sys.Text = "system context";
             //
@@ -180,7 +180,7 @@
             this.authorization_sys_grid.Location = new System.Drawing.Point(3, 16);
             this.authorization_sys_grid.Name = "authorization_sys_grid";
             this.authorization_sys_grid.Size = new System.Drawing.Size(831, 353);
-            this.authorization_sys_grid.TabIndex = 1;
+            this.authorization_sys_grid.TabIndex = 0;
             //
             // dataGridViewCheckBoxColumn2
             //
@@ -213,7 +213,7 @@
             this.gateway_sys.Location = new System.Drawing.Point(6, 6);
             this.gateway_sys.Name = "gateway_sys";
             this.gateway_sys.Size = new System.Drawing.Size(837, 372);
-            this.gateway_sys.TabIndex = 10;
+            this.gateway_sys.TabIndex = 0;
             this.gateway_sys.TabStop = false;
             this.gateway_sys.Text = "system context";
             //
@@ -227,7 +227,7 @@
             this.gateway_sys_grid.Location = new System.Drawing.Point(3, 16);
             this.gateway_sys_grid.Name = "gateway_sys_grid";
             this.gateway_sys_grid.Size = new System.Drawing.Size(831, 353);
-            this.gateway_sys_grid.TabIndex = 1;
+            this.gateway_sys_grid.TabIndex = 0;
             //
             // dataGridViewCheckBoxColumn3
             //
@@ -261,7 +261,7 @@
             this.notification_usr.Location = new System.Drawing.Point(6, 185);
             this.notification_usr.Name = "notification_usr";
             this.notification_usr.Size = new System.Drawing.Size(834, 193);
-            this.notification_usr.TabIndex = 11;
+            this.notification_usr.TabIndex = 1;
             this.notification_usr.TabStop = false;
             this.notification_usr.Text = "user context";
             //
@@ -275,7 +275,7 @@
             this.notification_usr_grid.Location = new System.Drawing.Point(3, 16);
             this.notification_usr_grid.Name = "notification_usr_grid";
             this.notification_usr_grid.Size = new System.Drawing.Size(828, 174);
-            this.notification_usr_grid.TabIndex = 2;
+            this.notification_usr_grid.TabIndex = 0;
             //
             // dataGridViewCheckBoxColumn8
             //
@@ -298,7 +298,7 @@
             this.notification_sys.Location = new System.Drawing.Point(6, 6);
             this.notification_sys.Name = "notification_sys";
             this.notification_sys.Size = new System.Drawing.Size(837, 173);
-            this.notification_sys.TabIndex = 10;
+            this.notification_sys.TabIndex = 0;
             this.notification_sys.TabStop = false;
             this.notification_sys.Text = "system context";
             //
@@ -312,7 +312,7 @@
             this.notification_sys_grid.Location = new System.Drawing.Point(3, 16);
             this.notification_sys_grid.Name = "notification_sys_grid";
             this.notification_sys_grid.Size = new System.Drawing.Size(831, 154);
-            this.notification_sys_grid.TabIndex = 1;
+            this.notification_sys_grid.TabIndex = 0;
             //
             // dataGridViewCheckBoxColumn4
             //
@@ -346,7 +346,7 @@
             this.changepwd_usr.Location = new System.Drawing.Point(6, 185);
             this.changepwd_usr.Name = "changepwd_usr";
             this.changepwd_usr.Size = new System.Drawing.Size(834, 193);
-            this.changepwd_usr.TabIndex = 11;
+            this.changepwd_usr.TabIndex = 1;
             this.changepwd_usr.TabStop = false;
             this.changepwd_usr.Text = "user context";
             //
@@ -360,7 +360,7 @@
             this.changepwd_usr_grid.Location = new System.Drawing.Point(3, 16);
             this.changepwd_usr_grid.Name = "changepwd_usr_grid";
             this.changepwd_usr_grid.Size = new System.Drawing.Size(828, 174);
-            this.changepwd_usr_grid.TabIndex = 2;
+            this.changepwd_usr_grid.TabIndex = 0;
             //
             // dataGridViewCheckBoxColumn9
             //
@@ -383,7 +383,7 @@
             this.changepwd_sys.Location = new System.Drawing.Point(6, 6);
             this.changepwd_sys.Name = "changepwd_sys";
             this.changepwd_sys.Size = new System.Drawing.Size(837, 173);
-            this.changepwd_sys.TabIndex = 10;
+            this.changepwd_sys.TabIndex = 0;
             this.changepwd_sys.TabStop = false;
             this.changepwd_sys.Text = "system context";
             //
@@ -397,7 +397,7 @@
             this.changepwd_sys_grid.Location = new System.Drawing.Point(3, 16);
             this.changepwd_sys_grid.Name = "changepwd_sys_grid";
             this.changepwd_sys_grid.Size = new System.Drawing.Size(831, 154);
-            this.changepwd_sys_grid.TabIndex = 1;
+            this.changepwd_sys_grid.TabIndex = 0;
             //
             // dataGridViewCheckBoxColumn5
             //
@@ -416,30 +416,30 @@
             //
             // close_btn
             //
-            this.close_btn.Location = new System.Drawing.Point(790, 428);
+            this.close_btn.Location = new System.Drawing.Point(705, 430);
             this.close_btn.Name = "close_btn";
             this.close_btn.Size = new System.Drawing.Size(79, 24);
-            this.close_btn.TabIndex = 6;
-            this.close_btn.Text = "Close";
+            this.close_btn.TabIndex = 3;
+            this.close_btn.Text = "Cancel";
             this.close_btn.UseVisualStyleBackColor = true;
             this.close_btn.Click += new System.EventHandler(this.close_btn_Click);
             //
             // save_btn
             //
-            this.save_btn.Location = new System.Drawing.Point(705, 428);
+            this.save_btn.Location = new System.Drawing.Point(790, 430);
             this.save_btn.Name = "save_btn";
             this.save_btn.Size = new System.Drawing.Size(79, 24);
-            this.save_btn.TabIndex = 7;
+            this.save_btn.TabIndex = 4;
             this.save_btn.Text = "Save";
             this.save_btn.UseVisualStyleBackColor = true;
             this.save_btn.Click += new System.EventHandler(this.save_btn_Click);
             //
             // help_btn
             //
-            this.help_btn.Location = new System.Drawing.Point(620, 428);
+            this.help_btn.Location = new System.Drawing.Point(620, 430);
             this.help_btn.Name = "help_btn";
             this.help_btn.Size = new System.Drawing.Size(79, 24);
-            this.help_btn.TabIndex = 8;
+            this.help_btn.TabIndex = 2;
             this.help_btn.Text = "Help";
             this.help_btn.UseVisualStyleBackColor = true;
             this.help_btn.Click += new System.EventHandler(this.help_btn_Click);
@@ -450,7 +450,7 @@
             this.macros_label.Location = new System.Drawing.Point(12, 428);
             this.macros_label.Name = "macros_label";
             this.macros_label.Size = new System.Drawing.Size(572, 26);
-            this.macros_label.TabIndex = 9;
+            this.macros_label.TabIndex = 1;
             this.macros_label.Text = "Macros:\r\n%u = Username, %o OriginalUsername, %p Password, %b = oldPassword, %s = " +
                 "SID, %e = PasswordEXP, %i = SessionID";
             //
