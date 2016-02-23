@@ -37,7 +37,6 @@
             this.serverTextBox = new System.Windows.Forms.TextBox();
             this.serverLabel = new System.Windows.Forms.Label();
             this.portTextBox = new System.Windows.Forms.TextBox();
-            this.btnHelp = new System.Windows.Forms.Button();
             this.portLabel = new System.Windows.Forms.Label();
             this.sslCheckBox = new System.Windows.Forms.CheckBox();
             this.appendDomainCheckBox = new System.Windows.Forms.CheckBox();
@@ -45,6 +44,7 @@
             this.domainLabel = new System.Windows.Forms.Label();
             this.timeoutTextBox = new System.Windows.Forms.TextBox();
             this.timeoutLabel = new System.Windows.Forms.Label();
+            this.btnHelp = new System.Windows.Forms.Button();
             this.m_saveCloseButton = new System.Windows.Forms.Button();
             this.m_cancelButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.m_serversListDgv)).BeginInit();
@@ -91,7 +91,7 @@
             this.m_deleteServerButton.Location = new System.Drawing.Point(481, 74);
             this.m_deleteServerButton.Name = "m_deleteServerButton";
             this.m_deleteServerButton.Size = new System.Drawing.Size(75, 23);
-            this.m_deleteServerButton.TabIndex = 15;
+            this.m_deleteServerButton.TabIndex = 13;
             this.m_deleteServerButton.Text = "Delete";
             this.m_deleteServerButton.UseVisualStyleBackColor = true;
             this.m_deleteServerButton.Click += new System.EventHandler(this.m_deleteServerButton_Click);
@@ -101,7 +101,7 @@
             this.m_newServerButton.Location = new System.Drawing.Point(410, 74);
             this.m_newServerButton.Name = "m_newServerButton";
             this.m_newServerButton.Size = new System.Drawing.Size(65, 23);
-            this.m_newServerButton.TabIndex = 14;
+            this.m_newServerButton.TabIndex = 12;
             this.m_newServerButton.Text = "New";
             this.m_newServerButton.UseVisualStyleBackColor = true;
             this.m_newServerButton.Click += new System.EventHandler(this.newServerButton_Click);
@@ -113,7 +113,7 @@
             this.protocolComboBox.Location = new System.Drawing.Point(61, 19);
             this.protocolComboBox.Name = "protocolComboBox";
             this.protocolComboBox.Size = new System.Drawing.Size(59, 21);
-            this.protocolComboBox.TabIndex = 3;
+            this.protocolComboBox.TabIndex = 1;
             this.protocolComboBox.SelectedIndexChanged += new System.EventHandler(this.protocolComboBox_SelectedIndexChanged);
             //
             // protocolLabel
@@ -122,7 +122,7 @@
             this.protocolLabel.Location = new System.Drawing.Point(6, 22);
             this.protocolLabel.Name = "protocolLabel";
             this.protocolLabel.Size = new System.Drawing.Size(49, 13);
-            this.protocolLabel.TabIndex = 2;
+            this.protocolLabel.TabIndex = 0;
             this.protocolLabel.Text = "Protocol:";
             //
             // serverTextBox
@@ -130,7 +130,7 @@
             this.serverTextBox.Location = new System.Drawing.Point(173, 19);
             this.serverTextBox.Name = "serverTextBox";
             this.serverTextBox.Size = new System.Drawing.Size(212, 20);
-            this.serverTextBox.TabIndex = 5;
+            this.serverTextBox.TabIndex = 3;
             //
             // serverLabel
             //
@@ -138,7 +138,7 @@
             this.serverLabel.Location = new System.Drawing.Point(126, 22);
             this.serverLabel.Name = "serverLabel";
             this.serverLabel.Size = new System.Drawing.Size(41, 13);
-            this.serverLabel.TabIndex = 4;
+            this.serverLabel.TabIndex = 2;
             this.serverLabel.Text = "Server:";
             //
             // portTextBox
@@ -146,7 +146,7 @@
             this.portTextBox.Location = new System.Drawing.Point(426, 19);
             this.portTextBox.Name = "portTextBox";
             this.portTextBox.Size = new System.Drawing.Size(50, 20);
-            this.portTextBox.TabIndex = 7;
+            this.portTextBox.TabIndex = 5;
             //
             // portLabel
             //
@@ -154,7 +154,7 @@
             this.portLabel.Location = new System.Drawing.Point(391, 22);
             this.portLabel.Name = "portLabel";
             this.portLabel.Size = new System.Drawing.Size(29, 13);
-            this.portLabel.TabIndex = 6;
+            this.portLabel.TabIndex = 4;
             this.portLabel.Text = "Port:";
             //
             // sslCheckBox
@@ -163,7 +163,7 @@
             this.sslCheckBox.Location = new System.Drawing.Point(482, 21);
             this.sslCheckBox.Name = "sslCheckBox";
             this.sslCheckBox.Size = new System.Drawing.Size(68, 17);
-            this.sslCheckBox.TabIndex = 8;
+            this.sslCheckBox.TabIndex = 6;
             this.sslCheckBox.Text = "Use SSL";
             this.sslCheckBox.UseVisualStyleBackColor = true;
             this.sslCheckBox.CheckedChanged += new System.EventHandler(this.sslCheckBox_CheckedChanged);
@@ -174,7 +174,7 @@
             this.appendDomainCheckBox.Location = new System.Drawing.Point(9, 50);
             this.appendDomainCheckBox.Name = "appendDomainCheckBox";
             this.appendDomainCheckBox.Size = new System.Drawing.Size(165, 17);
-            this.appendDomainCheckBox.TabIndex = 9;
+            this.appendDomainCheckBox.TabIndex = 7;
             this.appendDomainCheckBox.Text = "Append Domain to Username";
             this.appendDomainCheckBox.UseVisualStyleBackColor = true;
             this.appendDomainCheckBox.CheckedChanged += new System.EventHandler(this.domainAppendCheckBox_CheckedChanged);
@@ -184,7 +184,7 @@
             this.domainTextBox.Location = new System.Drawing.Point(227, 47);
             this.domainTextBox.Name = "domainTextBox";
             this.domainTextBox.Size = new System.Drawing.Size(165, 20);
-            this.domainTextBox.TabIndex = 11;
+            this.domainTextBox.TabIndex = 9;
             this.domainTextBox.TextChanged += new System.EventHandler(this.domainTextBox_TextChanged);
             //
             // domainLabel
@@ -193,7 +193,7 @@
             this.domainLabel.Location = new System.Drawing.Point(175, 51);
             this.domainLabel.Name = "domainLabel";
             this.domainLabel.Size = new System.Drawing.Size(46, 13);
-            this.domainLabel.TabIndex = 10;
+            this.domainLabel.TabIndex = 8;
             this.domainLabel.Text = "Domain:";
             //
             // timeoutTextBox
@@ -201,7 +201,7 @@
             this.timeoutTextBox.Location = new System.Drawing.Point(452, 48);
             this.timeoutTextBox.Name = "timeoutTextBox";
             this.timeoutTextBox.Size = new System.Drawing.Size(76, 20);
-            this.timeoutTextBox.TabIndex = 13;
+            this.timeoutTextBox.TabIndex = 11;
             //
             // timeoutLabel
             //
@@ -209,34 +209,34 @@
             this.timeoutLabel.Location = new System.Drawing.Point(398, 51);
             this.timeoutLabel.Name = "timeoutLabel";
             this.timeoutLabel.Size = new System.Drawing.Size(48, 13);
-            this.timeoutLabel.TabIndex = 12;
+            this.timeoutLabel.TabIndex = 10;
             this.timeoutLabel.Text = "Timeout:";
             //
             // btnHelp
             //
-            this.btnHelp.Location = new System.Drawing.Point(306, 332);
+            this.btnHelp.Location = new System.Drawing.Point(349, 333);
             this.btnHelp.Name = "btnHelp";
             this.btnHelp.Size = new System.Drawing.Size(71, 23);
-            this.btnHelp.TabIndex = 16;
+            this.btnHelp.TabIndex = 2;
             this.btnHelp.Text = "Help";
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.Btn_help);
             //
             // m_saveCloseButton
             //
-            this.m_saveCloseButton.Location = new System.Drawing.Point(392, 332);
+            this.m_saveCloseButton.Location = new System.Drawing.Point(503, 333);
             this.m_saveCloseButton.Name = "m_saveCloseButton";
-            this.m_saveCloseButton.Size = new System.Drawing.Size(95, 23);
-            this.m_saveCloseButton.TabIndex = 2;
-            this.m_saveCloseButton.Text = "Save and Close";
+            this.m_saveCloseButton.Size = new System.Drawing.Size(71, 23);
+            this.m_saveCloseButton.TabIndex = 4;
+            this.m_saveCloseButton.Text = "Save";
             this.m_saveCloseButton.UseVisualStyleBackColor = true;
             this.m_saveCloseButton.Click += new System.EventHandler(this.m_saveCloseButton_Click);
             //
             // m_cancelButton
             //
-            this.m_cancelButton.Location = new System.Drawing.Point(502, 332);
+            this.m_cancelButton.Location = new System.Drawing.Point(426, 333);
             this.m_cancelButton.Name = "m_cancelButton";
-            this.m_cancelButton.Size = new System.Drawing.Size(75, 23);
+            this.m_cancelButton.Size = new System.Drawing.Size(71, 23);
             this.m_cancelButton.TabIndex = 3;
             this.m_cancelButton.Text = "Cancel";
             this.m_cancelButton.UseVisualStyleBackColor = true;
@@ -254,8 +254,8 @@
             this.Controls.Add(this.m_serversListDgv);
             this.Name = "Configuration";
             this.Text = "Multi Email Configuration";
-            ((System.ComponentModel.ISupportInitialize)(this.m_serversListDgv)).EndInit();
             this.Click += new System.EventHandler(this.Btn_help);
+            ((System.ComponentModel.ISupportInitialize)(this.m_serversListDgv)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
