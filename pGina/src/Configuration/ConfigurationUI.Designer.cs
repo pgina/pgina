@@ -29,12 +29,13 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigurationUI));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
             this.ntpservers_group = new System.Windows.Forms.GroupBox();
+            this.ntpservers = new System.Windows.Forms.RichTextBox();
             this.groupLogon = new System.Windows.Forms.GroupBox();
             this.chk_lastusername = new System.Windows.Forms.CheckBox();
             this.groupBox18 = new System.Windows.Forms.GroupBox();
@@ -162,7 +163,6 @@
             this.m_pginaVersionLbl = new System.Windows.Forms.Label();
             this.btnSaveAndClose = new System.Windows.Forms.Button();
             this.help = new System.Windows.Forms.Button();
-            this.ntpservers = new System.Windows.Forms.RichTextBox();
             this.m_tabs.SuspendLayout();
             this.m_generalConfigTab.SuspendLayout();
             this.ntpservers_group.SuspendLayout();
@@ -249,9 +249,18 @@
             this.ntpservers_group.Location = new System.Drawing.Point(572, 299);
             this.ntpservers_group.Name = "ntpservers_group";
             this.ntpservers_group.Size = new System.Drawing.Size(194, 106);
-            this.ntpservers_group.TabIndex = 9;
+            this.ntpservers_group.TabIndex = 4;
             this.ntpservers_group.TabStop = false;
             this.ntpservers_group.Text = "NTP Servers";
+            //
+            // ntpservers
+            //
+            this.ntpservers.Location = new System.Drawing.Point(6, 19);
+            this.ntpservers.Name = "ntpservers";
+            this.ntpservers.Size = new System.Drawing.Size(182, 81);
+            this.ntpservers.TabIndex = 0;
+            this.ntpservers.Text = "";
+            this.ntpservers.WordWrap = false;
             //
             // groupLogon
             //
@@ -259,7 +268,7 @@
             this.groupLogon.Location = new System.Drawing.Point(448, 411);
             this.groupLogon.Name = "groupLogon";
             this.groupLogon.Size = new System.Drawing.Size(318, 47);
-            this.groupLogon.TabIndex = 8;
+            this.groupLogon.TabIndex = 6;
             this.groupLogon.TabStop = false;
             this.groupLogon.Text = "Logon";
             //
@@ -269,7 +278,7 @@
             this.chk_lastusername.Location = new System.Drawing.Point(9, 19);
             this.chk_lastusername.Name = "chk_lastusername";
             this.chk_lastusername.Size = new System.Drawing.Size(206, 17);
-            this.chk_lastusername.TabIndex = 7;
+            this.chk_lastusername.TabIndex = 0;
             this.chk_lastusername.Text = "Display last user name in logon screen";
             this.chk_lastusername.UseVisualStyleBackColor = true;
             //
@@ -288,7 +297,7 @@
             this.groupBox18.Location = new System.Drawing.Point(17, 464);
             this.groupBox18.Name = "groupBox18";
             this.groupBox18.Size = new System.Drawing.Size(749, 77);
-            this.groupBox18.TabIndex = 6;
+            this.groupBox18.TabIndex = 7;
             this.groupBox18.TabStop = false;
             this.groupBox18.Text = "Email Notifications";
             //
@@ -298,7 +307,7 @@
             this.notify_label_pass.Location = new System.Drawing.Point(307, 48);
             this.notify_label_pass.Name = "notify_label_pass";
             this.notify_label_pass.Size = new System.Drawing.Size(56, 13);
-            this.notify_label_pass.TabIndex = 9;
+            this.notify_label_pass.TabIndex = 7;
             this.notify_label_pass.Text = "Password:";
             //
             // notify_label_user
@@ -307,7 +316,7 @@
             this.notify_label_user.Location = new System.Drawing.Point(307, 22);
             this.notify_label_user.Name = "notify_label_user";
             this.notify_label_user.Size = new System.Drawing.Size(58, 13);
-            this.notify_label_user.TabIndex = 8;
+            this.notify_label_user.TabIndex = 2;
             this.notify_label_user.Text = "Username:";
             //
             // notify_label_email
@@ -316,7 +325,7 @@
             this.notify_label_email.Location = new System.Drawing.Point(3, 48);
             this.notify_label_email.Name = "notify_label_email";
             this.notify_label_email.Size = new System.Drawing.Size(62, 13);
-            this.notify_label_email.TabIndex = 7;
+            this.notify_label_email.TabIndex = 5;
             this.notify_label_email.Text = "email Addr.:";
             //
             // notify_label_smtp
@@ -325,7 +334,7 @@
             this.notify_label_smtp.Location = new System.Drawing.Point(3, 22);
             this.notify_label_smtp.Name = "notify_label_smtp";
             this.notify_label_smtp.Size = new System.Drawing.Size(66, 13);
-            this.notify_label_smtp.TabIndex = 6;
+            this.notify_label_smtp.TabIndex = 0;
             this.notify_label_smtp.Text = "smtp Server:";
             //
             // notify_ssl
@@ -334,7 +343,7 @@
             this.notify_ssl.Location = new System.Drawing.Point(606, 47);
             this.notify_ssl.Name = "notify_ssl";
             this.notify_ssl.Size = new System.Drawing.Size(46, 17);
-            this.notify_ssl.TabIndex = 5;
+            this.notify_ssl.TabIndex = 9;
             this.notify_ssl.Text = "SSL";
             this.notify_ssl.UseVisualStyleBackColor = true;
             //
@@ -353,7 +362,7 @@
             this.notify_pass.Location = new System.Drawing.Point(371, 45);
             this.notify_pass.Name = "notify_pass";
             this.notify_pass.Size = new System.Drawing.Size(218, 20);
-            this.notify_pass.TabIndex = 3;
+            this.notify_pass.TabIndex = 8;
             this.notify_pass.UseSystemPasswordChar = true;
             //
             // notify_user
@@ -361,14 +370,14 @@
             this.notify_user.Location = new System.Drawing.Point(371, 19);
             this.notify_user.Name = "notify_user";
             this.notify_user.Size = new System.Drawing.Size(218, 20);
-            this.notify_user.TabIndex = 2;
+            this.notify_user.TabIndex = 3;
             //
             // notify_email
             //
             this.notify_email.Location = new System.Drawing.Point(75, 45);
             this.notify_email.Name = "notify_email";
             this.notify_email.Size = new System.Drawing.Size(218, 20);
-            this.notify_email.TabIndex = 1;
+            this.notify_email.TabIndex = 6;
             //
             // notify_smtp
             //
@@ -376,7 +385,7 @@
             this.notify_smtp.Location = new System.Drawing.Point(75, 19);
             this.notify_smtp.Name = "notify_smtp";
             this.notify_smtp.Size = new System.Drawing.Size(218, 20);
-            this.notify_smtp.TabIndex = 0;
+            this.notify_smtp.TabIndex = 1;
             //
             // groupBox4
             //
@@ -394,7 +403,7 @@
             this.chk_originalUsernameUnlock.Location = new System.Drawing.Point(9, 19);
             this.chk_originalUsernameUnlock.Name = "chk_originalUsernameUnlock";
             this.chk_originalUsernameUnlock.Size = new System.Drawing.Size(333, 17);
-            this.chk_originalUsernameUnlock.TabIndex = 4;
+            this.chk_originalUsernameUnlock.TabIndex = 0;
             this.chk_originalUsernameUnlock.Text = "Use original username to unlock computer (Windows 7 and later).";
             this.chk_originalUsernameUnlock.UseVisualStyleBackColor = true;
             //
@@ -418,7 +427,7 @@
             this.cpEnableDisableBtn.Location = new System.Drawing.Point(210, 58);
             this.cpEnableDisableBtn.Name = "cpEnableDisableBtn";
             this.cpEnableDisableBtn.Size = new System.Drawing.Size(65, 26);
-            this.cpEnableDisableBtn.TabIndex = 6;
+            this.cpEnableDisableBtn.TabIndex = 5;
             this.cpEnableDisableBtn.Text = "Enable";
             this.cpEnableDisableBtn.UseVisualStyleBackColor = true;
             this.cpEnableDisableBtn.Click += new System.EventHandler(this.cpEnableDisableBtn_Click);
@@ -428,7 +437,7 @@
             this.cpRegisterBtn.Location = new System.Drawing.Point(210, 26);
             this.cpRegisterBtn.Name = "cpRegisterBtn";
             this.cpRegisterBtn.Size = new System.Drawing.Size(65, 26);
-            this.cpRegisterBtn.TabIndex = 4;
+            this.cpRegisterBtn.TabIndex = 2;
             this.cpRegisterBtn.Text = "Register";
             this.cpRegisterBtn.UseVisualStyleBackColor = true;
             this.cpRegisterBtn.Click += new System.EventHandler(this.cpRegisterBtn_Click);
@@ -439,7 +448,7 @@
             this.cpEnabledTB.Name = "cpEnabledTB";
             this.cpEnabledTB.ReadOnly = true;
             this.cpEnabledTB.Size = new System.Drawing.Size(124, 20);
-            this.cpEnabledTB.TabIndex = 3;
+            this.cpEnabledTB.TabIndex = 4;
             //
             // cpEnabledLabel
             //
@@ -447,7 +456,7 @@
             this.cpEnabledLabel.Location = new System.Drawing.Point(25, 65);
             this.cpEnabledLabel.Name = "cpEnabledLabel";
             this.cpEnabledLabel.Size = new System.Drawing.Size(49, 13);
-            this.cpEnabledLabel.TabIndex = 2;
+            this.cpEnabledLabel.TabIndex = 3;
             this.cpEnabledLabel.Text = "Enabled:";
             //
             // cpRegisteredTB
@@ -487,7 +496,7 @@
             this.logonUiShowServiceStatusCB.Location = new System.Drawing.Point(12, 19);
             this.logonUiShowServiceStatusCB.Name = "logonUiShowServiceStatusCB";
             this.logonUiShowServiceStatusCB.Size = new System.Drawing.Size(175, 17);
-            this.logonUiShowServiceStatusCB.TabIndex = 4;
+            this.logonUiShowServiceStatusCB.TabIndex = 0;
             this.logonUiShowServiceStatusCB.Text = "Show service status in logon UI";
             this.logonUiShowServiceStatusCB.UseVisualStyleBackColor = true;
             //
@@ -496,7 +505,7 @@
             this.serviceStopBtn.Location = new System.Drawing.Point(139, 69);
             this.serviceStopBtn.Name = "serviceStopBtn";
             this.serviceStopBtn.Size = new System.Drawing.Size(80, 26);
-            this.serviceStopBtn.TabIndex = 3;
+            this.serviceStopBtn.TabIndex = 4;
             this.serviceStopBtn.Text = "Stop";
             this.serviceStopBtn.UseVisualStyleBackColor = true;
             this.serviceStopBtn.Click += new System.EventHandler(this.serviceStopBtn_Click);
@@ -506,7 +515,7 @@
             this.serviceStartBtn.Location = new System.Drawing.Point(53, 69);
             this.serviceStartBtn.Name = "serviceStartBtn";
             this.serviceStartBtn.Size = new System.Drawing.Size(80, 26);
-            this.serviceStartBtn.TabIndex = 2;
+            this.serviceStartBtn.TabIndex = 3;
             this.serviceStartBtn.Text = "Start";
             this.serviceStartBtn.UseVisualStyleBackColor = true;
             this.serviceStartBtn.Click += new System.EventHandler(this.serviceStartBtn_Click);
@@ -517,7 +526,7 @@
             this.serviceStatusTB.Name = "serviceStatusTB";
             this.serviceStatusTB.ReadOnly = true;
             this.serviceStatusTB.Size = new System.Drawing.Size(166, 20);
-            this.serviceStatusTB.TabIndex = 1;
+            this.serviceStatusTB.TabIndex = 2;
             //
             // servStatusLabel
             //
@@ -525,7 +534,7 @@
             this.servStatusLabel.Location = new System.Drawing.Point(7, 46);
             this.servStatusLabel.Name = "servStatusLabel";
             this.servStatusLabel.Size = new System.Drawing.Size(40, 13);
-            this.servStatusLabel.TabIndex = 0;
+            this.servStatusLabel.TabIndex = 1;
             this.servStatusLabel.Text = "Status:";
             //
             // motdGB
@@ -547,7 +556,7 @@
             this.enableMotdCB.Location = new System.Drawing.Point(11, 19);
             this.enableMotdCB.Name = "enableMotdCB";
             this.enableMotdCB.Size = new System.Drawing.Size(94, 17);
-            this.enableMotdCB.TabIndex = 3;
+            this.enableMotdCB.TabIndex = 0;
             this.enableMotdCB.Text = "Enable MOTD";
             this.enableMotdCB.UseVisualStyleBackColor = true;
             this.enableMotdCB.CheckedChanged += new System.EventHandler(this.enableMotdCB_CheckedChanged);
@@ -559,7 +568,7 @@
             this.label12.Location = new System.Drawing.Point(53, 66);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(532, 26);
-            this.label12.TabIndex = 2;
+            this.label12.TabIndex = 3;
             this.label12.Text = resources.GetString("label12.Text");
             //
             // motdTB
@@ -567,7 +576,7 @@
             this.motdTB.Location = new System.Drawing.Point(54, 43);
             this.motdTB.Name = "motdTB";
             this.motdTB.Size = new System.Drawing.Size(667, 20);
-            this.motdTB.TabIndex = 1;
+            this.motdTB.TabIndex = 2;
             //
             // motdLabel
             //
@@ -575,7 +584,7 @@
             this.motdLabel.Location = new System.Drawing.Point(6, 46);
             this.motdLabel.Name = "motdLabel";
             this.motdLabel.Size = new System.Drawing.Size(42, 13);
-            this.motdLabel.TabIndex = 0;
+            this.motdLabel.TabIndex = 1;
             this.motdLabel.Text = "MOTD:";
             //
             // groupBox12
@@ -597,7 +606,7 @@
             this.btnImageBrowse.Location = new System.Drawing.Point(457, 28);
             this.btnImageBrowse.Name = "btnImageBrowse";
             this.btnImageBrowse.Size = new System.Drawing.Size(33, 23);
-            this.btnImageBrowse.TabIndex = 4;
+            this.btnImageBrowse.TabIndex = 2;
             this.btnImageBrowse.Text = "...";
             this.btnImageBrowse.UseVisualStyleBackColor = true;
             this.btnImageBrowse.Click += new System.EventHandler(this.btnImageBrowse_Click);
@@ -659,7 +668,7 @@
             this.pluginsGroupBox.Location = new System.Drawing.Point(15, 149);
             this.pluginsGroupBox.Name = "pluginsGroupBox";
             this.pluginsGroupBox.Size = new System.Drawing.Size(758, 377);
-            this.pluginsGroupBox.TabIndex = 9;
+            this.pluginsGroupBox.TabIndex = 1;
             this.pluginsGroupBox.TabStop = false;
             this.pluginsGroupBox.Text = "Current Plugins";
             //
@@ -670,35 +679,35 @@
             this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
             this.pluginsDG.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle11;
             this.pluginsDG.Location = new System.Drawing.Point(10, 19);
             this.pluginsDG.Name = "pluginsDG";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle12;
             this.pluginsDG.Size = new System.Drawing.Size(735, 316);
-            this.pluginsDG.TabIndex = 10;
+            this.pluginsDG.TabIndex = 0;
             this.pluginsDG.DoubleClick += new System.EventHandler(this.pluginsDG_DoubleClick);
             //
             // configureButton
@@ -707,7 +716,7 @@
             this.configureButton.Location = new System.Drawing.Point(671, 341);
             this.configureButton.Name = "configureButton";
             this.configureButton.Size = new System.Drawing.Size(74, 25);
-            this.configureButton.TabIndex = 9;
+            this.configureButton.TabIndex = 1;
             this.configureButton.Text = "Configure...";
             this.configureButton.UseVisualStyleBackColor = true;
             this.configureButton.Click += new System.EventHandler(this.configureButton_Click);
@@ -722,7 +731,7 @@
             this.groupBox1.Location = new System.Drawing.Point(15, 20);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(758, 123);
-            this.groupBox1.TabIndex = 7;
+            this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Search Directories";
             //
@@ -732,7 +741,7 @@
             this.btnRemove.Location = new System.Drawing.Point(670, 88);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(75, 23);
-            this.btnRemove.TabIndex = 7;
+            this.btnRemove.TabIndex = 2;
             this.btnRemove.Text = "Remove";
             this.btnRemove.UseVisualStyleBackColor = true;
             this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
@@ -743,7 +752,7 @@
             this.btnAdd.Location = new System.Drawing.Point(589, 88);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(75, 23);
-            this.btnAdd.TabIndex = 6;
+            this.btnAdd.TabIndex = 1;
             this.btnAdd.Text = "Add";
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
@@ -756,7 +765,7 @@
             this.lstPluginDirs.MultiSelect = false;
             this.lstPluginDirs.Name = "lstPluginDirs";
             this.lstPluginDirs.Size = new System.Drawing.Size(735, 63);
-            this.lstPluginDirs.TabIndex = 5;
+            this.lstPluginDirs.TabIndex = 0;
             this.lstPluginDirs.UseCompatibleStateImageBehavior = false;
             this.lstPluginDirs.View = System.Windows.Forms.View.Details;
             //
@@ -784,7 +793,7 @@
             this.groupBox17.Location = new System.Drawing.Point(199, 366);
             this.groupBox17.Name = "groupBox17";
             this.groupBox17.Size = new System.Drawing.Size(376, 169);
-            this.groupBox17.TabIndex = 22;
+            this.groupBox17.TabIndex = 4;
             this.groupBox17.TabStop = false;
             this.groupBox17.Text = "Change Password";
             //
@@ -795,7 +804,7 @@
             this.passwdBtnDown.Location = new System.Drawing.Point(339, 89);
             this.passwdBtnDown.Name = "passwdBtnDown";
             this.passwdBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.passwdBtnDown.TabIndex = 16;
+            this.passwdBtnDown.TabIndex = 2;
             this.passwdBtnDown.UseVisualStyleBackColor = true;
             this.passwdBtnDown.Click += new System.EventHandler(this.passwdBtnDown_Click);
             //
@@ -806,7 +815,7 @@
             this.passwdBtnUp.Location = new System.Drawing.Point(339, 56);
             this.passwdBtnUp.Name = "passwdBtnUp";
             this.passwdBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.passwdBtnUp.TabIndex = 15;
+            this.passwdBtnUp.TabIndex = 1;
             this.passwdBtnUp.UseVisualStyleBackColor = true;
             this.passwdBtnUp.Click += new System.EventHandler(this.passwdBtnUp_Click);
             //
@@ -828,7 +837,7 @@
             this.groupBox8.Location = new System.Drawing.Point(16, 191);
             this.groupBox8.Name = "groupBox8";
             this.groupBox8.Size = new System.Drawing.Size(367, 169);
-            this.groupBox8.TabIndex = 18;
+            this.groupBox8.TabIndex = 2;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "Gateway";
             //
@@ -839,7 +848,7 @@
             this.gatewayBtnDown.Location = new System.Drawing.Point(330, 89);
             this.gatewayBtnDown.Name = "gatewayBtnDown";
             this.gatewayBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.gatewayBtnDown.TabIndex = 16;
+            this.gatewayBtnDown.TabIndex = 2;
             this.gatewayBtnDown.UseVisualStyleBackColor = true;
             this.gatewayBtnDown.Click += new System.EventHandler(this.gatewayBtnDown_Click);
             //
@@ -850,7 +859,7 @@
             this.gatewayBtnUp.Location = new System.Drawing.Point(330, 56);
             this.gatewayBtnUp.Name = "gatewayBtnUp";
             this.gatewayBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.gatewayBtnUp.TabIndex = 15;
+            this.gatewayBtnUp.TabIndex = 1;
             this.gatewayBtnUp.UseVisualStyleBackColor = true;
             this.gatewayBtnUp.Click += new System.EventHandler(this.gatewayBtnUp_Click);
             //
@@ -872,7 +881,7 @@
             this.groupBox11.Location = new System.Drawing.Point(398, 191);
             this.groupBox11.Name = "groupBox11";
             this.groupBox11.Size = new System.Drawing.Size(376, 169);
-            this.groupBox11.TabIndex = 21;
+            this.groupBox11.TabIndex = 3;
             this.groupBox11.TabStop = false;
             this.groupBox11.Text = "Event Notification";
             //
@@ -883,7 +892,7 @@
             this.eventBtnDown.Location = new System.Drawing.Point(339, 89);
             this.eventBtnDown.Name = "eventBtnDown";
             this.eventBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.eventBtnDown.TabIndex = 16;
+            this.eventBtnDown.TabIndex = 2;
             this.eventBtnDown.UseVisualStyleBackColor = true;
             this.eventBtnDown.Click += new System.EventHandler(this.eventBtnDown_Click);
             //
@@ -894,7 +903,7 @@
             this.eventBtnUp.Location = new System.Drawing.Point(339, 56);
             this.eventBtnUp.Name = "eventBtnUp";
             this.eventBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.eventBtnUp.TabIndex = 15;
+            this.eventBtnUp.TabIndex = 1;
             this.eventBtnUp.UseVisualStyleBackColor = true;
             this.eventBtnUp.Click += new System.EventHandler(this.eventBtnUp_Click);
             //
@@ -916,7 +925,7 @@
             this.groupBox2.Location = new System.Drawing.Point(398, 16);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(376, 169);
-            this.groupBox2.TabIndex = 17;
+            this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Authorization";
             //
@@ -927,7 +936,7 @@
             this.authorizeBtnDown.Location = new System.Drawing.Point(339, 89);
             this.authorizeBtnDown.Name = "authorizeBtnDown";
             this.authorizeBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.authorizeBtnDown.TabIndex = 16;
+            this.authorizeBtnDown.TabIndex = 2;
             this.authorizeBtnDown.UseVisualStyleBackColor = true;
             this.authorizeBtnDown.Click += new System.EventHandler(this.authorizeBtnDown_Click);
             //
@@ -938,7 +947,7 @@
             this.authorizeBtnUp.Location = new System.Drawing.Point(339, 56);
             this.authorizeBtnUp.Name = "authorizeBtnUp";
             this.authorizeBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.authorizeBtnUp.TabIndex = 15;
+            this.authorizeBtnUp.TabIndex = 1;
             this.authorizeBtnUp.UseVisualStyleBackColor = true;
             this.authorizeBtnUp.Click += new System.EventHandler(this.authorizeBtnUp_Click);
             //
@@ -960,7 +969,7 @@
             this.groupBox7.Location = new System.Drawing.Point(16, 16);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Size = new System.Drawing.Size(367, 169);
-            this.groupBox7.TabIndex = 12;
+            this.groupBox7.TabIndex = 0;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Authentication";
             //
@@ -971,7 +980,7 @@
             this.authenticateBtnDown.Location = new System.Drawing.Point(330, 89);
             this.authenticateBtnDown.Name = "authenticateBtnDown";
             this.authenticateBtnDown.Size = new System.Drawing.Size(26, 27);
-            this.authenticateBtnDown.TabIndex = 16;
+            this.authenticateBtnDown.TabIndex = 2;
             this.authenticateBtnDown.UseVisualStyleBackColor = true;
             this.authenticateBtnDown.Click += new System.EventHandler(this.authenticateBtnDown_Click);
             //
@@ -982,7 +991,7 @@
             this.authenticateBtnUp.Location = new System.Drawing.Point(330, 56);
             this.authenticateBtnUp.Name = "authenticateBtnUp";
             this.authenticateBtnUp.Size = new System.Drawing.Size(26, 27);
-            this.authenticateBtnUp.TabIndex = 15;
+            this.authenticateBtnUp.TabIndex = 1;
             this.authenticateBtnUp.UseVisualStyleBackColor = true;
             this.authenticateBtnUp.Click += new System.EventHandler(this.authenticateBtnUp_Click);
             //
@@ -1145,7 +1154,7 @@
             this.label18.Location = new System.Drawing.Point(13, 312);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(411, 13);
-            this.label18.TabIndex = 6;
+            this.label18.TabIndex = 2;
             this.label18.Text = "To disable the built-in Microsoft credential provider, select \"PasswordProvider\" " +
                 "above.";
             //
@@ -1155,7 +1164,7 @@
             this.dgvCredProvFilter.Location = new System.Drawing.Point(13, 38);
             this.dgvCredProvFilter.Name = "dgvCredProvFilter";
             this.dgvCredProvFilter.Size = new System.Drawing.Size(721, 266);
-            this.dgvCredProvFilter.TabIndex = 5;
+            this.dgvCredProvFilter.TabIndex = 1;
             //
             // label17
             //
@@ -1163,7 +1172,7 @@
             this.label17.Location = new System.Drawing.Point(10, 22);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(240, 13);
-            this.label17.TabIndex = 2;
+            this.label17.TabIndex = 0;
             this.label17.Text = "Mark a checkbox to disable a credential provider:";
             //
             // textBox1
@@ -1176,7 +1185,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.Size = new System.Drawing.Size(703, 45);
-            this.textBox1.TabIndex = 1;
+            this.textBox1.TabIndex = 3;
             this.textBox1.Text = resources.GetString("textBox1.Text");
             //
             // m_simTab
@@ -1559,10 +1568,10 @@
             // btnApply
             //
             this.btnApply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnApply.Location = new System.Drawing.Point(650, 602);
+            this.btnApply.Location = new System.Drawing.Point(735, 602);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(75, 23);
-            this.btnApply.TabIndex = 4;
+            this.btnApply.TabIndex = 5;
             this.btnApply.Text = "Apply";
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
@@ -1570,11 +1579,11 @@
             // btnOkay
             //
             this.btnOkay.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOkay.Location = new System.Drawing.Point(731, 602);
+            this.btnOkay.Location = new System.Drawing.Point(573, 602);
             this.btnOkay.Name = "btnOkay";
             this.btnOkay.Size = new System.Drawing.Size(75, 23);
             this.btnOkay.TabIndex = 3;
-            this.btnOkay.Text = "Close";
+            this.btnOkay.Text = "Cancel";
             this.btnOkay.UseVisualStyleBackColor = true;
             this.btnOkay.Click += new System.EventHandler(this.btnOkay_Click);
             //
@@ -1585,17 +1594,17 @@
             this.m_pginaVersionLbl.Location = new System.Drawing.Point(12, 615);
             this.m_pginaVersionLbl.Name = "m_pginaVersionLbl";
             this.m_pginaVersionLbl.Size = new System.Drawing.Size(72, 13);
-            this.m_pginaVersionLbl.TabIndex = 5;
+            this.m_pginaVersionLbl.TabIndex = 1;
             this.m_pginaVersionLbl.Text = "pGina version";
             //
             // btnSaveAndClose
             //
             this.btnSaveAndClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSaveAndClose.Location = new System.Drawing.Point(549, 602);
+            this.btnSaveAndClose.Location = new System.Drawing.Point(654, 602);
             this.btnSaveAndClose.Name = "btnSaveAndClose";
-            this.btnSaveAndClose.Size = new System.Drawing.Size(91, 23);
-            this.btnSaveAndClose.TabIndex = 6;
-            this.btnSaveAndClose.Text = "Save & Close";
+            this.btnSaveAndClose.Size = new System.Drawing.Size(75, 23);
+            this.btnSaveAndClose.TabIndex = 4;
+            this.btnSaveAndClose.Text = "Save";
             this.btnSaveAndClose.UseMnemonic = false;
             this.btnSaveAndClose.UseVisualStyleBackColor = true;
             this.btnSaveAndClose.Click += new System.EventHandler(this.btnSaveAndClose_Click);
@@ -1603,22 +1612,13 @@
             // help
             //
             this.help.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.help.Location = new System.Drawing.Point(464, 602);
+            this.help.Location = new System.Drawing.Point(492, 602);
             this.help.Name = "help";
             this.help.Size = new System.Drawing.Size(75, 23);
-            this.help.TabIndex = 7;
+            this.help.TabIndex = 2;
             this.help.Text = "Help";
             this.help.UseVisualStyleBackColor = true;
             this.help.Click += new System.EventHandler(this.Btn_help);
-            //
-            // ntpservers
-            //
-            this.ntpservers.Location = new System.Drawing.Point(6, 19);
-            this.ntpservers.Name = "ntpservers";
-            this.ntpservers.Size = new System.Drawing.Size(182, 81);
-            this.ntpservers.TabIndex = 2;
-            this.ntpservers.Text = "";
-            this.ntpservers.WordWrap = false;
             //
             // ConfigurationUI
             //
