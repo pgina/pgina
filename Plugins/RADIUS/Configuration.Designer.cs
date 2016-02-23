@@ -57,6 +57,7 @@
             this.sendNasIdentifierCB = new System.Windows.Forms.CheckBox();
             this.sendNasIpAddrCB = new System.Windows.Forms.CheckBox();
             this.acctGB = new System.Windows.Forms.GroupBox();
+            this.acctingForAllUsersCB = new System.Windows.Forms.CheckBox();
             this.forceInterimUpdLbl = new System.Windows.Forms.Label();
             this.forceInterimUpdTB = new System.Windows.Forms.TextBox();
             this.forceInterimUpdCB = new System.Windows.Forms.CheckBox();
@@ -66,7 +67,6 @@
             this.enableAuthCB = new System.Windows.Forms.CheckBox();
             this.enableAcctCB = new System.Windows.Forms.CheckBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.acctingForAllUsersCB = new System.Windows.Forms.CheckBox();
             this.btnHelp = new System.Windows.Forms.Button();
             this.authGB.SuspendLayout();
             this.acctGB.SuspendLayout();
@@ -76,20 +76,20 @@
             //
             // btnOk
             //
-            this.btnOk.Location = new System.Drawing.Point(296, 471);
+            this.btnOk.Location = new System.Drawing.Point(377, 471);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
-            this.btnOk.TabIndex = 22;
+            this.btnOk.TabIndex = 10;
             this.btnOk.Text = "Save";
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
             //
             // btnCancel
             //
-            this.btnCancel.Location = new System.Drawing.Point(377, 471);
+            this.btnCancel.Location = new System.Drawing.Point(296, 471);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 23;
+            this.btnCancel.TabIndex = 9;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -225,7 +225,7 @@
             this.label9.Location = new System.Drawing.Point(21, 445);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(117, 13);
-            this.label9.TabIndex = 19;
+            this.label9.TabIndex = 5;
             this.label9.Text = "IP Address Suggestion:";
             //
             // ipAddrSuggestionTB
@@ -233,7 +233,7 @@
             this.ipAddrSuggestionTB.Location = new System.Drawing.Point(133, 442);
             this.ipAddrSuggestionTB.Name = "ipAddrSuggestionTB";
             this.ipAddrSuggestionTB.Size = new System.Drawing.Size(98, 20);
-            this.ipAddrSuggestionTB.TabIndex = 20;
+            this.ipAddrSuggestionTB.TabIndex = 6;
             //
             // useModifiedNameCB
             //
@@ -241,7 +241,7 @@
             this.useModifiedNameCB.Location = new System.Drawing.Point(24, 414);
             this.useModifiedNameCB.Name = "useModifiedNameCB";
             this.useModifiedNameCB.Size = new System.Drawing.Size(207, 17);
-            this.useModifiedNameCB.TabIndex = 18;
+            this.useModifiedNameCB.TabIndex = 4;
             this.useModifiedNameCB.Text = "Use modified username for accounting";
             this.useModifiedNameCB.UseVisualStyleBackColor = true;
             //
@@ -257,7 +257,7 @@
             this.authGB.Location = new System.Drawing.Point(18, 171);
             this.authGB.Name = "authGB";
             this.authGB.Size = new System.Drawing.Size(434, 134);
-            this.authGB.TabIndex = 15;
+            this.authGB.TabIndex = 2;
             this.authGB.TabStop = false;
             this.authGB.Text = "Authentication Options";
             //
@@ -267,7 +267,7 @@
             this.sessionTimeoutCB.Location = new System.Drawing.Point(7, 88);
             this.sessionTimeoutCB.Name = "sessionTimeoutCB";
             this.sessionTimeoutCB.Size = new System.Drawing.Size(140, 17);
-            this.sessionTimeoutCB.TabIndex = 0;
+            this.sessionTimeoutCB.TabIndex = 5;
             this.sessionTimeoutCB.Text = "Enable Session Timeout";
             this.sessionTimeoutCB.UseVisualStyleBackColor = true;
             //
@@ -277,7 +277,7 @@
             this.wisprTimeoutCB.Location = new System.Drawing.Point(6, 111);
             this.wisprTimeoutCB.Name = "wisprTimeoutCB";
             this.wisprTimeoutCB.Size = new System.Drawing.Size(173, 17);
-            this.wisprTimeoutCB.TabIndex = 1;
+            this.wisprTimeoutCB.TabIndex = 6;
             this.wisprTimeoutCB.Text = "WISPr Session Terminate Time";
             this.wisprTimeoutCB.UseVisualStyleBackColor = true;
             //
@@ -335,9 +335,19 @@
             this.acctGB.Location = new System.Drawing.Point(18, 311);
             this.acctGB.Name = "acctGB";
             this.acctGB.Size = new System.Drawing.Size(434, 97);
-            this.acctGB.TabIndex = 16;
+            this.acctGB.TabIndex = 3;
             this.acctGB.TabStop = false;
             this.acctGB.Text = "Accounting Options";
+            //
+            // acctingForAllUsersCB
+            //
+            this.acctingForAllUsersCB.AutoSize = true;
+            this.acctingForAllUsersCB.Location = new System.Drawing.Point(7, 17);
+            this.acctingForAllUsersCB.Name = "acctingForAllUsersCB";
+            this.acctingForAllUsersCB.Size = new System.Drawing.Size(226, 17);
+            this.acctingForAllUsersCB.TabIndex = 0;
+            this.acctingForAllUsersCB.Text = "Perform accounting for non-RADIUS users";
+            this.acctingForAllUsersCB.UseVisualStyleBackColor = true;
             //
             // forceInterimUpdLbl
             //
@@ -345,7 +355,7 @@
             this.forceInterimUpdLbl.Location = new System.Drawing.Point(184, 65);
             this.forceInterimUpdLbl.Name = "forceInterimUpdLbl";
             this.forceInterimUpdLbl.Size = new System.Drawing.Size(47, 13);
-            this.forceInterimUpdLbl.TabIndex = 3;
+            this.forceInterimUpdLbl.TabIndex = 4;
             this.forceInterimUpdLbl.Text = "seconds";
             //
             // forceInterimUpdTB
@@ -353,7 +363,7 @@
             this.forceInterimUpdTB.Location = new System.Drawing.Point(142, 62);
             this.forceInterimUpdTB.Name = "forceInterimUpdTB";
             this.forceInterimUpdTB.Size = new System.Drawing.Size(36, 20);
-            this.forceInterimUpdTB.TabIndex = 2;
+            this.forceInterimUpdTB.TabIndex = 3;
             //
             // forceInterimUpdCB
             //
@@ -361,7 +371,7 @@
             this.forceInterimUpdCB.Location = new System.Drawing.Point(24, 64);
             this.forceInterimUpdCB.Name = "forceInterimUpdCB";
             this.forceInterimUpdCB.Size = new System.Drawing.Size(116, 17);
-            this.forceInterimUpdCB.TabIndex = 1;
+            this.forceInterimUpdCB.TabIndex = 2;
             this.forceInterimUpdCB.Text = "Send update every";
             this.forceInterimUpdCB.UseVisualStyleBackColor = true;
             //
@@ -371,7 +381,7 @@
             this.sendInterimUpdatesCB.Location = new System.Drawing.Point(6, 40);
             this.sendInterimUpdatesCB.Name = "sendInterimUpdatesCB";
             this.sendInterimUpdatesCB.Size = new System.Drawing.Size(128, 17);
-            this.sendInterimUpdatesCB.TabIndex = 0;
+            this.sendInterimUpdatesCB.TabIndex = 1;
             this.sendInterimUpdatesCB.Text = "Send Interim Updates";
             this.sendInterimUpdatesCB.UseVisualStyleBackColor = true;
             //
@@ -381,7 +391,7 @@
             this.label10.Location = new System.Drawing.Point(238, 445);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(89, 13);
-            this.label10.TabIndex = 21;
+            this.label10.TabIndex = 7;
             this.label10.Text = "(regex supported)";
             //
             // groupBox1
@@ -404,7 +414,7 @@
             this.groupBox1.Location = new System.Drawing.Point(18, 65);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(434, 100);
-            this.groupBox1.TabIndex = 24;
+            this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Server Settings";
             //
@@ -435,26 +445,16 @@
             this.groupBox5.Location = new System.Drawing.Point(18, 13);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(434, 46);
-            this.groupBox5.TabIndex = 25;
+            this.groupBox5.TabIndex = 0;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "RADIUS Features";
-            //
-            // acctingForAllUsersCB
-            //
-            this.acctingForAllUsersCB.AutoSize = true;
-            this.acctingForAllUsersCB.Location = new System.Drawing.Point(7, 17);
-            this.acctingForAllUsersCB.Name = "acctingForAllUsersCB";
-            this.acctingForAllUsersCB.Size = new System.Drawing.Size(226, 17);
-            this.acctingForAllUsersCB.TabIndex = 4;
-            this.acctingForAllUsersCB.Text = "Perform accounting for non-RADIUS users";
-            this.acctingForAllUsersCB.UseVisualStyleBackColor = true;
             //
             // btnHelp
             //
             this.btnHelp.Location = new System.Drawing.Point(215, 471);
             this.btnHelp.Name = "btnHelp";
             this.btnHelp.Size = new System.Drawing.Size(75, 23);
-            this.btnHelp.TabIndex = 26;
+            this.btnHelp.TabIndex = 8;
             this.btnHelp.Text = "Help";
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.Btn_help);
