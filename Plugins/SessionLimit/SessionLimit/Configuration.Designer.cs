@@ -41,7 +41,7 @@
             this.saveButton.Location = new System.Drawing.Point(227, 100);
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(81, 26);
-            this.saveButton.TabIndex = 0;
+            this.saveButton.TabIndex = 5;
             this.saveButton.Text = "Save";
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
@@ -51,7 +51,7 @@
             this.cancelButton.Location = new System.Drawing.Point(140, 100);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(81, 26);
-            this.cancelButton.TabIndex = 1;
+            this.cancelButton.TabIndex = 4;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
@@ -61,7 +61,7 @@
             this.globalLimitTB.Location = new System.Drawing.Point(152, 23);
             this.globalLimitTB.Name = "globalLimitTB";
             this.globalLimitTB.Size = new System.Drawing.Size(145, 20);
-            this.globalLimitTB.TabIndex = 2;
+            this.globalLimitTB.TabIndex = 1;
             //
             // globalLimitLbl
             //
@@ -69,7 +69,7 @@
             this.globalLimitLbl.Location = new System.Drawing.Point(12, 26);
             this.globalLimitLbl.Name = "globalLimitLbl";
             this.globalLimitLbl.Size = new System.Drawing.Size(130, 13);
-            this.globalLimitLbl.TabIndex = 3;
+            this.globalLimitLbl.TabIndex = 0;
             this.globalLimitLbl.Text = "Global time limit (minutes): ";
             //
             // label1
@@ -78,7 +78,7 @@
             this.label1.Location = new System.Drawing.Point(53, 58);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(244, 13);
-            this.label1.TabIndex = 4;
+            this.label1.TabIndex = 2;
             this.label1.Text = "A value of 0 means sessions will not be logged off.";
             //
             // helpButton
@@ -86,7 +86,7 @@
             this.helpButton.Location = new System.Drawing.Point(53, 100);
             this.helpButton.Name = "helpButton";
             this.helpButton.Size = new System.Drawing.Size(81, 26);
-            this.helpButton.TabIndex = 5;
+            this.helpButton.TabIndex = 3;
             this.helpButton.Text = "Help";
             this.helpButton.UseVisualStyleBackColor = true;
             //
