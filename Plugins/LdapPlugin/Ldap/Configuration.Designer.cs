@@ -117,10 +117,10 @@
             //
             // saveButton
             //
-            this.saveButton.Location = new System.Drawing.Point(607, 464);
+            this.saveButton.Location = new System.Drawing.Point(601, 464);
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(81, 26);
-            this.saveButton.TabIndex = 0;
+            this.saveButton.TabIndex = 4;
             this.saveButton.Text = "Save";
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
@@ -131,7 +131,7 @@
             this.ldapHostDescriptionLabel.Location = new System.Drawing.Point(6, 22);
             this.ldapHostDescriptionLabel.Name = "ldapHostDescriptionLabel";
             this.ldapHostDescriptionLabel.Size = new System.Drawing.Size(71, 13);
-            this.ldapHostDescriptionLabel.TabIndex = 1;
+            this.ldapHostDescriptionLabel.TabIndex = 0;
             this.ldapHostDescriptionLabel.Text = "LDAP Host(s)";
             this.descriptionToolTip.SetToolTip(this.ldapHostDescriptionLabel, "A whitespace separated list of hostnames or IP addresses.");
             //
@@ -142,7 +142,7 @@
             this.ldapHostTextBox.Location = new System.Drawing.Point(110, 19);
             this.ldapHostTextBox.Name = "ldapHostTextBox";
             this.ldapHostTextBox.Size = new System.Drawing.Size(462, 20);
-            this.ldapHostTextBox.TabIndex = 2;
+            this.ldapHostTextBox.TabIndex = 1;
             this.descriptionToolTip.SetToolTip(this.ldapHostTextBox, "A whitespace separated list of hostnames or IP addresses.");
             //
             // validateServerCertCheckBox
@@ -151,7 +151,7 @@
             this.validateServerCertCheckBox.Location = new System.Drawing.Point(512, 47);
             this.validateServerCertCheckBox.Name = "validateServerCertCheckBox";
             this.validateServerCertCheckBox.Size = new System.Drawing.Size(148, 17);
-            this.validateServerCertCheckBox.TabIndex = 6;
+            this.validateServerCertCheckBox.TabIndex = 8;
             this.validateServerCertCheckBox.Text = "Validate Server Certificate";
             this.descriptionToolTip.SetToolTip(this.validateServerCertCheckBox, "Whether or not to verify the server\'s SSL certificate when connecting.");
             this.validateServerCertCheckBox.UseVisualStyleBackColor = true;
@@ -162,8 +162,8 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(6, 74);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(102, 13);
-            this.label1.TabIndex = 7;
+            this.label1.Size = new System.Drawing.Size(54, 13);
+            this.label1.TabIndex = 9;
             this.label1.Text = "Certificate";
             this.descriptionToolTip.SetToolTip(this.label1, "File containing the LDAP server\'s public certificate.  If this is left blank (and" +
                     " \"Validate\" is checked) the server\'s\r\ncertificate is verified against the Window" +
@@ -183,7 +183,7 @@
             this.ldapPortLabel.Location = new System.Drawing.Point(6, 48);
             this.ldapPortLabel.Name = "ldapPortLabel";
             this.ldapPortLabel.Size = new System.Drawing.Size(57, 13);
-            this.ldapPortLabel.TabIndex = 4;
+            this.ldapPortLabel.TabIndex = 2;
             this.ldapPortLabel.Text = "LDAP Port";
             this.descriptionToolTip.SetToolTip(this.ldapPortLabel, "The port number");
             //
@@ -193,7 +193,7 @@
             this.useSslCheckBox.Location = new System.Drawing.Point(363, 47);
             this.useSslCheckBox.Name = "useSslCheckBox";
             this.useSslCheckBox.Size = new System.Drawing.Size(68, 17);
-            this.useSslCheckBox.TabIndex = 5;
+            this.useSslCheckBox.TabIndex = 6;
             this.useSslCheckBox.Text = "Use SSL";
             this.descriptionToolTip.SetToolTip(this.useSslCheckBox, "Whether or not to use SSL encryption.");
             this.useSslCheckBox.UseVisualStyleBackColor = true;
@@ -205,7 +205,7 @@
             this.label2.Location = new System.Drawing.Point(6, 100);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(60, 13);
-            this.label2.TabIndex = 8;
+            this.label2.TabIndex = 12;
             this.label2.Text = "Search DN";
             this.descriptionToolTip.SetToolTip(this.label2, "The DN to use when connecting to the server in order\r\nto perform the search.  If " +
                     "this is left blank, an anonymous\r\nbind will be attempted.");
@@ -216,7 +216,7 @@
             this.label3.Location = new System.Drawing.Point(6, 126);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(90, 13);
-            this.label3.TabIndex = 10;
+            this.label3.TabIndex = 15;
             this.label3.Text = "Search Password";
             this.descriptionToolTip.SetToolTip(this.label3, "The password to use when searching");
             //
@@ -226,7 +226,7 @@
             this.timeoutLabel.Location = new System.Drawing.Point(206, 48);
             this.timeoutLabel.Name = "timeoutLabel";
             this.timeoutLabel.Size = new System.Drawing.Size(45, 13);
-            this.timeoutLabel.TabIndex = 10;
+            this.timeoutLabel.TabIndex = 4;
             this.timeoutLabel.Text = "Timeout";
             this.descriptionToolTip.SetToolTip(this.timeoutLabel, "The number of seconds to wait for a server to respond before giving up \r\nand movi" +
                     "ng on to the next server.");
@@ -236,7 +236,7 @@
             this.timeoutTextBox.Location = new System.Drawing.Point(265, 45);
             this.timeoutTextBox.Name = "timeoutTextBox";
             this.timeoutTextBox.Size = new System.Drawing.Size(76, 20);
-            this.timeoutTextBox.TabIndex = 11;
+            this.timeoutTextBox.TabIndex = 5;
             this.descriptionToolTip.SetToolTip(this.timeoutTextBox, "The number of seconds to wait for a server to respond before\r\ngiving up and movin" +
                     "g on to the next server in the list.\r\n");
             //
@@ -245,7 +245,7 @@
             this.searchDnTextBox.Location = new System.Drawing.Point(110, 97);
             this.searchDnTextBox.Name = "searchDnTextBox";
             this.searchDnTextBox.Size = new System.Drawing.Size(296, 20);
-            this.searchDnTextBox.TabIndex = 9;
+            this.searchDnTextBox.TabIndex = 13;
             this.descriptionToolTip.SetToolTip(this.searchDnTextBox, "Optional.  Used when searching for group \r\nmembership and other search operations" +
                     "\r\n");
             //
@@ -255,7 +255,7 @@
             this.authzRequireAuthCB.Location = new System.Drawing.Point(181, 9);
             this.authzRequireAuthCB.Name = "authzRequireAuthCB";
             this.authzRequireAuthCB.Size = new System.Drawing.Size(202, 17);
-            this.authzRequireAuthCB.TabIndex = 19;
+            this.authzRequireAuthCB.TabIndex = 3;
             this.authzRequireAuthCB.Text = "Deny when LDAP authentication fails";
             this.descriptionToolTip.SetToolTip(this.authzRequireAuthCB, resources.GetString("authzRequireAuthCB.ToolTip"));
             this.authzRequireAuthCB.UseVisualStyleBackColor = true;
@@ -266,7 +266,7 @@
             this.authzAllowOnErrorCB.Location = new System.Drawing.Point(400, 9);
             this.authzAllowOnErrorCB.Name = "authzAllowOnErrorCB";
             this.authzAllowOnErrorCB.Size = new System.Drawing.Size(184, 17);
-            this.authzAllowOnErrorCB.TabIndex = 20;
+            this.authzAllowOnErrorCB.TabIndex = 4;
             this.authzAllowOnErrorCB.Text = "Allow when server is unreachable";
             this.descriptionToolTip.SetToolTip(this.authzAllowOnErrorCB, "When the LDAP server is down or another unexpected error \r\noccurs, authorization " +
                     "succeeds if this is checked. ");
@@ -277,7 +277,7 @@
             this.sslCertFileTextBox.Location = new System.Drawing.Point(109, 71);
             this.sslCertFileTextBox.Name = "sslCertFileTextBox";
             this.sslCertFileTextBox.Size = new System.Drawing.Size(463, 20);
-            this.sslCertFileTextBox.TabIndex = 8;
+            this.sslCertFileTextBox.TabIndex = 10;
             this.descriptionToolTip.SetToolTip(this.sslCertFileTextBox, "Optional:  If left empty, the certificate will be validated\r\nagainst the Windows " +
                     "certificate store.");
             //
@@ -287,7 +287,7 @@
             this.allowEmptyPwCB.Location = new System.Drawing.Point(6, 6);
             this.allowEmptyPwCB.Name = "allowEmptyPwCB";
             this.allowEmptyPwCB.Size = new System.Drawing.Size(137, 17);
-            this.allowEmptyPwCB.TabIndex = 14;
+            this.allowEmptyPwCB.TabIndex = 0;
             this.allowEmptyPwCB.Text = "Allow Empty Passwords";
             this.descriptionToolTip.SetToolTip(this.allowEmptyPwCB, "When selected, empty passwords are used in bind\r\nattempts.  Otherwise, an empty p" +
                     "assword causes\r\nauthentication to immediately fail.");
@@ -299,7 +299,7 @@
             this.searchContextsLabel.Location = new System.Drawing.Point(3, 94);
             this.searchContextsLabel.Name = "searchContextsLabel";
             this.searchContextsLabel.Size = new System.Drawing.Size(91, 13);
-            this.searchContextsLabel.TabIndex = 20;
+            this.searchContextsLabel.TabIndex = 6;
             this.searchContextsLabel.Text = "Search Context(s)";
             this.descriptionToolTip.SetToolTip(this.searchContextsLabel, "A list of one or more DNs (one per line) that indicate\r\nroots of LDAP subtrees th" +
                     "at will be searched.");
@@ -309,7 +309,7 @@
             this.dnPatternTextBox.Location = new System.Drawing.Point(107, 33);
             this.dnPatternTextBox.Name = "dnPatternTextBox";
             this.dnPatternTextBox.Size = new System.Drawing.Size(543, 20);
-            this.dnPatternTextBox.TabIndex = 16;
+            this.dnPatternTextBox.TabIndex = 3;
             this.descriptionToolTip.SetToolTip(this.dnPatternTextBox, "Pattern used to generate a DN from a user name.  Use\r\n%u as a placeholder for the" +
                     " user name.");
             //
@@ -319,7 +319,7 @@
             this.searchFilterLabel.Location = new System.Drawing.Point(3, 68);
             this.searchFilterLabel.Name = "searchFilterLabel";
             this.searchFilterLabel.Size = new System.Drawing.Size(66, 13);
-            this.searchFilterLabel.TabIndex = 18;
+            this.searchFilterLabel.TabIndex = 4;
             this.searchFilterLabel.Text = "Search Filter";
             this.descriptionToolTip.SetToolTip(this.searchFilterLabel, "The filter to use when searching.\r\n%u is replaced with the user name\r\n");
             //
@@ -329,7 +329,7 @@
             this.dnPatternLabel.Location = new System.Drawing.Point(3, 26);
             this.dnPatternLabel.Name = "dnPatternLabel";
             this.dnPatternLabel.Size = new System.Drawing.Size(85, 13);
-            this.dnPatternLabel.TabIndex = 15;
+            this.dnPatternLabel.TabIndex = 1;
             this.dnPatternLabel.Text = "User DN Pattern";
             this.descriptionToolTip.SetToolTip(this.dnPatternLabel, "The pattern to use when creating a DN from a user name.\r\n%u can be used to indica" +
                     "te the user name.\r\n");
@@ -340,7 +340,7 @@
             this.searchForDnCheckBox.Location = new System.Drawing.Point(7, 42);
             this.searchForDnCheckBox.Name = "searchForDnCheckBox";
             this.searchForDnCheckBox.Size = new System.Drawing.Size(94, 17);
-            this.searchForDnCheckBox.TabIndex = 17;
+            this.searchForDnCheckBox.TabIndex = 2;
             this.searchForDnCheckBox.Text = "Search for DN";
             this.descriptionToolTip.SetToolTip(this.searchForDnCheckBox, "Whether or not to search a set of LDAP trees for the\r\nDN rather than using the ab" +
                     "ove pattern.");
@@ -353,9 +353,10 @@
             this.useTlsCheckBox.Location = new System.Drawing.Point(437, 47);
             this.useTlsCheckBox.Name = "useTlsCheckBox";
             this.useTlsCheckBox.Size = new System.Drawing.Size(68, 17);
-            this.useTlsCheckBox.TabIndex = 13;
+            this.useTlsCheckBox.TabIndex = 7;
             this.useTlsCheckBox.Text = "StartTLS";
-            this.descriptionToolTip.SetToolTip(this.useTlsCheckBox, "Use StartTLS if your LDAP server is not using an alternative (636) port for encryption\nYou can run encryption and clear text over 389");
+            this.descriptionToolTip.SetToolTip(this.useTlsCheckBox, "Use StartTLS if your LDAP server is not using an alternative (636) port for encry" +
+                    "ption\nYou can run encryption and clear text over 389");
             this.useTlsCheckBox.UseVisualStyleBackColor = true;
             this.useTlsCheckBox.CheckedChanged += new System.EventHandler(this.useTlsCheckBox_CheckedChanged);
             //
@@ -382,7 +383,7 @@
             this.ldapServerGroupBox.Location = new System.Drawing.Point(12, 12);
             this.ldapServerGroupBox.Name = "ldapServerGroupBox";
             this.ldapServerGroupBox.Size = new System.Drawing.Size(676, 151);
-            this.ldapServerGroupBox.TabIndex = 3;
+            this.ldapServerGroupBox.TabIndex = 0;
             this.ldapServerGroupBox.TabStop = false;
             this.ldapServerGroupBox.Text = "LDAP Server";
             //
@@ -403,7 +404,7 @@
             this.showPwCB.Location = new System.Drawing.Point(412, 126);
             this.showPwCB.Name = "showPwCB";
             this.showPwCB.Size = new System.Drawing.Size(77, 17);
-            this.showPwCB.TabIndex = 12;
+            this.showPwCB.TabIndex = 17;
             this.showPwCB.Text = "Show Text";
             this.showPwCB.UseVisualStyleBackColor = true;
             this.showPwCB.CheckedChanged += new System.EventHandler(this.showPwCB_CheckedChanged);
@@ -413,7 +414,7 @@
             this.searchPassTextBox.Location = new System.Drawing.Point(110, 123);
             this.searchPassTextBox.Name = "searchPassTextBox";
             this.searchPassTextBox.Size = new System.Drawing.Size(296, 20);
-            this.searchPassTextBox.TabIndex = 11;
+            this.searchPassTextBox.TabIndex = 16;
             this.searchPassTextBox.UseSystemPasswordChar = true;
             //
             // sslCertFileBrowseButton
@@ -421,17 +422,17 @@
             this.sslCertFileBrowseButton.Location = new System.Drawing.Point(578, 71);
             this.sslCertFileBrowseButton.Name = "sslCertFileBrowseButton";
             this.sslCertFileBrowseButton.Size = new System.Drawing.Size(80, 20);
-            this.sslCertFileBrowseButton.TabIndex = 9;
+            this.sslCertFileBrowseButton.TabIndex = 11;
             this.sslCertFileBrowseButton.Text = "Browse...";
             this.sslCertFileBrowseButton.UseVisualStyleBackColor = true;
             this.sslCertFileBrowseButton.Click += new System.EventHandler(this.sslCertFileBrowseButton_Click);
             //
             // cancelButton
             //
-            this.cancelButton.Location = new System.Drawing.Point(524, 464);
+            this.cancelButton.Location = new System.Drawing.Point(519, 464);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(76, 26);
-            this.cancelButton.TabIndex = 5;
+            this.cancelButton.TabIndex = 3;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
@@ -446,7 +447,7 @@
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(670, 289);
-            this.tabControl1.TabIndex = 6;
+            this.tabControl1.TabIndex = 1;
             //
             // authTabPage
             //
@@ -467,7 +468,7 @@
             this.authtab.Name = "authtab";
             this.authtab.SelectedIndex = 0;
             this.authtab.Size = new System.Drawing.Size(666, 263);
-            this.authtab.TabIndex = 16;
+            this.authtab.TabIndex = 0;
             //
             // tabPage1
             //
@@ -494,14 +495,14 @@
             this.searchContextsTextBox.Name = "searchContextsTextBox";
             this.searchContextsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.searchContextsTextBox.Size = new System.Drawing.Size(543, 140);
-            this.searchContextsTextBox.TabIndex = 21;
+            this.searchContextsTextBox.TabIndex = 7;
             //
             // searchFilterTextBox
             //
             this.searchFilterTextBox.Location = new System.Drawing.Point(107, 65);
             this.searchFilterTextBox.Name = "searchFilterTextBox";
             this.searchFilterTextBox.Size = new System.Drawing.Size(543, 20);
-            this.searchFilterTextBox.TabIndex = 19;
+            this.searchFilterTextBox.TabIndex = 5;
             //
             // tabPage2
             //
@@ -573,8 +574,8 @@
             this.AuthPathLabel.AutoSize = true;
             this.AuthPathLabel.Location = new System.Drawing.Point(158, 214);
             this.AuthPathLabel.Name = "AuthPathLabel";
-            this.AuthPathLabel.Size = new System.Drawing.Size(29, 13);
-            this.AuthPathLabel.TabIndex = 24;
+            this.AuthPathLabel.Size = new System.Drawing.Size(32, 13);
+            this.AuthPathLabel.TabIndex = 11;
             this.AuthPathLabel.Text = "Path:";
             //
             // AuthFilterLabel
@@ -583,7 +584,7 @@
             this.AuthFilterLabel.Location = new System.Drawing.Point(158, 239);
             this.AuthFilterLabel.Name = "AuthFilterLabel";
             this.AuthFilterLabel.Size = new System.Drawing.Size(32, 13);
-            this.AuthFilterLabel.TabIndex = 23;
+            this.AuthFilterLabel.TabIndex = 13;
             this.AuthFilterLabel.Text = "Filter:";
             //
             // authzRuleFilter
@@ -591,7 +592,7 @@
             this.authzRuleFilter.Location = new System.Drawing.Point(195, 236);
             this.authzRuleFilter.Name = "authzRuleFilter";
             this.authzRuleFilter.Size = new System.Drawing.Size(273, 20);
-            this.authzRuleFilter.TabIndex = 22;
+            this.authzRuleFilter.TabIndex = 14;
             //
             // authzRuleScope
             //
@@ -604,7 +605,7 @@
             this.authzRuleScope.Location = new System.Drawing.Point(77, 211);
             this.authzRuleScope.Name = "authzRuleScope";
             this.authzRuleScope.Size = new System.Drawing.Size(76, 21);
-            this.authzRuleScope.TabIndex = 21;
+            this.authzRuleScope.TabIndex = 10;
             //
             // authzRuleDeleteBtn
             //
@@ -613,7 +614,7 @@
             this.authzRuleDeleteBtn.Location = new System.Drawing.Point(622, 82);
             this.authzRuleDeleteBtn.Name = "authzRuleDeleteBtn";
             this.authzRuleDeleteBtn.Size = new System.Drawing.Size(32, 34);
-            this.authzRuleDeleteBtn.TabIndex = 18;
+            this.authzRuleDeleteBtn.TabIndex = 7;
             this.authzRuleDeleteBtn.UseVisualStyleBackColor = true;
             this.authzRuleDeleteBtn.Click += new System.EventHandler(this.authzRuleDeleteBtn_Click);
             //
@@ -623,7 +624,7 @@
             this.authzRuleDownBtn.Location = new System.Drawing.Point(622, 123);
             this.authzRuleDownBtn.Name = "authzRuleDownBtn";
             this.authzRuleDownBtn.Size = new System.Drawing.Size(32, 34);
-            this.authzRuleDownBtn.TabIndex = 17;
+            this.authzRuleDownBtn.TabIndex = 8;
             this.authzRuleDownBtn.UseVisualStyleBackColor = true;
             this.authzRuleDownBtn.Click += new System.EventHandler(this.authzRuleDownBtn_Click);
             //
@@ -633,7 +634,7 @@
             this.authzRuleUpBtn.Location = new System.Drawing.Point(622, 42);
             this.authzRuleUpBtn.Name = "authzRuleUpBtn";
             this.authzRuleUpBtn.Size = new System.Drawing.Size(32, 34);
-            this.authzRuleUpBtn.TabIndex = 16;
+            this.authzRuleUpBtn.TabIndex = 6;
             this.authzRuleUpBtn.UseVisualStyleBackColor = true;
             this.authzRuleUpBtn.Click += new System.EventHandler(this.authzRuleUpBtn_Click);
             //
@@ -643,7 +644,7 @@
             this.label7.Location = new System.Drawing.Point(6, 9);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(44, 13);
-            this.label7.TabIndex = 15;
+            this.label7.TabIndex = 0;
             this.label7.Text = "Default:";
             //
             // authzDefaultDenyRB
@@ -652,7 +653,7 @@
             this.authzDefaultDenyRB.Location = new System.Drawing.Point(112, 7);
             this.authzDefaultDenyRB.Name = "authzDefaultDenyRB";
             this.authzDefaultDenyRB.Size = new System.Drawing.Size(50, 17);
-            this.authzDefaultDenyRB.TabIndex = 14;
+            this.authzDefaultDenyRB.TabIndex = 2;
             this.authzDefaultDenyRB.TabStop = true;
             this.authzDefaultDenyRB.Text = "Deny";
             this.authzDefaultDenyRB.UseVisualStyleBackColor = true;
@@ -663,7 +664,7 @@
             this.authzDefaultAllowRB.Location = new System.Drawing.Point(56, 7);
             this.authzDefaultAllowRB.Name = "authzDefaultAllowRB";
             this.authzDefaultAllowRB.Size = new System.Drawing.Size(50, 17);
-            this.authzDefaultAllowRB.TabIndex = 13;
+            this.authzDefaultAllowRB.TabIndex = 1;
             this.authzDefaultAllowRB.TabStop = true;
             this.authzDefaultAllowRB.Text = "Allow";
             this.authzDefaultAllowRB.UseVisualStyleBackColor = true;
@@ -673,7 +674,7 @@
             this.authzRuleAddButton.Location = new System.Drawing.Point(545, 236);
             this.authzRuleAddButton.Name = "authzRuleAddButton";
             this.authzRuleAddButton.Size = new System.Drawing.Size(71, 23);
-            this.authzRuleAddButton.TabIndex = 12;
+            this.authzRuleAddButton.TabIndex = 16;
             this.authzRuleAddButton.Text = "Add Rule";
             this.authzRuleAddButton.UseVisualStyleBackColor = true;
             this.authzRuleAddButton.Click += new System.EventHandler(this.authzRuleAddButton_Click);
@@ -681,11 +682,11 @@
             // authzRulesListBox
             //
             this.authzRulesListBox.FormattingEnabled = true;
+            this.authzRulesListBox.HorizontalScrollbar = true;
             this.authzRulesListBox.Location = new System.Drawing.Point(6, 32);
             this.authzRulesListBox.Name = "authzRulesListBox";
             this.authzRulesListBox.Size = new System.Drawing.Size(610, 173);
-            this.authzRulesListBox.TabIndex = 11;
-            this.authzRulesListBox.HorizontalScrollbar = true;
+            this.authzRulesListBox.TabIndex = 5;
             this.authzRulesListBox.SelectedIndexChanged += new System.EventHandler(this.authzRulesListBox_SelectedIndexChanged);
             //
             // authzRuleActionComboBox
@@ -698,14 +699,14 @@
             this.authzRuleActionComboBox.Location = new System.Drawing.Point(474, 236);
             this.authzRuleActionComboBox.Name = "authzRuleActionComboBox";
             this.authzRuleActionComboBox.Size = new System.Drawing.Size(65, 21);
-            this.authzRuleActionComboBox.TabIndex = 6;
+            this.authzRuleActionComboBox.TabIndex = 15;
             //
             // authzRulePathTB
             //
             this.authzRulePathTB.Location = new System.Drawing.Point(195, 211);
             this.authzRulePathTB.Name = "authzRulePathTB";
             this.authzRulePathTB.Size = new System.Drawing.Size(421, 20);
-            this.authzRulePathTB.TabIndex = 5;
+            this.authzRulePathTB.TabIndex = 12;
             //
             // authzRuleMemberComboBox
             //
@@ -717,7 +718,7 @@
             this.authzRuleMemberComboBox.Location = new System.Drawing.Point(6, 211);
             this.authzRuleMemberComboBox.Name = "authzRuleMemberComboBox";
             this.authzRuleMemberComboBox.Size = new System.Drawing.Size(65, 21);
-            this.authzRuleMemberComboBox.TabIndex = 4;
+            this.authzRuleMemberComboBox.TabIndex = 9;
             //
             // gatewayTabPage
             //
@@ -745,8 +746,8 @@
             this.GatewayPathLabel.AutoSize = true;
             this.GatewayPathLabel.Location = new System.Drawing.Point(158, 214);
             this.GatewayPathLabel.Name = "GatewayPathLabel";
-            this.GatewayPathLabel.Size = new System.Drawing.Size(29, 13);
-            this.GatewayPathLabel.TabIndex = 25;
+            this.GatewayPathLabel.Size = new System.Drawing.Size(32, 13);
+            this.GatewayPathLabel.TabIndex = 4;
             this.GatewayPathLabel.Text = "Path:";
             //
             // GatewayFilterLabel
@@ -755,7 +756,7 @@
             this.GatewayFilterLabel.Location = new System.Drawing.Point(6, 240);
             this.GatewayFilterLabel.Name = "GatewayFilterLabel";
             this.GatewayFilterLabel.Size = new System.Drawing.Size(32, 13);
-            this.GatewayFilterLabel.TabIndex = 24;
+            this.GatewayFilterLabel.TabIndex = 6;
             this.GatewayFilterLabel.Text = "Filter:";
             //
             // gatewayRuleFilter
@@ -763,7 +764,7 @@
             this.gatewayRuleFilter.Location = new System.Drawing.Point(41, 236);
             this.gatewayRuleFilter.Name = "gatewayRuleFilter";
             this.gatewayRuleFilter.Size = new System.Drawing.Size(224, 20);
-            this.gatewayRuleFilter.TabIndex = 23;
+            this.gatewayRuleFilter.TabIndex = 7;
             //
             // gatewayRuleScope
             //
@@ -776,14 +777,14 @@
             this.gatewayRuleScope.Location = new System.Drawing.Point(77, 211);
             this.gatewayRuleScope.Name = "gatewayRuleScope";
             this.gatewayRuleScope.Size = new System.Drawing.Size(76, 21);
-            this.gatewayRuleScope.TabIndex = 22;
+            this.gatewayRuleScope.TabIndex = 3;
             //
             // gatwayRulePathTB
             //
             this.gatwayRulePathTB.Location = new System.Drawing.Point(195, 211);
             this.gatwayRulePathTB.Name = "gatwayRulePathTB";
             this.gatwayRulePathTB.Size = new System.Drawing.Size(421, 20);
-            this.gatwayRulePathTB.TabIndex = 21;
+            this.gatwayRulePathTB.TabIndex = 5;
             //
             // gatewayRuleGroupMemberCB
             //
@@ -796,7 +797,7 @@
             this.gatewayRuleGroupMemberCB.Location = new System.Drawing.Point(6, 211);
             this.gatewayRuleGroupMemberCB.Name = "gatewayRuleGroupMemberCB";
             this.gatewayRuleGroupMemberCB.Size = new System.Drawing.Size(65, 21);
-            this.gatewayRuleGroupMemberCB.TabIndex = 20;
+            this.gatewayRuleGroupMemberCB.TabIndex = 2;
             this.gatewayRuleGroupMemberCB.SelectedIndexChanged += new System.EventHandler(this.gatewayRuleGroupMemberCB_SelectedIndexChanged);
             //
             // gatewayRuleDeleteBtn
@@ -806,7 +807,7 @@
             this.gatewayRuleDeleteBtn.Location = new System.Drawing.Point(622, 82);
             this.gatewayRuleDeleteBtn.Name = "gatewayRuleDeleteBtn";
             this.gatewayRuleDeleteBtn.Size = new System.Drawing.Size(32, 34);
-            this.gatewayRuleDeleteBtn.TabIndex = 19;
+            this.gatewayRuleDeleteBtn.TabIndex = 1;
             this.gatewayRuleDeleteBtn.UseVisualStyleBackColor = true;
             this.gatewayRuleDeleteBtn.Click += new System.EventHandler(this.gatewayRuleDeleteBtn_Click);
             //
@@ -816,7 +817,7 @@
             this.label6.Location = new System.Drawing.Point(285, 240);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(95, 13);
-            this.label6.TabIndex = 10;
+            this.label6.TabIndex = 8;
             this.label6.Text = "add to local group:";
             //
             // gatewayRuleLocalGroupTB
@@ -824,16 +825,16 @@
             this.gatewayRuleLocalGroupTB.Location = new System.Drawing.Point(386, 236);
             this.gatewayRuleLocalGroupTB.Name = "gatewayRuleLocalGroupTB";
             this.gatewayRuleLocalGroupTB.Size = new System.Drawing.Size(153, 20);
-            this.gatewayRuleLocalGroupTB.TabIndex = 7;
+            this.gatewayRuleLocalGroupTB.TabIndex = 9;
             //
             // gatewayRulesListBox
             //
             this.gatewayRulesListBox.FormattingEnabled = true;
+            this.gatewayRulesListBox.HorizontalScrollbar = true;
             this.gatewayRulesListBox.Location = new System.Drawing.Point(6, 6);
             this.gatewayRulesListBox.Name = "gatewayRulesListBox";
             this.gatewayRulesListBox.Size = new System.Drawing.Size(610, 199);
-            this.gatewayRulesListBox.TabIndex = 9;
-            this.gatewayRulesListBox.HorizontalScrollbar = true;
+            this.gatewayRulesListBox.TabIndex = 0;
             this.gatewayRulesListBox.SelectedIndexChanged += new System.EventHandler(this.gatewayRulesListBox_SelectedIndexChanged);
             //
             // gatewayRuleAddButton
@@ -841,7 +842,7 @@
             this.gatewayRuleAddButton.Location = new System.Drawing.Point(545, 236);
             this.gatewayRuleAddButton.Name = "gatewayRuleAddButton";
             this.gatewayRuleAddButton.Size = new System.Drawing.Size(71, 23);
-            this.gatewayRuleAddButton.TabIndex = 8;
+            this.gatewayRuleAddButton.TabIndex = 10;
             this.gatewayRuleAddButton.Text = "Add Rule";
             this.gatewayRuleAddButton.UseVisualStyleBackColor = true;
             this.gatewayRuleAddButton.Click += new System.EventHandler(this.gatewayRuleAddButton_Click);
@@ -864,7 +865,7 @@
             this.label9.Location = new System.Drawing.Point(6, 3);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(54, 13);
-            this.label9.TabIndex = 1;
+            this.label9.TabIndex = 0;
             this.label9.Text = "Attributes:";
             //
             // passwordAttributesDGV
@@ -873,14 +874,14 @@
             this.passwordAttributesDGV.Location = new System.Drawing.Point(6, 19);
             this.passwordAttributesDGV.Name = "passwordAttributesDGV";
             this.passwordAttributesDGV.Size = new System.Drawing.Size(648, 238);
-            this.passwordAttributesDGV.TabIndex = 0;
+            this.passwordAttributesDGV.TabIndex = 1;
             //
             // help
             //
-            this.help.Location = new System.Drawing.Point(441, 464);
+            this.help.Location = new System.Drawing.Point(437, 464);
             this.help.Name = "help";
             this.help.Size = new System.Drawing.Size(76, 26);
-            this.help.TabIndex = 7;
+            this.help.TabIndex = 2;
             this.help.Text = "Help";
             this.help.UseVisualStyleBackColor = true;
             this.help.Click += new System.EventHandler(this.Btn_help);
