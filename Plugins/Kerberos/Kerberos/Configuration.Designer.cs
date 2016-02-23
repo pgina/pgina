@@ -57,7 +57,7 @@
             this.save.Location = new System.Drawing.Point(185, 94);
             this.save.Name = "save";
             this.save.Size = new System.Drawing.Size(75, 23);
-            this.save.TabIndex = 2;
+            this.save.TabIndex = 5;
             this.save.Text = "Save";
             this.save.UseVisualStyleBackColor = true;
             this.save.Click += new System.EventHandler(this.save_Click);
@@ -67,7 +67,7 @@
             this.description.Location = new System.Drawing.Point(3, 29);
             this.description.Name = "description";
             this.description.Size = new System.Drawing.Size(251, 38);
-            this.description.TabIndex = 3;
+            this.description.TabIndex = 2;
             this.description.Text = "Enter the target Kerberos realm name ex: REALM.UTAH.EDU";
             //
             // cancel
@@ -85,7 +85,7 @@
             this.help.Location = new System.Drawing.Point(23, 94);
             this.help.Name = "help";
             this.help.Size = new System.Drawing.Size(75, 23);
-            this.help.TabIndex = 5;
+            this.help.TabIndex = 3;
             this.help.Text = "Help";
             this.help.UseVisualStyleBackColor = true;
             //
