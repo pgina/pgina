@@ -38,13 +38,13 @@
             this.m_chkAuthzLocalAdmin = new System.Windows.Forms.CheckBox();
             this.m_chkAuthzAll = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.m_chkGroupFailIsFAIL = new System.Windows.Forms.CheckBox();
+            this.m_groupsDgv = new System.Windows.Forms.DataGridView();
+            this.Group = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_scrambleAllExceptDGV = new System.Windows.Forms.DataGridView();
             this.Username = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_chkRemoveProfile = new System.Windows.Forms.CheckBox();
             this.m_chkScramble = new System.Windows.Forms.CheckBox();
-            this.m_chkGroupFailIsFAIL = new System.Windows.Forms.CheckBox();
-            this.m_groupsDgv = new System.Windows.Forms.DataGridView();
-            this.Group = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_btnSave = new System.Windows.Forms.Button();
             this.m_btnClose = new System.Windows.Forms.Button();
             this.m_chkScrambleWhenLMFails = new System.Windows.Forms.CheckBox();
@@ -55,8 +55,8 @@
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_localGroupDgv)).BeginInit();
             this.groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.m_scrambleAllExceptDGV)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.m_groupsDgv)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.m_scrambleAllExceptDGV)).BeginInit();
             this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             //
@@ -100,7 +100,7 @@
             this.m_chkMirror.Location = new System.Drawing.Point(15, 21);
             this.m_chkMirror.Name = "m_chkMirror";
             this.m_chkMirror.Size = new System.Drawing.Size(158, 17);
-            this.m_chkMirror.TabIndex = 4;
+            this.m_chkMirror.TabIndex = 0;
             this.m_chkMirror.Text = "Mirror groups from local user";
             this.m_chkMirror.UseVisualStyleBackColor = true;
             //
@@ -123,7 +123,7 @@
             this.m_localGroupDgv.Location = new System.Drawing.Point(15, 113);
             this.m_localGroupDgv.Name = "m_localGroupDgv";
             this.m_localGroupDgv.Size = new System.Drawing.Size(311, 200);
-            this.m_localGroupDgv.TabIndex = 2;
+            this.m_localGroupDgv.TabIndex = 4;
             //
             // LocalGroup
             //
@@ -137,7 +137,7 @@
             this.m_chkAuthzLocalAdmin.Location = new System.Drawing.Point(15, 67);
             this.m_chkAuthzLocalAdmin.Name = "m_chkAuthzLocalAdmin";
             this.m_chkAuthzLocalAdmin.Size = new System.Drawing.Size(239, 17);
-            this.m_chkAuthzLocalAdmin.TabIndex = 1;
+            this.m_chkAuthzLocalAdmin.TabIndex = 2;
             this.m_chkAuthzLocalAdmin.Text = "Require local administrator group membership";
             this.m_chkAuthzLocalAdmin.UseVisualStyleBackColor = true;
             //
@@ -147,7 +147,7 @@
             this.m_chkAuthzAll.Location = new System.Drawing.Point(15, 44);
             this.m_chkAuthzAll.Name = "m_chkAuthzAll";
             this.m_chkAuthzAll.Size = new System.Drawing.Size(179, 17);
-            this.m_chkAuthzAll.TabIndex = 0;
+            this.m_chkAuthzAll.TabIndex = 1;
             this.m_chkAuthzAll.Text = "Authorize all authenticated users";
             this.m_chkAuthzAll.UseVisualStyleBackColor = true;
             //
@@ -161,6 +161,32 @@
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Gateway";
+            //
+            // m_chkGroupFailIsFAIL
+            //
+            this.m_chkGroupFailIsFAIL.AutoSize = true;
+            this.m_chkGroupFailIsFAIL.Location = new System.Drawing.Point(15, 19);
+            this.m_chkGroupFailIsFAIL.Name = "m_chkGroupFailIsFAIL";
+            this.m_chkGroupFailIsFAIL.Size = new System.Drawing.Size(291, 17);
+            this.m_chkGroupFailIsFAIL.TabIndex = 0;
+            this.m_chkGroupFailIsFAIL.Text = "Failure to create or join local groups should prevent login";
+            this.m_chkGroupFailIsFAIL.UseVisualStyleBackColor = true;
+            //
+            // m_groupsDgv
+            //
+            this.m_groupsDgv.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.m_groupsDgv.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Group});
+            this.m_groupsDgv.Location = new System.Drawing.Point(15, 42);
+            this.m_groupsDgv.Name = "m_groupsDgv";
+            this.m_groupsDgv.Size = new System.Drawing.Size(311, 248);
+            this.m_groupsDgv.TabIndex = 1;
+            //
+            // Group
+            //
+            this.Group.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Group.HeaderText = "Mandatory Groups";
+            this.Group.Name = "Group";
             //
             // m_scrambleAllExceptDGV
             //
@@ -184,7 +210,7 @@
             this.m_chkRemoveProfile.Location = new System.Drawing.Point(15, 19);
             this.m_chkRemoveProfile.Name = "m_chkRemoveProfile";
             this.m_chkRemoveProfile.Size = new System.Drawing.Size(216, 17);
-            this.m_chkRemoveProfile.TabIndex = 8;
+            this.m_chkRemoveProfile.TabIndex = 0;
             this.m_chkRemoveProfile.Text = "Remove account and profile after logout";
             this.m_chkRemoveProfile.UseVisualStyleBackColor = true;
             this.m_chkRemoveProfile.CheckedChanged += new System.EventHandler(this.m_chkRemoveProfile_CheckedChanged);
@@ -195,54 +221,28 @@
             this.m_chkScramble.Location = new System.Drawing.Point(15, 42);
             this.m_chkScramble.Name = "m_chkScramble";
             this.m_chkScramble.Size = new System.Drawing.Size(174, 17);
-            this.m_chkScramble.TabIndex = 7;
+            this.m_chkScramble.TabIndex = 1;
             this.m_chkScramble.Text = "Scramble password after logout";
             this.m_chkScramble.UseVisualStyleBackColor = true;
             this.m_chkScramble.CheckedChanged += new System.EventHandler(this.m_chkScramble_CheckedChanged);
             //
-            // m_chkGroupFailIsFAIL
-            //
-            this.m_chkGroupFailIsFAIL.AutoSize = true;
-            this.m_chkGroupFailIsFAIL.Location = new System.Drawing.Point(15, 19);
-            this.m_chkGroupFailIsFAIL.Name = "m_chkGroupFailIsFAIL";
-            this.m_chkGroupFailIsFAIL.Size = new System.Drawing.Size(291, 17);
-            this.m_chkGroupFailIsFAIL.TabIndex = 6;
-            this.m_chkGroupFailIsFAIL.Text = "Failure to create or join local groups should prevent login";
-            this.m_chkGroupFailIsFAIL.UseVisualStyleBackColor = true;
-            //
-            // m_groupsDgv
-            //
-            this.m_groupsDgv.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.m_groupsDgv.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Group});
-            this.m_groupsDgv.Location = new System.Drawing.Point(15, 42);
-            this.m_groupsDgv.Name = "m_groupsDgv";
-            this.m_groupsDgv.Size = new System.Drawing.Size(311, 248);
-            this.m_groupsDgv.TabIndex = 5;
-            //
-            // Group
-            //
-            this.Group.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Group.HeaderText = "Mandatory Groups";
-            this.Group.Name = "Group";
-            //
             // m_btnSave
             //
-            this.m_btnSave.Location = new System.Drawing.Point(533, 412);
+            this.m_btnSave.Location = new System.Drawing.Point(628, 411);
             this.m_btnSave.Name = "m_btnSave";
             this.m_btnSave.Size = new System.Drawing.Size(75, 23);
-            this.m_btnSave.TabIndex = 3;
+            this.m_btnSave.TabIndex = 6;
             this.m_btnSave.Text = "Save";
             this.m_btnSave.UseVisualStyleBackColor = true;
             this.m_btnSave.Click += new System.EventHandler(this.m_btnSave_Click);
             //
             // m_btnClose
             //
-            this.m_btnClose.Location = new System.Drawing.Point(618, 412);
+            this.m_btnClose.Location = new System.Drawing.Point(547, 411);
             this.m_btnClose.Name = "m_btnClose";
             this.m_btnClose.Size = new System.Drawing.Size(75, 23);
-            this.m_btnClose.TabIndex = 4;
-            this.m_btnClose.Text = "Close";
+            this.m_btnClose.TabIndex = 5;
+            this.m_btnClose.Text = "Cancel";
             this.m_btnClose.UseVisualStyleBackColor = true;
             this.m_btnClose.Click += new System.EventHandler(this.m_btnClose_Click);
             //
@@ -272,16 +272,16 @@
             this.groupBox4.Location = new System.Drawing.Point(361, 329);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(342, 76);
-            this.groupBox4.TabIndex = 5;
+            this.groupBox4.TabIndex = 3;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Notification";
             //
             // Help
             //
-            this.Help.Location = new System.Drawing.Point(448, 412);
+            this.Help.Location = new System.Drawing.Point(466, 411);
             this.Help.Name = "Help";
             this.Help.Size = new System.Drawing.Size(75, 23);
-            this.Help.TabIndex = 6;
+            this.Help.TabIndex = 4;
             this.Help.Text = "Help";
             this.Help.UseVisualStyleBackColor = true;
             this.Help.Click += new System.EventHandler(this.m_Help_Click);
@@ -308,8 +308,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.m_localGroupDgv)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.m_scrambleAllExceptDGV)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.m_groupsDgv)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.m_scrambleAllExceptDGV)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
