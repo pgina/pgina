@@ -199,7 +199,7 @@ namespace Abstractions.Settings
                                 case RegistryValueKind.MultiString:
                                     foreach (string s in (string[])type)
                                     {
-                                        value += String.Format("{0}\n", s);
+                                        value += String.Format("{0}\0", s);
                                     }
                                     value = value.TrimEnd();
                                     break;
