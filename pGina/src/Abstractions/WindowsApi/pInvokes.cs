@@ -2383,7 +2383,7 @@ namespace Abstractions.WindowsApi
         /// returns GetLastWin32Error as string
         /// </summary>
         /// <returns></returns>
-        internal static string LastError(int error)
+        public static string LastError(int error)
         {
             return new Win32Exception(error).Message;
 
@@ -2393,7 +2393,7 @@ namespace Abstractions.WindowsApi
         /// returns GetLastWin32Error as string
         /// </summary>
         /// <returns></returns>
-        internal static string LastError()
+        public static string LastError()
         {
             return new Win32Exception(Marshal.GetLastWin32Error()).Message;
         }
