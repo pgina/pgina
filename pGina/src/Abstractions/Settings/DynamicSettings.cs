@@ -49,6 +49,11 @@ namespace Abstractions.Settings
             m_rootKey = root;
         }
 
+        public DynamicSettings(Guid pluginGuid)
+        {
+            m_rootKey = String.Format(@"{0}\Plugins\{1}", ROOT_KEY, pluginGuid.ToString());
+        }
+
         /// <summary>
         /// Sets the default value for a setting.  Checks to see if the setting
         /// is already defined in the registry.  If so, the method does nothing.
