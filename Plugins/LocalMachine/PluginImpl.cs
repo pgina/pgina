@@ -588,7 +588,7 @@ namespace pGina.Plugin.LocalMachine
                             userInfo.LocalProfilePath = uprofile;
                             properties.AddTrackedSingle<UserInformation>(userInfo);
 
-                            if (uprofile.Contains(@"\TEMP"))
+                            if ((uprofile.Contains(@"\TEMP") && !userInfo.Username.StartsWith("temp", StringComparison.CurrentCultureIgnoreCase)) || Abstractions.Windows.User.IsProfileTemp(userInfo.SID.ToString()) == true)
                             {
                                 Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows was unable to load the profile");
                             }
