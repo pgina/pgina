@@ -54,6 +54,11 @@ namespace Abstractions.Settings
             m_rootKey = String.Format(@"{0}\Plugins\{1}", ROOT_KEY, pluginGuid.ToString());
         }
 
+        public DynamicSettings(Guid pluginGuid, string subkey)
+        {
+            m_rootKey = String.Format(@"{0}\Plugins\{1}\{2}", ROOT_KEY, pluginGuid.ToString(), subkey);
+        }
+
         /// <summary>
         /// Sets the default value for a setting.  Checks to see if the setting
         /// is already defined in the registry.  If so, the method does nothing.
@@ -70,6 +75,21 @@ namespace Abstractions.Settings
             catch (KeyNotFoundException)
             {
                 SetSetting(name, value);
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(m_rootKey, true))
+                {
+                    if (m_rootKey.EndsWith(@"\global", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        System.Security.AccessControl.RegistrySecurity acc = key.GetAccessControl(System.Security.AccessControl.AccessControlSections.All);
+                        System.Security.AccessControl.RegistryAccessRule authenticated = new System.Security.AccessControl.RegistryAccessRule(
+                            new System.Security.Principal.SecurityIdentifier(System.Security.Principal.WellKnownSidType.AuthenticatedUserSid, null),
+                            System.Security.AccessControl.RegistryRights.ReadKey,
+                            System.Security.AccessControl.InheritanceFlags.None,
+                            System.Security.AccessControl.PropagationFlags.None,
+                            System.Security.AccessControl.AccessControlType.Allow);
+                        acc.AddAccessRule(authenticated);
+                        key.SetAccessControl(acc);
+                    }
+                }
             }
         }
 
