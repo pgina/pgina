@@ -74,6 +74,67 @@ namespace Abstractions.Windows
             return ret;
         }
 
+        internal enum Profile_State
+        {
+            Profile_is_mandatory = 0x0001,
+            Update_the_locally_cached_profile = 0x0002,
+            New_local_profile = 0x0004,
+            New_central_profile = 0x0008,
+            Update_the_central_profile = 0x0010,
+            Delete_the_cached_profile = 0x0020,
+            Upgrade_the_profile = 0x0040,
+            Using_Guest_user_profile = 0x0080,
+            Using_Administrator_profile = 0x0100,
+            Default_net_profile_is_available_and_ready = 0x0200,
+            Slow_network_link_identified = 0x0400,
+            Temporary_profile_loaded = 0x0800,
+        }
+        /// <summary>
+        /// return true if profile is temp. uses ProfileList State regkey
+        /// </summary>
+        /// <param name="sid"></param>
+        /// <returns></returns>
+        public static bool? IsProfileTemp(string sid)
+        {
+            try
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(string.Format("{0}\\{1}", ROOT_PROFILE_KEY, sid)))
+                {
+                    if (key != null)
+                    {
+                        object type = key.GetValue("State");
+                        Profile_State value = 0;
+                        switch (key.GetValueKind("State"))
+                        {
+                            case RegistryValueKind.DWord:
+                                value = (Profile_State)type;
+                                break;
+                            case RegistryValueKind.QWord:
+                                value = (Profile_State)type;
+                                break;
+                        }
+
+                        if (value.HasFlag(Profile_State.Temporary_profile_loaded))
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        LibraryLogging.Info("IsProfileTemp key {0}\\{1} not found", ROOT_PROFILE_KEY, sid);
+                        return null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LibraryLogging.Info("IsProfileTemp exception:{0}", ex.Message);
+                return null;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// if a user receives a temp profile of whatever reason
         /// MS is renaming the SID key under ProfileList to SID.bak
