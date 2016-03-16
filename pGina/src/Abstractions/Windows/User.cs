@@ -67,7 +67,7 @@ namespace Abstractions.Windows
                 }
                 else
                 {
-                    throw new KeyNotFoundException(string.Format("Unable to open registry key"));
+                    LibraryLogging.Info("GetProfileDir key {0} not found", ROOT_PROFILE_KEY);
                 }
             }
 
