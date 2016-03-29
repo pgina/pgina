@@ -555,7 +555,7 @@ namespace pGina.Plugin.Ldap
             //m_logger.InfoFormat("userDN={0}", userDN);
 
             List<string> ntps = m_serverIdentifier.Servers.ToList();
-            ntps.AddRange(pGinaSettings["ntpservers"].Split('\n').ToList());
+            ntps.AddRange(pGinaSettings["ntpservers"].Split('\0').ToList());
             m_logger.InfoFormat("ntplist:{0}", String.Join(" ", ntps));
 
             Dictionary<string, List<string>> search = GetUserAttribValue(userDN, "(objectClass=*)", SearchScope.Base, new string[] { "shadowMax", "sambaPwdMustChange", "userAccountControl", "msDS-User-Account-Control-Computed", "msDS-UserPasswordExpiryTimeComputed", "pwdLastSet", "memberOf", "msDS-PSOApplied" });
