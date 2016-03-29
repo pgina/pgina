@@ -576,7 +576,36 @@ namespace pGina.Service.Impl
                 }
                 else
                 {
-                    m_logger.DebugFormat("Parse Request for: {0} in session: {1} reason: {2}", sessionDriver.UserInformation.Username, msg.Session, msg.Reason);
+                    // check if username is equal originalusername
+                    // if not return originalusername and password
+                    bool originalUsernameUnlock = Settings.Get.UseOriginalUsernameInUnlockScenario;
+                    if (originalUsernameUnlock && LoginRequestMessage.LoginReason.Unlock == msg.Reason)
+                    {
+                        m_logger.InfoFormat("Unlock with original Username:{0} for Session:{1}", sessionDriver.UserInformation.Username, msg.Session);
+                        lock (m_sessionPropertyCache)
+                        {
+                            List<SessionProperties> ses = new List<SessionProperties>();
+                            if (m_sessionPropertyCache.Exists(msg.Session))
+                            {
+                                ses = m_sessionPropertyCache.Get(msg.Session);
+                            }
+                            // the first entry is always the interactive user
+                            SessionProperties sess = ses.DefaultIfEmpty(new SessionProperties(Guid.Empty, true)).FirstOrDefault();
+                            UserInformation ui = sess.GetTrackedSingle<UserInformation>();
+                            if (ui.Username != ui.OriginalUsername)
+                            {
+                                sessionDriver.UserInformation.Username = ui.Username;
+                                sessionDriver.UserInformation.Domain = Environment.MachineName;
+                                sessionDriver.UserInformation.Password = ui.Password;
+                                result.Success = true;
+                            }
+                            m_logger.InfoFormat("Unlock as:{0} for Session:{1}", sessionDriver.UserInformation.Username, msg.Session);
+                        }
+                    }
+                    else
+                    {
+                        m_logger.DebugFormat("Parse Request for: {0} in session: {1} reason: {2}", sessionDriver.UserInformation.Username, msg.Session, msg.Reason);
+                    }
                 }
 
                 if (LastUsernameEnable && msg.Reason == LoginRequestMessage.LoginReason.Login && result.Success)
