@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pgSMB2", "pgSMB2\pgSMB2.csproj", "{6FEF9F9F-373B-4C23-B8D0-9A59EFE01E7D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "proquota", "proquota\proquota.csproj", "{932E940D-2B4D-49A2-A454-ECF664E6599E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6FEF9F9F-373B-4C23-B8D0-9A59EFE01E7D} = {6FEF9F9F-373B-4C23-B8D0-9A59EFE01E7D}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +18,10 @@ Global
 		{6FEF9F9F-373B-4C23-B8D0-9A59EFE01E7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FEF9F9F-373B-4C23-B8D0-9A59EFE01E7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FEF9F9F-373B-4C23-B8D0-9A59EFE01E7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{932E940D-2B4D-49A2-A454-ECF664E6599E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{932E940D-2B4D-49A2-A454-ECF664E6599E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{932E940D-2B4D-49A2-A454-ECF664E6599E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{932E940D-2B4D-49A2-A454-ECF664E6599E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

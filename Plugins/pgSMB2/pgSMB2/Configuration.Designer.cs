@@ -55,10 +55,11 @@ namespace pGina.Plugin.pgSMB2
         private void InitializeComponent()
         {
             this.Gateway_group = new System.Windows.Forms.GroupBox();
-            this.ntp = new System.Windows.Forms.TextBox();
             this.Description = new System.Windows.Forms.Label();
-            this.ntp_label = new System.Windows.Forms.Label();
             this.User_group = new System.Windows.Forms.GroupBox();
+            this.MaxStore_proquota_label = new System.Windows.Forms.Label();
+            this.MaxStore_proquota_richTextBox = new System.Windows.Forms.RichTextBox();
+            this.MaxStore_proquota_comboBox = new System.Windows.Forms.ComboBox();
             this.MaxStore_calc = new System.Windows.Forms.Label();
             this.MaxStore_label = new System.Windows.Forms.Label();
             this.MaxStore = new System.Windows.Forms.NumericUpDown();
@@ -88,6 +89,8 @@ namespace pGina.Plugin.pgSMB2
             this.save = new System.Windows.Forms.Button();
             this.close = new System.Windows.Forms.Button();
             this.help = new System.Windows.Forms.Button();
+            this.MaxStore_exclude_label = new System.Windows.Forms.Label();
+            this.MaxStore_exclude = new System.Windows.Forms.TextBox();
             this.Gateway_group.SuspendLayout();
             this.User_group.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.MaxStore)).BeginInit();
@@ -97,9 +100,7 @@ namespace pGina.Plugin.pgSMB2
             //
             // Gateway_group
             //
-            this.Gateway_group.Controls.Add(this.ntp);
             this.Gateway_group.Controls.Add(this.Description);
-            this.Gateway_group.Controls.Add(this.ntp_label);
             this.Gateway_group.Controls.Add(this.User_group);
             this.Gateway_group.Controls.Add(this.Roaming_group);
             this.Gateway_group.Location = new System.Drawing.Point(12, 12);
@@ -109,36 +110,23 @@ namespace pGina.Plugin.pgSMB2
             this.Gateway_group.TabStop = false;
             this.Gateway_group.Text = "Gateway";
             //
-            // ntp
-            //
-            this.ntp.Location = new System.Drawing.Point(345, 221);
-            this.ntp.Name = "ntp";
-            this.ntp.ReadOnly = true;
-            this.ntp.Size = new System.Drawing.Size(311, 20);
-            this.ntp.TabIndex = 3;
-            this.ntp.WordWrap = false;
-            //
             // Description
             //
             this.Description.AutoSize = true;
-            this.Description.Location = new System.Drawing.Point(333, 244);
+            this.Description.Location = new System.Drawing.Point(339, 317);
             this.Description.Name = "Description";
-            this.Description.Size = new System.Drawing.Size(263, 52);
-            this.Description.TabIndex = 4;
-            this.Description.Text = "Macros:\r\n  %u = UserName\r\n  %z = User Profile Path (c:\\users\\%username%)\r\n  any o" +
-                "ther Environment Varaiable will also be resolved";
-            //
-            // ntp_label
-            //
-            this.ntp_label.AutoSize = true;
-            this.ntp_label.Location = new System.Drawing.Point(342, 205);
-            this.ntp_label.Name = "ntp_label";
-            this.ntp_label.Size = new System.Drawing.Size(180, 13);
-            this.ntp_label.TabIndex = 2;
-            this.ntp_label.Text = "space seperated ntp servers (FQDN)";
+            this.Description.Size = new System.Drawing.Size(314, 39);
+            this.Description.TabIndex = 2;
+            this.Description.Text = "Macros:\r\n  %u = UserName, %z = User Profile Path (c:\\users\\%username%)\r\n  any oth" +
+                "er Environment Varaiable will also be resolved";
             //
             // User_group
             //
+            this.User_group.Controls.Add(this.MaxStore_exclude);
+            this.User_group.Controls.Add(this.MaxStore_exclude_label);
+            this.User_group.Controls.Add(this.MaxStore_proquota_label);
+            this.User_group.Controls.Add(this.MaxStore_proquota_richTextBox);
+            this.User_group.Controls.Add(this.MaxStore_proquota_comboBox);
             this.User_group.Controls.Add(this.MaxStore_calc);
             this.User_group.Controls.Add(this.MaxStore_label);
             this.User_group.Controls.Add(this.MaxStore);
@@ -150,10 +138,38 @@ namespace pGina.Plugin.pgSMB2
             this.User_group.Controls.Add(this.HomeDirDrive_label);
             this.User_group.Location = new System.Drawing.Point(339, 19);
             this.User_group.Name = "User_group";
-            this.User_group.Size = new System.Drawing.Size(323, 180);
+            this.User_group.Size = new System.Drawing.Size(323, 295);
             this.User_group.TabIndex = 1;
             this.User_group.TabStop = false;
             this.User_group.Text = "User";
+            //
+            // MaxStore_proquota_label
+            //
+            this.MaxStore_proquota_label.AutoSize = true;
+            this.MaxStore_proquota_label.Location = new System.Drawing.Point(3, 212);
+            this.MaxStore_proquota_label.Name = "MaxStore_proquota_label";
+            this.MaxStore_proquota_label.Size = new System.Drawing.Size(286, 13);
+            this.MaxStore_proquota_label.TabIndex = 10;
+            this.MaxStore_proquota_label.Text = "Proquota Balloontip and MessageBox Text: (MaxStoreText)";
+            //
+            // MaxStore_proquota_richTextBox
+            //
+            this.MaxStore_proquota_richTextBox.Location = new System.Drawing.Point(6, 251);
+            this.MaxStore_proquota_richTextBox.Name = "MaxStore_proquota_richTextBox";
+            this.MaxStore_proquota_richTextBox.Size = new System.Drawing.Size(311, 36);
+            this.MaxStore_proquota_richTextBox.TabIndex = 12;
+            this.MaxStore_proquota_richTextBox.Text = "";
+            this.MaxStore_proquota_richTextBox.TextChanged += new System.EventHandler(this.MaxStore_proquota_richTextBox_TextChanged);
+            //
+            // MaxStore_proquota_comboBox
+            //
+            this.MaxStore_proquota_comboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.MaxStore_proquota_comboBox.FormattingEnabled = true;
+            this.MaxStore_proquota_comboBox.Location = new System.Drawing.Point(6, 228);
+            this.MaxStore_proquota_comboBox.Name = "MaxStore_proquota_comboBox";
+            this.MaxStore_proquota_comboBox.Size = new System.Drawing.Size(311, 21);
+            this.MaxStore_proquota_comboBox.TabIndex = 11;
+            this.MaxStore_proquota_comboBox.SelectedIndexChanged += new System.EventHandler(this.MaxStore_proquota_comboBox_SelectedIndexChanged);
             //
             // MaxStore_calc
             //
@@ -168,9 +184,9 @@ namespace pGina.Plugin.pgSMB2
             this.MaxStore_label.AutoSize = true;
             this.MaxStore_label.Location = new System.Drawing.Point(3, 134);
             this.MaxStore_label.Name = "MaxStore_label";
-            this.MaxStore_label.Size = new System.Drawing.Size(240, 13);
+            this.MaxStore_label.Size = new System.Drawing.Size(178, 13);
             this.MaxStore_label.TabIndex = 6;
-            this.MaxStore_label.Text = "The user max storage space in kbytes (MaxStore)";
+            this.MaxStore_label.Text = "The user quota in kbytes (MaxStore)";
             //
             // MaxStore
             //
@@ -441,6 +457,22 @@ namespace pGina.Plugin.pgSMB2
             this.help.UseVisualStyleBackColor = true;
             this.help.Click += new System.EventHandler(this.Btn_help);
             //
+            // MaxStore_exclude_label
+            //
+            this.MaxStore_exclude_label.AutoSize = true;
+            this.MaxStore_exclude_label.Location = new System.Drawing.Point(3, 174);
+            this.MaxStore_exclude_label.Name = "MaxStore_exclude_label";
+            this.MaxStore_exclude_label.Size = new System.Drawing.Size(315, 13);
+            this.MaxStore_exclude_label.TabIndex = 8;
+            this.MaxStore_exclude_label.Text = "Exclude profile directories from quota as regex (MaxStoreExclude)";
+            //
+            // MaxStore_exclude
+            //
+            this.MaxStore_exclude.Location = new System.Drawing.Point(6, 190);
+            this.MaxStore_exclude.Name = "MaxStore_exclude";
+            this.MaxStore_exclude.Size = new System.Drawing.Size(311, 20);
+            this.MaxStore_exclude.TabIndex = 9;
+            //
             // Configuration
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -497,9 +529,12 @@ namespace pGina.Plugin.pgSMB2
         private System.Windows.Forms.Label Description;
         private System.Windows.Forms.Button save;
         private System.Windows.Forms.Button close;
-        private System.Windows.Forms.Label MaxStore_calc;
-        private System.Windows.Forms.TextBox ntp;
-        private System.Windows.Forms.Label ntp_label;
         private System.Windows.Forms.Button help;
+        private System.Windows.Forms.Label MaxStore_calc;
+        private System.Windows.Forms.RichTextBox MaxStore_proquota_richTextBox;
+        private System.Windows.Forms.ComboBox MaxStore_proquota_comboBox;
+        private System.Windows.Forms.Label MaxStore_proquota_label;
+        private System.Windows.Forms.TextBox MaxStore_exclude;
+        private System.Windows.Forms.Label MaxStore_exclude_label;
     }
 }

@@ -205,7 +205,7 @@ namespace pGina.Plugin.pgSMB2
 
             if (!settings["MaxStore"].Equals("0"))
             {
-                long uPath_size = GetDirectorySize(uPath, @".*(\\AppData\\)(Local|LocalLow)$");
+                long uPath_size = GetDirectorySize(uPath, settings["MaxStoreExclude"]);
                 if (uPath_size == 0)
                 {
                     m_logger.ErrorFormat("User directory:{0} size returned:0", uPath);
@@ -265,7 +265,10 @@ namespace pGina.Plugin.pgSMB2
                     break;
                 }
                 m_logger.DebugFormat("Exitcode:{0}\n{1}", ret_code, tail(stdmerge, 10));
-                Thread.Sleep(new TimeSpan(0, 0, 30));
+                if (x < Convert.ToUInt32(settings["ConnectRetry"]))
+                {
+                    Thread.Sleep(new TimeSpan(0, 0, 30));
+                }
             }
 
             //where is the compressed profile now?
@@ -875,7 +878,7 @@ namespace pGina.Plugin.pgSMB2
                 {
                     try
                     {
-                        m_logger.DebugFormat("{0}. try to connect to {1} as {2}", x, share, dusername);
+                        m_logger.DebugFormat("{0}. try to connect to {1} as {2} pwd {3}", x, share, dusername, password);
                         if (!Abstractions.WindowsApi.pInvokes.MapNetworkDrive(share, dusername, password))
                         {
                             m_logger.ErrorFormat("Failed to connect to share {0}", share);
@@ -997,7 +1000,7 @@ namespace pGina.Plugin.pgSMB2
 
             return ret.TrimEnd();
         }
-        private List<string> GetDirectories(string d, string exclude)
+        public List<string> GetDirectories(string d, string exclude)
         {
             List<string> ret = new List<string>();
 
@@ -1025,13 +1028,11 @@ namespace pGina.Plugin.pgSMB2
             return ret;
         }
 
-        private long GetDirectorySize(string d, string exclude)
+        public Dictionary<string, long> GetFiles(string d, string exclude)
         {
             List<string> dirs = new List<string>() { d };
             dirs.AddRange(GetDirectories(d, exclude));
-            List<string> filesL = new List<string>();
-
-            long ret = 0;
+            Dictionary<string, long> ret = new Dictionary<string, long>();
 
             try
             {
@@ -1041,8 +1042,47 @@ namespace pGina.Plugin.pgSMB2
                     string[] files = Directory.GetFiles(dir, "*", System.IO.SearchOption.TopDirectoryOnly);
                     foreach (string file in files)
                     {
-                        ret += new FileInfo(file).Length;
+                        ret.Add(file, new FileInfo(file).Length);
                     }
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.ErrorFormat("GetFiles() error:", ex.Message);
+            }
+
+            return ret;
+        }
+
+        public long GetDirectorySize(string d, string exclude)
+        {
+            Dictionary<string, long> files = GetFiles(d, exclude);
+            long ret = 0;
+
+            try
+            {
+                foreach ( KeyValuePair<string, long> pair in files )
+                {
+                    ret += pair.Value;
+                }
+            }
+            catch (Exception ex)
+            {
+                m_logger.ErrorFormat("GetDirectorySize() error:", ex.Message);
+            }
+
+            return ret;
+        }
+
+        public long GetDirectorySize(Dictionary<string, long> files)
+        {
+            long ret = 0;
+
+            try
+            {
+                foreach (KeyValuePair<string, long> pair in files)
+                {
+                    ret += pair.Value;
                 }
             }
             catch (Exception ex)

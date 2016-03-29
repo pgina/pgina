@@ -36,6 +36,7 @@ namespace pGina.Plugin.pgSMB2
     class Settings
     {
         private static dynamic m_settings = new pGinaDynamicSettings(PluginImpl.PluginUuid);
+        private static dynamic m_settings_global = new pGinaDynamicSettings(PluginImpl.PluginUuid, "global");
 
         static Settings()
         {
@@ -50,15 +51,27 @@ namespace pGina.Plugin.pgSMB2
 
             m_settings.SetDefault("HomeDir", @"\\server.my.domain.com\%u" );
             m_settings.SetDefault("HomeDirDrive", @"O:" );
-            m_settings.SetDefault("ScriptPath", @"\\server.my.domain.com\%u\script\login.cmd" );
+            m_settings.SetDefault("ScriptPath", @"\\server.my.domain.com\%u\script\login.cmd");
             m_settings.SetDefault("MaxStore", 0);
-
-            m_settings.SetDefault("ntp", @"ts1.my.domain.com ts2.my.domain.com");
+            m_settings_global.SetDefault("MaxStoreExclude", @"(?i).*(\\AppData\\)(Local|LocalLow)$");
+            m_settings_global.SetDefault("MaxStoreText", new string[] {
+                "MaxStoreUserprofile\tProfile storage space",
+                "MaxStorefree\tfree",
+                "MaxStoreExceeded\texceeded",
+                "MaxStoreWarningTitle\tProfile storage space limit soon reached",
+                "MaxStoreErrorTitle\tProfile storage space limit exceeded",
+                "MaxStoreErrorText\tYou have exceeded your profile storage space.\nBefore you can log off, you need to move some items from your profile to network or local storage.",
+                "MaxStoreCalculateText\tcalculate"
+            });
         }
 
         public static dynamic Store
         {
             get { return m_settings; }
+        }
+        public static dynamic StoreGlobal
+        {
+            get { return m_settings_global; }
         }
     }
 }

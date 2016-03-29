@@ -32,6 +32,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace pGina.Plugin.pgSMB2
 {
@@ -41,6 +42,12 @@ namespace pGina.Plugin.pgSMB2
         {
             InitializeComponent();
             SettingsToUi();
+        }
+
+        public class MaxStoreText
+        {
+            public string Name { get; set; }
+            public string Value { get; set; }
         }
 
         private void SettingsToUi()
@@ -57,15 +64,12 @@ namespace pGina.Plugin.pgSMB2
             string HomeDirDrive = Settings.Store.HomeDirDrive;
             string ScriptPath = Settings.Store.ScriptPath;
             int MaxStore = Settings.Store.MaxStore;
-            string Ntp = "";
+            string MaxStoreExclude = Settings.StoreGlobal.MaxStoreExclude;
+            string[] MaxStoreText = Settings.StoreGlobal.MaxStoreText;
             Dictionary<string, string> ntps = pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "" });
             if (!ntps.ContainsKey("ntpservers") || String.IsNullOrEmpty(ntps["ntpservers"]))
             {
                 MessageBox.Show(this, "Setup at least one Ntp server in the global configuration", "Global Ntp Server missing");
-            }
-            else
-            {
-                Ntp = ntps["ntpservers"].Replace('\n', ' ');
             }
 
             this.SMBshare.Text = SMBshare_str;
@@ -81,7 +85,20 @@ namespace pGina.Plugin.pgSMB2
             this.ScriptPath.Text = ScriptPath;
             this.MaxStore.Value = (uint)MaxStore;
             this.MaxStore_calc.Text = ((uint)MaxStore / 1024).ToString("F") + " MByte";
-            this.ntp.Text = Ntp;
+            this.MaxStore_exclude.Text = MaxStoreExclude;
+
+            List<MaxStoreText> dataSource = new List<MaxStoreText>();
+            foreach (string text in MaxStoreText)
+            {
+                dataSource.Add(new MaxStoreText()
+                {
+                    Name  = text.Split(new char[] { '\t' }, 2).First(),
+                    Value = text.Split(new char[] { '\t' }, 2).Last()
+                });
+            }
+            this.MaxStore_proquota_comboBox.DataSource = dataSource;
+            this.MaxStore_proquota_comboBox.DisplayMember = "Name";
+            this.MaxStore_proquota_comboBox.ValueMember = "Value";
 
             //MessageBox.Show(Environment.CurrentDirectory.ToString());
             //MessageBox.Show(Environment.ExpandEnvironmentVariables(TempComp));
@@ -107,8 +124,9 @@ namespace pGina.Plugin.pgSMB2
             toolTip1.SetToolTip(this.HomeDir, "The user home directory");
             toolTip1.SetToolTip(this.HomeDirDrive, "The user home drive");
             toolTip1.SetToolTip(this.ScriptPath, "The full path to your login script (Runonce regkey!)");
-            toolTip1.SetToolTip(this.MaxStore, "Maximum profile size in kbytes\n0 == all space");
-            toolTip1.SetToolTip(this.ntp, "global imported space seperated list of ntp servers");
+            toolTip1.SetToolTip(this.MaxStore, "Maximum profile size in kbytes\nless or equal 10MB == all space");
+            toolTip1.SetToolTip(this.MaxStore_exclude, "Exclude Directories from user profile storage quota\nRegular-Expressions!");
+            toolTip1.SetToolTip(this.MaxStore_proquota_comboBox, "Text for proquota");
         }
 
         private void UiToSettings()
@@ -125,6 +143,25 @@ namespace pGina.Plugin.pgSMB2
             Settings.Store.HomeDir = this.HomeDir.Text.Trim();
             Settings.Store.HomeDirDrive = this.HomeDirDrive.Text.Trim();
             Settings.Store.ScriptPath = this.ScriptPath.Text.Trim();
+
+            try
+            {
+                Regex.IsMatch("foobar", this.MaxStore_exclude.Text.Trim());
+                Settings.StoreGlobal.MaxStoreExclude = this.MaxStore_exclude.Text.Trim();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, ex.Message, "A regular expression parsing error occurred");
+            }
+
+            List<MaxStoreText> proquota_text = this.MaxStore_proquota_comboBox.DataSource as List<MaxStoreText>;
+            List<string> proquota = new List<string>();
+            foreach (MaxStoreText d in proquota_text)
+            {
+                proquota.Add(String.Format("{0}\t{1}\n", d.Name, d.Value));
+            }
+            Settings.StoreGlobal.MaxStoreText = proquota.ToArray();
+
             Dictionary<string, string> ntps = pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "" });
             if (!ntps.ContainsKey("ntpservers") || String.IsNullOrEmpty(ntps["ntpservers"]))
             {
@@ -151,6 +188,26 @@ namespace pGina.Plugin.pgSMB2
         private void Btn_help(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation/plugins/pgsmb2.html");
+        }
+
+        private void MaxStore_proquota_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            MaxStoreText data = this.MaxStore_proquota_comboBox.SelectedItem as MaxStoreText;
+            this.MaxStore_proquota_richTextBox.Text = data.Value;
+        }
+
+        private void MaxStore_proquota_richTextBox_TextChanged(object sender, EventArgs e)
+        {
+            MaxStoreText selected = this.MaxStore_proquota_comboBox.SelectedItem as MaxStoreText;
+            List<MaxStoreText> data = this.MaxStore_proquota_comboBox.DataSource as List<MaxStoreText>;
+            for (int x = 0; x < data.Count;x++ )
+            {
+                if (data[x].Name == selected.Name)
+                {
+                    data[x].Value = this.MaxStore_proquota_richTextBox.Text;
+                }
+            }
+            this.MaxStore_proquota_comboBox.DataSource = data;
         }
     }
 }

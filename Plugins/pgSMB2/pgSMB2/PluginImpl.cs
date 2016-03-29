@@ -165,8 +165,9 @@ namespace pGina.Plugin.pgSMB2
                 {"UncompressCLI", Settings.Store.UncompressCLI.ToString()},
                 {"CompressCLI", Settings.Store.CompressCLI.ToString()},
                 {"MaxStore", (userInfo.usri4_max_storage > 0) ? userInfo.usri4_max_storage.ToString() : Settings.Store.MaxStore.ToString()},
-                {"ntp", (global_settings.ContainsKey("ntpservers")? global_settings["ntpservers"].Replace('\n',' ') : "")},
+                {"ntp", (global_settings.ContainsKey("ntpservers")? global_settings["ntpservers"].Replace('\0',' ') : "")},
                 /*maybe emty*/
+                {"MaxStoreExclude", Settings.StoreGlobal.MaxStoreExclude.ToString()},
                 {"HomeDir", (!String.IsNullOrEmpty(userInfo.usri4_home_dir)) ? userInfo.usri4_home_dir : Settings.Store.HomeDir.ToString()},
                 {"HomeDirDrive", (!String.IsNullOrEmpty(userInfo.usri4_home_dir_drive)) ? userInfo.usri4_home_dir_drive : Settings.Store.HomeDirDrive.ToString()},
                 {"ScriptPath", (!String.IsNullOrEmpty(userInfo.LoginScript)) ? userInfo.LoginScript : Settings.Store.ScriptPath.ToString()},
@@ -350,62 +351,94 @@ namespace pGina.Plugin.pgSMB2
                         }
                     }
 
-                    if (userInfo.Description.EndsWith("pGina created pgSMB2"))
+                    IntPtr hToken = Abstractions.WindowsApi.pInvokes.GetUserToken(userInfo.Username, null, userInfo.Password);
+                    if (hToken != IntPtr.Zero)
                     {
-                        if (!Abstractions.Windows.User.SetQuota(pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString(), Convert.ToUInt32(settings["MaxStore"])))
+                        string uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfilePath(hToken);
+                        if (String.IsNullOrEmpty(uprofile))
                         {
-                            m_logger.InfoFormat("{1} failed to set quota GPO for user {0}", userInfo.SID.ToString(), userInfo.Username);
+                            uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfileDir(hToken);
                         }
-                        else
-                        {
-                            m_logger.InfoFormat("{1} done quota GPO settings for user {0}", userInfo.SID.ToString(), userInfo.Username);
-                            try
-                            {
-                                Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, "proquota.exe");
-                            }
-                            catch (Exception ex)
-                            {
-                                m_logger.ErrorFormat("{2} Can't run application {0} because {1}", "proquota.exe", ex.ToString(), userInfo.Username);
-                            }
-                        }
+                        Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
+                        m_logger.InfoFormat("add LocalProfilePath:[{0}]", uprofile);
+                        // the profile realy exists there, instead of assuming it will be created or changed during a login (temp profile[win error reading profile])
+                        userInfo.LocalProfilePath = uprofile;
+                        properties.AddTrackedSingle<UserInformation>(userInfo);
 
-                        IntPtr hToken = Abstractions.WindowsApi.pInvokes.GetUserToken(userInfo.Username, null, userInfo.Password);
-                        if (hToken != IntPtr.Zero)
+                        if ((uprofile.Contains(@"\TEMP") && !userInfo.Username.StartsWith("temp", StringComparison.CurrentCultureIgnoreCase)) || Abstractions.Windows.User.IsProfileTemp(userInfo.SID.ToString()) == true)
                         {
-                            string uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfilePath(hToken);
-                            if (String.IsNullOrEmpty(uprofile))
-                            {
-                                uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfileDir(hToken);
-                            }
-                            Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
-                            // the profile realy exists there, instead of assuming it will be created or changed during a login (temp profile[win error reading profile])
-                            userInfo.LocalProfilePath = uprofile;
+                            m_logger.InfoFormat("TEMP profile detected");
+
+                            string userInfo_old_Description = userInfo.Description;
+                            userInfo.Description = "pGina created pgSMB2 tmp";
                             properties.AddTrackedSingle<UserInformation>(userInfo);
 
-                            if (uprofile.Contains(@"\TEMP"))
+                            pInvokes.structenums.USER_INFO_4 userinfo4 = new pInvokes.structenums.USER_INFO_4();
+                            if (pInvokes.UserGet(userInfo.Username, ref userinfo4))
                             {
-                                m_logger.InfoFormat("TEMP profile detected");
-
-                                userInfo.Description = "pGina created pgSMB2 tmp";
-                                properties.AddTrackedSingle<UserInformation>(userInfo);
-
-                                pInvokes.structenums.USER_INFO_4 userinfo4 = new pInvokes.structenums.USER_INFO_4();
-                                if (pInvokes.UserGet(userInfo.Username, ref userinfo4))
+                                userinfo4.logon_hours = IntPtr.Zero;
+                                userinfo4.comment = userInfo.Description;
+                                if (!pInvokes.UserMod(userInfo.Username, userinfo4))
                                 {
-                                    userinfo4.logon_hours = IntPtr.Zero;
-                                    userinfo4.comment = userInfo.Description;
-                                    if (!pInvokes.UserMod(userInfo.Username, userinfo4))
-                                    {
-                                        m_logger.ErrorFormat("Can't modify userinformation {0}", userInfo.Username);
-                                    }
+                                    m_logger.ErrorFormat("Can't modify userinformation {0}", userInfo.Username);
                                 }
-                                else
-                                {
-                                    m_logger.ErrorFormat("Can't get userinformation {0}", userInfo.Username);
-                                }
+                            }
+                            else
+                            {
+                                m_logger.ErrorFormat("Can't get userinformation {0}", userInfo.Username);
+                            }
 
+                            if (userInfo_old_Description.EndsWith("pGina created pgSMB2"))
+                            {
                                 Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), userInfo.Username, userInfo.Password, String.Format("pGina: Windows tmp Login {0} from {1}", userInfo.Username, Environment.MachineName), "Windows was unable to load the profile");
                             }
+                        }
+                    }
+
+
+                    if (userInfo.Description.EndsWith("pGina created pgSMB2"))
+                    {
+
+                        try
+                        {
+                            if (!EventLog.SourceExists("proquota"))
+                                EventLog.CreateEventSource("proquota", "Application");
+                        }
+                        catch
+                        {
+                            EventLog.CreateEventSource("proquota", "Application");
+                        }
+                        Abstractions.Windows.User.SetQuota(pInvokes.structenums.RegistryLocation.HKEY_USERS, userInfo.SID.ToString(), 0);
+
+                        string proquotaPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "proquota.exe");
+                        try
+                        {
+                            using (Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes", true))
+                            {
+                                if (key != null)
+                                {
+                                    bool proquota_exclude_found = false;
+                                    foreach (string ValueName in key.GetValueNames())
+                                    {
+                                        if (ValueName.Equals(proquotaPath, StringComparison.CurrentCultureIgnoreCase))
+                                        {
+                                            proquota_exclude_found = true;
+                                        }
+                                    }
+
+                                    if (!proquota_exclude_found)
+                                    {
+                                        key.SetValue(proquotaPath, 0, Microsoft.Win32.RegistryValueKind.DWord);
+                                    }
+                                }
+                            }
+                        }
+                        catch { }
+
+                        m_logger.InfoFormat("start session:{0} prog:{1}", SessionId, proquotaPath);
+                        if (!Abstractions.WindowsApi.pInvokes.StartUserProcessInSession(SessionId, proquotaPath + " \"" + userInfo.LocalProfilePath + "\" " + settings["MaxStore"]))
+                        {
+                            m_logger.ErrorFormat("{0} Can't run application {1}", userInfo.Username, "proquota.exe");
                         }
                     }
                 }

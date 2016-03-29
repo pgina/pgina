@@ -62,7 +62,7 @@ Source: "..\pGina\src\bin\*.exe"; DestDir: "{app}"; Flags: ignoreversion recurse
 Source: "..\pGina\src\bin\*.dll"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\pGina\src\bin\*.xml"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\pGina\src\bin\*.config"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-;Source: "..\Plugins\bin\*.exe"; DestDir: "{app}\Plugins"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\Plugins\bin\*.exe"; DestDir: "{app}\Plugins"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\Plugins\bin\*.dll"; DestDir: "{app}\Plugins"; Flags: ignoreversion recursesubdirs createallsubdirs
 ;Source: "..\Plugins\bin\*.xml"; DestDir: "{app}\Plugins"; Flags: ignoreversion recursesubdirs createallsubdirs
 ;Source: "..\Plugins\bin\*.config"; DestDir: "{app}\Plugins"; Flags: ignoreversion recursesubdirs createallsubdirs
