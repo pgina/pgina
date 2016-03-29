@@ -584,6 +584,7 @@ namespace pGina.Plugin.LocalMachine
                                 uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfileDir(hToken);
                             }
                             Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
+                            m_logger.InfoFormat("add LocalProfilePath:[{0}]", uprofile);
                             // the profile realy exists there, instead of assuming it will be created or changed during a login (temp profile[win error reading profile])
                             userInfo.LocalProfilePath = uprofile;
                             properties.AddTrackedSingle<UserInformation>(userInfo);
