@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("pGina Team")]
 [assembly: AssemblyProduct("MySQLAuth")]
-[assembly: AssemblyCopyright("Copyright © 2012 pGina Team")]
+[assembly: AssemblyCopyright("Copyright © pGina Team 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.2.4.1")]
-[assembly: AssemblyFileVersion("3.2.4.1")]
+[assembly: AssemblyVersion("3.9.9.0")]
+[assembly: AssemblyFileVersion("3.9.9.0")]

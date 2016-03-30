@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("scripting.Management")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("pGina Team")]
+[assembly: AssemblyCompany("Medical University of Vienna")]
 [assembly: AssemblyProduct("scripting.Management")]
-[assembly: AssemblyCopyright("Copyright © pGina Team 2014")]
+[assembly: AssemblyCopyright("Copyright © Medical University of Vienna 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("4.0.0.0")]
-[assembly: AssemblyFileVersion("4.0.0.0")]
+[assembly: AssemblyVersion("3.9.9.0")]
+[assembly: AssemblyFileVersion("3.9.9.0")]

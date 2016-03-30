@@ -6,7 +6,7 @@ management and login time actions.
 
 ## License
 
-Copyright (c) 2012, pGina Team
+Copyright (c) 2016, pGina Team
 
 All Rights Reserved.
 
