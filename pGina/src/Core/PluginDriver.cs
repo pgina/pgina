@@ -119,7 +119,10 @@ namespace pGina.Core
                 // Set the original username to the current username if not already set
                 UserInformation userInfo = m_properties.GetTrackedSingle<UserInformation>();
                 if (string.IsNullOrEmpty(userInfo.OriginalUsername))
+                {
                     userInfo.OriginalUsername = userInfo.Username;
+                    userInfo.OriginalPassword = userInfo.Password;
+                }
 
                 // Execute login
                 BeginChain();

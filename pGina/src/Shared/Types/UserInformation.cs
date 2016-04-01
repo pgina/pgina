@@ -134,6 +134,22 @@ namespace pGina.Shared.Types
         private string _Password;
 
         /// <summary>
+        /// The password provided by the user.
+        /// </summary>
+        public string OriginalPassword
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(_OriginalPassword)) ? "" : _OriginalPassword;
+            }
+            set
+            {
+                _OriginalPassword = value;
+            }
+        }
+        private string _OriginalPassword;
+
+        /// <summary>
         /// The old password
         /// </summary>
         public string oldPassword

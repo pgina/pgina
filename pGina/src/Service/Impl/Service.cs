@@ -594,12 +594,20 @@ namespace pGina.Service.Impl
                             UserInformation ui = sess.GetTrackedSingle<UserInformation>();
                             if (ui.Username != ui.OriginalUsername)
                             {
-                                sessionDriver.UserInformation.Username = ui.Username;
-                                sessionDriver.UserInformation.Domain = Environment.MachineName;
-                                sessionDriver.UserInformation.Password = ui.Password;
-                                result.Success = true;
+                                if (ui.OriginalPassword == sessionDriver.UserInformation.Password)
+                                {
+                                    sessionDriver.UserInformation.Username = ui.Username;
+                                    sessionDriver.UserInformation.Domain = Environment.MachineName;
+                                    sessionDriver.UserInformation.Password = ui.Password;
+                                    result.Success = true;
+                                    m_logger.InfoFormat("Unlock as:{0} for Session:{1}", sessionDriver.UserInformation.Username, msg.Session);
+                                }
+                                else
+                                {
+                                    result.Success = false;
+                                    result.Message = "Password incorrect!";
+                                }
                             }
-                            m_logger.InfoFormat("Unlock as:{0} for Session:{1}", sessionDriver.UserInformation.Username, msg.Session);
                         }
                     }
                     else
