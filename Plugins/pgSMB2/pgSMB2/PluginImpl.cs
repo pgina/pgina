@@ -289,9 +289,9 @@ namespace pGina.Plugin.pgSMB2
             {
                 UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
                 m_logger.DebugFormat("{1} SessionChange SessionLogoff for ID:{0}", SessionId, userInfo.Username);
-                m_logger.InfoFormat("{3} {0} {1} {2}", userInfo.Description.Contains("pGina created"), userInfo.HasSID, properties.CREDUI, userInfo.Username);
+                m_logger.InfoFormat("{3} {0} {1} {2}", userInfo.Description.Contains("pGina created pgSMB2"), userInfo.HasSID, properties.CREDUI, userInfo.Username);
 
-                if (userInfo.Description.Contains("pGina created") && userInfo.HasSID && !properties.CREDUI)
+                if (userInfo.Description.Contains("pGina created pgSMB2") && userInfo.HasSID && !properties.CREDUI)
                 {
                     try
                     {
@@ -324,7 +324,7 @@ namespace pGina.Plugin.pgSMB2
                 }
                 else
                 {
-                    m_logger.InfoFormat("{0} {1}. I'm not executing Notification stage", userInfo.Username, (properties.CREDUI) ? "has a program running in his context" : "is'nt a pGina created user");
+                    m_logger.InfoFormat("{0} {1}. I'm not executing Notification stage", userInfo.Username, (properties.CREDUI) ? "has a program running in his context" : "is'nt a pGina created pgSMB2 user");
                 }
             }
             if (Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
