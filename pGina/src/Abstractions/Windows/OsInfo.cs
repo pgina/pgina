@@ -67,8 +67,8 @@ namespace Abstractions.Windows
 
         public static string OsDescription()
         {
-            return string.Format("OS: {0} Runtime: {1} Culture: {2}", System.Environment.OSVersion.VersionString, System.Environment.Version, CultureInfo.InstalledUICulture.EnglishName);
-
+            pInvokes.structenums.OSVERSIONINFOW ver = pInvokes.VersionsInfo();
+            return string.Format("OS {0}.{1}.{2} Runtime: {3} Culture: {4}", ver.dwMajorVersion, ver.dwMinorVersion, ver.dwBuildNumber, System.Environment.Version, CultureInfo.InstalledUICulture.EnglishName);
         }
 
         public static bool Is7OrLater()
