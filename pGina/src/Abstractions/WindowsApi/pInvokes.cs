@@ -1201,19 +1201,35 @@ namespace Abstractions.WindowsApi
             return (sessionInfo.State == SafeNativeMethods.WTS_CONNECTSTATE_CLASS.WTSReset) ? true : false;
         }
 
+        public static string GetUserDomain(int sessionId)
+        {
+            uint bytes = 0;
+            IntPtr userInfo = IntPtr.Zero;
+
+            bool result = SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionId, SafeNativeMethods.WTS_INFO_CLASS.WTSDomainName, out userInfo, out bytes);
+            if (!result)
+            {
+                LibraryLogging.Error("GetUserDomain({1}) WTSQuerySessionInformation WTSUserName Error:{0}", LastError(), sessionId);
+            }
+            string userName = Marshal.PtrToStringAnsi(userInfo);
+            SafeNativeMethods.WTSFreeMemory(userInfo);
+
+            return userName;
+        }
+
         public static string GetUserName(int sessionId)
         {
             uint bytes = 0;
             IntPtr userInfo = IntPtr.Zero;
-            bool result = SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionId, SafeNativeMethods.WTS_INFO_CLASS.WTSUserName, out userInfo, out bytes);
 
+            bool result = SafeNativeMethods.WTSQuerySessionInformation(SafeNativeMethods.WTS_CURRENT_SERVER_HANDLE, sessionId, SafeNativeMethods.WTS_INFO_CLASS.WTSUserName, out userInfo, out bytes);
             if (!result)
             {
                 LibraryLogging.Error("GetUserName({1}) WTSQuerySessionInformation WTSUserName Error:{0}", LastError(), sessionId);
             }
-
             string userName = Marshal.PtrToStringAnsi(userInfo);
             SafeNativeMethods.WTSFreeMemory(userInfo);
+
             return userName;
         }
 

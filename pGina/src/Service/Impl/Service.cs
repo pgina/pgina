@@ -827,6 +827,19 @@ namespace pGina.Service.Impl
             {
                 lock (m_sessionPropertyCache)
                 {
+                    if (evnt == SessionChangeReason.SessionLogon && m_sessionPropertyCache.Exists(sessionID))
+                    {
+                        // if a user tried to logon but didnt pass the logonscreen (windows 8 and 10 lock screen bug) trash the info stored about that session
+                        UserInformation uInfo = m_sessionPropertyCache.Get(sessionID).First().GetTrackedSingle<UserInformation>();
+                        string sessionID_is = String.Format("{0}@{1}", Abstractions.WindowsApi.pInvokes.GetUserName(sessionID), Abstractions.WindowsApi.pInvokes.GetUserDomain(sessionID));
+                        string sessionID_should = String.Format("{0}@{1}", uInfo.Username, uInfo.Domain);
+                        if (!sessionID_is.Equals(sessionID_should, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            m_logger.InfoFormat("SessionLogon missmatch {0} != {1} removing SessionProperties", sessionID_is, sessionID_should);
+                            m_sessionPropertyCache.Remove(sessionID);
+                            return;
+                        }
+                    }
                     if (evnt == SessionChangeReason.SessionLogoff)
                     {
                             CREDUIhelper(sessionID);
