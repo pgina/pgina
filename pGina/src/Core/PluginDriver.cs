@@ -212,6 +212,7 @@ namespace pGina.Core
                         else
                         {
                             m_logger.WarnFormat("{0} Failed without a message", plugin.Uuid);
+                            finalResult.Message = String.Format("Failed to authenticate user: {0}", m_properties.GetTrackedSingle<UserInformation>().Username);
                         }
                     }
                 }
