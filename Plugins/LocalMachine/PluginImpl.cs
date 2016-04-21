@@ -310,8 +310,14 @@ namespace pGina.Plugin.LocalMachine
                     {
                         // We use a pInvoke here instead of using PrincipalContext.ValidateCredentials
                         // due to the fact that the latter will throw an exception when the network is disconnected.
-                        if (Abstractions.WindowsApi.pInvokes.ValidateCredentials(userInfo.Username, userInfo.Password))
+                        if (Abstractions.WindowsApi.pInvokes.ValidateUser(userInfo.Username, Environment.MachineName, userInfo.Password))
                         {
+                            if (!Abstractions.WindowsApi.pInvokes.ValidateCredentials(userInfo.Username, userInfo.Password))
+                            {
+                                userInfo.PasswordEXP = true;
+                                // windows itself will put on an error "pwd expired"
+                            }
+
                             m_logger.InfoFormat("Authenticated user: {0}", userInfo.Username);
                             userInfo.Domain = Environment.MachineName;
 
