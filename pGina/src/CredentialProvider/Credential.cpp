@@ -56,11 +56,21 @@ namespace pGina
 		IFACEMETHODIMP Credential::QueryInterface(__in REFIID riid, __deref_out void **ppv)
 		{
 			// And more crazy ass v-table madness, yay COM again!
+			static const QITAB qitCredUI[] =
+			{
+				QITABENT(Credential, ICredentialProviderCredential),
+				{ 0 },
+			};
 			static const QITAB qit[] =
 			{
 				QITABENT(Credential, ICredentialProviderCredential),
+				QITABENT(Credential, IConnectableCredentialProviderCredential),
 				{0},
 			};
+			if (m_usageScenario == CPUS_CREDUI)
+			{
+				return QISearch(this, qitCredUI, riid, ppv);
+			}
 			return QISearch(this, qit, riid, ppv);
 		}
 
@@ -243,17 +253,21 @@ namespace pGina
 			return E_NOTIMPL;
 		}
 
-		IFACEMETHODIMP Credential::GetSerialization(__out CREDENTIAL_PROVIDER_GET_SERIALIZATION_RESPONSE* pcpgsr, __out CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs,
-													__deref_out_opt PWSTR* ppwszOptionalStatusText, __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
+		IFACEMETHODIMP Credential::Connect(IQueryContinueWithStatus *pqcws)
 		{
+			// Reset m_loginResult
+			m_loginResult.Username(L"");
+			m_loginResult.Password(L"");
+			m_loginResult.Domain(L"");
+			m_loginResult.Message(L"");
+			m_loginResult.Result(false);
+
 			// Workout what our username, and password are.  Plugins are responsible for parsing out domain\machine name if needed
 			PWSTR username = FindUsernameValue();
 			PWSTR password = FindPasswordValue();
-			PWSTR domain = NULL;
 			pGina::Transactions::User::LoginResult loginResult;
-			HWND hdialog;
-			HANDLE hThread_dialog;
 			std::wstring title;
+			pGina::Memory::ObjectCleanupPool cleanup;
 
 			pGina::Protocol::LoginRequestMessage::LoginReason reason = pGina::Protocol::LoginRequestMessage::Login;
 			switch(m_usageScenario)
@@ -261,14 +275,12 @@ namespace pGina
 			case CPUS_LOGON:
 				if ( !pGina::Helpers::IsUserLocalAdmin(username) && !pGina::Service::StateHelper::GetState() )
 				{
-					pDEBUG(L"Credential::GetSerialization: pGina service is unavailable");
-					SHStrDupW(L"Your login request failed, because the pGina service is not running!\nOnly useres from the local administrator group are able to login.\n\nPlease contact your system administrator.\nReboot the machine to fix this issue.", ppwszOptionalStatusText);
+					pDEBUG(L"Credential::Connect: pGina service is unavailable");
+					m_loginResult.Message(L"Your login request failed, because the pGina service is not running!\nOnly useres from the local administrator group are able to login.\n\nPlease contact your system administrator.\nReboot the machine to fix this issue.");
 					SetStringValue(m_fields->usernameFieldIdx, (PCWSTR)L"");
 					SetStringValue(m_fields->passwordFieldIdx, (PCWSTR)L"");
 
-					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
-					*pcpsiOptionalStatusIcon = CPSI_ERROR;
-					return S_FALSE;
+					return S_OK;
 				}
 				break;
 			case CPUS_UNLOCK_WORKSTATION:
@@ -278,17 +290,16 @@ namespace pGina
 				reason = pGina::Protocol::LoginRequestMessage::CredUI;
 				break;
 			case CPUS_CHANGE_PASSWORD:
+				PWSTR domain = NULL;
 				PWSTR newPassword = NULL;
 				PWSTR newPasswordConfirm = NULL;
 
 				if ( !pGina::Service::StateHelper::GetState() )
 				{
-					pDEBUG(L"Credential::GetSerialization: pGina service is unavailable");
-					SHStrDupW(L"Your password change request failed, because the pGina service is not running!\n\nPlease contact your system administrator.\nReboot the machine to fix this issue.", ppwszOptionalStatusText);
+					pDEBUG(L"Credential::Connect: pGina service is unavailable");
+					m_loginResult.Message(L"Your password change request failed, because the pGina service is not running!\n\nPlease contact your system administrator.\nReboot the machine to fix this issue.");
 
-					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
-					*pcpsiOptionalStatusIcon = CPSI_ERROR;
-					return S_FALSE;
+					return S_OK;
 				}
 
 				title = L"Processing password change for ";
@@ -313,9 +324,7 @@ namespace pGina
 				// return a failure.
 				if( (newPassword == NULL || newPasswordConfirm == NULL) || wcscmp(newPassword, newPasswordConfirm ) != 0 )
 				{
-					SHStrDupW(L"New passwords do not match", ppwszOptionalStatusText);
-					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
-					*pcpsiOptionalStatusIcon = CPSI_ERROR;
+					m_loginResult.Message(L"New passwords do not match");
 					if (hdialog != NULL)
 					{
 						DestroyWindow(hdialog);
@@ -324,7 +333,8 @@ namespace pGina
 					{
 						BlockInput(false);
 					}
-					return S_FALSE;
+
+					return S_OK;
 				}
 
 				pGina::Service::StateHelper::PushUsername(username, password, pGina::Service::StateHelper::GetLoginChangePassword());
@@ -348,9 +358,6 @@ namespace pGina
 				}
 				else
 				{
-					// User Principal Name
-					// LogonUser wants username as user principal name if domain is null
-					// split the Down-Level Logon Name username into username and domain
 					pos = dom.find(L"@");
 					if (pos != std::wstring::npos)
 					{
@@ -374,18 +381,20 @@ namespace pGina
 					domain = _wcsdup(dom.c_str());
 				}
 
+				cleanup.AddFree(domain);
+
 				HANDLE hToken;
 				if (!LogonUser(username, domain, password, LOGON32_LOGON_NETWORK, LOGON32_PROVIDER_DEFAULT, &hToken))
 				{
 					// ERROR_PASSWORD_EXPIRED 1330
 					// ERROR_PASSWORD_MUST_CHANGE 1907
 					int passwdChangeRequired[3] = {GetLastError(), ERROR_PASSWORD_EXPIRED, ERROR_PASSWORD_MUST_CHANGE};
-					pERROR(L"Credential::GetSerialization: CPUS_CHANGE_PASSWORD LogonUser failed:%i", passwdChangeRequired[0]);
+					pERROR(L"Credential::Connect: CPUS_CHANGE_PASSWORD LogonUser failed:%i", passwdChangeRequired[0]);
 					for (int x = 1; x < 3; x++)
 					{
 						if (passwdChangeRequired[0] == passwdChangeRequired[x])
 						{
-							pERROR(L"Credential::GetSerialization: CPUS_CHANGE_PASSWORD LogonUser failed converted to success %d", passwdChangeRequired[0]);
+							pERROR(L"Credential::Connect: CPUS_CHANGE_PASSWORD LogonUser failed converted to success %d", passwdChangeRequired[0]);
 							passwdChangeRequired[0] = 0;
 							break;
 						}
@@ -396,10 +405,8 @@ namespace pGina
 					}
 					else
 					{
-						SHStrDupW(L"Your old password does not match", ppwszOptionalStatusText);
 						pDEBUG(L"Your old password does not match");
-						*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
-						*pcpsiOptionalStatusIcon = CPSI_ERROR;
+						m_loginResult.Message(L"Your old password does not match");
 						if (hdialog != NULL)
 						{
 							DestroyWindow(hdialog);
@@ -408,7 +415,8 @@ namespace pGina
 						{
 							BlockInput(false);
 						}
-						return S_FALSE;
+
+						return S_OK;
 					}
 				}
 				else
@@ -424,10 +432,8 @@ namespace pGina
 						loginResult.Message(L"Failed to change password, no message from plugins.");
 						pDEBUG(L"Failed to change password, no message from plugins.");
 					}
-					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);
 					pDEBUG(L"pGina::Transactions::User::ProcessChangePasswordForUser failed: %s", loginResult.Message().c_str());
-					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
-					*pcpsiOptionalStatusIcon = CPSI_ERROR;
+					m_loginResult.Message(loginResult.Message());
 					if (hdialog != NULL)
 					{
 						DestroyWindow(hdialog);
@@ -436,28 +442,22 @@ namespace pGina
 					{
 						BlockInput(false);
 					}
-					return S_FALSE;
+					return S_OK;
 				}
 
 				pGina::Service::StateHelper::PushUsername(pGina::Service::StateHelper::GetUsername(), newPassword, pGina::Service::StateHelper::GetLoginChangePassword());
 
 				if(loginResult.Message().length() > 0)
-					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);
+					m_loginResult.Message(loginResult.Message());
 				else
-					SHStrDupW(L"pGina: Your password was successfully changed", ppwszOptionalStatusText);
-
-				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
-				*pcpsiOptionalStatusIcon = CPSI_SUCCESS;
-				if (hdialog != NULL)
-				{
-					DestroyWindow(hdialog);
-				}
-				else
-				{
-					BlockInput(false);
-				}
+					m_loginResult.Message(L"pGina: Your password was successfully changed");
 
 				pDEBUG(L"change password success");
+
+				m_loginResult.Username(loginResult.Username());
+				m_loginResult.Password(loginResult.Password());
+				m_loginResult.Domain(loginResult.Domain());
+				m_loginResult.Result(true);
 
 				return S_OK;
 				break;
@@ -465,7 +465,6 @@ namespace pGina
 
 			if (m_usageScenario == CPUS_CREDUI)
 			{
-				//swprintf(title, 128, L"%s %s", L"Processing UAC for", (LPWSTR)username);
 				title = L"Processing UAC for ";
 				title.append(username);
 				hdialog = CreateWindowEx(WS_EX_TOPMOST, L"Static", title.c_str(), WS_DLGFRAME, (int)(GetSystemMetrics(SM_CXFULLSCREEN)/2)-137, (int)GetSystemMetrics(SM_CYFULLSCREEN)/2, 275, 15, ::GetForegroundWindow(), NULL, GetMyInstance(), NULL);
@@ -480,24 +479,28 @@ namespace pGina
 			}
 			else
 			{
-				//swprintf(title, 128, L"%s %s", L"Processing Login for", (LPWSTR)username);
 				title = L"Processing logon for ";
 				title.append(username);
 				hThread_dialog = CreateThread(NULL, 0, Credential::Thread_dialog, (LPVOID) title.c_str(), 0, NULL);
+
+				if( pqcws )
+				{
+					pqcws->SetStatusMessage(L"You will be logged in.\nResistance is futile!");
+				}
 			}
 
-			pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);
+			pDEBUG(L"Credential::Connect: Processing login for %s", username);
 			loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password, reason);
 			if(!loginResult.Result() && (m_usageScenario != CPUS_CREDUI))
 			{
-				pERROR(L"Credential::GetSerialization: Failed attempt");
+				pERROR(L"Credential::Connect: Failed attempt");
 				if(loginResult.Message().length() > 0)
 				{
-					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);
+					m_loginResult.Message(loginResult.Message());
 				}
 				else
 				{
-					SHStrDupW(L"Plugins did not provide a specific error message", ppwszOptionalStatusText);
+					m_loginResult.Message(L"Plugins did not provide a specific error message");
 				}
 				if (pGina::Registry::GetBool(L"LastUsernameEnable", false))
 				{
@@ -512,13 +515,11 @@ namespace pGina
 				}
 				ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, false);
 
-				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
-				*pcpsiOptionalStatusIcon = CPSI_ERROR;
 				if (hThread_dialog != NULL)
 				{
 					Credential::Thread_dialog_close(hThread_dialog);
 				}
-				return S_FALSE;
+				return S_OK;
 			}
 
 			// At this point the info has passed to the service and been validated, so now we have to pack it up and provide it back to
@@ -526,12 +527,79 @@ namespace pGina
 
 			pGina::Service::StateHelper::PushUsername(username, password, pGina::Service::StateHelper::GetLoginChangePassword());
 
+			m_loginResult.Username(loginResult.Username());
+			m_loginResult.Password(loginResult.Password());
+			m_loginResult.Domain(loginResult.Domain());
+			m_loginResult.Result(true);
+
+			return S_OK;
+		}
+
+		IFACEMETHODIMP Credential::GetSerialization(__out CREDENTIAL_PROVIDER_GET_SERIALIZATION_RESPONSE* pcpgsr, __out CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs,
+													__deref_out_opt PWSTR* ppwszOptionalStatusText, __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
+		{
+			// Credential::Connect will have executed prior to this method, which contacts the
+			// service, so m_loginResult should have the result from the plugins.
+
+			if (m_usageScenario == CPUS_CREDUI)
+			{
+				Credential::Connect(NULL);
+			}
+			if (m_usageScenario == CPUS_CHANGE_PASSWORD && m_loginResult.Result())
+			{
+				if(m_loginResult.Message().length() > 0)
+					SHStrDupW(m_loginResult.Message().c_str(), ppwszOptionalStatusText);
+				else
+					SHStrDupW(L"pGina: Your password was successfully changed", ppwszOptionalStatusText);
+
+				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
+				*pcpsiOptionalStatusIcon = CPSI_SUCCESS;
+				if (hdialog != NULL)
+				{
+					DestroyWindow(hdialog);
+				}
+				else
+				{
+					BlockInput(false);
+				}
+
+				return S_OK;
+			}
+
+			if (!m_loginResult.Result())
+			{
+				if(m_loginResult.Message().length() > 0)
+				{
+					SHStrDupW(m_loginResult.Message().c_str(), ppwszOptionalStatusText);
+				}
+				else
+				{
+					SHStrDupW(L"Process login failed, but a specific error message was not provided", ppwszOptionalStatusText);
+				}
+
+				if (hThread_dialog != NULL)
+				{
+					Credential::Thread_dialog_close(hThread_dialog);
+				}
+				if(hdialog != NULL)
+				{
+					DestroyWindow(hdialog);
+				}
+				else
+				{
+					BlockInput(false);
+				}
+				ClearZeroAndFreeAnyTextFields(true);
+				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
+				*pcpsiOptionalStatusIcon = CPSI_ERROR;
+
+				return S_FALSE;
+			}
+
 			pGina::Memory::ObjectCleanupPool cleanup;
-
-			username = loginResult.Username().length() > 0 ? _wcsdup(loginResult.Username().c_str()) : NULL;
-			password = loginResult.Password().length() > 0 ? _wcsdup(loginResult.Password().c_str()) : NULL;
-			domain = loginResult.Domain().length() > 0 ? _wcsdup(loginResult.Domain().c_str()) : NULL;
-
+			PWSTR username = m_loginResult.Username().length() > 0 ? _wcsdup(m_loginResult.Username().c_str()) : NULL;
+			PWSTR password = m_loginResult.Password().length() > 0 ? _wcsdup(m_loginResult.Password().c_str()) : NULL;
+			PWSTR domain   = m_loginResult.Domain().length()   > 0 ? _wcsdup(m_loginResult.Domain().c_str())   : NULL;
 			cleanup.AddFree(username);
 			cleanup.AddFree(password);
 			cleanup.AddFree(domain);
@@ -552,6 +620,7 @@ namespace pGina
 				{
 					BlockInput(false);
 				}
+
 				return result;
 			}
 
@@ -608,13 +677,14 @@ namespace pGina
 					if(hdialog != NULL)
 					{
 						DestroyWindow(hdialog);
-						MessageBox(::GetForegroundWindow(), loginResult.Message().c_str(), L"Error during login", MB_OK);
+						MessageBox(::GetForegroundWindow(), m_loginResult.Message().c_str(), L"Error during login", MB_OK);
 					}
 					else
 					{
 						BlockInput(false);
 					}
 					pGina::Transactions::LoginInfo::Move(username, L"", L"", pGina::Helpers::GetCurrentSessionId(), -1);
+
 					return result;
 				}
 			}
@@ -629,6 +699,7 @@ namespace pGina
 					{
 						Credential::Thread_dialog_close(hThread_dialog);
 					}
+
 					return result;
 				}
 
@@ -640,6 +711,7 @@ namespace pGina
 					{
 						Credential::Thread_dialog_close(hThread_dialog);
 					}
+
 					return result;
 				}
 			}
@@ -660,6 +732,7 @@ namespace pGina
 				{
 					BlockInput(false);
 				}
+
 				return result;
 			}
 
@@ -679,6 +752,7 @@ namespace pGina
 			{
 				BlockInput(false);
 			}
+
 			return S_OK;
 		}
 
@@ -704,6 +778,11 @@ namespace pGina
 			}
 
 			return S_OK;
+		}
+
+		IFACEMETHODIMP Credential::Disconnect()
+		{
+			return E_NOTIMPL;
 		}
 
 		Credential::Credential() :

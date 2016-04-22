@@ -384,7 +384,11 @@ namespace pGina
 				return E_INVALIDARG;
 
 			// Alright... QueryIface for ICredentialProviderCredential
-			return m_credential->QueryInterface(IID_ICredentialProviderCredential, reinterpret_cast<void **>(ppcpc));
+			if (m_usageScenario == CPUS_CREDUI)
+			{
+				return m_credential->QueryInterface(IID_ICredentialProviderCredential, reinterpret_cast<void **>(ppcpc));
+			}
+			return m_credential->QueryInterface(IID_IConnectableCredentialProviderCredential, reinterpret_cast<void **>(ppcpc));
 		}
 
 		IFACEMETHODIMP Provider::GetFieldDescriptorForUi(UI_FIELDS const& fields, DWORD index, CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR **ppcpfd)
