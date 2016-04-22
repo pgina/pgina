@@ -95,17 +95,8 @@ namespace Abstractions.Pipes
             writer.Flush();
         }
 
-        protected void HandlePipeConnection(PipeStream pipeStream, IDictionary<string, object> initialMessage)
+        protected void HandlePipeConnection(BinaryReader reader, BinaryWriter writer, IDictionary<string, object> initialMessage)
         {
-            // You think we'd scope these with using() right? They are IDisposable
-            //  after all... but nope, the implementation of these is such that
-            //  disposing of them also disposes the underlying stream.  Leaving us
-            //  with a double (or triple if we close the pipeServer stream ourselves)
-            //  close.  Yay.  Instead we abandoned these to the GC knowing that they
-            //  are only wrappers anyway and have/use little/no resources of their own.
-            BinaryReader reader = new BinaryReader(pipeStream, Encoding.Unicode);
-            BinaryWriter writer = new BinaryWriter(pipeStream, Encoding.Unicode);
-
             try
             {
                 // If we should announce with a specific message, do so
@@ -125,17 +116,6 @@ namespace Abstractions.Pipes
             catch(Exception e)
             {
                 LibraryLogging.Error("Error while using pipe connection: {0}", e);
-            }
-
-            try
-            {
-                pipeStream.Flush();
-                pipeStream.WaitForPipeDrain();
-                pipeStream.Close();
-            }
-            catch(Exception e)
-            {
-                LibraryLogging.Error("Error while flushing/closing pipe connection: {0}", e);
             }
         }
     }

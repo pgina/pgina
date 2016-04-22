@@ -155,7 +155,13 @@ namespace Abstractions.Pipes
 
                         // Handle this connection, note that we always expect client to initiate the
                         //  flow of messages, so we do not include an initial message
-                        HandlePipeConnection(pipeServer, null);
+                        using (BinaryReader reader = new BinaryReader(pipeServer, Encoding.Unicode/*, true*/))
+                        {
+                            using (BinaryWriter writer = new BinaryWriter(pipeServer, Encoding.Unicode/*, true*/))
+                            {
+                                HandlePipeConnection(reader, writer, null);
+                            }
+                        }
                     }
                 }
                 catch (Exception e)

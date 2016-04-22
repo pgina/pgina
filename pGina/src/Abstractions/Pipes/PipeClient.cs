@@ -100,7 +100,7 @@ namespace Abstractions.Pipes
                             LibraryLogging.Error("Error connecting PipeClient: {0}", e);
                             return;
                         }
-                        Thread.Sleep(250);
+                        Thread.Sleep(100);
                     }
                 }
 
@@ -108,7 +108,13 @@ namespace Abstractions.Pipes
                 //  error handling to prevent a pipe error exception
                 try
                 {
-                    HandlePipeConnection(pipeClient, initialMessage);
+                    using (BinaryReader reader = new BinaryReader(pipeClient, Encoding.Unicode/*, true*/))
+                    {
+                        using (BinaryWriter writer = new BinaryWriter(pipeClient, Encoding.Unicode/*, true*/))
+                        {
+                            HandlePipeConnection(reader, writer, null);
+                        }
+                    }
                 }
                 catch (IOException)
                 {
