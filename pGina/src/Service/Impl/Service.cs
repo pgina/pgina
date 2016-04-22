@@ -292,6 +292,10 @@ namespace pGina.Service.Impl
                 sessionDriver.UserInformation.Password = (String.IsNullOrEmpty(msg.Password)) ? "" : msg.Password;
                 sessionDriver.UserInformation.Domain = msg.Domain;
                 sessionDriver.UserInformation.SessionID = msg.Session;
+                if (msg.Reason == LoginRequestMessage.LoginReason.CredUI)
+                {
+                    sessionDriver.SessionProperties.CREDUI = true;
+                }
 
                 if (String.IsNullOrEmpty(sessionDriver.UserInformation.Username))
                 {
@@ -557,14 +561,6 @@ namespace pGina.Service.Impl
                                         sessionDriver.SessionProperties.AddTrackedSingle<UserInformation>(ui);
                                         m_logger.InfoFormat("ses add LocalProfilePath:[{0}]", ui.LocalProfilePath);
                                     }
-                                }
-                                if (msg.Reason == LoginRequestMessage.LoginReason.CredUI)
-                                {
-                                    sessionDriver.SessionProperties.CREDUI = true;
-                                }
-                                else
-                                {
-                                    sessionDriver.SessionProperties.CREDUI = false;
                                 }
                                 ses.Add(sessionDriver.SessionProperties);
                                 m_logger.InfoFormat("add user {0} to sessioninfo:{1} GUID:{2} CREDUI:{3}", sessionDriver.UserInformation.Username, msg.Session, sessionDriver.SessionProperties.Id, (msg.Reason == LoginRequestMessage.LoginReason.CredUI) ? "true" : "false");
