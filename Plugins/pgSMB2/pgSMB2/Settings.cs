@@ -63,6 +63,7 @@ namespace pGina.Plugin.pgSMB2
                 "MaxStoreErrorText\tYou have exceeded your profile storage space.\nBefore you can log off, you need to move some items from your profile to network or local storage.",
                 "MaxStoreCalculateText\tcalculate"
             });
+            m_settings_global.SetDefault("ACE", "this has to be set by pgina to adapt the user access to this key");
         }
 
         public static dynamic Store
