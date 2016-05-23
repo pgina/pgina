@@ -1348,7 +1348,7 @@ namespace pGina.Service.Impl
                 if (String.IsNullOrEmpty(domain))
                 {
                     ret["username"] = username;
-                    ret["domain"] = "";
+                    ret["domain"] = Environment.MachineName;
                 }
             }
 
