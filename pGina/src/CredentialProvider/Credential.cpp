@@ -525,7 +525,7 @@ namespace pGina
 			// At this point the info has passed to the service and been validated, so now we have to pack it up and provide it back to
 			// LogonUI/Winlogon as a serialized/packed logon structure.
 
-			pGina::Service::StateHelper::PushUsername(username, password, pGina::Service::StateHelper::GetLoginChangePassword());
+			pGina::Service::StateHelper::PushUsername(username, (password)? password: L"", pGina::Service::StateHelper::GetLoginChangePassword());
 
 			m_loginResult.Username(loginResult.Username());
 			m_loginResult.Password(loginResult.Password());
@@ -692,7 +692,7 @@ namespace pGina
 			{
 				// Init kiul
 				KERB_INTERACTIVE_UNLOCK_LOGON kiul;
-				result = Microsoft::Sample::KerbInteractiveUnlockLogonInit(domain, username, password, m_usageScenario, &kiul);
+				result = Microsoft::Sample::KerbInteractiveUnlockLogonInit(domain, username, (password)? password : L"", m_usageScenario, &kiul);
 				if(!SUCCEEDED(result))
 				{
 					if (hThread_dialog != NULL)
