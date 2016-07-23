@@ -280,10 +280,18 @@ namespace pGina.Plugin.Ldap
                 if( m_encryptionMethod == Settings.EncryptionMethod.START_TLS )
                 {
                     m_logger.DebugFormat("Stopping TLS");
-                    m_conn.SessionOptions.StopTransportLayerSecurity();
+                    try
+                    {
+                        m_conn.SessionOptions.StopTransportLayerSecurity();
+
+                    } catch(Exception e)
+                    {
+                        m_logger.DebugFormat("Stopping TLS Failed, but continuing with disconnect...");
+                    }
                 }
                 m_conn.Dispose();
                 m_conn = null;
+                m_logger.DebugFormat("Disposed of connection.");
             }
         }
 
