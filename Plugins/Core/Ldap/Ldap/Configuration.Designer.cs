@@ -54,6 +54,8 @@
             this.groupDNPattern = new System.Windows.Forms.TextBox();
             this.allowEmptyPwCB = new System.Windows.Forms.CheckBox();
             this.dnPatternTextBox = new System.Windows.Forms.TextBox();
+            this.groupGidAttrIU = new System.Windows.Forms.TextBox();
+            this.groupGidAttr = new System.Windows.Forms.TextBox();
             this.authzApplyToAllUsersCB = new System.Windows.Forms.CheckBox();
             this.ldapServerGroupBox = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
@@ -71,6 +73,8 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.m_useAuthBindForAuthzAndGatewayCb = new System.Windows.Forms.CheckBox();
@@ -100,6 +104,7 @@
             this.changePasswordDeleteAttribBtn = new System.Windows.Forms.Button();
             this.label9 = new System.Windows.Forms.Label();
             this.passwordAttributesDGV = new System.Windows.Forms.DataGridView();
+            this.label14 = new System.Windows.Forms.Label();
             this.ldapServerGroupBox.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -350,6 +355,22 @@
             this.descriptionToolTip.SetToolTip(this.dnPatternTextBox, "Pattern used to generate a DN from a user name.  Use\r\n%u as a placeholder for the" +
         " user name.");
             // 
+            // groupGidAttrIU
+            // 
+            this.groupGidAttrIU.Location = new System.Drawing.Point(316, 45);
+            this.groupGidAttrIU.Name = "groupGidAttrIU";
+            this.groupGidAttrIU.Size = new System.Drawing.Size(118, 20);
+            this.groupGidAttrIU.TabIndex = 5;
+            this.descriptionToolTip.SetToolTip(this.groupGidAttrIU, "The attribute that stores the GID\'s a user is member of. (optional)");
+            // 
+            // groupGidAttr
+            // 
+            this.groupGidAttr.Location = new System.Drawing.Point(534, 48);
+            this.groupGidAttr.Name = "groupGidAttr";
+            this.groupGidAttr.Size = new System.Drawing.Size(118, 20);
+            this.groupGidAttr.TabIndex = 7;
+            this.descriptionToolTip.SetToolTip(this.groupGidAttr, "The attribute that stores the group\'s ID (GID).");
+            // 
             // authzApplyToAllUsersCB
             // 
             this.authzApplyToAllUsersCB.AutoSize = true;
@@ -525,16 +546,39 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.label14);
+            this.groupBox4.Controls.Add(this.groupGidAttr);
+            this.groupBox4.Controls.Add(this.label13);
+            this.groupBox4.Controls.Add(this.groupGidAttrIU);
+            this.groupBox4.Controls.Add(this.label11);
             this.groupBox4.Controls.Add(this.groupDNPattern);
             this.groupBox4.Controls.Add(this.label4);
             this.groupBox4.Controls.Add(this.groupMemberAttrTB);
             this.groupBox4.Controls.Add(this.label5);
             this.groupBox4.Location = new System.Drawing.Point(6, 295);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(660, 54);
+            this.groupBox4.Size = new System.Drawing.Size(660, 106);
             this.groupBox4.TabIndex = 17;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Groups";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(456, 51);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(72, 13);
+            this.label13.TabIndex = 6;
+            this.label13.Text = "Gid Attribute *";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(202, 48);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(108, 13);
+            this.label11.TabIndex = 4;
+            this.label11.Text = "Gid Attribute in User *";
             // 
             // groupBox3
             // 
@@ -857,6 +901,15 @@
             this.passwordAttributesDGV.Size = new System.Drawing.Size(648, 170);
             this.passwordAttributesDGV.TabIndex = 0;
             // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(542, 78);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(110, 13);
+            this.label14.TabIndex = 8;
+            this.label14.Text = "* = optional for groups";
+            // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -962,5 +1015,10 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.CheckBox m_useAuthBindForAuthzAndGatewayCb;
         private System.Windows.Forms.CheckBox authzApplyToAllUsersCB;
+        private System.Windows.Forms.TextBox groupGidAttr;
+        private System.Windows.Forms.TextBox groupGidAttrIU;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label14;
     }
 }

@@ -136,6 +136,12 @@ namespace pGina.Plugin.Ldap
             string grpMemberAttrib = Settings.Store.GroupMemberAttrib;
             this.groupMemberAttrTB.Text = grpMemberAttrib;
 
+            string GroupGidAttrib = Settings.Store.GroupGidAttrib;
+            this.groupGidAttr.Text = GroupGidAttrib;
+
+            string GroupGidAttribIU = Settings.Store.GroupGidAttribIU;
+            this.groupGidAttrIU.Text = GroupGidAttribIU;
+
             int derefValue = Settings.Store.Dereference;
             this.DereferenceComboBox.SelectedIndex = derefValue;
 
@@ -356,6 +362,28 @@ namespace pGina.Plugin.Ldap
                 MessageBox.Show("WARNING: You should provide a Group DN Pattern and Member Attribute when \n" +
                     " using one or more group authorization or gateway rules.");
             }
+
+            if (
+                (
+                    ( !string.IsNullOrEmpty(this.groupGidAttr.Text.Trim()) ) || 
+                    ( !string.IsNullOrEmpty(this.groupGidAttrIU.Text.Trim()) ) 
+                )
+                && 
+                (
+                    string.IsNullOrEmpty(this.groupDNPattern.Text.Trim()) ||
+                    string.IsNullOrEmpty(this.groupMemberAttrTB.Text.Trim()) ||
+                    string.IsNullOrEmpty(this.groupGidAttr.Text.Trim()) ||
+                    string.IsNullOrEmpty(this.groupGidAttrIU.Text.Trim())
+                )
+
+                )
+
+            {
+                MessageBox.Show("ERROR: To use the gid Attributes all group info needs to be filled in!");
+                return false;
+            }
+
+
             // TODO: Make sure that other input is valid.
 
             return true;
@@ -373,6 +401,8 @@ namespace pGina.Plugin.Ldap
             Settings.Store.SetEncryptedSetting("SearchPW", searchPassTextBox.Text);
             Settings.Store.GroupDnPattern = this.groupDNPattern.Text.Trim();
             Settings.Store.GroupMemberAttrib = this.groupMemberAttrTB.Text.Trim();
+            Settings.Store.GroupGidAttrib = this.groupGidAttr.Text.Trim();
+            Settings.Store.GroupGidAttribIU = this.groupGidAttrIU.Text.Trim();
             Settings.Store.Dereference = this.DereferenceComboBox.SelectedIndex;
             Settings.Store.UseAuthBindForAuthzAndGateway = this.m_useAuthBindForAuthzAndGatewayCb.Checked;
 
@@ -557,5 +587,6 @@ namespace pGina.Plugin.Ldap
         {
             UpdateSslElements();
         }
+
     }
 }

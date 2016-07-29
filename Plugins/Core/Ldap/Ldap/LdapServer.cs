@@ -37,6 +37,7 @@ using System.IdentityModel.Tokens;
 using System.IO;
 using System.Text.RegularExpressions;
 using pGina.Shared.Types;
+using System.Xml.Serialization;
 
 namespace pGina.Plugin.Ldap
 {
@@ -280,10 +281,18 @@ namespace pGina.Plugin.Ldap
                 if( m_encryptionMethod == Settings.EncryptionMethod.START_TLS )
                 {
                     m_logger.DebugFormat("Stopping TLS");
-                    m_conn.SessionOptions.StopTransportLayerSecurity();
+                    try
+                    {
+                        m_conn.SessionOptions.StopTransportLayerSecurity();
+
+                    } catch(Exception e)
+                    {
+                        m_logger.DebugFormat("Stopping TLS Failed, but continuing with disconnect...");
+                    }
                 }
                 m_conn.Dispose();
                 m_conn = null;
+                m_logger.DebugFormat("Disposed of connection.");
             }
         }
 
@@ -312,6 +321,8 @@ namespace pGina.Plugin.Ldap
         {
             string groupDn = Settings.Store.GroupDnPattern;
             string groupAttribute = Settings.Store.GroupMemberAttrib;
+            string groupGidAttribute = Settings.Store.GroupGidAttrib;
+            string groupGidAttributeIU = Settings.Store.GroupGidAttribIU;
 
             if (string.IsNullOrEmpty(groupDn))
                 throw new Exception("Can't resolve group DN, group DN pattern missing.");
@@ -341,13 +352,76 @@ namespace pGina.Plugin.Ldap
             }
 
             string filter = string.Format("({0}={1})", groupAttribute, target);
+
             m_logger.DebugFormat("Searching for group membership, DN: {0}  Filter: {1}", groupDn, filter);
             try
             {
+                
+                // Basic group check
                 SearchRequest req = new SearchRequest(groupDn, filter, SearchScope.Base, new string[] {"dn"});
                 req.Aliases = (DereferenceAlias)((int)Settings.Store.Dereference);
                 SearchResponse resp = (SearchResponse)m_conn.SendRequest(req);
-                return resp.Entries.Count > 0;
+
+                if( resp.Entries.Count > 0)
+                {
+                    return true;
+                }
+
+                
+                //We go and search for the GID of a group and see if the user has this GID set to.
+                //A group should only have 1 GID set, a user can have more than 1.
+                //We only check this if the user provides us with Attributes.
+                //We need not use this method if the user was allready found using the default way above.
+                //If this fails, we return 'False'
+                
+
+                // Check if we have attributes to search for
+                if (!string.IsNullOrEmpty(groupGidAttribute) && 
+                    !string.IsNullOrEmpty(groupGidAttributeIU ) )
+                {
+                    m_logger.DebugFormat("User not found in group, trying GID method");
+                    m_logger.DebugFormat("Using groupGidAttribute '{0}' to search for the GID", groupGidAttribute, target, groupDn);
+
+                // Go get the GID for the group
+                SearchRequest gidReq = new SearchRequest(groupDn, groupGidAttribute+"=*", SearchScope.Base, new string[] { groupGidAttribute });
+                gidReq.Aliases = (DereferenceAlias)((int)Settings.Store.Dereference);
+                SearchResponse gidResp = (SearchResponse)m_conn.SendRequest(gidReq);
+
+                    // Check if we have one, and only one response
+                    if (gidResp.Entries.Count == 1 && gidResp.Entries[0].Attributes[groupGidAttribute].Count == 1)
+                    {
+
+                        // Put the first answer in a string
+                        string gidForGroup = gidResp.Entries[0].Attributes[groupGidAttribute][0].ToString();
+
+                        m_logger.DebugFormat("Found GID to be {0}",  gidForGroup);
+
+                        string gidFilter = string.Format("({0}={1})", groupGidAttributeIU, gidForGroup);
+                        string userDN = FindUserDN(user);
+
+                        m_logger.DebugFormat("Searching in '{0}' for {1} ", userDN, gidFilter);
+
+
+                        //Go search to check is user is member
+                        SearchRequest gidIUReq = new SearchRequest(userDN, gidFilter, SearchScope.Base, new string[] { groupGidAttributeIU });
+                        gidIUReq.Aliases = (DereferenceAlias)((int)Settings.Store.Dereference);
+                        SearchResponse gidIUResp = (SearchResponse)m_conn.SendRequest(gidIUReq);
+
+                        return  gidIUResp.Entries.Count > 0;
+                
+                    }
+                    else
+                    {
+                        m_logger.DebugFormat("Could not find the GID ({0}) for group {1}",groupGidAttribute, groupDn);
+
+                    }
+
+                }
+                
+
+                //Nothing was found
+                return false;
+
             }
             catch (DirectoryOperationException e)
             {
