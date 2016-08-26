@@ -1968,7 +1968,15 @@ namespace Abstractions.WindowsApi
             int lngReturn = SafeNativeMethods.NetUserGetInfo((String.IsNullOrEmpty(domain)) ? null : domain, username, 4, out bufPtr);
             if (lngReturn == 0)
             {
-                userinfo4 = (structenums.USER_INFO_4)Marshal.PtrToStructure(bufPtr, typeof(structenums.USER_INFO_4));
+                try
+                {
+                    userinfo4 = (structenums.USER_INFO_4)Marshal.PtrToStructure(bufPtr, typeof(structenums.USER_INFO_4));
+                }
+                catch (Exception ex)
+                {
+                    LibraryLogging.Error("UserGet Marshal.PtrToStructure error:{0}", ex.ToString());
+                    return false;
+                }
             }
             else if (lngReturn == 2221)
             {
