@@ -495,6 +495,7 @@ namespace pGina.Plugin.pgSMB2
                     BooleanResult RetBool = ro.put(settings, userInfo.Username, userInfo.Password, userInfo.LocalProfilePath, userInfo.SID);
                     if (!RetBool.Success)
                     {
+                        m_logger.ErrorFormat("unable to Logoff {0} Error:{1}", userInfo.Username, RetBool.Message);
                         Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), userInfo.Username, userInfo.Password, String.Format("pGina: unable to Logoff {0} from {1}", userInfo.Username, Environment.MachineName), RetBool.Message);
                     }
                 }

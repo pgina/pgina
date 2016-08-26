@@ -178,15 +178,15 @@ namespace pGina.Plugin.pgSMB2
             m_logger = LogManager.GetLogger(String.Format("pgSMB2[Roaming:{0}]", username));
             try
             {
-                if (!PutProfile(settings, username, password, SID))
+                BooleanResult result = PutProfile(settings, username, password, LocalProfilePath, SID);
+                if (!result.Success)
                 {
-                    return new BooleanResult() { Success = false, Message = string.Format("Unable to upload the profile") };
+                    return new BooleanResult() { Success = false, Message = string.Format("Unable to upload the profile {0}", result.Message) };
                 }
             }
             catch (Exception ex)
             {
-                m_logger.ErrorFormat("Error {0} during profile upload", ex.Message);
-                return new BooleanResult() { Success = false, Message = string.Format("Unable to upload the profile") };
+                return new BooleanResult() { Success = false, Message = string.Format("Error {0} during profile upload", ex.ToString()) };
             }
 
             return new BooleanResult() { Success = true };
@@ -204,7 +204,7 @@ namespace pGina.Plugin.pgSMB2
             }
             if (!File.Exists(uPath + "\\NTUSER.DAT"))
             {
-                return false;
+                return new BooleanResult() { Success = false, Message = String.Format("Unable to find \"{0}{1}\"", uPath, "\\NTUSER.DAT") };
             }
 
             if (!settings["MaxStore"].Equals("0"))
@@ -212,14 +212,12 @@ namespace pGina.Plugin.pgSMB2
                 long uPath_size = GetDirectorySize(uPath, settings["MaxStoreExclude"]);
                 if (uPath_size == 0)
                 {
-                    m_logger.ErrorFormat("User directory:{0} size returned:0", uPath);
-                    return false;
+                    return new BooleanResult() { Success = false, Message = String.Format("User directory:{0} size returned:0", uPath) };
                 }
                 uPath_size = Convert.ToInt64(uPath_size / 1024);
                 if (uPath_size > Convert.ToInt64(settings["MaxStore"]))
                 {
-                    m_logger.ErrorFormat("User directory:{0} MaxStore:{1} kbyte exceeded:{2} kbyte", uPath, Convert.ToInt64(settings["MaxStore"]), uPath_size);
-                    return false;
+                    return new BooleanResult() { Success = false, Message = String.Format("User directory:{0} MaxStore:{1} kbyte exceeded:{2} kbyte", uPath, Convert.ToInt64(settings["MaxStore"]), uPath_size) };
                 }
             }
 
@@ -288,8 +286,7 @@ namespace pGina.Plugin.pgSMB2
             }
             if (String.IsNullOrEmpty(ThereIsTheProfile))
             {
-                m_logger.ErrorFormat("Unable to find the file \"{0}\" in your compress command {1}", settings["Filename"], settings["CompressCLI"]);
-                return false;
+                return new BooleanResult() { Success = false, Message = String.Format("Unable to find the file \"{0}\" in your compress command {1}", settings["Filename"], settings["CompressCLI"]) };
             }
             else
             {
@@ -304,17 +301,15 @@ namespace pGina.Plugin.pgSMB2
             {
                 if (!Connect2share(settings["SMBshare"], username, password, Convert.ToUInt32(settings["ConnectRetry"]), false))
                 {
-                    m_logger.ErrorFormat("Unable to connect to {0}", settings["RoamingSource"]);
-                    return false;
+                    return new BooleanResult() { Success = false, Message = String.Format("Unable to connect to {0}", settings["RoamingSource"]) };
                 }
                 if (!Directory.Exists(settings["RoamingSource"]))
                 {
-                    m_logger.ErrorFormat("Can't find {0}", settings["RoamingSource"]);
                     if (!Connect2share(settings["SMBshare"], null, null, 0, true))
                     {
                         m_logger.WarnFormat("unable to disconnect from {0}", settings["RoamingSource"]);
                     }
-                    return false;
+                    return new BooleanResult() { Success = false, Message = String.Format("Can't find {0}", settings["RoamingSource"]) };
                 }
 
                 string remoteFile = settings["RoamingSource"] + "\\" + settings["Filename"];
@@ -398,6 +393,7 @@ namespace pGina.Plugin.pgSMB2
                 for (uint x = 0; x < Convert.ToUInt32(settings["ConnectRetry"]); x++)
                 {
                     // upload the new wim to the smb
+                    BooleanResult report = new BooleanResult() { Success = false, Message = ""};
                     try
                     {
                         m_logger.DebugFormat("File.Copy {0} {1}", ThereIsTheProfile, remoteFile);
@@ -406,6 +402,7 @@ namespace pGina.Plugin.pgSMB2
                     }
                     catch (Exception ex)
                     {
+                        report.Message = ex.Message;
                         m_logger.Debug(ex.Message);
                     }
 
@@ -416,7 +413,7 @@ namespace pGina.Plugin.pgSMB2
                             m_logger.WarnFormat("unable to disconnect from {0}", settings["RoamingSource"]);
                         }
                         Abstractions.Windows.Security.ReplaceFileSecurity(ThereIsTheProfile, new IdentityReference[] { new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null) }, FileSystemRights.FullControl, AccessControlType.Allow, InheritanceFlags.None, PropagationFlags.None);
-                        return false;
+                        return report;
                     }
                     else
                     {
@@ -449,9 +446,9 @@ namespace pGina.Plugin.pgSMB2
                     }
                 }
 
-                return true;
+                return new BooleanResult() { Success = true, Message = "" };
             }
-            return false;
+            return new BooleanResult() { Success = false, Message = "failed to compress the profile" };
         }
 
         private Boolean GetProfile(ref Dictionary<string,string> settings, string username, string password)
