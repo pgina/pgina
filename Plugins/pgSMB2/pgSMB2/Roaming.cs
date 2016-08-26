@@ -173,12 +173,12 @@ namespace pGina.Plugin.pgSMB2
             return new BooleanResult() { Success = true };
         }
 
-        public BooleanResult put(Dictionary<string, string> settings, string username, string password)
+        public BooleanResult put(Dictionary<string, string> settings, string username, string password, string LocalProfilePath, SecurityIdentifier SID)
         {
             m_logger = LogManager.GetLogger(String.Format("pgSMB2[Roaming:{0}]", username));
             try
             {
-                if (!PutProfile(settings, username, password))
+                if (!PutProfile(settings, username, password, SID))
                 {
                     return new BooleanResult() { Success = false, Message = string.Format("Unable to upload the profile") };
                 }
@@ -192,14 +192,18 @@ namespace pGina.Plugin.pgSMB2
             return new BooleanResult() { Success = true };
         }
 
-        private Boolean PutProfile(Dictionary<string, string> settings, string username, string password)
+        private BooleanResult PutProfile(Dictionary<string, string> settings, string username, string password, string LocalProfilePath, SecurityIdentifier SID)
         {
             int ret_code = -1;
 
-            string uPath = GetExistingUserProfile(username, password);
+            string uPath = LocalProfilePath; // should be set by sessionlogon
+            if (String.IsNullOrEmpty(LocalProfilePath))
+            {
+                m_logger.InfoFormat("LocalProfilePath is empty re-evaluate");
+                uPath = GetExistingUserProfile(username, password, SID.Value);
+            }
             if (!File.Exists(uPath + "\\NTUSER.DAT"))
             {
-                m_logger.ErrorFormat("Unable to find \"{0}\"", uPath + "\\NTUSER.DAT");
                 return false;
             }
 
@@ -524,15 +528,27 @@ namespace pGina.Plugin.pgSMB2
             return true;
         }
 
-        private string GetExistingUserProfile(string username, string password)
+        private string GetExistingUserProfile(string username, string password, string userSID = "")
         {
             Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
-            if (!Abstractions.WindowsApi.pInvokes.UserGet(username, ref userinfo4))
+            if (String.IsNullOrEmpty(userSID))
             {
-                m_logger.DebugFormat("Can't get userinfo for user {0}", username);
-                return "";
+                if (!Abstractions.WindowsApi.pInvokes.UserGet(username, ref userinfo4))
+                {
+                    m_logger.DebugFormat("Can't get userinfo for user {0}", username);
+                    return "";
+                }
+                try
+                {
+                    userSID = new SecurityIdentifier(userinfo4.user_sid).Value;
+                }
+                catch (Exception ex)
+                {
+                    m_logger.ErrorFormat("failed to convert SID for \"{0}\":{1}", userinfo4.name, ex.ToString());
+                    return "";
+                }
             }
-            string userSID = new SecurityIdentifier(userinfo4.user_sid).Value;
+
             if (!Abstractions.Windows.User.FixProfileList(userSID))
             {
                 m_logger.DebugFormat("Error in FixProfileList {0}", userSID);

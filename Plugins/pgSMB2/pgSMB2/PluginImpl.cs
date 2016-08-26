@@ -492,7 +492,7 @@ namespace pGina.Plugin.pgSMB2
                 Roaming ro = new Roaming();
                 if (!userInfo.Description.EndsWith(" tmp")) //its a tmp profile do not upload
                 {
-                    BooleanResult RetBool = ro.put(settings, userInfo.Username, userInfo.Password);
+                    BooleanResult RetBool = ro.put(settings, userInfo.Username, userInfo.Password, userInfo.LocalProfilePath, userInfo.SID);
                     if (!RetBool.Success)
                     {
                         Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { "notify_pass" }), userInfo.Username, userInfo.Password, String.Format("pGina: unable to Logoff {0} from {1}", userInfo.Username, Environment.MachineName), RetBool.Message);
