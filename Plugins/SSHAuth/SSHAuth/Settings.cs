@@ -13,10 +13,8 @@ namespace pGina.Plugin.SSHAuth
 
         static Settings()
         {
-            m_settings.SetDefault("Foo", "Bar");
-            m_settings.SetDefault("DoSomething", true);
-            m_settings.SetDefault("ListOfStuff", new string[] { "a", "b", "c" });
-            m_settings.SetDefault("Size", 1);
+            m_settings.SetDefault("Host", "localhost");
+            m_settings.SetDefault("Port", "22");
         }
 
         public static dynamic Store
