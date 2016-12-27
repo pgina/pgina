@@ -64,10 +64,10 @@ namespace pGina.Plugin.Kerberos
         /**
          * P/Invoke for the unmanaged function that will deal with the actual athentication of a user through Kerberos
          * */
-        [DllImport("authdll.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        [DllImport("authdll.dll", EntryPoint = "auth_user", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
         public static extern int auth_userx86(string Username, string Password, string Domain, string Ticket);
 
-        [DllImport("authdllx64.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        [DllImport("authdllx64.dll", EntryPoint = "auth_user", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
         public static extern int auth_userx64(string Username, string Password, string Domain, string Ticket);
 
         public static int auth_user(string Username, string Password, string Domain, string Ticket)
