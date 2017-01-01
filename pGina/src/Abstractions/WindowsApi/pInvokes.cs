@@ -456,6 +456,10 @@ namespace Abstractions.WindowsApi
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern bool CloseHandle(IntPtr hObject);
+
+            [DllImport("kernel32.dll")]
+            [return: MarshalAs(UnmanagedType.U4)]
+            public static extern int WTSGetActiveConsoleSessionId();
             #endregion
 
             #region advapi32.dll
@@ -493,6 +497,21 @@ namespace Abstractions.WindowsApi
             [DllImport("advapi32.dll", SetLastError = true)]
             public static extern bool RevertToSelf();
             #endregion
+        }
+
+        public static int GetSessionId()
+        {
+            int ret=0;
+            try
+            {
+                ret = SafeNativeMethods.WTSGetActiveConsoleSessionId();
+            }
+            catch
+            {
+                int lastError = Marshal.GetLastWin32Error();
+                throw new Win32Exception(lastError, "WTSGetActiveConsoleSessionId");
+            }
+            return ret;
         }
 
         public static IntPtr WTSQueryUserToken(int sessionId)

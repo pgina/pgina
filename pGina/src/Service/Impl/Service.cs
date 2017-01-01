@@ -146,6 +146,25 @@ namespace pGina.Service.Impl
             m_server.Stop();
         }
 
+        public Boolean OnCustomCommand()
+        {
+            Boolean result = false;
+            foreach (IPluginLogoffRequestAddTime plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
+            {
+                try
+                {
+                    if (plugin.LogoffRequestAddTime())
+                        result = true;
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("Ignoring unhandled exception from {0}: {1}", plugin.Uuid, e);
+                    result = false;
+                }
+            }
+            return result;
+        }
+
         public void SessionChange(SessionChangeDescription changeDescription)
         {
             m_logger.InfoFormat("SessionChange: {0} -> {1}", changeDescription.SessionId, changeDescription.Reason);
@@ -268,6 +287,17 @@ namespace pGina.Service.Impl
 
                 m_logger.DebugFormat("Processing LoginRequest for: {0} in session: {1} reason: {2}", 
                     sessionDriver.UserInformation.Username, msg.Session, msg.Reason);
+
+                // check if a plugin still does some logoff work for this user
+                Boolean thisUserLogoff = false;
+                foreach (IPluginLogoffRequestAddTime plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
+                {
+                    if (plugin.LoginUserRequest(sessionDriver.UserInformation.Username))
+                        thisUserLogoff = true;
+                }
+                if (thisUserLogoff)
+                    return new LoginResponseMessage() { Result = false, Message = String.Format("Still logoff work to do for user {0}\nWait a view seconds and retry", sessionDriver.UserInformation.Username) };
+
                 BooleanResult result = sessionDriver.PerformLoginProcess();
 
                 if (msg.Reason == LoginRequestMessage.LoginReason.Login)

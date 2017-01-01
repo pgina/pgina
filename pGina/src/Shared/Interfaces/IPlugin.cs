@@ -124,6 +124,27 @@ namespace pGina.Shared.Interfaces
     }
 
     /// <summary>
+    /// Plugins that want notification of shutdown events as they occur must implement this.
+    /// </summary>
+    public interface IPluginLogoffRequestAddTime : IPluginBase
+    {
+        /// <summary>
+        /// Called during a shutdown, after the GPO shutdown scripts
+        /// it requires a bool true to wait a while longer
+        /// </summary>
+        /// <param name="props"></param>
+        Boolean LogoffRequestAddTime();
+
+        /// <summary>
+        /// Called prior to authentication for every login.
+        /// to check if the user that tries to login is still logged out
+        /// bool false means the user can login
+        /// </summary>
+        /// <param name="username"></param>
+        Boolean LoginUserRequest(string username);
+    }
+
+    /// <summary>
     /// Plugins that want to have some persistent state between stages can implement this
     /// interface.  BeginChain will be called at the beginning of a login process and
     /// EndChain will be called when the login process completes (regardless of which stage

@@ -45,6 +45,7 @@
             this.pGinaServiceProjectInstaller.ServicesDependedOn = new string[] {
         "RpcSs"};
             this.pGinaServiceProjectInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+            this.pGinaServiceProjectInstaller.ServicesDependedOn = new string[] {"TermService"};
             // 
             // ProjectInstaller
             // 
