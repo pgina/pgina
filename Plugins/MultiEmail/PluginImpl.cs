@@ -153,7 +153,6 @@ namespace pGina.Plugin.MultiEmail
                     bool authenticated = false;
 
                     m_logger.DebugFormat(email_server.Server + ": Have network stream...");
-
                     //Authenticate based on protocol
                     if (protocol == "POP3")
                     {
@@ -205,24 +204,19 @@ namespace pGina.Plugin.MultiEmail
         {
             //Sets up network connection and returns the stream
             m_logger.DebugFormat(server + ": Connecting to {0}:{1}, {2} SSL", server, port, ssl ? "using" : "not using");
+            TcpClient socket = new TcpClient(server, port);
+            NetworkStream ns = socket.GetStream();
 
-            using (TcpClient socket = new TcpClient(server, port))
+            ns.ReadTimeout = timeout;
+            ns.WriteTimeout = timeout;
+
+            if (ssl)
             {
-                using (NetworkStream ns = socket.GetStream())
-                {
-
-                    ns.ReadTimeout = timeout;
-                    ns.WriteTimeout = timeout;
-
-                    if (ssl)
-                    {
-                        SslStream sns = new SslStream(ns, true);
-                        sns.AuthenticateAsClient(server);
-                        return sns;
-                    }
-                    return ns;
-                }
+                SslStream sns = new SslStream(ns, true);
+                sns.AuthenticateAsClient(server);
+                return sns;
             }
+            return ns;
         }
 
         /// <summary>
@@ -236,50 +230,46 @@ namespace pGina.Plugin.MultiEmail
         {
             try
             {
-                using (System.IO.StreamReader reader = new System.IO.StreamReader(stream))
+                System.IO.StreamReader reader = new System.IO.StreamReader(stream);
+                System.IO.StreamWriter writer = new System.IO.StreamWriter(stream);
+
+                String resp = getResponse(reader, server);
+                m_logger.DebugFormat(server + ": Initially connected: {0}", resp);
+
+                if (!resp.StartsWith("+OK"))
+                    throw new EMailAuthException(server + ": Invalid response from server.");
+
+                //Check the server welcome message for a timestamp to indicate APOP support
+                string apopHash = apopPass(resp, creds.Password);
+                if (apopHash != null)
                 {
-                    using (System.IO.StreamWriter writer = new System.IO.StreamWriter(stream))
-                    {
+                    writer.WriteLine(string.Format("APOP {0} {1}", creds.UserName, apopHash));
+                    writer.Flush();
 
-                        String resp = getResponse(reader, server);
-                        m_logger.DebugFormat(server + ": Initially connected: {0}", resp);
-
-                        if (!resp.StartsWith("+OK"))
-                            throw new EMailAuthException(server + ": Invalid response from server.");
-
-                        //Check the server welcome message for a timestamp to indicate APOP support
-                        string apopHash = apopPass(resp, creds.Password);
-                        if (apopHash != null)
-                        {
-                            writer.WriteLine(string.Format("APOP {0} {1}", creds.UserName, apopHash));
-                            writer.Flush();
-
-                            resp = getResponse(reader, server);
-                            m_logger.DebugFormat(server + ": APOP response: {0}", resp);
-                        }
-
-                        //No timestamp = no APOP support, sending plaintext
-                        else
-                        {
-                            writer.WriteLine("USER {0}", creds.UserName);
-                            writer.Flush();
-
-                            resp = getResponse(reader, server);
-                            m_logger.DebugFormat(server + ": USER resp: {0}", resp);
-
-                            writer.WriteLine("PASS {0}", creds.Password);
-                            writer.Flush();
-
-                            resp = getResponse(reader, server);
-                            m_logger.DebugFormat(server + ": PASS resp: {0}", resp);
-                        }
-
-                        //Say goodbye to server
-                        writer.WriteLine("QUIT");
-                        writer.Flush();
-                        return resp.StartsWith("+OK");
-                    }
+                    resp = getResponse(reader, server);
+                    m_logger.DebugFormat(server + ": APOP response: {0}", resp);
                 }
+
+                //No timestamp = no APOP support, sending plaintext
+                else
+                {
+                    writer.WriteLine("USER {0}", creds.UserName);
+                    writer.Flush();
+
+                    resp = getResponse(reader, server);
+                    m_logger.DebugFormat(server + ": USER resp: {0}", resp);
+
+                    writer.WriteLine("PASS {0}", creds.Password);
+                    writer.Flush();
+
+                    resp = getResponse(reader, server);
+                    m_logger.DebugFormat(server + ": PASS resp: {0}", resp);
+                }
+
+                //Say goodbye to server
+                writer.WriteLine("QUIT");
+                writer.Flush();
+                return resp.StartsWith("+OK");
             }
             catch (EMailAuthException) { throw; }
             catch (Exception e)
@@ -300,43 +290,39 @@ namespace pGina.Plugin.MultiEmail
         {   //Sends username/password to IMAP server and verifies successful login.
             try
             {
-                using (System.IO.StreamReader reader = new System.IO.StreamReader(stream))
+                System.IO.StreamReader reader = new System.IO.StreamReader(stream);
+                System.IO.StreamWriter writer = new System.IO.StreamWriter(stream);
+
+                String resp = getResponse(reader, server);
+                m_logger.DebugFormat(server + ": IMAP server: {0}", resp);
+
+                writer.WriteLine("li01 LOGIN {{{0}}}", creds.UserName.Length);
+                writer.Flush();
+                resp = getResponse(reader, server);
+                m_logger.DebugFormat(server + ": IMAP Server: {0}", resp);
+                if (!resp.StartsWith("+"))
+                    throw new EMailAuthException(string.Format(server + ": Unexpected response from server: {0}", resp));
+
+                writer.WriteLine("{0} {{{1}}}", creds.UserName, creds.Password.Length);
+                writer.Flush();
+                resp = getResponse(reader, server);
+                m_logger.DebugFormat(server + ": IMAP Server: {0}", resp);
+                if (!resp.StartsWith("+"))
+                    throw new EMailAuthException(string.Format(server + ": Unexpected response from server: {0}", resp));
+
+                writer.WriteLine(creds.Password);
+                writer.Flush();
+                do
                 {
-                    using (System.IO.StreamWriter writer = new System.IO.StreamWriter(stream))
-                    {
+                    resp = getResponse(reader, server);
+                    m_logger.DebugFormat(server + ": IMAP Server: {0}", resp);
+                } while (!resp.StartsWith("li01"));
 
-                        String resp = getResponse(reader, server);
-                        m_logger.DebugFormat(server + ": IMAP server: {0}", resp);
+                //Tell server we're disconnecting
+                writer.WriteLine("lo01 LOGOUT");
+                writer.Flush();
 
-                        writer.WriteLine("li01 LOGIN {{{0}}}", creds.UserName.Length);
-                        writer.Flush();
-                        resp = getResponse(reader, server);
-                        m_logger.DebugFormat(server + ": IMAP Server: {0}", resp);
-                        if (!resp.StartsWith("+"))
-                            throw new EMailAuthException(string.Format(server + ": Unexpected response from server: {0}", resp));
-
-                        writer.WriteLine("{0} {{{1}}}", creds.UserName, creds.Password.Length);
-                        writer.Flush();
-                        resp = getResponse(reader, server);
-                        m_logger.DebugFormat(server + ": IMAP Server: {0}", resp);
-                        if (!resp.StartsWith("+"))
-                            throw new EMailAuthException(string.Format(server + ": Unexpected response from server: {0}", resp));
-
-                        writer.WriteLine(creds.Password);
-                        writer.Flush();
-                        do
-                        {
-                            resp = getResponse(reader, server);
-                            m_logger.DebugFormat(server + ": IMAP Server: {0}", resp);
-                        } while (!resp.StartsWith("li01"));
-
-                        //Tell server we're disconnecting
-                        writer.WriteLine("lo01 LOGOUT");
-                        writer.Flush();
-
-                        return resp.StartsWith("li01 OK");
-                    }
-                }
+                return resp.StartsWith("li01 OK");
             }
             catch (EMailAuthException) { throw; }
             catch (Exception e)
@@ -407,7 +393,7 @@ namespace pGina.Plugin.MultiEmail
             List<ServersList> servers = new List<ServersList>();
             string jsonData = Settings.Store.Servers.ToString();
 
-            if (String.IsNullOrEmpty(jsonData))
+            if (!String.IsNullOrEmpty(jsonData))
             {
                 servers = m_jsonSerializer.Deserialize<List<ServersList>>(jsonData);
             }
