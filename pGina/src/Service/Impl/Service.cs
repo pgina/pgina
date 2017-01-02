@@ -287,6 +287,7 @@ namespace pGina.Service.Impl
                 PluginDriver sessionDriver = new PluginDriver();
                 bool LastUsernameEnable = Settings.Get.LastUsernameEnable;
 
+                string oriUsername = msg.Username; //to distinguish email from domain
                 msg = SplitDomainfromUsername(msg);
                 sessionDriver.UserInformation.Username = msg.Username;
                 sessionDriver.UserInformation.Password = (String.IsNullOrEmpty(msg.Password)) ? "" : msg.Password;
@@ -388,6 +389,15 @@ namespace pGina.Service.Impl
                         }
                     }
                 }
+
+                // for those who are logging in by using a mail address
+                if (oriUsername.Contains("@"))
+                {
+                    sessionDriver.UserInformation.Username = oriUsername;
+                    sessionDriver.UserInformation.Domain = Environment.MachineName;
+                    m_logger.DebugFormat("Reintegrate username from username:{0} domain:{1} to {2} and domain:{3}", msg.Username, msg.Domain, oriUsername, Environment.MachineName);
+                }
+                // mail mod end
 
                 BooleanResult result = new BooleanResult() { Success = true, Message = "" };
 
