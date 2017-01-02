@@ -1358,7 +1358,15 @@ namespace pGina.Service.Impl
                 if (String.IsNullOrEmpty(domain))
                 {
                     ret["username"] = username;
-                    ret["domain"] = Environment.MachineName;
+                    string domainmember = Abstractions.WindowsApi.pInvokes.GetMachineDomainMembershipEX();
+                    if (string.IsNullOrEmpty(domainmember))
+                    {
+                        ret["domain"] = Environment.MachineName;
+                    }
+                    else
+                    {
+                        ret["domain"] = domainmember;
+                    }
                 }
             }
 
