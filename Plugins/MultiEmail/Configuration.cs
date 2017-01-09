@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2016, pGina Team
+	Copyright (c) 2017, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
