@@ -391,7 +391,7 @@ namespace pGina.Service.Impl
                 }
 
                 // for those who are logging in by using a mail address
-                if (oriUsername.Contains("@"))
+                if (oriUsername.Contains("@") && !oriUsername.ToLower().Contains("@" + Environment.MachineName.ToLower()))
                 {
                     sessionDriver.UserInformation.Username = oriUsername;
                     sessionDriver.UserInformation.Domain = Environment.MachineName;
