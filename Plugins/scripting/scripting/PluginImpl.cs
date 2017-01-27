@@ -164,9 +164,11 @@ namespace pGina.Plugin.scripting
         {
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
             Dictionary<string, Dictionary<bool, string>> settings = GetSettings(userInfo);
-            Dictionary<bool, string> settings_sys = settings["authe_sys"];
+            Dictionary<bool, string> authe_sys = new Dictionary<bool, string>();
+            try { authe_sys = settings["authe_sys"]; }
+            catch { }
 
-            foreach(KeyValuePair<bool, string> line in settings_sys)
+            foreach (KeyValuePair<bool, string> line in authe_sys)
             {
                 if (!Run(userInfo.SessionID, line.Value, userInfo, line.Key, true))
                     return new BooleanResult { Success = false, Message = String.Format("failed to run:{0}", line.Value) };
@@ -194,7 +196,9 @@ namespace pGina.Plugin.scripting
         {
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
             Dictionary<string, Dictionary<bool, string>> settings = GetSettings(userInfo);
-            Dictionary<bool, string> autho_sys = settings["autho_sys"];
+            Dictionary<bool, string> autho_sys = new Dictionary<bool, string>();
+            try { autho_sys = settings["autho_sys"]; }
+            catch { }
 
             foreach (KeyValuePair<bool, string> line in autho_sys)
             {
@@ -205,15 +209,15 @@ namespace pGina.Plugin.scripting
             // return false if no other plugin succeeded
             BooleanResult ret = new BooleanResult() { Success = false };
             PluginActivityInformation pluginInfo = properties.GetTrackedSingle<PluginActivityInformation>();
-            foreach (Guid uuid in pluginInfo.GetAuthenticationPlugins())
+            foreach (Guid uuid in pluginInfo.GetAuthorizationPlugins())
             {
-                if (pluginInfo.GetAuthenticationResult(uuid).Success)
+                if (pluginInfo.GetAuthorizationResult(uuid).Success)
                 {
                     return new BooleanResult() { Success = true };
                 }
                 else
                 {
-                    ret.Message = pluginInfo.GetAuthenticationResult(uuid).Message;
+                    ret.Message = pluginInfo.GetAuthorizationResult(uuid).Message;
                 }
             }
 
@@ -224,7 +228,9 @@ namespace pGina.Plugin.scripting
         {
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
             Dictionary<string, Dictionary<bool, string>> settings = GetSettings(userInfo);
-            Dictionary<bool, string> gateway_sys = settings["gateway_sys"];
+            Dictionary<bool, string> gateway_sys = new Dictionary<bool, string>();
+            try { gateway_sys = settings["gateway_sys"]; }
+            catch { }
 
             foreach (KeyValuePair<bool, string> line in gateway_sys)
             {
@@ -232,22 +238,7 @@ namespace pGina.Plugin.scripting
                     return new BooleanResult { Success = false, Message = String.Format("failed to run:{0}", line.Value) };
             }
 
-            // return false if no other plugin succeeded
-            BooleanResult ret = new BooleanResult() { Success = false };
-            PluginActivityInformation pluginInfo = properties.GetTrackedSingle<PluginActivityInformation>();
-            foreach (Guid uuid in pluginInfo.GetAuthenticationPlugins())
-            {
-                if (pluginInfo.GetAuthenticationResult(uuid).Success)
-                {
-                    return new BooleanResult() { Success = true };
-                }
-                else
-                {
-                    ret.Message = pluginInfo.GetAuthenticationResult(uuid).Message;
-                }
-            }
-
-            return ret;
+            return new BooleanResult() { Success = true };
         }
 
         public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, SessionProperties properties)
@@ -261,8 +252,12 @@ namespace pGina.Plugin.scripting
                 if (userInfo.Description.Contains("pGina created"))
                 {
                     Dictionary<string, Dictionary<bool, string>> settings = GetSettings(userInfo);
-                    Dictionary<bool, string> notification_sys = settings["notification_sys"];
-                    Dictionary<bool, string> notification_usr = settings["notification_usr"];
+                    Dictionary<bool, string> notification_sys = new Dictionary<bool, string>();
+                    try { notification_sys = settings["notification_sys"]; }
+                    catch { }
+                    Dictionary<bool, string> notification_usr = new Dictionary<bool, string>();
+                    try { notification_usr = settings["notification_usr"]; }
+                    catch { }
 
 
                     foreach (KeyValuePair<bool, string> line in notification_sys)
@@ -284,8 +279,12 @@ namespace pGina.Plugin.scripting
         {
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
             Dictionary<string, Dictionary<bool, string>> settings = GetSettings(userInfo);
-            Dictionary<bool, string> changepwd_sys = settings["changepwd_sys"];
-            Dictionary<bool, string> changepwd_usr = settings["changepwd_usr"];
+            Dictionary<bool, string> changepwd_sys = new Dictionary<bool, string>();
+            try { changepwd_sys = settings["changepwd_sys"]; }
+            catch { }
+            Dictionary<bool, string> changepwd_usr = new Dictionary<bool, string>();
+            try { changepwd_usr = settings["changepwd_usr"]; }
+            catch { }
 
             foreach (KeyValuePair<bool, string> line in changepwd_sys)
             {
