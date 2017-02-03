@@ -129,30 +129,42 @@ namespace pGina.Plugin.scripting
         internal bool Run(int sessionId, string cmd, UserInformation userInfo, bool pwd, bool sys)
         {
             string expand_cmd = "";
+            string expand_cmd_out = "";
             foreach (string c in cmd.Split(' '))
             {
                 string ce = c;
+                string cp = c;
                 if (!Regex.IsMatch(c, @"(?i)%\S+%") && Regex.IsMatch(c, @"(?i)%\S+"))
                 {
                     ce = ce.Replace("%u", userInfo.Username);
+                    cp = cp.Replace("%u", userInfo.Username);
                     ce = ce.Replace("%o", userInfo.OriginalUsername);
+                    cp = cp.Replace("%o", userInfo.OriginalUsername);
                     if (pwd)
                     {
                         ce = ce.Replace("%p", userInfo.Password);
+                        cp = cp.Replace("%p", "*****");
                         ce = ce.Replace("%b", userInfo.oldPassword);
+                        cp = cp.Replace("%b", "*****");
                     }
                     ce = ce.Replace("%s", userInfo.SID.Value);
+                    cp = cp.Replace("%s", userInfo.SID.Value);
                     ce = ce.Replace("%e", userInfo.PasswordEXP.ToString());
+                    cp = cp.Replace("%e", userInfo.PasswordEXP.ToString());
                     ce = ce.Replace("%i", userInfo.SessionID.ToString());
+                    cp = cp.Replace("%i", userInfo.SessionID.ToString());
                     expand_cmd += ce + " ";
+                    expand_cmd_out += cp + " ";
                 }
                 else
                 {
                     expand_cmd += c + " ";
+                    expand_cmd_out += cp + " ";
                 }
             }
             expand_cmd = expand_cmd.Trim();
-            m_logger.InfoFormat("execute {0}", expand_cmd);
+            expand_cmd_out = expand_cmd_out.Trim();
+            m_logger.InfoFormat("execute {0}", expand_cmd_out);
 
             if (sys)
                 return Abstractions.WindowsApi.pInvokes.StartProcessInSessionWait(sessionId, expand_cmd);
@@ -175,8 +187,8 @@ namespace pGina.Plugin.scripting
             }
 
             // return false if no other plugin succeeded
-            BooleanResult ret = new BooleanResult() { Success = false };
-            PluginActivityInformation pluginInfo = properties.GetTrackedSingle<PluginActivityInformation>();
+            BooleanResult ret = new BooleanResult() { Success = false, Message = this.Name + " plugin can't authenticate a user on its own" };
+            /*PluginActivityInformation pluginInfo = properties.GetTrackedSingle<PluginActivityInformation>();
             foreach (Guid uuid in pluginInfo.GetAuthenticationPlugins())
             {
                 if (pluginInfo.GetAuthenticationResult(uuid).Success)
@@ -187,7 +199,7 @@ namespace pGina.Plugin.scripting
                 {
                     ret.Message = pluginInfo.GetAuthenticationResult(uuid).Message;
                 }
-            }
+            }*/
 
             return ret;
         }
@@ -207,7 +219,7 @@ namespace pGina.Plugin.scripting
             }
 
             // return false if no other plugin succeeded
-            BooleanResult ret = new BooleanResult() { Success = false };
+            BooleanResult ret = new BooleanResult() { Success = false, Message = this.Name + " plugin can't authorize a user on its own" };
             PluginActivityInformation pluginInfo = properties.GetTrackedSingle<PluginActivityInformation>();
             foreach (Guid uuid in pluginInfo.GetAuthorizationPlugins())
             {
