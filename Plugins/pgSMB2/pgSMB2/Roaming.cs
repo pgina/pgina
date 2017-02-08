@@ -260,7 +260,7 @@ namespace pGina.Plugin.pgSMB2
                 // run imagex in capture mode
                 string stdmerge = "";
 
-                m_logger.DebugFormat("Run \"{0}\" \"{1}\"", settings["Compressor"], settings["CompressCLI"].Replace("%z",uPath));
+                m_logger.DebugFormat("Run {0} {1}", settings["Compressor"], settings["CompressCLI"].Replace("%z",uPath));
                 ret_code = RunWait(settings["Compressor"], settings["CompressCLI"].Replace("%z", uPath), out stdmerge);
                 if (ret_code == 0)
                 {
@@ -504,7 +504,7 @@ namespace pGina.Plugin.pgSMB2
                 }
                 args = args.Replace("%z", uPath);
 
-                m_logger.DebugFormat("Run \"{0}\" \"{1}\"", settings["Compressor"], args);
+                m_logger.DebugFormat("Run {0} {1}", settings["Compressor"], args);
                 ret_code = RunWait(settings["Compressor"], args, out stdmerge);
                 if (ret_code == 0)
                 {
@@ -984,7 +984,7 @@ namespace pGina.Plugin.pgSMB2
             }
             catch (Exception ex)
             {
-                Console.WriteLine("RunWait failed error:{0}", ex.Message);
+                m_logger.ErrorFormat("RunWait failed error:{0}", ex.Message);
                 return -1;
             }
 
@@ -1009,6 +1009,13 @@ namespace pGina.Plugin.pgSMB2
                 for (int x = s.Length - lines; x < s.Length; x++)
                 {
                     ret += s[x] + "\r\n";
+                }
+            }
+            else
+            {
+                foreach (string line in s)
+                {
+                    ret += line + "\r\n";
                 }
             }
 
