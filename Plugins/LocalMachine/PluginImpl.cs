@@ -273,6 +273,11 @@ namespace pGina.Plugin.LocalMachine
             }
             catch(Exception e)
             {
+                if (e.Message.ToLower().Contains("0x800708c5"))
+                {
+                    return new BooleanResult() { Success = false, Message = string.Format("This Worstation is denying the password of {0}.\nMost likely the password does not meet complexity requirements\n\n{1}", userInfo.Username, e) };
+                }
+
                 return new BooleanResult() { Success = false, Message = string.Format("Unexpected error while syncing user's info: {0}", e) };
             }
 
