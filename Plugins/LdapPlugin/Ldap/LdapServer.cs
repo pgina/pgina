@@ -244,7 +244,7 @@ namespace pGina.Plugin.Ldap
             }
             catch (LdapException e)
             {
-                m_logger.ErrorFormat("LdapException: {0} {1}", e.Message, e.ServerErrorMessage);
+                m_logger.ErrorFormat("LdapException: {0} {1} {2}", e.ErrorCode, e.Message, e.ServerErrorMessage);
                 throw e;
             }
             catch (InvalidOperationException e)
@@ -295,7 +295,7 @@ namespace pGina.Plugin.Ldap
             }
             catch (LdapException e)
             {
-                m_logger.ErrorFormat("LdapException: {0} {1}", e.Message, e.ServerErrorMessage);
+                m_logger.ErrorFormat("LdapException: {0} {1} {2}", e.ErrorCode, e.Message, e.ServerErrorMessage);
                 throw e;
             }
             catch (InvalidOperationException e)
@@ -456,6 +456,13 @@ namespace pGina.Plugin.Ldap
                 }
                 catch (Exception e)
                 {
+                    // IBM LDAP doesnt return error 49 so we analyze the exeption string
+                    if (e.ToString().Contains("pGina.Plugin.Ldap.LdapServer.Bind"))
+                    {
+                        m_logger.ErrorFormat("The user name or password is incorrect: {0}", e.Message);
+                        return new BooleanResult { Success = false, Message = "The user name or password is incorrect" };
+                    }
+
                     m_logger.ErrorFormat("LDAP plugin failed {0}",e.Message);
                     return new BooleanResult { Success = false, Message = String.Format("LDAP plugin failed\n{0}",e.Message) };
                 }
