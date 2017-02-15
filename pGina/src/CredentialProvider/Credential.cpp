@@ -485,7 +485,7 @@ namespace pGina
 
 				if( pqcws )
 				{
-					pqcws->SetStatusMessage(L"You will be logged in.\nResistance is futile!");
+					pqcws->SetStatusMessage(L"You will be logged in.\nPlease wait ...");
 				}
 			}
 
