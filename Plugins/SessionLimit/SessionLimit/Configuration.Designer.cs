@@ -89,6 +89,7 @@
             this.helpButton.TabIndex = 3;
             this.helpButton.Text = "Help";
             this.helpButton.UseVisualStyleBackColor = true;
+            this.helpButton.Click += new System.EventHandler(this.Btn_help);
             //
             // Configuration
             //
@@ -103,7 +104,6 @@
             this.Controls.Add(this.saveButton);
             this.Name = "Configuration";
             this.Text = "Session Limit Plugin Configuration";
-            this.Click += new System.EventHandler(this.Btn_help);
             this.ResumeLayout(false);
             this.PerformLayout();
 

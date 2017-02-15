@@ -183,6 +183,7 @@
             this.btnHelp.TabIndex = 11;
             this.btnHelp.Text = "Help";
             this.btnHelp.UseVisualStyleBackColor = true;
+            this.btnHelp.Click += new System.EventHandler(this.Btn_help);
             //
             // Configuration
             //
@@ -205,7 +206,6 @@
             this.Controls.Add(this.btnOk);
             this.Name = "Configuration";
             this.Text = "Single User Login Plugin Configuration";
-            this.Click += new System.EventHandler(this.Btn_help);
             ((System.ComponentModel.ISupportInitialize)(this.m_dgv)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

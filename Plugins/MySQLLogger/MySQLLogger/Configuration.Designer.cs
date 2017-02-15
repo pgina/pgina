@@ -427,6 +427,7 @@
             this.helpBtn.TabIndex = 6;
             this.helpBtn.Text = "Help";
             this.helpBtn.UseVisualStyleBackColor = true;
+            this.helpBtn.Click += new System.EventHandler(this.Btn_help);
             //
             // Configuration
             //
@@ -445,7 +446,6 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "Configuration";
             this.Text = "MySQL Logger Plugin Configuration";
-            this.Click += new System.EventHandler(this.Btn_help);
             this.eventsBox.ResumeLayout(false);
             this.eventsBox.PerformLayout();
             this.groupBox2.ResumeLayout(false);

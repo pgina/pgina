@@ -88,6 +88,7 @@
             this.help.TabIndex = 3;
             this.help.Text = "Help";
             this.help.UseVisualStyleBackColor = true;
+            this.help.Click += new System.EventHandler(this.Btn_help);
             //
             // Configuration
             //
@@ -102,7 +103,6 @@
             this.Controls.Add(this.label1);
             this.Name = "Configuration";
             this.Text = "KRB5 Realm Configuration";
-            this.Click += new System.EventHandler(this.Btn_help);
             this.ResumeLayout(false);
             this.PerformLayout();
 
