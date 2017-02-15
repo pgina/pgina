@@ -892,7 +892,7 @@ namespace pGina.Plugin.pgSMB2
                 {
                     try
                     {
-                        m_logger.DebugFormat("{0}. try to connect to {1} as {2} pwd {3}", x, share, dusername, password);
+                        m_logger.DebugFormat("{0}. try to connect to {1} as {2}", x, share, dusername);
                         if (!Abstractions.WindowsApi.pInvokes.MapNetworkDrive(share, dusername, password))
                         {
                             m_logger.ErrorFormat("Failed to connect to share {0}", share);
