@@ -95,6 +95,7 @@
             this.help.TabIndex = 3;
             this.help.Text = "Help";
             this.help.UseVisualStyleBackColor = true;
+            this.help.Click += new System.EventHandler(this.Btn_help);
             //
             // portLabel
             //
@@ -141,7 +142,6 @@
             this.Controls.Add(this.hostLabel);
             this.Name = "Configuration";
             this.Text = "SSHAuth Configuration";
-            this.Click += new System.EventHandler(this.Btn_help);
             this.ResumeLayout(false);
             this.PerformLayout();
 
