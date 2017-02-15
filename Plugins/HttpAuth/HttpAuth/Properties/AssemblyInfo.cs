@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("HttpAuth")]
-[assembly: AssemblyCopyright("Copyright © Václav Klecanda 2016")]
+[assembly: AssemblyCopyright("Copyright © Václav Klecanda 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

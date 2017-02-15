@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Medical University of Vienna")]
 [assembly: AssemblyProduct("pgSMB2.Management")]
-[assembly: AssemblyCopyright("Copyright © Medical University of Vienna 2016")]
+[assembly: AssemblyCopyright("Copyright © Medical University of Vienna 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
