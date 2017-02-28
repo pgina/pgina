@@ -320,6 +320,7 @@ namespace pGina.Plugin.LocalMachine
                             if (!Abstractions.WindowsApi.pInvokes.ValidateCredentials(userInfo.Username, userInfo.Password))
                             {
                                 userInfo.PasswordEXP = true;
+                                properties.AddTrackedSingle<UserInformation>(userInfo);
                                 // windows itself will put on an error "pwd expired"
                             }
 
