@@ -621,6 +621,10 @@ namespace pGina.Plugin.LocalMachine
                     m_logger.ErrorFormat("userPrincipal.Delete error:{0}", ex.Message);
                 }
             }
+
+            m_logger.Debug(@"removing Profile 'SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\" + UserInfo.SID + "'");
+            try { Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\" + UserInfo.SID, false); }
+            catch { }
         }
 
         private static void RecurseDelete(string directory)
