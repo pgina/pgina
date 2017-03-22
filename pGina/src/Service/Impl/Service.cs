@@ -59,6 +59,7 @@ namespace pGina.Service.Impl
         private ILog m_abstractLogger = LogManager.GetLogger("Abstractions");
         private PipeServer m_server = null;
         private ObjectCache<int, List<SessionProperties>> m_sessionPropertyCache = new ObjectCache<int, List<SessionProperties>>();
+        private List<int> sessionlogoff = new List<int>();
 
         static Service()
         {
@@ -151,7 +152,7 @@ namespace pGina.Service.Impl
 
         public Boolean OnCustomCommand()
         {
-            Boolean result = false;
+            Boolean result = Convert.ToBoolean(sessionlogoff.Count);
             foreach (IPluginLogoffRequestAddTime plugin in PluginLoader.GetOrderedPluginsOfType<IPluginLogoffRequestAddTime>())
             {
                 try
@@ -848,7 +849,9 @@ namespace pGina.Service.Impl
                     }
                     if (evnt == SessionChangeReason.SessionLogoff)
                     {
-                            CREDUIhelper(sessionID);
+                        sessionlogoff.Add(sessionID);
+                        m_logger.InfoFormat("Logoff in progress {0}", sessionID);
+                        CREDUIhelper(sessionID);
                     }
                     foreach (IPluginEventNotifications plugin in PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>())
                     {
@@ -863,6 +866,11 @@ namespace pGina.Service.Impl
                         {
                             plugin.SessionChange(sessionID, evnt, null);
                         }
+                    }
+                    if (evnt == SessionChangeReason.SessionLogoff)
+                    {
+                        sessionlogoff.Remove(sessionID);
+                        m_logger.InfoFormat("Logoff completed {0}", sessionID);
                     }
                     // If this is a logout, remove from our map
                     if (evnt == SessionChangeReason.SessionLogoff && m_sessionPropertyCache.Exists(sessionID))
