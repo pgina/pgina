@@ -144,9 +144,7 @@ namespace pGina.Plugin.Ldap
                 catch (Exception e)
                 {
                     m_logger.ErrorFormat("Start TLS failed with {0}", e.Message);
-                    m_useTls = false;
-                    m_useSsl = true;
-                    m_logger.ErrorFormat("fallback to SSL");
+                    m_conn = null;
                 }
             }
             if (m_useSsl)
