@@ -43,24 +43,44 @@ namespace pGina.Plugin.Ldap
     {
         private static ILog m_logger = LogManager.GetLogger("LDAP GroupRuleLoader");
 
-        public static void SaveAuthzRules(List<GroupAuthzRule> rules)
+        public static string SaveAuthzRules(List<GroupAuthzRule> rules)
         {
+            string ret = "";
             List<string> strList = new List<string>();
             foreach (GroupRule rule in rules)
             {
-                strList.Add(rule.ToRegString());
+                if (GroupAuthzRule.FromRegString(rule.ToRegString()) == null)
+                {
+                    ret += rule + "\n";
+                    m_logger.ErrorFormat("Rule doesn't comply:{0}", rule);
+                }
+                else
+                {
+                    strList.Add(rule.ToRegString());
+                }
             }
             Settings.Store.GroupAuthzRules = strList.ToArray();
+            return ret;
         }
 
-        public static void SaveGatewayRules(List<GroupGatewayRule> rules)
+        public static string SaveGatewayRules(List<GroupGatewayRule> rules)
         {
+            string ret = "";
             List<string> strList = new List<string>();
             foreach (GroupRule rule in rules)
             {
-                strList.Add(rule.ToRegString());
+                if (GroupGatewayRule.FromRegString(rule.ToRegString()) == null)
+                {
+                    ret += rule + "\n";
+                    m_logger.ErrorFormat("Rule doesn't comply:{0}", rule);
+                }
+                else
+                {
+                    strList.Add(rule.ToRegString());
+                }
             }
             Settings.Store.GroupGatewayRules = strList.ToArray();
+            return ret;
         }
 
         public static List<GroupAuthzRule> GetAuthzRules()

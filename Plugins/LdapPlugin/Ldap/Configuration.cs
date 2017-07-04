@@ -402,7 +402,11 @@ namespace pGina.Plugin.Ldap
                 lst.Add(item as GroupAuthzRule);
                 m_logger.DebugFormat("Saving rule: {0}", item);
             }
-            GroupRuleLoader.SaveAuthzRules(lst);
+            string SaveAuthzRules_ret = GroupRuleLoader.SaveAuthzRules(lst);
+            if (!string.IsNullOrEmpty(SaveAuthzRules_ret))
+            {
+                MessageBox.Show("There was an error in saving your authorization rules.\n" + SaveAuthzRules_ret);
+            }
 
             // Gateway
             List<GroupGatewayRule> gwList = new List<GroupGatewayRule>();
@@ -411,7 +415,11 @@ namespace pGina.Plugin.Ldap
                 gwList.Add(item as GroupGatewayRule);
                 m_logger.DebugFormat("Saving rule: {0}", item);
             }
-            GroupRuleLoader.SaveGatewayRules(gwList);
+            string SaveGatewayRules_ret = GroupRuleLoader.SaveGatewayRules(gwList);
+            if (!string.IsNullOrEmpty(SaveGatewayRules_ret))
+            {
+                MessageBox.Show("There was an error in saving your gateway rules.\n" + SaveGatewayRules_ret);
+            }
 
             // Change Password
             List<AttributeEntry> entries = new List<AttributeEntry>();
