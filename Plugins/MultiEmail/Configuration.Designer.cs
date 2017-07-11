@@ -254,7 +254,6 @@
             this.Controls.Add(this.m_serversListDgv);
             this.Name = "Configuration";
             this.Text = "Multi Email Configuration";
-            this.Click += new System.EventHandler(this.Btn_help);
             ((System.ComponentModel.ISupportInitialize)(this.m_serversListDgv)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
