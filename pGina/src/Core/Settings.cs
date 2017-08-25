@@ -67,6 +67,7 @@ namespace pGina.Core
             s_settings.SetDefault("ntpservers", new string[] { "" });
             s_settings.SetDefault("LastUsername", "");
             s_settings.SetDefault("LastUsernameEnable", false);
+            s_settings.SetDefault("PreferLocalAuthentication", false);
 
             s_settings.SetDefault("CredentialProviderFilters", new string[] { });
 

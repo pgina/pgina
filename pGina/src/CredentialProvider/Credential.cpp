@@ -269,6 +269,23 @@ namespace pGina
 			std::wstring title;
 			pGina::Memory::ObjectCleanupPool cleanup;
 
+			if (pGina::Registry::GetBool(L"PreferLocalAuthentication", false))
+			{
+				std::wstring dom = username;
+				size_t pos = dom.find(L"\\");
+				if (pos == std::wstring::npos)
+				{
+					pos = dom.find(L"@");
+					if (pos == std::wstring::npos)
+					{
+						pDEBUG(L"Credential::Connect: no \"\\\" or \"@\" found in username but PreferLocalAuthentication defined: change username to: \".\\%s\"", dom.c_str());
+						dom = L".\\";
+						dom.append(username);
+						username = _wcsdup(dom.c_str());
+					}
+				}
+			}
+
 			pGina::Protocol::LoginRequestMessage::LoginReason reason = pGina::Protocol::LoginRequestMessage::Login;
 			switch(m_usageScenario)
 			{

@@ -307,6 +307,7 @@ namespace pGina.Configuration
 
             // Display last username in logon screen
             chk_lastusername.Checked = Settings.Get.LastUsernameEnable;
+            chk_preferlocalauthentication.Checked = Settings.Get.PreferLocalAuthentication;
 
             //ntp server
             //this.ntpservers = Settings.Get.GetGetSetting("ntpservers");
@@ -946,6 +947,7 @@ namespace pGina.Configuration
 
             // Display last username in logon screen
             Settings.Get.LastUsernameEnable = chk_lastusername.Checked;
+            Settings.Get.PreferLocalAuthentication = chk_preferlocalauthentication.Checked;
 
             if (Abstractions.Windows.OsInfo.IsVistaOrLater())
                 this.SaveCpSettings();

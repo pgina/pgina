@@ -29,14 +29,15 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigurationUI));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_tabs = new System.Windows.Forms.TabControl();
             this.m_generalConfigTab = new System.Windows.Forms.TabPage();
             this.ntpservers_group = new System.Windows.Forms.GroupBox();
             this.ntpservers = new System.Windows.Forms.RichTextBox();
             this.groupLogon = new System.Windows.Forms.GroupBox();
+            this.chk_preferlocalauthentication = new System.Windows.Forms.CheckBox();
             this.chk_lastusername = new System.Windows.Forms.CheckBox();
             this.groupBox18 = new System.Windows.Forms.GroupBox();
             this.notify_label_pass = new System.Windows.Forms.Label();
@@ -264,18 +265,28 @@
             //
             // groupLogon
             //
+            this.groupLogon.Controls.Add(this.chk_preferlocalauthentication);
             this.groupLogon.Controls.Add(this.chk_lastusername);
-            this.groupLogon.Location = new System.Drawing.Point(448, 411);
+            this.groupLogon.Location = new System.Drawing.Point(369, 411);
             this.groupLogon.Name = "groupLogon";
-            this.groupLogon.Size = new System.Drawing.Size(318, 47);
+            this.groupLogon.Size = new System.Drawing.Size(397, 47);
             this.groupLogon.TabIndex = 6;
             this.groupLogon.TabStop = false;
             this.groupLogon.Text = "Logon";
             //
+            // chk_preferlocalauthentication
+            //
+            this.chk_preferlocalauthentication.Location = new System.Drawing.Point(239, 19);
+            this.chk_preferlocalauthentication.Name = "chk_preferlocalauthentication";
+            this.chk_preferlocalauthentication.Size = new System.Drawing.Size(150, 17);
+            this.chk_preferlocalauthentication.TabIndex = 1;
+            this.chk_preferlocalauthentication.Text = "Prefer local Authentication";
+            this.chk_preferlocalauthentication.UseVisualStyleBackColor = true;
+            //
             // chk_lastusername
             //
             this.chk_lastusername.AutoSize = true;
-            this.chk_lastusername.Location = new System.Drawing.Point(9, 19);
+            this.chk_lastusername.Location = new System.Drawing.Point(10, 19);
             this.chk_lastusername.Name = "chk_lastusername";
             this.chk_lastusername.Size = new System.Drawing.Size(206, 17);
             this.chk_lastusername.TabIndex = 0;
@@ -392,7 +403,7 @@
             this.groupBox4.Controls.Add(this.chk_originalUsernameUnlock);
             this.groupBox4.Location = new System.Drawing.Point(17, 411);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(419, 47);
+            this.groupBox4.Size = new System.Drawing.Size(346, 47);
             this.groupBox4.TabIndex = 5;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Unlock";
@@ -400,7 +411,7 @@
             // chk_originalUsernameUnlock
             //
             this.chk_originalUsernameUnlock.AutoSize = true;
-            this.chk_originalUsernameUnlock.Location = new System.Drawing.Point(9, 19);
+            this.chk_originalUsernameUnlock.Location = new System.Drawing.Point(6, 19);
             this.chk_originalUsernameUnlock.Name = "chk_originalUsernameUnlock";
             this.chk_originalUsernameUnlock.Size = new System.Drawing.Size(333, 17);
             this.chk_originalUsernameUnlock.TabIndex = 0;
@@ -679,33 +690,33 @@
             this.pluginsDG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.pluginsDG.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.pluginsDG.DefaultCellStyle = dataGridViewCellStyle2;
             this.pluginsDG.Location = new System.Drawing.Point(10, 19);
             this.pluginsDG.Name = "pluginsDG";
-            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.pluginsDG.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.pluginsDG.Size = new System.Drawing.Size(735, 316);
             this.pluginsDG.TabIndex = 0;
             this.pluginsDG.DoubleClick += new System.EventHandler(this.pluginsDG_DoubleClick);
@@ -1831,5 +1842,6 @@
         private System.Windows.Forms.CheckBox chk_lastusername;
         private System.Windows.Forms.GroupBox ntpservers_group;
         private System.Windows.Forms.RichTextBox ntpservers;
+        private System.Windows.Forms.CheckBox chk_preferlocalauthentication;
     }
 }

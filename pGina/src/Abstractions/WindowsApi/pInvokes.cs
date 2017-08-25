@@ -1755,7 +1755,7 @@ namespace Abstractions.WindowsApi
             }
             else
             {
-                LibraryLogging.Error("CreateProfile error:{0} {1}", hResult, LastError());
+                LibraryLogging.Error("CreateProfile error:{0} {1} {2}", hResult, LastError(), path.ToString());
             }
 
             return "";
