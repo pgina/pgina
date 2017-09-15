@@ -1103,7 +1103,7 @@ namespace Abstractions.WindowsApi
             if(retVal != 0)
             {
                 int dataSize = Marshal.SizeOf(typeof(SafeNativeMethods.WTS_SESSION_INFO));
-                int currentSession = (int) sessionInfoList;
+                Int64 currentSession = (Int64) sessionInfoList;
 
                 for(int x = 0; x < sessionCount; x++)
                 {
