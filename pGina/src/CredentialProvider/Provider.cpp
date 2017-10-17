@@ -49,6 +49,8 @@ namespace pGina
 {
 	namespace CredProv
 	{
+		/*static */ bool Provider::m_redraw;
+
 		IFACEMETHODIMP Provider::QueryInterface(__in REFIID riid, __deref_out void **ppv)
 		{
 			// And more crazy ass v-table madness, yay COM again!
@@ -62,7 +64,13 @@ namespace pGina
 
 		IFACEMETHODIMP_(ULONG) Provider::AddRef()
 		{
-		return InterlockedIncrement(&m_referenceCount);
+			// Win 10 workaround to redraw the CP after an error
+			if (m_redraw)
+			{
+				m_redraw = false;
+				m_logonUiCallbackEvents->CredentialsChanged(m_logonUiCallbackContext);
+			}
+			return InterlockedIncrement(&m_referenceCount);
 		}
 
 		IFACEMETHODIMP_(ULONG) Provider::Release()
@@ -226,16 +234,16 @@ namespace pGina
 			}
 
 			return result;
-    	}
+		}
 
 		IFACEMETHODIMP Provider::Advise(__in ICredentialProviderEvents* pcpe, __in UINT_PTR upAdviseContext)
 		{
-			// If we already have a callback handle, release our reference to it
-			UnAdvise();
-
 			// Store what we've been given
 			m_logonUiCallbackEvents = pcpe;
 			m_logonUiCallbackContext = upAdviseContext;
+			
+			// If we already have a callback handle, release our reference to it
+			UnAdvise();
 
 			// Up ref count as we hold a pointer to this guy
 			if(m_logonUiCallbackEvents)

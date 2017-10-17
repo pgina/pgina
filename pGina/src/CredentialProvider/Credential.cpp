@@ -519,19 +519,7 @@ namespace pGina
 				{
 					m_loginResult.Message(L"Plugins did not provide a specific error message");
 				}
-				if (pGina::Registry::GetBool(L"LastUsernameEnable", false))
-				{
-					m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
-					m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
-				}
-				else
-				{
-					ClearZeroAndFreeFields(CPFT_EDIT_TEXT, false);
-					m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
-					m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
-				}
-				ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, false);
-
+				
 				if (hThread_dialog != NULL)
 				{
 					Credential::Thread_dialog_close(hThread_dialog);
@@ -606,9 +594,38 @@ namespace pGina
 				{
 					BlockInput(false);
 				}
-				ClearZeroAndFreeAnyTextFields(true);
+
+				if (pGina::Registry::GetBool(L"LastUsernameEnable", false))
+				{
+					std::wstring sessionUname = pGina::Registry::GetString( L"LastUsername", L"");
+					if (!sessionUname.empty())
+					{
+						m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
+						m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
+					}
+					else
+					{
+						ClearZeroAndFreeFields(CPFT_EDIT_TEXT, false);
+						m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
+						m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
+					}
+				}
+				else
+				{
+					ClearZeroAndFreeFields(CPFT_EDIT_TEXT, false);
+					m_fields->fields[m_fields->usernameFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_FOCUSED;
+					m_fields->fields[m_fields->passwordFieldIdx].fieldStatePair.fieldInteractiveState = CPFIS_NONE;
+				}
+				ClearZeroAndFreeFields(CPFT_PASSWORD_TEXT, false);
+				
 				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 				*pcpsiOptionalStatusIcon = CPSI_ERROR;
+
+				// Win 10 Workarround to redraw the CP after an error
+				if (Credential::ISwin10())
+				{
+					Provider::m_redraw = true;
+				}
 
 				return S_FALSE;
 			}
@@ -1089,6 +1106,33 @@ namespace pGina
 				Sleep(1050);
 			WaitForSingleObject(thread, 1000);
 			CloseHandle(thread);
+		}
+
+		// https://stackoverflow.com/questions/36543301/detecting-windows-10-version/36543774#36543774
+		BOOL Credential::ISwin10()
+		{
+			RTL_OSVERSIONINFOW rovi = { 0 };
+			HMODULE hMod = ::GetModuleHandle(L"ntdll.dll");
+			if (hMod)
+			{
+				Credential::RtlGetVersionPtr fxPtr = (Credential::RtlGetVersionPtr)::GetProcAddress(hMod, "RtlGetVersion");
+				if (fxPtr != nullptr)
+				{
+					rovi.dwOSVersionInfoSize = sizeof(rovi);
+					if (fxPtr(&rovi) != 0)
+					{
+						rovi.dwMajorVersion = 10;
+					}
+				}
+				FreeLibrary(hMod);
+			}
+
+			if (rovi.dwMajorVersion == 10)
+			{
+				return true;
+			}
+	
+			return false;
 		}
 	}
 }

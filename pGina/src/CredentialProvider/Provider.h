@@ -61,6 +61,7 @@ namespace pGina
 
 			virtual void	ServiceStateChanged(bool newState);
 			CREDENTIAL_PROVIDER_USAGE_SCENARIO	m_usageScenario;
+			static bool m_redraw;
 		protected:
 			Provider();
 			__override ~Provider();

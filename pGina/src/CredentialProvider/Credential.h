@@ -77,7 +77,9 @@ namespace pGina
 							   DWORD usageFlags, const wchar_t *username, const wchar_t *password);
 
 			virtual void	ServiceStateChanged(bool newState);
-
+			
+			typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
+			BOOL ISwin10();
 		private:
 			void	ClearZeroAndFreeAnyPasswordFields(bool updateUi);
 			void	ClearZeroAndFreeAnyTextFields(bool updateUi);
