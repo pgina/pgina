@@ -238,12 +238,12 @@ namespace pGina
 
 		IFACEMETHODIMP Provider::Advise(__in ICredentialProviderEvents* pcpe, __in UINT_PTR upAdviseContext)
 		{
+			// If we already have a callback handle, release our reference to it
+			UnAdvise();
+			
 			// Store what we've been given
 			m_logonUiCallbackEvents = pcpe;
 			m_logonUiCallbackContext = upAdviseContext;
-			
-			// If we already have a callback handle, release our reference to it
-			UnAdvise();
 
 			// Up ref count as we hold a pointer to this guy
 			if(m_logonUiCallbackEvents)
