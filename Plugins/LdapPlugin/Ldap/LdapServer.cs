@@ -30,6 +30,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.DirectoryServices.Protocols;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Net;
 using System.IdentityModel.Selectors;
@@ -154,6 +155,46 @@ namespace pGina.Plugin.Ldap
         }
 
         /// <summary>
+        /// Check that certificate CN or SubjectAltName matches LDAP server name
+        /// </summary>
+        /// <param name="conn">The LDAP connection.</param>
+        /// <param name="cert">The server's certificate</param>
+        /// <returns>true if verification succeeds, false otherwise.</returns>
+        private bool VerifyCertName(LdapConnection conn, X509Certificate2 cert)
+        {
+            string name = conn.SessionOptions.HostName;
+            string[] dnparts = cert.SubjectName.Name.Split(',');
+            foreach (var dnpart in dnparts)
+            {
+                int i = dnpart.IndexOf("=");
+                if (i > 0 && dnpart.Substring(0, i) == "CN")
+                    if (dnpart.Substring(i + 1) == name)
+                        return true;
+            }
+
+            foreach (X509Extension extension in cert.Extensions)
+            {
+                if (extension.Oid.Value == "2.5.29.17")
+                {
+                    AsnEncodedData asndata = new AsnEncodedData(extension.Oid, extension.RawData);
+                    string san = asndata.Format(true);
+                    String[] sans = san.Split('\r');
+                    foreach (var s in sans)
+                    {
+                        int i = s.IndexOf("=");
+                        if (i > 0)
+                            {
+                                string r = s.Substring(i + 1);
+                                if (r == name)
+                                    return true;
+                            }
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// This is the verify certificate callback method used when initially binding to the
         /// LDAP server.  This manages all certificate validation.
         /// </summary>
@@ -180,19 +221,20 @@ namespace pGina.Plugin.Ldap
             {
                 m_logger.Debug("Verifying server cert with Windows store.");
 
-                // We set the RevocationMode to NoCheck because most custom (self-generated) CAs
-                // do not work properly with revocation lists.  This is slightly less secure, but
-                // the most common use case for this plugin probably doesn't rely on revocation
-                // lists.
-                X509ChainPolicy policy = new X509ChainPolicy() {
-                    RevocationMode = X509RevocationMode.NoCheck
-                };
-
-                // Create a validator using the policy
-                X509CertificateValidator validator = X509CertificateValidator.CreatePeerOrChainTrustValidator(true, policy);
                 try
                 {
-                    validator.Validate(serverCert);
+                    if (!serverCert.Verify())
+                    {
+                        m_logger.Debug("Server certificate verification failed.");
+                        return false;
+                    }
+
+                    // Check that certificate name match server name
+                    if (!VerifyCertName(conn, serverCert))
+                    {
+                        m_logger.Debug("Server certificate does not match hostname.");
+                        return false;
+                    }
 
                     // If we get here, validation succeeded.
                     m_logger.Debug("Server certificate verification succeeded.");
