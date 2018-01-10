@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Medical University of Vienna")]
 [assembly: AssemblyProduct("scripting.Management")]
-[assembly: AssemblyCopyright("Copyright © Medical University of Vienna 2017")]
+[assembly: AssemblyCopyright("Copyright © Medical University of Vienna 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.9.9.6")]
-[assembly: AssemblyFileVersion("3.9.9.6")]
+[assembly: AssemblyVersion("3.9.9.11")]
+[assembly: AssemblyFileVersion("3.9.9.11")]

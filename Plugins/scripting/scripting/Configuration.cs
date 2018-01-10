@@ -43,17 +43,17 @@ namespace pGina.Plugin.scripting
         {
             try
             {
-                Getgridview(this.authentication_sys_grid, (string[])Settings.Store.authe_sys);
+                Getgridview(this.authentication_sys_grid, (string[])Settings.Store.authe_sys, 2);
 
-                Getgridview(this.authorization_sys_grid, (string[])Settings.Store.autho_sys);
+                Getgridview(this.authorization_sys_grid, (string[])Settings.Store.autho_sys, 2);
 
-                Getgridview(this.gateway_sys_grid, (string[])Settings.Store.gateway_sys);
+                Getgridview(this.gateway_sys_grid, (string[])Settings.Store.gateway_sys, 2);
 
-                Getgridview(this.notification_sys_grid, (string[])Settings.Store.notification_sys);
-                Getgridview(this.notification_usr_grid, (string[])Settings.Store.notification_usr);
+                Getgridview(this.notification_sys_grid, (string[])Settings.Store.notification_sys, 4);
+                Getgridview(this.notification_usr_grid, (string[])Settings.Store.notification_usr, 4);
 
-                Getgridview(this.changepwd_sys_grid, (string[])Settings.Store.changepwd_sys);
-                Getgridview(this.changepwd_usr_grid, (string[])Settings.Store.changepwd_usr);
+                Getgridview(this.changepwd_sys_grid, (string[])Settings.Store.changepwd_sys, 2);
+                Getgridview(this.changepwd_usr_grid, (string[])Settings.Store.changepwd_usr, 2);
             }
             catch (Exception ex)
             {
@@ -77,13 +77,13 @@ namespace pGina.Plugin.scripting
             this.Close();
         }
 
-        private void Getgridview(DataGridView grid, string[] data)
+        private void Getgridview(DataGridView grid, string[] data, int column)
         {
             List<string> lines = data.ToList();
             foreach (string line in lines)
             {
                 string[] split = line.Split('\t');
-                if (split.Count() == 2)
+                if (split.Count() == 2 && column == 2)
                 {
                     split[0] = split[0].Trim();
                     split[1] = split[1].Trim();
@@ -94,6 +94,23 @@ namespace pGina.Plugin.scripting
                         string script = split[1];
 
                         grid.Rows.Add(pwd, script);
+                    }
+                }
+                if (split.Count() == 4 && column == 4)
+                {
+                    split[0] = split[0].Trim();
+                    split[1] = split[1].Trim();
+                    split[2] = split[2].Trim();
+                    split[3] = split[3].Trim();
+
+                    if (!String.IsNullOrEmpty(split[0]) && !String.IsNullOrEmpty(split[1]) && !String.IsNullOrEmpty(split[2]) && !String.IsNullOrEmpty(split[3]))
+                    {
+                        bool pwd = Convert.ToBoolean(split[0]);
+                        bool logon = Convert.ToBoolean(split[1]);
+                        bool logoff = Convert.ToBoolean(split[2]);
+                        string script = split[3];
+
+                        grid.Rows.Add(pwd, logon, logoff, script);
                     }
                 }
             }
@@ -139,18 +156,52 @@ namespace pGina.Plugin.scripting
             List<string> AttribConv = new List<string>();
             foreach (DataGridViewRow row in grid.Rows)
             {
-                if (row.Cells[1].Value != null)
+                string script = "";
+                string logoff = "";
+                string logon = "";
+                string pwd = "";
+
+                if (row.Cells.Count == 4)
                 {
-                    if (row.Cells[0].Value == null)
-                    {
-                        AttribConv.Add(bool.FalseString + "\t" + row.Cells[1].Value.ToString().Trim());
-                    }
+                    if (row.Cells[3].Value != null)
+                        script = row.Cells[3].Value.ToString().Trim();
+
+                    if (row.Cells[2].Value != null)
+                        logoff = row.Cells[2].Value.ToString();
                     else
-                    {
-                        AttribConv.Add(row.Cells[0].Value.ToString() + "\t" + row.Cells[1].Value.ToString().Trim());
-                    }
+                        logoff = false.ToString();
+
+                    if (row.Cells[1].Value != null)
+                        logon = row.Cells[1].Value.ToString();
+                    else
+                        logon = false.ToString();
+
+                    if (row.Cells[0].Value != null)
+                        pwd = row.Cells[0].Value.ToString();
+                    else
+                        pwd = false.ToString();
+                }
+
+                if (row.Cells.Count == 2)
+                {
+                    if (row.Cells[1].Value != null)
+                        script = row.Cells[1].Value.ToString();
+
+                    if (row.Cells[0].Value != null)
+                        pwd = row.Cells[0].Value.ToString();
+                    else
+                        pwd = false.ToString();
+                }
+
+                if (!string.IsNullOrEmpty(pwd) && !string.IsNullOrEmpty(script))
+                {
+                    if (!string.IsNullOrEmpty(logoff) && !string.IsNullOrEmpty(logon))
+                        AttribConv.Add(String.Format("{0}\t{1}\t{2}\t{3}", pwd, logon, logoff, script));
+                    else
+                        AttribConv.Add(String.Format("{0}\t{1}", pwd, script));
                 }
             }
+
             if (AttribConv.Count > 0)
             {
                 return AttribConv.ToArray();

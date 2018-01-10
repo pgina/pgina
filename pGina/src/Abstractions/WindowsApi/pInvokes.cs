@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2017, pGina Team
+	Copyright (c) 2018, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -277,8 +277,6 @@ namespace Abstractions.WindowsApi
                 public UInt32 dwThreadId;
             };
 
-            public const int CREATE_UNICODE_ENVIRONMENT = 0x00000400;
-
             [StructLayout(LayoutKind.Sequential)]
             public struct WTS_SESSION_INFO
             {
@@ -494,7 +492,7 @@ namespace Abstractions.WindowsApi
 
             [DllImport("advapi32.dll", SetLastError = true)]
             public static extern bool CreateProcessAsUser(IntPtr hToken, string lpApplicationName, string lpCommandLine, ref SECURITY_ATTRIBUTES lpProcessAttributes,
-                                                           ref SECURITY_ATTRIBUTES lpThreadAttributes, bool bInheritHandles, uint dwCreationFlags, IntPtr lpEnvironment,
+                                                           ref SECURITY_ATTRIBUTES lpThreadAttributes, bool bInheritHandles, CreationFlags dwCreationFlags, IntPtr lpEnvironment,
                                                            string lpCurrentDirectory, ref STARTUPINFO lpStartupInfo, out PROCESS_INFORMATION lpProcessInformation);
 
             [DllImport("advapi32.dll", SetLastError = true)]
@@ -610,6 +608,24 @@ namespace Abstractions.WindowsApi
             [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
             [return: MarshalAs(UnmanagedType.Bool)]
             internal static extern bool ChangeServiceConfig2(SafeHandle hService, int dwInfoLevel, IntPtr lpInfo);
+
+            [DllImport("userenv.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool LoadUserProfile(IntPtr hToken, ref PROFILEINFO lpProfileInfo);
+
+            [DllImport("userenv.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool UnloadUserProfile(IntPtr hToken, IntPtr hProfile);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool CreateProcess(string lpApplicationName, string lpCommandLine, ref SECURITY_ATTRIBUTES lpProcessAttributes, ref SECURITY_ATTRIBUTES lpThreadAttributes, bool bInheritHandles, uint dwCreationFlags, IntPtr lpEnvironment, string lpCurrentDirectory, [In] ref STARTUPINFO lpStartupInfo, out PROCESS_INFORMATION lpProcessInformation);
+
+            [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            internal static extern Int32 WaitForSingleObject(IntPtr Handle, Int32 Wait);
+
+            [DllImport("kernel32.dll", SetLastError = true)]
+            internal static extern bool GetExitCodeProcess(IntPtr hProcess, out uint lpExitCode);
 
             [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
             internal struct USER_INFO_1052
@@ -791,6 +807,52 @@ namespace Abstractions.WindowsApi
                 public string lan_group;
                 public int ver_major;
                 public int ver_minor;
+            }
+
+            [Flags]
+            internal enum CreationFlags
+            {
+                CREATE_BREAKAWAY_FROM_JOB = 0x01000000,
+                CREATE_DEFAULT_ERROR_MODE = 0x04000000,
+                CREATE_NEW_CONSOLE = 0x00000010,
+                CREATE_NEW_PROCESS_GROUP = 0x00000200,
+                CREATE_NO_WINDOW = 0x08000000,
+                CREATE_PROTECTED_PROCESS = 0x00040000,
+                CREATE_PRESERVE_CODE_AUTHZ_LEVEL = 0x02000000,
+                CREATE_SEPARATE_WOW_VDM = 0x00000800,
+                CREATE_SHARED_WOW_VDM = 0x00001000,
+                CREATE_SUSPENDED = 0x00000004,
+                CREATE_UNICODE_ENVIRONMENT = 0x00000400,
+                DEBUG_ONLY_THIS_PROCESS = 0x00000002,
+                DEBUG_PROCESS = 0x00000001,
+                DETACHED_PROCESS = 0x00000008,
+                EXTENDED_STARTUPINFO_PRESENT = 0x00080000,
+                INHERIT_PARENT_AFFINITY = 0x00010000,
+            }
+
+            [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+            internal struct STARTUPINFOEX
+            {
+                public STARTUPINFO StartupInfo;
+                public IntPtr lpAttributeList;
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            internal struct PROFILEINFO
+            {
+                internal int dwSize;
+                internal int dwFlags;
+                [MarshalAs(UnmanagedType.LPTStr)]
+                internal String lpUserName;
+                [MarshalAs(UnmanagedType.LPTStr)]
+                internal String lpProfilePath;
+                [MarshalAs(UnmanagedType.LPTStr)]
+                internal String lpDefaultPath;
+                [MarshalAs(UnmanagedType.LPTStr)]
+                internal String lpServerName;
+                [MarshalAs(UnmanagedType.LPTStr)]
+                internal String lpPolicyPath;
+                internal IntPtr hProfile;
             }
 
             internal static Boolean RegistryLoadPrivilegeSet = false;
@@ -1377,7 +1439,7 @@ namespace Abstractions.WindowsApi
                 startInfo.lpDesktop = "Winsta0\\Default";   // TBD: Support other desktops?
 
                 SafeNativeMethods.PROCESS_INFORMATION procInfo = new SafeNativeMethods.PROCESS_INFORMATION();
-                if (!SafeNativeMethods.CreateProcessAsUser(token, null, cmdLine, ref defSec, ref defSec, false, SafeNativeMethods.CREATE_UNICODE_ENVIRONMENT, environmentBlock, null, ref startInfo, out procInfo))
+                if (!SafeNativeMethods.CreateProcessAsUser(token, null, cmdLine, ref defSec, ref defSec, false, SafeNativeMethods.CreationFlags.CREATE_UNICODE_ENVIRONMENT, environmentBlock, null, ref startInfo, out procInfo))
                 {
                     LibraryLogging.Error("StartProcessWithToken(IntPtr, {1}) CreateProcessAsUser Error:{0}", LastError(), cmdLine);
                 }
@@ -1393,6 +1455,97 @@ namespace Abstractions.WindowsApi
             {
                 SafeNativeMethods.CloseHandle(environmentBlock);
             }
+        }
+
+        public static bool StartProcessAsUserWait(string username, string domain, string password, string command)
+        {
+            IntPtr hToken = IntPtr.Zero;
+
+            if (SafeNativeMethods.LogonUser(username, domain, password, (int)SafeNativeMethods.LogonType.LOGON32_LOGON_INTERACTIVE, (int)SafeNativeMethods.LogonProvider.LOGON32_PROVIDER_DEFAULT, out hToken))
+            {
+                SafeNativeMethods.PROFILEINFO pinfo = new SafeNativeMethods.PROFILEINFO();
+                pinfo.dwSize = Marshal.SizeOf(pinfo);
+                pinfo.lpUserName = username;
+
+                if (SafeNativeMethods.LoadUserProfile(hToken, ref pinfo))
+                {
+                    using (Process proc = StartProcessWithToken(hToken, command))
+                    {
+                        try
+                        {
+                            proc.WaitForExit();
+                        }
+                        catch
+                        {
+                            if (!SafeNativeMethods.UnloadUserProfile(hToken, pinfo.hProfile))
+                            {
+                                LibraryLogging.Error("StartProcessAsUserWait({0}, {1}, ****, {2}) UnloadUserProfile Error:{3}", username, domain, command, LastError());
+                            }
+                            CloseHandle(hToken);
+                            return false;
+                        }
+                    }
+                    if (!SafeNativeMethods.UnloadUserProfile(hToken, pinfo.hProfile))
+                    {
+                        LibraryLogging.Error("StartProcessAsUserWait({0}, {1}, ****, {2}) UnloadUserProfile Error:{3}", username, domain, command, LastError());
+                    }
+                }
+                else
+                {
+                    LibraryLogging.Error("StartProcessAsUserWait({0}, {1}, ****, {2}) LoadUserProfile Error:{3}", username, domain, command, LastError());
+                    CloseHandle(hToken);
+                    return false;
+                }
+
+                CloseHandle(hToken);
+            }
+            else
+            {
+                LibraryLogging.Error("StartProcessAsUserWait({0}, {1}, ****, {2}) LogonUser Error:{3}", username, domain, command, LastError());
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Run app as system
+        /// </summary>
+        /// <param name="Application"></param>
+        /// <param name="CommandLine"></param>
+        /// <returns>return code of the app or uint.MaxValue if exception</returns>
+        public static uint CProcess(string Application, string CommandLine)
+        {
+            SafeNativeMethods.PROCESS_INFORMATION pInfo = new SafeNativeMethods.PROCESS_INFORMATION();
+            SafeNativeMethods.STARTUPINFO sInfo = new SafeNativeMethods.STARTUPINFO();
+            SafeNativeMethods.SECURITY_ATTRIBUTES pSec = new SafeNativeMethods.SECURITY_ATTRIBUTES();
+            SafeNativeMethods.SECURITY_ATTRIBUTES tSec = new SafeNativeMethods.SECURITY_ATTRIBUTES();
+            pSec.nLength = Marshal.SizeOf(pSec);
+            tSec.nLength = Marshal.SizeOf(tSec);
+
+            if (SafeNativeMethods.CreateProcess(Application, CommandLine, ref pSec, ref tSec, false, 0x0020, IntPtr.Zero, null, ref sInfo, out pInfo))
+            {
+                if (SafeNativeMethods.WaitForSingleObject(pInfo.hProcess, -1) == 0)
+                {
+                    uint ExitCode;
+                    if (!SafeNativeMethods.GetExitCodeProcess(pInfo.hProcess, out ExitCode))
+                    {
+                        LibraryLogging.Error(String.Format("CProcess() GetExitCodeProcess Error:{0}", LastError()));
+                        return uint.MaxValue;
+                    }
+                    return ExitCode;
+                }
+                else
+                {
+                    LibraryLogging.Error(String.Format("CProcess() WaitForSingleObject Error:{0}", LastError()));
+                }
+            }
+            else
+            {
+                LibraryLogging.Error(String.Format("CreateProcess Error:{0}", LastError()));
+            }
+
+            return uint.MaxValue;
         }
 
         public static NetworkCredential GetCredentials(string caption, string message)

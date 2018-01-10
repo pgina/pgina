@@ -48,10 +48,14 @@
             this.notification_usr = new System.Windows.Forms.GroupBox();
             this.notification_usr_grid = new System.Windows.Forms.DataGridView();
             this.dataGridViewCheckBoxColumn8 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.dataGridViewCheckBoxColumn8logon = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.dataGridViewCheckBoxColumn8logoff = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.dataGridViewTextBoxColumn8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.notification_sys = new System.Windows.Forms.GroupBox();
             this.notification_sys_grid = new System.Windows.Forms.DataGridView();
             this.dataGridViewCheckBoxColumn4 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.dataGridViewCheckBoxColumn4logon = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.dataGridViewCheckBoxColumn4logoff = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tab_changepwd = new System.Windows.Forms.TabPage();
             this.changepwd_usr = new System.Windows.Forms.GroupBox();
@@ -270,6 +274,8 @@
             this.notification_usr_grid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.notification_usr_grid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewCheckBoxColumn8,
+            this.dataGridViewCheckBoxColumn8logon,
+            this.dataGridViewCheckBoxColumn8logoff,
             this.dataGridViewTextBoxColumn8});
             this.notification_usr_grid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.notification_usr_grid.Location = new System.Drawing.Point(3, 16);
@@ -284,6 +290,22 @@
             this.dataGridViewCheckBoxColumn8.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this.dataGridViewCheckBoxColumn8.ToolTipText = "submit user password";
             this.dataGridViewCheckBoxColumn8.Width = 85;
+            //
+            // dataGridViewCheckBoxColumn8logon
+            //
+            this.dataGridViewCheckBoxColumn8logon.HeaderText = "logon";
+            this.dataGridViewCheckBoxColumn8logon.Name = "dataGridViewCheckBoxColumn8logon";
+            this.dataGridViewCheckBoxColumn8logon.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.dataGridViewCheckBoxColumn8logon.ToolTipText = "run on logon";
+            this.dataGridViewCheckBoxColumn8logon.Width = 50;
+            //
+            // dataGridViewCheckBoxColumn8logoff
+            //
+            this.dataGridViewCheckBoxColumn8logoff.HeaderText = "logoff";
+            this.dataGridViewCheckBoxColumn8logoff.Name = "dataGridViewCheckBoxColumn8logoff";
+            this.dataGridViewCheckBoxColumn8logoff.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.dataGridViewCheckBoxColumn8logoff.ToolTipText = "run on logoff";
+            this.dataGridViewCheckBoxColumn8logoff.Width = 50;
             //
             // dataGridViewTextBoxColumn8
             //
@@ -307,6 +329,8 @@
             this.notification_sys_grid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.notification_sys_grid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewCheckBoxColumn4,
+            this.dataGridViewCheckBoxColumn4logon,
+            this.dataGridViewCheckBoxColumn4logoff,
             this.dataGridViewTextBoxColumn4});
             this.notification_sys_grid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.notification_sys_grid.Location = new System.Drawing.Point(3, 16);
@@ -321,6 +345,22 @@
             this.dataGridViewCheckBoxColumn4.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this.dataGridViewCheckBoxColumn4.ToolTipText = "submit user password";
             this.dataGridViewCheckBoxColumn4.Width = 85;
+            //
+            // dataGridViewCheckBoxColumn4logon
+            //
+            this.dataGridViewCheckBoxColumn4logon.HeaderText = "logon";
+            this.dataGridViewCheckBoxColumn4logon.Name = "dataGridViewCheckBoxColumn4logon";
+            this.dataGridViewCheckBoxColumn4logon.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.dataGridViewCheckBoxColumn4logon.ToolTipText = "run on logon";
+            this.dataGridViewCheckBoxColumn4logon.Width = 50;
+            //
+            // dataGridViewCheckBoxColumn4logoff
+            //
+            this.dataGridViewCheckBoxColumn4logoff.HeaderText = "logoff";
+            this.dataGridViewCheckBoxColumn4logoff.Name = "dataGridViewCheckBoxColumn4logoff";
+            this.dataGridViewCheckBoxColumn4logoff.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.dataGridViewCheckBoxColumn4logoff.ToolTipText = "run on logoff";
+            this.dataGridViewCheckBoxColumn4logoff.Width = 50;
             //
             // dataGridViewTextBoxColumn4
             //
@@ -451,8 +491,8 @@
             this.macros_label.Name = "macros_label";
             this.macros_label.Size = new System.Drawing.Size(572, 26);
             this.macros_label.TabIndex = 1;
-            this.macros_label.Text = "Macros:\r\n%u = Username, %o OriginalUsername, %p Password, %b = oldPassword, %s = " +
-                "SID, %e = PasswordEXP, %i = SessionID";
+            this.macros_label.Text = "Macros: %u = Username, %o = OriginalUsername, %p = Password, %b = oldPassword, %s = " +
+                "SID, %e = PasswordEXP,\r\n %i = SessionID, %Ae = Authentication plugins, %Ao = Authorization plugins, %Gw = Gateway plugins";
             //
             // Configuration
             //
@@ -517,8 +557,12 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
         private System.Windows.Forms.DataGridView notification_usr_grid;
         private System.Windows.Forms.DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn8;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn8logon;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn8logoff;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn8;
         private System.Windows.Forms.DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn4;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn4logon;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn4logoff;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
         private System.Windows.Forms.DataGridView changepwd_usr_grid;
         private System.Windows.Forms.DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn9;
