@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2017, pGina Team
+	Copyright (c) 2018, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -30,13 +30,14 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.DirectoryServices.Protocols;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Net;
 using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Security.Cryptography;
+
 using pGina.Shared.Types;
 
 namespace pGina.Plugin.Ldap
@@ -71,9 +72,19 @@ namespace pGina.Plugin.Ldap
         private bool m_verifyCert;
 
         /// <summary>
+        /// Check the SSL certificate against a copy in local machine cert store
+        /// </summary>
+        private bool m_verifyCertMatch;
+
+        /// <summary>
         /// The SSL certificate to verify against (if required)
         /// </summary>
         private X509Certificate2 m_cert;
+
+        /// <summary>
+        /// The SSL certificate to verify against (if required)
+        /// </summary>
+        private List<string> m_hostname;
 
         private Dictionary<string, string> pGinaSettings = new Dictionary<string, string>();
 
@@ -91,6 +102,11 @@ namespace pGina.Plugin.Ldap
             m_useTls = Settings.Store.UseTls;
             m_verifyCert = Settings.Store.RequireCert;
             string certFile = Settings.Store.ServerCertFile;
+            if (certFile.Equals("MATCH"))
+            {
+                certFile = "";
+                m_verifyCertMatch = true;
+            }
             if ((m_useSsl || m_useTls) && m_verifyCert)
             {
                 if ( !string.IsNullOrEmpty(certFile) && File.Exists(certFile))
@@ -107,6 +123,7 @@ namespace pGina.Plugin.Ldap
             string[] hosts = Settings.Store.LdapHost;
             int port = Settings.Store.LdapPort;
             m_serverIdentifier = new LdapDirectoryIdentifier(hosts, port, false, false);
+            m_hostname = hosts.ToList();
 
             m_logger.DebugFormat("Initializing LdapServer host(s): [{0}], port: {1}, useSSL = {2}, useTLS = {3}, verifyCert = {4}",
                 string.Join(", ", hosts), port, m_useSsl, m_useTls, m_verifyCert);
@@ -162,35 +179,66 @@ namespace pGina.Plugin.Ldap
         /// <returns>true if verification succeeds, false otherwise.</returns>
         private bool VerifyCertName(LdapConnection conn, X509Certificate2 cert)
         {
-            string name = conn.SessionOptions.HostName;
-            string[] dnparts = cert.SubjectName.Name.Split(',');
-            foreach (var dnpart in dnparts)
-            {
-                int i = dnpart.IndexOf("=");
-                if (i > 0 && dnpart.Substring(0, i) == "CN")
-                    if (dnpart.Substring(i + 1) == name)
-                        return true;
-            }
+            string certCN = "";
+            List<string> name = new List<string>() { conn.SessionOptions.HostName };
 
-            foreach (X509Extension extension in cert.Extensions)
+            try
             {
-                if (extension.Oid.Value == "2.5.29.17")
+                List<IPAddress> Ipaddr = new List<IPAddress>();
+                IPHostEntry hostFQDN = Dns.GetHostEntry(conn.SessionOptions.HostName);
+                Ipaddr = hostFQDN.AddressList.ToList();
+
+                foreach (string host in m_hostname)
                 {
-                    AsnEncodedData asndata = new AsnEncodedData(extension.Oid, extension.RawData);
-                    string san = asndata.Format(true);
-                    String[] sans = san.Split('\r');
-                    foreach (var s in sans)
+                    hostFQDN = Dns.GetHostEntry(host.Trim());
+                    if (hostFQDN.AddressList.ToList().Any(x => Ipaddr.Contains(x)))
                     {
-                        int i = s.IndexOf("=");
-                        if (i > 0)
-                            {
-                                string r = s.Substring(i + 1);
-                                if (r == name)
-                                    return true;
-                            }
+                        name.Add(host.Trim());
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                m_logger.InfoFormat("Error in VerifyCertName() during GetHostEntry:{0}", ex);
+            }
+
+            m_logger.InfoFormat("Verify DNS name against:{0}", string.Join(" ", name));
+
+            string[] str = cert.SubjectName.Decode(X500DistinguishedNameFlags.DoNotUsePlusSign | X500DistinguishedNameFlags.DoNotUseQuotes | X500DistinguishedNameFlags.UseNewLines | X500DistinguishedNameFlags.UseUTF8Encoding).Trim('\r').Split('\n');
+            for (int x = 0; x < str.Length; x++)
+            {
+                if (str[x].StartsWith("CN="))
+                    certCN = str[x].Replace("CN=", "").Trim();
+            }
+            certCN = certCN.Replace(".", @"\.").Replace("*", ".*");
+            if (name.Any(x => Regex.IsMatch(x, "^" + certCN)))
+            {
+                return true;
+            }
+
+            List<string> certSAN = new List<string>();
+            foreach (X509Extension extension in cert.Extensions)
+            {
+                AsnEncodedData asndata = new AsnEncodedData(extension.Oid, extension.RawData);
+                string[] adata = asndata.Format(true).Trim('\r').Split('\n');
+                for (int x = 0; x < adata.Length; x++)
+                {
+                    if (adata[x].StartsWith("DNS-Name="))
+                    {
+                        string SANregex = adata[x].Replace("DNS-Name=", "").Trim();
+                        SANregex = SANregex.Replace(".", @"\.").Replace("*", ".*");
+                        certSAN.Add(SANregex);
+                    }
+                }
+            }
+            foreach (string csan in certSAN)
+            {
+                if (name.Any(x => Regex.IsMatch(x, "^" + csan)))
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
 
@@ -205,7 +253,7 @@ namespace pGina.Plugin.Ldap
         {
             m_logger.Debug("VerifyCert(...)");
             m_logger.DebugFormat("Verifying certificate from host: {0}", conn.SessionOptions.HostName);
-
+            
             // Convert to X509Certificate2
             X509Certificate2 serverCert = new X509Certificate2(cert);
 
@@ -214,6 +262,28 @@ namespace pGina.Plugin.Ldap
             {
                 m_logger.Debug("Server certificate accepted without verification.");
                 return true;
+            }
+
+            if (m_verifyCertMatch)
+            {
+                try
+                {
+                    X509Store certStore = new X509Store(StoreLocation.LocalMachine);
+                    certStore.Open(OpenFlags.ReadOnly);
+                    if (certStore.Certificates.Contains(cert))
+                        return true;
+                    else
+                    {
+                        m_logger.ErrorFormat("Can't find server cert in Windows store. Place it in Local Computer cert store.");
+                        return false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    m_logger.ErrorFormat("Server certificate validation exception: {0}", e.Message);
+                }
+
+                return false;
             }
 
             // If the certificate is null, then we verify against the machine's/user's certificate store

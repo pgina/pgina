@@ -278,8 +278,7 @@
             this.sslCertFileTextBox.Name = "sslCertFileTextBox";
             this.sslCertFileTextBox.Size = new System.Drawing.Size(463, 20);
             this.sslCertFileTextBox.TabIndex = 10;
-            this.descriptionToolTip.SetToolTip(this.sslCertFileTextBox, "Optional:  If left empty, the certificate will be validated\r\nagainst the Windows " +
-                    "certificate store.");
+            this.descriptionToolTip.SetToolTip(this.sslCertFileTextBox, "Optional:  If left empty, the certificate will be validated against the Local Computer certificate store.\r\nPut in MATCH if you have stored the certificate in the Local Computer certification storage.");
             //
             // allowEmptyPwCB
             //

@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2017, pGina Team
+	Copyright (c) 2018, pGina Team
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -345,9 +345,12 @@ namespace pGina.Plugin.Ldap
                 return false;
             }
 
-            if (validateServerCertCheckBox.CheckState == CheckState.Checked &&
-                sslCertFileTextBox.Text.Trim().Length > 0 &&
-                !(File.Exists(sslCertFileTextBox.Text.Trim())))
+            if (validateServerCertCheckBox.CheckState == CheckState.Checked && sslCertFileTextBox.Text.Trim().Equals("MATCH"))
+            {
+                return true;
+            }
+
+            if (validateServerCertCheckBox.CheckState == CheckState.Checked && sslCertFileTextBox.Text.Trim().Length > 0 && !File.Exists(sslCertFileTextBox.Text.Trim()))
             {
                 MessageBox.Show("SSL certificate file does not exist."
                     + "Please select a valid certificate file.");
