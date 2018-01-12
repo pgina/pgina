@@ -1435,8 +1435,8 @@ namespace Abstractions.WindowsApi
                 // Now we can finally get into the business at hand and setup our process info
                 SafeNativeMethods.STARTUPINFO startInfo = new SafeNativeMethods.STARTUPINFO();
                 startInfo.cb = Marshal.SizeOf(startInfo);
-                startInfo.wShowWindow = 0;
-                startInfo.lpDesktop = "Winsta0\\Default";   // TBD: Support other desktops?
+                //startInfo.wShowWindow = 0;
+                //startInfo.lpDesktop = "Winsta0\\Default";   // TBD: Support other desktops?
 
                 SafeNativeMethods.PROCESS_INFORMATION procInfo = new SafeNativeMethods.PROCESS_INFORMATION();
                 if (!SafeNativeMethods.CreateProcessAsUser(token, null, cmdLine, ref defSec, ref defSec, false, SafeNativeMethods.CreationFlags.CREATE_UNICODE_ENVIRONMENT, environmentBlock, null, ref startInfo, out procInfo))

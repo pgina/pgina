@@ -277,7 +277,7 @@ namespace pGina.Plugin.scripting
             }
             expand_cmd = expand_cmd.Trim();
             expand_cmd_out = expand_cmd_out.Trim();
-            m_logger.InfoFormat("execute {0} {1} {2}", pwd, sys, expand_cmd_out);
+            m_logger.InfoFormat("execute {0}", expand_cmd_out);
 
             if (sys)
             {
