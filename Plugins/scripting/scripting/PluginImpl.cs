@@ -232,7 +232,7 @@ namespace pGina.Plugin.scripting
             return Convert.ToBoolean(lines.Count);
         }
 
-        internal bool Run(int sessionId, string cmd, UserInformation userInfo, bool pwd, bool sys, string authentication, string authorization, string gateway)
+        internal bool Run(int sessionId, string cmd, UserInformation userInfo, bool pwd, bool? sys, string authentication, string authorization, string gateway)
         {
             string expand_cmd = "";
             string expand_cmd_out = "";
@@ -279,11 +279,15 @@ namespace pGina.Plugin.scripting
             expand_cmd_out = expand_cmd_out.Trim();
             m_logger.InfoFormat("execute {0}", expand_cmd_out);
 
-            if (sys)
+            if (sys == true)
             {
                 return (Abstractions.WindowsApi.pInvokes.CProcess(null, expand_cmd) == 0) ? true : false;
             }
-            else
+            else if (sys == false)
+            {
+                return Abstractions.WindowsApi.pInvokes.StartUserProcessInSessionWait(sessionId, expand_cmd);
+            }
+            else //null while logoff
             {
                 return Abstractions.WindowsApi.pInvokes.StartProcessAsUserWait(userInfo.Username, Environment.MachineName, userInfo.Password, expand_cmd);
             }
@@ -590,7 +594,7 @@ namespace pGina.Plugin.scripting
                 {
                     if (line.logoff)
                     {
-                        if (!Run(userInfo.SessionID, line.script, userInfo, line.pwd, false, authentication, authorization, gateway))
+                        if (!Run(userInfo.SessionID, line.script, userInfo, line.pwd, null, authentication, authorization, gateway))
                             m_logger.InfoFormat("failed to run:{0}", line.script);
                     }
                 }
