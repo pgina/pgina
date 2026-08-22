@@ -1,0 +1,58 @@
+# Visual Studio / .NET
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+
+# Build results
+[Bb]in/
+[Oo]bj/
+**/bin/
+**/obj/
+*.csproj.FileListAbsolute.txt
+
+# NuGet packages
+*.nupkg
+**/packages/
+
+# Rider / Resharper
+.idea/
+_ReSharper*/
+*.DotSettings.user
+
+# VS Code
+.vscode/
+
+# Native build artifacts
+*.pdb
+*.ilk
+*.idb
+*.ipch
+*.obj
+*.lib
+*.dll
+*.exe
+
+# Installer / packaging
+*.msi
+*.msix
+*.appx
+
+# Logs and caches
+*.log
+*.cache
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Other
+*.userprefs
+
+# Ignore local test outputs
+TestResults/
+
+# Allow these config files if intentionally committed
+!/.gitattributes

@@ -1,4 +1,4 @@
-﻿/*
+/*
     Written by Florian Rohmer (2013)
      
     Distribued under the pGina license.
@@ -38,11 +38,11 @@ using System.Web;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-using pGina.Shared.Types;
-using pGina.Shared.Interfaces;
+using OpenCredential.Shared.Types;
+using OpenCredential.Shared.Interfaces;
 using log4net;
 
-namespace pGina.Plugin.LogonScriptFromLDAP
+namespace OpenCredential.Plugin.LogonScriptFromLDAP
 {
     public class PluginImpl : IPluginConfiguration, IPluginAuthenticationGateway, IPluginEventNotifications 
     {

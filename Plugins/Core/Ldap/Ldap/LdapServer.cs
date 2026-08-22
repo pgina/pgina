@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
@@ -36,10 +36,10 @@ using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Text.RegularExpressions;
-using pGina.Shared.Types;
+using OpenCredential.Shared.Types;
 using System.Xml.Serialization;
 
-namespace pGina.Plugin.Ldap
+namespace OpenCredential.Plugin.Ldap
 {
     public class LdapServer : IDisposable
     {

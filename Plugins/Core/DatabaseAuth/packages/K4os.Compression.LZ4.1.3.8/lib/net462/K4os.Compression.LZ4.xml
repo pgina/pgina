@@ -1,0 +1,1673 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>K4os.Compression.LZ4</name>
+    </assembly>
+    <members>
+        <member name="T:K4os.Compression.LZ4.Encoders.EncoderAction">
+            <summary>
+            Action performed by encoder using <c>FlushAndEncode</c> method.
+            </summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Encoders.EncoderAction.None">
+            <summary>Nothing has happened, most likely loading 0 bytes.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Encoders.EncoderAction.Loaded">
+            <summary>Some bytes has been loaded into encoder.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Encoders.EncoderAction.Copied">
+            <summary>Compression was not possible so bytes has been copied.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Encoders.EncoderAction.Encoded">
+            <summary>Compression succeeded.</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Encoders.ILZ4Decoder">
+            <summary>
+            Interface of LZ4 decoder used by LZ4 streams.
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Encoders.ILZ4Decoder.BlockSize">
+            <summary>Block size.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Encoders.ILZ4Decoder.BytesReady">
+            <summary>Bytes already decoded and available to be read.
+            Always smaller than <see cref="P:K4os.Compression.LZ4.Encoders.ILZ4Decoder.BlockSize"/></summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.ILZ4Decoder.Decode(System.Byte*,System.Int32,System.Int32)">
+            <summary>
+            Decodes previously compressed block and caches decompressed block in decoder.
+            Returns number of bytes decoded. These bytes can be read with <see cref="M:K4os.Compression.LZ4.Encoders.ILZ4Decoder.Drain(System.Byte*,System.Int32,System.Int32)" />.
+            </summary>
+            <param name="source">Points to compressed block.</param>
+            <param name="length">Length of compressed block.</param>
+            <param name="blockSize">Size of the block. Value <c>0</c> indicates default block size.</param>
+            <returns>Number of decoded bytes.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.ILZ4Decoder.Inject(System.Byte*,System.Int32)">
+            <summary>
+            Inject already decompressed block and caches it in decoder.
+            Used with uncompressed-yet-chained blocks and pre-made dictionaries.
+            These bytes can be read with <see cref="M:K4os.Compression.LZ4.Encoders.ILZ4Decoder.Drain(System.Byte*,System.Int32,System.Int32)" />.
+            </summary>
+            <param name="source">Points to uncompressed block.</param>
+            <param name="length">Length of uncompressed block.</param>
+            <returns>Number of decoded bytes.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.ILZ4Decoder.Drain(System.Byte*,System.Int32,System.Int32)">
+            <summary>
+            Reads previously decoded bytes. Please note, <paramref name="offset"/> should be
+            negative number, pointing to bytes before current head. 
+            </summary>
+            <param name="target">Buffer to write to.</param>
+            <param name="offset">Offset in source buffer relatively to current head.
+            Please note, it should be negative value.</param>
+            <param name="length">Number of bytes to read.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.ILZ4Decoder.Peek(System.Int32)">
+            <summary>
+            Peeks at previously decoded bytes. Please note, <paramref name="offset"/> should be
+            negative number, pointing to bytes before current head. 
+            </summary>
+            <param name="offset">Offset in source buffer relatively to current head.
+            Please note, it should be negative value.</param>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Encoders.ILZ4Encoder">
+            <summary>
+            Interface of LZ4 encoder used by LZ4 streams.
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Encoders.ILZ4Encoder.BlockSize">
+            <summary>Block size.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Encoders.ILZ4Encoder.BytesReady">
+            <summary>Number of bytes read for compression.
+            Always smaller than <see cref="P:K4os.Compression.LZ4.Encoders.ILZ4Encoder.BlockSize"/></summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.ILZ4Encoder.Topup(System.Byte*,System.Int32)">
+            <summary>Adds bytes to internal buffer. Increases <see cref="P:K4os.Compression.LZ4.Encoders.ILZ4Encoder.BytesReady"/></summary>
+            <param name="source">Source buffer.</param>
+            <param name="length">Source buffer length.</param>
+            <returns>Number of bytes topped up. If this function returns 0 it means that buffer
+            is full (<see cref="P:K4os.Compression.LZ4.Encoders.ILZ4Encoder.BytesReady"/> equals <see cref="P:K4os.Compression.LZ4.Encoders.ILZ4Encoder.BlockSize"/>) and
+            <see cref="M:K4os.Compression.LZ4.Encoders.ILZ4Encoder.Encode(System.Byte*,System.Int32,System.Boolean)"/> should be called to flush it.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.ILZ4Encoder.Encode(System.Byte*,System.Int32,System.Boolean)">
+            <summary>
+            Encodes bytes in internal buffer (see: <see cref="P:K4os.Compression.LZ4.Encoders.ILZ4Encoder.BytesReady"/>, <see cref="M:K4os.Compression.LZ4.Encoders.ILZ4Encoder.Topup(System.Byte*,System.Int32)"/>).
+            If <paramref name="allowCopy"/> is <c>true</c> then if encoded buffer is bigger than
+            source buffer source bytes are copied instead. In such case returned length is negative.
+            </summary>
+            <param name="target">Target buffer.</param>
+            <param name="length">Target buffer length.</param>
+            <param name="allowCopy">Indicates if copying is allowed.</param>
+            <returns>Length of encoded buffer. Negative if bytes are just copied.</returns>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Encoders.LZ4BlockDecoder">
+            <summary>
+            LZ4 decoder used with independent blocks mode. Please note, that it will fail
+            if input data has been compressed with chained blocks
+            (<see cref="T:K4os.Compression.LZ4.Encoders.LZ4FastChainEncoder"/> and <see cref="T:K4os.Compression.LZ4.Encoders.LZ4HighChainEncoder"/>)
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4BlockDecoder.#ctor(System.Int32)">
+            <summary>Creates new instance of block decoder.</summary>
+            <param name="blockSize">Block size. Must be equal or greater to one used for compression.</param>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Encoders.LZ4BlockDecoder.BlockSize">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Encoders.LZ4BlockDecoder.BytesReady">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4BlockDecoder.Decode(System.Byte*,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4BlockDecoder.Inject(System.Byte*,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4BlockDecoder.Drain(System.Byte*,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4BlockDecoder.Peek(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4BlockDecoder.ReleaseUnmanaged">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Encoders.LZ4BlockEncoder">
+            <summary>
+            Independent block encoder. Produces larger files but uses less memory and
+            gives better performance.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4BlockEncoder.#ctor(K4os.Compression.LZ4.LZ4Level,System.Int32)">
+            <summary>Creates new instance of <see cref="T:K4os.Compression.LZ4.Encoders.LZ4BlockEncoder"/></summary>
+            <param name="level">Compression level.</param>
+            <param name="blockSize">Block size.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4BlockEncoder.EncodeBlock(System.Byte*,System.Int32,System.Byte*,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4BlockEncoder.CopyDict(System.Byte*,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Encoders.LZ4ChainDecoder">
+            <summary>LZ4 decoder handling dependent blocks.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4ChainDecoder.#ctor(System.Int32,System.Int32)">
+            <summary>Creates new instance of <see cref="T:K4os.Compression.LZ4.Encoders.LZ4ChainDecoder"/>.</summary>
+            <param name="blockSize">Block size.</param>
+            <param name="extraBlocks">Number of extra blocks.</param>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Encoders.LZ4ChainDecoder.BlockSize">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Encoders.LZ4ChainDecoder.BytesReady">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4ChainDecoder.Decode(System.Byte*,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4ChainDecoder.Inject(System.Byte*,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4ChainDecoder.Drain(System.Byte*,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4ChainDecoder.Peek(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4ChainDecoder.ReleaseUnmanaged">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Encoders.LZ4Decoder">
+            <summary>
+            Static class with factory methods to create LZ4 decoders.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4Decoder.Create(System.Boolean,System.Int32,System.Int32)">
+            <summary>Creates appropriate decoder for given parameters.</summary>
+            <param name="chaining">Dependent blocks.</param>
+            <param name="blockSize">Block size.</param>
+            <param name="extraBlocks">Number of extra blocks.</param>
+            <returns>LZ4 decoder.</returns>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Encoders.LZ4Encoder">
+            <summary>
+            Static class with factory method to create LZ4 encoders.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4Encoder.Create(System.Boolean,K4os.Compression.LZ4.LZ4Level,System.Int32,System.Int32)">
+            <summary>Creates appropriate decoder for given parameters.</summary>
+            <param name="chaining">Dependent blocks.</param>
+            <param name="level">Compression level.</param>
+            <param name="blockSize">Block size.</param>
+            <param name="extraBlocks">Number of extra blocks.</param>
+            <returns>LZ4 encoder.</returns>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Encoders.LZ4EncoderBase">
+            <summary>
+            Base class for LZ4 encoders. Provides basic functionality shared by
+            <see cref="T:K4os.Compression.LZ4.Encoders.LZ4BlockEncoder"/>, <see cref="T:K4os.Compression.LZ4.Encoders.LZ4FastChainEncoder"/>,
+            and <see cref="T:K4os.Compression.LZ4.Encoders.LZ4HighChainEncoder"/> encoders. Do not used directly.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderBase.#ctor(System.Boolean,System.Int32,System.Int32)">
+            <summary>Creates new instance of encoder.</summary>
+            <param name="chaining">Needs to be <c>true</c> if using dependent blocks.</param>
+            <param name="blockSize">Block size.</param>
+            <param name="extraBlocks">Number of extra blocks.</param>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Encoders.LZ4EncoderBase.BlockSize">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Encoders.LZ4EncoderBase.BytesReady">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderBase.Topup(System.Byte*,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderBase.Encode(System.Byte*,System.Int32,System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderBase.EncodeBlock(System.Byte*,System.Int32,System.Byte*,System.Int32)">
+            <summary>Encodes single block using appropriate algorithm.</summary>
+            <param name="source">Source buffer.</param>
+            <param name="sourceLength">Source buffer length.</param>
+            <param name="target">Target buffer.</param>
+            <param name="targetLength">Target buffer length.</param>
+            <returns>Number of bytes actually written to target buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderBase.CopyDict(System.Byte*,System.Int32)">
+            <summary>Copies current dictionary.</summary>
+            <param name="target">Target buffer.</param>
+            <param name="dictionaryLength">Dictionary length.</param>
+            <returns>Dictionary length.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderBase.ReleaseUnmanaged">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions">
+            <summary>
+            Functionality of encoders added on top of fixed interface.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.Topup(K4os.Compression.LZ4.Encoders.ILZ4Encoder,System.Byte*@,System.Int32)">
+            <summary>Tops encoder up with some data.</summary>
+            <param name="encoder">Encoder.</param>
+            <param name="source">Buffer pointer, will be shifted after operation by the number of
+            bytes actually loaded.</param>
+            <param name="length">Length of buffer.</param>
+            <returns><c>true</c> if buffer was topped up, <c>false</c> if no bytes were loaded.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.Topup(K4os.Compression.LZ4.Encoders.ILZ4Encoder,System.Byte[],System.Int32,System.Int32)">
+            <summary>Tops encoder up with some data.</summary>
+            <param name="encoder">Encoder.</param>
+            <param name="source">Buffer.</param>
+            <param name="offset">Buffer offset.</param>
+            <param name="length">Length of buffer.</param>
+            <returns>Number of bytes actually loaded.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.Topup(K4os.Compression.LZ4.Encoders.ILZ4Encoder,System.Byte[],System.Int32@,System.Int32)">
+            <summary>Tops encoder up with some data.</summary>
+            <param name="encoder">Encoder.</param>
+            <param name="source">Buffer.</param>
+            <param name="offset">Buffer offset, will be increased after operation by the number
+            of bytes actually loaded.</param>
+            <param name="length">Length of buffer.</param>
+            <returns><c>true</c> if buffer was topped up, <c>false</c> if no bytes were loaded.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.Encode(K4os.Compression.LZ4.Encoders.ILZ4Encoder,System.Byte[],System.Int32,System.Int32,System.Boolean)">
+            <summary>Encodes all bytes currently stored in encoder into target buffer.</summary>
+            <param name="encoder">Encoder.</param>
+            <param name="target">Target buffer.</param>
+            <param name="offset">Offset in target buffer.</param>
+            <param name="length">Length of target buffer.</param>
+            <param name="allowCopy">if <c>true</c> copying bytes is allowed.</param>
+            <returns>Number of bytes encoder. If bytes were copied than this value is negative.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.Encode(K4os.Compression.LZ4.Encoders.ILZ4Encoder,System.Byte[],System.Int32@,System.Int32,System.Boolean)">
+            <summary>Encodes all bytes currently stored in encoder into target buffer.</summary>
+            <param name="encoder">Encoder.</param>
+            <param name="target">Target buffer.</param>
+            <param name="offset">Offset in target buffer. Will be updated after operation.</param>
+            <param name="length">Length of target buffer.</param>
+            <param name="allowCopy">if <c>true</c> copying bytes is allowed.</param>
+            <returns>Result of this action. Bytes can be Copied (<see cref="F:K4os.Compression.LZ4.Encoders.EncoderAction.Copied"/>),
+            Encoded (<see cref="F:K4os.Compression.LZ4.Encoders.EncoderAction.Encoded"/>) or nothing could have
+            happened (<see cref="F:K4os.Compression.LZ4.Encoders.EncoderAction.None"/>).</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.Encode(K4os.Compression.LZ4.Encoders.ILZ4Encoder,System.Byte*@,System.Int32,System.Boolean)">
+            <summary>Encodes all bytes currently stored in encoder into target buffer.</summary>
+            <param name="encoder">Encoder.</param>
+            <param name="target">Target buffer. Will be updated after operation.</param>
+            <param name="length">Length of buffer.</param>
+            <param name="allowCopy">if <c>true</c> copying bytes is allowed.</param>
+            <returns>Result of this action. Bytes can be Copied (<see cref="F:K4os.Compression.LZ4.Encoders.EncoderAction.Copied"/>),
+            Encoded (<see cref="F:K4os.Compression.LZ4.Encoders.EncoderAction.Encoded"/>) or nothing could have
+            happened (<see cref="F:K4os.Compression.LZ4.Encoders.EncoderAction.None"/>).</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.TopupAndEncode(K4os.Compression.LZ4.Encoders.ILZ4Encoder,System.Byte*,System.Int32,System.Byte*,System.Int32,System.Boolean,System.Boolean,System.Int32@,System.Int32@)">
+            <summary>Tops encoder and encodes content.</summary>
+            <param name="encoder">Encoder.</param>
+            <param name="source">Source buffer (used to top up from).</param>
+            <param name="sourceLength">Source buffer length.</param>
+            <param name="target">Target buffer (used to encode into)</param>
+            <param name="targetLength">Target buffer length.</param>
+            <param name="forceEncode">Forces encoding even if encoder is not full.</param>
+            <param name="allowCopy">Allows to copy bytes if compression was not possible.</param>
+            <param name="loaded">Number of bytes loaded (topped up)</param>
+            <param name="encoded">Number if bytes encoded or copied.
+            Value is 0 if no encoding was done.</param>
+            <returns>Action performed.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.TopupAndEncode(K4os.Compression.LZ4.Encoders.ILZ4Encoder,System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32,System.Boolean,System.Boolean,System.Int32@,System.Int32@)">
+            <summary>Tops encoder and encodes content.</summary>
+            <param name="encoder">Encoder.</param>
+            <param name="source">Source buffer (used to top up from).</param>
+            <param name="sourceOffset">Offset within source buffer.</param>
+            <param name="sourceLength">Source buffer length.</param>
+            <param name="target">Target buffer (used to encode into)</param>
+            <param name="targetOffset">Offset within target buffer.</param>
+            <param name="targetLength">Target buffer length.</param>
+            <param name="forceEncode">Forces encoding even if encoder is not full.</param>
+            <param name="allowCopy">Allows to copy bytes if compression was not possible.</param>
+            <param name="loaded">Number of bytes loaded (topped up)</param>
+            <param name="encoded">Number if bytes encoded or copied.
+            Value is 0 if no encoding was done.</param>
+            <returns>Action performed.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.TopupAndEncode(K4os.Compression.LZ4.Encoders.ILZ4Encoder,System.ReadOnlySpan{System.Byte},System.Span{System.Byte},System.Boolean,System.Boolean,System.Int32@,System.Int32@)">
+            <summary>Tops encoder and encodes content.</summary>
+            <param name="encoder">Encoder.</param>
+            <param name="source">Source buffer (used to top up from).</param>
+            <param name="target">Target buffer (used to encode into)</param>
+            <param name="forceEncode">Forces encoding even if encoder is not full.</param>
+            <param name="allowCopy">Allows to copy bytes if compression was not possible.</param>
+            <param name="loaded">Number of bytes loaded (topped up)</param>
+            <param name="encoded">Number if bytes encoded or copied.
+            Value is 0 if no encoding was done.</param>
+            <returns>Action performed.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.FlushAndEncode(K4os.Compression.LZ4.Encoders.ILZ4Encoder,System.Byte*,System.Int32,System.Boolean,System.Int32@)">
+            <summary>Encoded remaining bytes in encoder.</summary>
+            <param name="encoder">Encoder.</param>
+            <param name="target">Target buffer.</param>
+            <param name="targetLength">Target buffer length.</param>
+            <param name="allowCopy">Allows to copy bytes if compression was not possible.</param>
+            <param name="encoded">Number if bytes encoded or copied.
+            Value is 0 if no encoding was done.</param>
+            <returns>Action performed.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.FlushAndEncode(K4os.Compression.LZ4.Encoders.ILZ4Encoder,System.Byte[],System.Int32,System.Int32,System.Boolean,System.Int32@)">
+            <summary>Encoded remaining bytes in encoder.</summary>
+            <param name="encoder">Encoder.</param>
+            <param name="target">Target buffer.</param>
+            <param name="targetOffset">Offset within target buffer.</param>
+            <param name="targetLength">Target buffer length.</param>
+            <param name="allowCopy">Allows to copy bytes if compression was not possible.</param>
+            <param name="encoded">Number if bytes encoded or copied.
+            Value is 0 if no encoding was done.</param>
+            <returns>Action performed.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.FlushAndEncode(K4os.Compression.LZ4.Encoders.ILZ4Encoder,System.Span{System.Byte},System.Boolean,System.Int32@)">
+            <summary>Encoded remaining bytes in encoder.</summary>
+            <param name="encoder">Encoder.</param>
+            <param name="target">Target buffer.</param>
+            <param name="allowCopy">Allows to copy bytes if compression was not possible.</param>
+            <param name="encoded">Number if bytes encoded or copied.
+            Value is 0 if no encoding was done.</param>
+            <returns>Action performed.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.Drain(K4os.Compression.LZ4.Encoders.ILZ4Decoder,System.Byte[],System.Int32,System.Int32,System.Int32)">
+            <summary>Drains decoder by reading all bytes which are ready.</summary>
+            <param name="decoder">Decoder.</param>
+            <param name="target">Target buffer.</param>
+            <param name="targetOffset">Offset within target buffer.</param>
+            <param name="offset">Offset in decoder relatively to decoder's head.
+            Please note, it should be negative value.</param>
+            <param name="length">Number of bytes.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.Drain(K4os.Compression.LZ4.Encoders.ILZ4Decoder,System.Span{System.Byte},System.Int32,System.Int32)">
+            <summary>Drains decoder by reading all bytes which are ready.</summary>
+            <param name="decoder">Decoder.</param>
+            <param name="target">Target buffer.</param>
+            <param name="offset">Offset in decoder relatively to decoder's head.
+            Please note, it should be negative value.</param>
+            <param name="length">Number of bytes.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.DecodeAndDrain(K4os.Compression.LZ4.Encoders.ILZ4Decoder,System.Byte*,System.Int32,System.Byte*,System.Int32,System.Int32@)">
+            <summary>Decodes data and immediately drains it into target buffer.</summary>
+            <param name="decoder">Decoder.</param>
+            <param name="source">Source buffer (with compressed data, to be decoded).</param>
+            <param name="sourceLength">Source buffer length.</param>
+            <param name="target">Target buffer (to drained into).</param>
+            <param name="targetLength">Target buffer length.</param>
+            <param name="decoded">Number of bytes actually decoded.</param>
+            <returns><c>true</c> decoder was drained, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.DecodeAndDrain(K4os.Compression.LZ4.Encoders.ILZ4Decoder,System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32,System.Int32@)">
+            <summary>Decodes data and immediately drains it into target buffer.</summary>
+            <param name="decoder">Decoder.</param>
+            <param name="source">Source buffer (with compressed data, to be decoded).</param>
+            <param name="sourceOffset">Offset within source buffer.</param>
+            <param name="sourceLength">Source buffer length.</param>
+            <param name="target">Target buffer (to drained into).</param>
+            <param name="targetOffset">Offset within target buffer.</param>
+            <param name="targetLength">Target buffer length.</param>
+            <param name="decoded">Number of bytes actually decoded.</param>
+            <returns><c>true</c> decoder was drained, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.DecodeAndDrain(K4os.Compression.LZ4.Encoders.ILZ4Decoder,System.ReadOnlySpan{System.Byte},System.Span{System.Byte},System.Int32@)">
+            <summary>Decodes data and immediately drains it into target buffer.</summary>
+            <param name="decoder">Decoder.</param>
+            <param name="source">Source buffer (with compressed data, to be decoded).</param>
+            <param name="target">Target buffer (to drained into).</param>
+            <param name="decoded">Number of bytes actually decoded.</param>
+            <returns><c>true</c> decoder was drained, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.Inject(K4os.Compression.LZ4.Encoders.ILZ4Decoder,System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Inject already decompressed block and caches it in decoder.
+            Used with uncompressed-yet-chained blocks and pre-made dictionaries.
+            See <see cref="M:K4os.Compression.LZ4.Encoders.ILZ4Decoder.Inject(System.Byte*,System.Int32)"/>.
+            </summary>
+            <param name="decoder">Decoder.</param>
+            <param name="buffer">Uncompressed block.</param>
+            <param name="offset">Offset in uncompressed block.</param>
+            <param name="length">Length of uncompressed block.</param>
+            <returns>Number of decoded bytes.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4EncoderExtensions.Decode(K4os.Compression.LZ4.Encoders.ILZ4Decoder,System.Byte[],System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Decodes previously compressed block and caches decompressed block in decoder.
+            Returns number of bytes decoded.
+            See <see cref="M:K4os.Compression.LZ4.Encoders.ILZ4Decoder.Decode(System.Byte*,System.Int32,System.Int32)"/>.
+            </summary>
+            <param name="decoder">Decoder.</param>
+            <param name="buffer">Compressed block.</param>
+            <param name="offset">Offset in compressed block.</param>
+            <param name="length">Length of compressed block.</param>
+            <param name="blockSize">Size of the block. Value <c>0</c> indicates default block size.</param>
+            <returns>Number of decoded bytes.</returns>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Encoders.LZ4FastChainEncoder">
+            <summary>
+            LZ4 encoder using dependent blocks with fast compression.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4FastChainEncoder.#ctor(System.Int32,System.Int32)">
+            <summary>Creates new instance of <see cref="T:K4os.Compression.LZ4.Encoders.LZ4FastChainEncoder"/></summary>
+            <param name="blockSize">Block size.</param>
+            <param name="extraBlocks">Number of extra blocks.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4FastChainEncoder.ReleaseUnmanaged">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4FastChainEncoder.EncodeBlock(System.Byte*,System.Int32,System.Byte*,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4FastChainEncoder.CopyDict(System.Byte*,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Encoders.LZ4HighChainEncoder">
+            <summary>
+            LZ4 encoder using dependent blocks with high compression.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4HighChainEncoder.#ctor(K4os.Compression.LZ4.LZ4Level,System.Int32,System.Int32)">
+            <summary>Creates new instance of <see cref="T:K4os.Compression.LZ4.Encoders.LZ4HighChainEncoder"/></summary>
+            <param name="level">Compression level.</param>
+            <param name="blockSize">Block size.</param>
+            <param name="extraBlocks">Number of extra blocks.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4HighChainEncoder.ReleaseUnmanaged">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4HighChainEncoder.EncodeBlock(System.Byte*,System.Int32,System.Byte*,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Encoders.LZ4HighChainEncoder.CopyDict(System.Byte*,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Engine.Algorithm">
+            <summary>Algorithm selection.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Engine.Algorithm.X32">
+            <summary>Intel and ARMv7 version of 32 bit algorithm.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Engine.Algorithm.X64">
+            <summary>Intel version of 64 bit algorithm.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Engine.LL.Algorithm">
+            <summary>Checks what algorithm should be used (32 vs 64 bit).</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Engine.Pubternal">
+            <summary>
+            Existence of this class is an admission of failure.
+            I failed to export internals to test assemblies.
+            Using InternalsVisibleTo work, of course, but with signing (which was requested
+            in https://github.com/MiloszKrajewski/K4os.Compression.LZ4/issues/9) it is
+            absolute PITA. So no, I'm not using InternalsVisibleTo I will just expose this
+            little class with some "redirects" to real internals. 
+            </summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Engine.Pubternal.FastContext">
+            <summary>Pubternal wrapper for LZ4_stream_t.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Engine.Pubternal.FastContext.#ctor">
+            <summary>Creates new instance of wrapper for LZ4_stream_t.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Engine.Pubternal.FastContext.ReleaseUnmanaged">
+            <inheritdoc/>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Engine.Pubternal.CompressFast(K4os.Compression.LZ4.Engine.Pubternal.FastContext,System.Byte*,System.Byte*,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Compresses chunk of data using LZ4_compress_fast_continue.
+            </summary>
+            <param name="context">Wrapper for LZ4_stream_t</param>
+            <param name="source">Source block address.</param>
+            <param name="target">Target block address.</param>
+            <param name="sourceLength">Source block length.</param>
+            <param name="targetLength">Target block length.</param>
+            <param name="acceleration">Acceleration.</param>
+            <returns>Number of bytes actually written to target.</returns>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Internal.BufferPool">
+            <summary>
+            Naive wrapper around ArrayPool. Makes calls if something should be pooled. 
+            </summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.BufferPool.MinPooledSize">
+            <summary>Minimum size of the buffer that can be pooled.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.BufferPool.Alloc(System.Int32,System.Boolean)">
+            <summary>Allocate temporary buffer to store decompressed data.</summary>
+            <param name="size">Minimum size of the buffer.</param>
+            <param name="zero">Clear all data.</param>
+            <returns>Allocated buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.BufferPool.IsPooled(System.Byte[])">
+            <summary>
+            Determines if buffer was pooled or not.
+            The logic is quite simple: if buffer is smaller than 512 bytes are pooled.
+            </summary>
+            <param name="buffer">Buffer.</param>
+            <returns><c>true</c> if buffer was pooled; <c>false</c> otherwise</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.BufferPool.Free(System.Byte[])">
+            <summary>Releases allocated buffer. <see cref="M:K4os.Compression.LZ4.Internal.BufferPool.Alloc(System.Int32,System.Boolean)"/></summary>
+            <param name="buffer">Previously allocated buffer.</param>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Internal.Mem">
+            <summary>Utility class with memory related functions.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.Mem.K1">
+            <summary>1 KiB</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.Mem.K2">
+            <summary>2 KiB</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.Mem.K4">
+            <summary>4 KiB</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.Mem.K8">
+            <summary>8 KiB</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.Mem.K16">
+            <summary>16 KiB</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.Mem.K32">
+            <summary>32 KiB</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.Mem.K64">
+            <summary>64 KiB</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.Mem.K128">
+            <summary>128 KiB</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.Mem.K256">
+            <summary>256 KiB</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.Mem.K512">
+            <summary>512 KiB</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.Mem.M1">
+            <summary>1 MiB</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.Mem.M4">
+            <summary>4 MiB</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.Internal.Mem.Empty">
+            <summary>Empty byte array.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Internal.Mem.System32">
+            <summary>Checks if process is ran in 32-bit mode.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.RoundUp(System.Int32,System.Int32)">
+            <summary>Rounds integer value up to nearest multiple of step.</summary>
+            <param name="value">A value.</param>
+            <param name="step">A step.</param>
+            <returns>Value rounded up.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.CpBlk(System.Void*,System.Void*,System.UInt32)">
+            <summary>
+            Copies memory block for <paramref name="source"/> to <paramref name="target"/>.
+            </summary>
+            <param name="target">The target block address.</param>
+            <param name="source">The source block address.</param>
+            <param name="length">Length in bytes.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.ZBlk(System.Void*,System.Byte,System.UInt32)">
+            <summary>
+            Fills <paramref name="target"/> memory block with predefined <paramref name="value"/>.
+            </summary>
+            <param name="target">The target block address.</param>
+            <param name="value">Value to be used.</param>
+            <param name="length">Length in bytes.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Copy(System.Byte*,System.Byte*,System.Int32)">
+            <summary>
+            Copies memory block for <paramref name="source"/> to <paramref name="target"/>.
+            </summary>
+            <param name="target">The target block address.</param>
+            <param name="source">The source block address.</param>
+            <param name="length">Length in bytes.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Move(System.Byte*,System.Byte*,System.Int32)">
+            <summary>
+            Copies memory block for <paramref name="source"/> to <paramref name="target"/>.
+            It handle "move" semantic properly handling overlapping blocks properly.
+            </summary>
+            <param name="target">The target block address.</param>
+            <param name="source">The source block address.</param>
+            <param name="length">Length in bytes.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Alloc(System.Int32)">
+            <summary>Allocated block of memory. It is NOT initialized with zeroes.</summary>
+            <param name="size">Size in bytes.</param>
+            <returns>Pointer to allocated block.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Zero(System.Byte*,System.Int32)">
+            <summary>Fill block of memory with zeroes.</summary>
+            <param name="target">Address.</param>
+            <param name="length">Length.</param>
+            <returns>Original pointer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Fill(System.Byte*,System.Byte,System.Int32)">
+            <summary>Fills memory block with repeating pattern of a single byte.</summary>
+            <param name="target">Address.</param>
+            <param name="value">A pattern.</param>
+            <param name="length">Length.</param>
+            <returns>Original pointer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.AllocZero(System.Int32)">
+            <summary>Allocates block of memory and fills it with zeroes.</summary>
+            <param name="size">Size in bytes.</param>
+            <returns>Pointer to allocated block.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Free(System.Void*)">
+            <summary>Free memory allocated previously with <see cref="M:K4os.Compression.LZ4.Internal.Mem.Alloc(System.Int32)"/>.</summary>
+            <param name="ptr">Pointer to allocated block.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.CloneArray``1(``0[])">
+            <summary>Clones managed array to unmanaged one.
+            Allows quicker yet less safe unchecked access.</summary>
+            <param name="array">Input array.</param>
+            <returns>Cloned array.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Peek1(System.Void*)">
+            <summary>Reads exactly 1 byte from given address.</summary>
+            <param name="p">Address.</param>
+            <returns>Byte at given address.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Poke1(System.Void*,System.Byte)">
+            <summary>Writes exactly 1 byte to given address.</summary>
+            <param name="p">Address.</param>
+            <param name="v">Value.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Peek2(System.Void*)">
+            <summary>Reads exactly 2 bytes from given address.</summary>
+            <param name="p">Address.</param>
+            <returns>2 bytes at given address.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Poke2(System.Void*,System.UInt16)">
+            <summary>Writes exactly 2 bytes to given address.</summary>
+            <param name="p">Address.</param>
+            <param name="v">Value.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Peek4(System.Void*)">
+            <summary>Reads exactly 4 bytes from given address.</summary>
+            <param name="p">Address.</param>
+            <returns>4 bytes at given address.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Poke4(System.Void*,System.UInt32)">
+            <summary>Writes exactly 4 bytes to given address.</summary>
+            <param name="p">Address.</param>
+            <param name="v">Value.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Peek8(System.Void*)">
+            <summary>Reads exactly 8 bytes from given address.</summary>
+            <param name="p">Address.</param>
+            <returns>8 bytes at given address.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Poke8(System.Void*,System.UInt64)">
+            <summary>Writes exactly 8 bytes to given address.</summary>
+            <param name="p">Address.</param>
+            <param name="v">Value.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Copy1(System.Byte*,System.Byte*)">
+            <summary>Copies exactly 1 byte from source to target.</summary>
+            <param name="target">Target address.</param>
+            <param name="source">Source address.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Copy2(System.Byte*,System.Byte*)">
+            <summary>Copies exactly 2 bytes from source to target.</summary>
+            <param name="target">Target address.</param>
+            <param name="source">Source address.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Copy4(System.Byte*,System.Byte*)">
+            <summary>Copies exactly 4 bytes from source to target.</summary>
+            <param name="target">Target address.</param>
+            <param name="source">Source address.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem.Copy8(System.Byte*,System.Byte*)">
+            <summary>Copies exactly 8 bytes from source to target.</summary>
+            <param name="target">Target address.</param>
+            <param name="source">Source address.</param>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Internal.PinnedMemory">
+            <summary>
+            Represents pinned memory.
+            It either points to unmanaged memory or block of memory from shared array pool.
+            When disposed, it handles it appropriately.
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Internal.PinnedMemory.MaxPooledSize">
+            <summary>
+            Maximum size of the buffer that can be pooled from shared array pool.
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Internal.PinnedMemory.Pointer">
+            <summary>Pointer to block of bytes.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Internal.PinnedMemory.Span">
+            <summary>Pointer to block of bytes as span.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.PinnedMemory.Reference``1">
+            <summary>Pointer to block of bytes.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.PinnedMemory.Alloc(System.Int32,System.Boolean)">
+            <summary>
+            Allocates pinned block of memory, depending on the size it tries to use shared array pool.
+            </summary>
+            <param name="size">Size in bytes.</param>
+            <param name="zero">Indicates if block should be zeroed.</param>
+            <returns>Allocated <see cref="T:K4os.Compression.LZ4.Internal.PinnedMemory"/>.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.PinnedMemory.Alloc(K4os.Compression.LZ4.Internal.PinnedMemory@,System.Int32,System.Boolean)">
+            <summary>
+            Allocates pinned block of memory, depending on the size it tries to use shared array pool.
+            </summary>
+            <param name="memory">Pinned memory pointer.</param>
+            <param name="size">Size in bytes.</param>
+            <param name="zero">Indicates if block should be zeroed.</param>
+            <returns>Allocated <see cref="T:K4os.Compression.LZ4.Internal.PinnedMemory"/>.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.PinnedMemory.Alloc``1(K4os.Compression.LZ4.Internal.PinnedMemory@,System.Boolean)">
+            <summary>
+            Allocates pinned block of memory for one item from shared array pool.
+            </summary>
+            <param name="memory">PinnedMemory pointer.</param>
+            <param name="zero">Indicates if block should be zeroed.</param>
+            <typeparam name="T">Type of item.</typeparam>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.PinnedMemory.Clear">
+            <summary>Fill allocated block of memory with zeros.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.PinnedMemory.Free">
+            <summary>
+            Releases the memory.
+            </summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Internal.UnmanagedResources">
+            <summary>
+            Skeleton for class with unmanaged resources.
+            Implements <see cref="T:System.IDisposable"/> but also handles proper release in
+            case <see cref="M:K4os.Compression.LZ4.Internal.UnmanagedResources.Dispose"/> was not called.
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Internal.UnmanagedResources.IsDisposed">
+            <summary>Determines if object was already disposed.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.UnmanagedResources.ThrowIfDisposed">
+            <summary>Throws exception is object has been disposed already. Convenience method.</summary>
+            <exception cref="T:System.ObjectDisposedException">Thrown if object is already disposed.</exception>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.UnmanagedResources.ReleaseUnmanaged">
+            <summary>Method releasing unmanaged resources.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.UnmanagedResources.ReleaseManaged">
+            <summary>Method releasing managed resources.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.UnmanagedResources.Dispose(System.Boolean)">
+            <summary>
+            Disposed resources.
+            </summary>
+            <param name="disposing"><c>true</c> if dispose was explicitly called,
+            <c>false</c> if called from GC.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.UnmanagedResources.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.UnmanagedResources.Finalize">
+            <summary>Destructor.</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Internal.Mem32">
+            <summary>Unsafe memory operations.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem32.PeekW(System.Void*)">
+            <summary>Reads 4 bytes from given address.</summary>
+            <param name="p">Address.</param>
+            <returns>4 bytes at given address.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem32.PokeW(System.Void*,System.UInt32)">
+            <summary>Writes 4 or 8 bytes to given address.</summary>
+            <param name="p">Address.</param>
+            <param name="v">Value.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem32.Copy16(System.Byte*,System.Byte*)">
+            <summary>Copies exactly 16 bytes from source to target.</summary>
+            <param name="target">Target address.</param>
+            <param name="source">Source address.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem32.Copy18(System.Byte*,System.Byte*)">
+            <summary>Copies exactly 18 bytes from source to target.</summary>
+            <param name="target">Target address.</param>
+            <param name="source">Source address.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem32.WildCopy8(System.Byte*,System.Byte*,System.Void*)">
+            <summary>
+            Copies memory block for <paramref name="source"/> to <paramref name="target"/>
+            up to (around) <paramref name="limit"/>.
+            It does not handle overlapping blocks and may copy up to 8 bytes more than expected.
+            </summary>
+            <param name="target">The target block address.</param>
+            <param name="source">The source block address.</param>
+            <param name="limit">The limit (in target block).</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem32.WildCopy32(System.Byte*,System.Byte*,System.Void*)">
+            <summary>
+            Copies memory block for <paramref name="source"/> to <paramref name="target"/>
+            up to (around) <paramref name="limit"/>.
+            It does not handle overlapping blocks and may copy up to 32 bytes more than expected.
+            This version copies two times 16 bytes (instead of one time 32 bytes)
+            because it must be compatible with offsets >= 16.
+            </summary>
+            <param name="target">The target block address.</param>
+            <param name="source">The source block address.</param>
+            <param name="limit">The limit (in target block).</param>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Internal.Mem64">
+            <summary>Unsafe memory operations.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.Peek2(System.Void*)">
+            <summary>Reads exactly 2 bytes from given address.</summary>
+            <param name="p">Address.</param>
+            <returns>2 bytes at given address.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.Poke2(System.Void*,System.UInt16)">
+            <summary>Writes exactly 2 bytes to given address.</summary>
+            <param name="p">Address.</param>
+            <param name="v">Value.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.Peek4(System.Void*)">
+            <summary>Reads exactly 4 bytes from given address.</summary>
+            <param name="p">Address.</param>
+            <returns>4 bytes at given address.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.Poke4(System.Void*,System.UInt32)">
+            <summary>Writes exactly 4 bytes to given address.</summary>
+            <param name="p">Address.</param>
+            <param name="v">Value.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.Copy1(System.Byte*,System.Byte*)">
+            <summary>Copies exactly 1 byte from source to target.</summary>
+            <param name="target">Target address.</param>
+            <param name="source">Source address.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.Copy2(System.Byte*,System.Byte*)">
+            <summary>Copies exactly 2 bytes from source to target.</summary>
+            <param name="target">Target address.</param>
+            <param name="source">Source address.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.Copy4(System.Byte*,System.Byte*)">
+            <summary>Copies exactly 4 bytes from source to target.</summary>
+            <param name="target">Target address.</param>
+            <param name="source">Source address.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.Peek8(System.Void*)">
+            <summary>Reads exactly 8 bytes from given address.</summary>
+            <param name="p">Address.</param>
+            <returns>8 bytes at given address.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.Poke8(System.Void*,System.UInt64)">
+            <summary>Writes exactly 8 bytes to given address.</summary>
+            <param name="p">Address.</param>
+            <param name="v">Value.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.Copy8(System.Byte*,System.Byte*)">
+            <summary>Copies exactly 8 bytes from source to target.</summary>
+            <param name="target">Target address.</param>
+            <param name="source">Source address.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.PeekW(System.Void*)">
+            <summary>Reads 8 bytes from given address.</summary>
+            <param name="p">Address.</param>
+            <returns>8 bytes at given address.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.PokeW(System.Void*,System.UInt64)">
+            <summary>Writes 8 bytes to given address.</summary>
+            <param name="p">Address.</param>
+            <param name="v">Value.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.Copy16(System.Byte*,System.Byte*)">
+            <summary>Copies exactly 16 bytes from source to target.</summary>
+            <param name="target">Target address.</param>
+            <param name="source">Source address.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.Copy18(System.Byte*,System.Byte*)">
+            <summary>Copies exactly 18 bytes from source to target.</summary>
+            <param name="target">Target address.</param>
+            <param name="source">Source address.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.WildCopy8(System.Byte*,System.Byte*,System.Void*)">
+            <summary>
+            Copies memory block for <paramref name="source"/> to <paramref name="target"/>
+            up to (around) <paramref name="limit"/>.
+            It does not handle overlapping blocks and may copy up to 8 bytes more than expected.
+            </summary>
+            <param name="target">The target block address.</param>
+            <param name="source">The source block address.</param>
+            <param name="limit">The limit (in target block).</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Internal.Mem64.WildCopy32(System.Byte*,System.Byte*,System.Void*)">
+            <summary>
+            Copies memory block for <paramref name="source"/> to <paramref name="target"/>
+            up to (around) <paramref name="limit"/>.
+            It does not handle overlapping blocks and may copy up to 32 bytes more than expected.
+            This version copies two times 16 bytes (instead of one time 32 bytes)
+            because it must be compatible with offsets >= 16.
+            </summary>
+            <param name="target">The target block address.</param>
+            <param name="source">The source block address.</param>
+            <param name="limit">The limit (in target block).</param>
+        </member>
+        <member name="T:K4os.Compression.LZ4.LZ4Codec">
+            <summary>
+            Static class exposing LZ4 block compression methods.
+            </summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.LZ4Codec.Version">
+            <summary>Version of LZ4 implementation.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.LZ4Codec.Enforce32">
+            <summary>
+            Enforces 32-bit compression/decompression algorithm even on 64-bit systems.
+            Please note, this property should not be used on regular basis, it just allows
+            to workaround some problems on platforms which do not support 64-bit the same was
+            as Intel (for example: unaligned read/writes).
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Codec.MaximumOutputSize(System.Int32)">
+            <summary>Maximum size after compression.</summary>
+            <param name="length">Length of input buffer.</param>
+            <returns>Maximum length after compression.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Codec.Encode(System.Byte*,System.Int32,System.Byte*,System.Int32,K4os.Compression.LZ4.LZ4Level)">
+            <summary>Compresses data from one buffer into another.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="sourceLength">Length of input buffer.</param>
+            <param name="target">Output buffer.</param>
+            <param name="targetLength">Output buffer length.</param>
+            <param name="level">Compression level.</param>
+            <returns>Number of bytes written, or negative value if output buffer is too small.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Codec.Encode(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},K4os.Compression.LZ4.LZ4Level)">
+            <summary>Compresses data from one buffer into another.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="target">Output buffer.</param>
+            <param name="level">Compression level.</param>
+            <returns>Number of bytes written, or negative value if output buffer is too small.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Codec.Encode(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32,K4os.Compression.LZ4.LZ4Level)">
+            <summary>Compresses data from one buffer into another.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="sourceOffset">Input buffer offset.</param>
+            <param name="sourceLength">Input buffer length.</param>
+            <param name="target">Output buffer.</param>
+            <param name="targetOffset">Output buffer offset.</param>
+            <param name="targetLength">Output buffer length.</param>
+            <param name="level">Compression level.</param>
+            <returns>Number of bytes written, or negative value if output buffer is too small.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Codec.Decode(System.Byte*,System.Int32,System.Byte*,System.Int32)">
+            <summary>Decompresses data from given buffer.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="sourceLength">Input buffer length.</param>
+            <param name="target">Output buffer.</param>
+            <param name="targetLength">Output buffer length.</param>
+            <returns>Number of bytes written, or negative value if output buffer is too small.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Codec.PartialDecode(System.Byte*,System.Int32,System.Byte*,System.Int32)">
+            <summary>Decompresses data from given buffer, stopping at <paramref name="targetLength"/>.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="sourceLength">Input buffer length.</param>
+            <param name="target">Output buffer.</param>
+            <param name="targetLength">Output buffer length. Decoding stops at this amount.</param>
+            <returns>Number of bytes written, or negative value if output buffer is too small.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Codec.Decode(System.Byte*,System.Int32,System.Byte*,System.Int32,System.Byte*,System.Int32)">
+            <summary>Decompresses data from given buffer.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="sourceLength">Input buffer length.</param>
+            <param name="target">Output buffer.</param>
+            <param name="targetLength">Output buffer length.</param>
+            <param name="dictionary">Dictionary buffer.</param>
+            <param name="dictionaryLength">Dictionary buffer length.</param>
+            <returns>Number of bytes written, or negative value if output buffer is too small.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Codec.PartialDecode(System.ReadOnlySpan{System.Byte},System.Span{System.Byte})">
+            <summary>Decompresses data from given buffer, stopping at <paramref name="target"/> buffer length.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="target">Output buffer. Decoding stops at end of buffer.</param>
+            <returns>Number of bytes written, or negative value if output buffer is too small.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Codec.Decode(System.ReadOnlySpan{System.Byte},System.Span{System.Byte})">
+            <summary>Decompresses data from given buffer.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="target">Output buffer.</param>
+            <returns>Number of bytes written, or negative value if output buffer is too small.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Codec.Decode(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},System.ReadOnlySpan{System.Byte})">
+            <summary>Decompresses data from given buffer.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="target">Output buffer.</param>
+            <param name="dictionary">Dictionary buffer.</param>
+            <returns>Number of bytes written, or negative value if output buffer is too small.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Codec.Decode(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32)">
+            <summary>Decompresses data from given buffer.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="sourceOffset">Input buffer offset.</param>
+            <param name="sourceLength">Input buffer length.</param>
+            <param name="target">Output buffer.</param>
+            <param name="targetOffset">Output buffer offset.</param>
+            <param name="targetLength">Output buffer length.</param>
+            <returns>Number of bytes written, or negative value if output buffer is too small.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Codec.Decode(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32)">
+            <summary>Decompresses data from given buffer.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="sourceOffset">Input buffer offset.</param>
+            <param name="sourceLength">Input buffer length.</param>
+            <param name="target">Output buffer.</param>
+            <param name="targetOffset">Output buffer offset.</param>
+            <param name="targetLength">Output buffer length.</param>
+            <param name="dictionary">Dictionary buffer.</param>
+            <param name="dictionaryOffset">Dictionary buffer offset.</param>
+            <param name="dictionaryLength">Dictionary buffer length.</param>
+            <returns>Number of bytes written, or negative value if output buffer is too small.</returns>
+        </member>
+        <member name="T:K4os.Compression.LZ4.LZ4Level">
+            <summary>Compression level.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.LZ4Level.L00_FAST">
+            <summary>Fast compression.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.LZ4Level.L03_HC">
+            <summary>High compression, level 3.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.LZ4Level.L04_HC">
+            <summary>High compression, level 4.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.LZ4Level.L05_HC">
+            <summary>High compression, level 5.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.LZ4Level.L06_HC">
+            <summary>High compression, level 6.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.LZ4Level.L07_HC">
+            <summary>High compression, level 7.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.LZ4Level.L08_HC">
+            <summary>High compression, level 8.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.LZ4Level.L09_HC">
+            <summary>High compression, level 9.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.LZ4Level.L10_OPT">
+            <summary>Optimal compression, level 10.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.LZ4Level.L11_OPT">
+            <summary>Optimal compression, level 11.</summary>
+        </member>
+        <member name="F:K4os.Compression.LZ4.LZ4Level.L12_MAX">
+            <summary>Maximum compression, level 12.</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.LZ4Pickler">
+            <summary>
+            Pickling support with LZ4 compression.
+            </summary>
+            <summary>
+            Pickling support with LZ4 compression.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.Pickle(System.Byte[],K4os.Compression.LZ4.LZ4Level)">
+            <summary>Compresses input buffer into self-contained package.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="level">Compression level.</param>
+            <returns>Output buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.Pickle(System.Byte[],System.Int32,System.Int32,K4os.Compression.LZ4.LZ4Level)">
+            <summary>Compresses input buffer into self-contained package.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="sourceIndex">Input buffer offset.</param>
+            <param name="sourceLength">Input buffer length.</param>
+            <param name="level">Compression level.</param>
+            <returns>Output buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.Pickle(System.Byte*,System.Int32,K4os.Compression.LZ4.LZ4Level)">
+            <summary>Compresses input buffer into self-contained package.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="length">Length of input data.</param>
+            <param name="level">Compression level.</param>
+            <returns>Output buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.Pickle(System.ReadOnlySpan{System.Byte},K4os.Compression.LZ4.LZ4Level)">
+            <summary>Compresses input buffer into self-contained package.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="level">Compression level.</param>
+            <returns>Output buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.Pickle``1(System.ReadOnlySpan{System.Byte},``0,K4os.Compression.LZ4.LZ4Level)">
+            <summary>Compresses input buffer into self-contained package.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="writer">Where the compressed data is written.</param>
+            <param name="level">Compression level.</param>
+            <returns>Output buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.Pickle(System.ReadOnlySpan{System.Byte},System.Buffers.IBufferWriter{System.Byte},K4os.Compression.LZ4.LZ4Level)">
+            <summary>Compresses input buffer into self-contained package.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="writer">Where the compressed data is written.</param>
+            <param name="level">Compression level.</param>
+            <returns>Output buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.Unpickle(System.Byte[])">
+            <summary>Decompresses previously pickled buffer (see: <see cref="T:K4os.Compression.LZ4.LZ4Pickler"/>.</summary>
+            <param name="source">Input buffer.</param>
+            <returns>Output buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.Unpickle(System.Byte[],System.Int32,System.Int32)">
+            <summary>Decompresses previously pickled buffer (see: <see cref="T:K4os.Compression.LZ4.LZ4Pickler"/>.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="index">Input buffer offset.</param>
+            <param name="count">Input buffer length.</param>
+            <returns>Output buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.Unpickle(System.Byte*,System.Int32)">
+            <summary>Decompresses previously pickled buffer (see: <see cref="T:K4os.Compression.LZ4.LZ4Pickler"/>.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="count">Input buffer length.</param>
+            <returns>Output buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.Unpickle(System.ReadOnlySpan{System.Byte})">
+            <summary>Decompresses previously pickled buffer (see: <see cref="T:K4os.Compression.LZ4.LZ4Pickler"/>.</summary>
+            <param name="source">Input buffer.</param>
+            <returns>Output buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.Unpickle``1(System.ReadOnlySpan{System.Byte},``0)">
+            <summary>Decompresses previously pickled buffer (see: <see cref="T:K4os.Compression.LZ4.LZ4Pickler"/>.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="writer">Where the decompressed data is written.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.Unpickle(System.ReadOnlySpan{System.Byte},System.Buffers.IBufferWriter{System.Byte})">
+            <summary>Decompresses previously pickled buffer (see: <see cref="T:K4os.Compression.LZ4.LZ4Pickler"/>.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="writer">Where the decompressed data is written.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.UnpickledSize(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Returns the uncompressed size of a chunk of compressed data.
+            </summary>
+            <param name="source">The data to inspect.</param>
+            <returns>The size in bytes of the data once unpickled.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.UnpickledSize(K4os.Compression.LZ4.PickleHeader@)">
+            <summary>
+            Returns the uncompressed size of a chunk of compressed data.
+            </summary>
+            <param name="header">Decoded header.</param>
+            <returns>The size in bytes of the data once unpickled.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.LZ4Pickler.Unpickle(System.ReadOnlySpan{System.Byte},System.Span{System.Byte})">
+            <summary>Decompresses previously pickled buffer (see: <see cref="T:K4os.Compression.LZ4.LZ4Pickler"/>.</summary>
+            <param name="source">Input buffer.</param>
+            <param name="output">Where the decompressed data is written.</param>
+            <remarks>
+            You obtain the size of the output buffer by calling <see cref="M:K4os.Compression.LZ4.LZ4Pickler.UnpickledSize(System.ReadOnlySpan{System.Byte})"/>.
+            </remarks>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.AllowNullAttribute">
+            <summary>
+            Specifies that null is allowed as an input even if the corresponding type disallows it.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DisallowNullAttribute">
+            <summary>
+            Specifies that null is disallowed as an input even if the corresponding type allows it.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute">
+            <summary>
+            Applied to a method that will never return under any circumstance.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute">
+            <summary>
+            Specifies that the method will not return if the associated Boolean parameter is passed the specified value.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.#ctor(System.Boolean)">
+            <summary>
+            Initializes the attribute with the specified parameter value.
+            </summary>
+            <param name="parameterValue">
+            The condition parameter value. Code after the method will be considered unreachable
+            by diagnostics if the argument to the associated parameter matches this value.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.ParameterValue">
+            <summary>
+            Gets the condition parameter value.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullAttribute">
+            <summary>
+            Specifies that an output may be null even if the corresponding type disallows it.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute">
+            <summary>
+            Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue"/>, the parameter may be null even if the corresponding type disallows it.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.#ctor(System.Boolean)">
+            <summary>
+            Initializes the attribute with the specified return value condition.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter may be null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue">
+            <summary>
+            Gets the return value condition.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute">
+            <summary>
+            Specifies that the method or property will ensure that the listed field and property members have not-null values.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String)">
+            <summary>
+            Initializes the attribute with a field or property member.
+            </summary>
+            <param name="member">The field or property member that is promised to be not-null.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String[])">
+            <summary>
+            Initializes the attribute with the list of field and property members.
+            </summary>
+            <param name="members">The list of field and property members that are promised to be not-null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.Members">
+            <summary>
+            Gets field or property member names.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute">
+            <summary>
+            Specifies that the method or property will ensure that the listed field and property
+            members have not-null values when returning with the specified return value condition.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String)">
+            <summary>
+            Initializes the attribute with the specified return value condition and a field or property member.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter will not be null.</param>
+            <param name="member">The field or property member that is promised to be not-null.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String[])">
+            <summary>
+            Initializes the attribute with the specified return value condition and list of field and property members.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter will not be null.</param>
+            <param name="members">The list of field and property members that are promised to be not-null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.ReturnValue">
+            <summary>
+            Gets the return value condition.
+            </summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.Members">
+            <summary>
+            Gets field or property member names.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullAttribute">
+            <summary>
+            Specifies that an output will not be null even if the corresponding type allows it.
+            Specifies that an input argument was not null when the call returns.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute">
+            <summary>
+            Specifies that the output will be non-null if the named parameter is non-null.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.#ctor(System.String)">
+            <summary>
+            Initializes the attribute with the associated parameter name.
+            </summary>
+            <param name="parameterName">The associated parameter name. The output will be non-null if the argument to the parameter specified is non-null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.ParameterName">
+            <summary>
+            Gets the associated parameter name.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute">
+            <summary>
+            Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.ReturnValue"/>, the parameter will not be null even if the corresponding type allows it.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.#ctor(System.Boolean)">
+            <summary>
+            Initializes the attribute with the specified return value condition.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter will not be null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute">
+            <summary>
+            Specifies that this constructor sets all required members for the current type,
+            and callers do not need to set any required members themselves.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute">
+            <summary>
+            Specifies the syntax used in a string.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.#ctor(System.String)">
+            <summary>
+            Initializes the <see cref="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/> with the identifier of the syntax used.
+            </summary>
+            <param name="syntax">The syntax identifier.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.#ctor(System.String,System.Object[])">
+            <summary>Initializes the <see cref="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/> with the identifier of the syntax used.</summary>
+            <param name="syntax">The syntax identifier.</param>
+            <param name="arguments">Optional arguments associated with the specific syntax employed.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Syntax">
+            <summary>Gets the identifier of the syntax used.</summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Arguments">
+            <summary>Optional arguments associated with the specific syntax employed.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.CompositeFormat">
+            <summary>The syntax identifier for strings containing composite formats for string formatting.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.DateOnlyFormat">
+            <summary>The syntax identifier for strings containing date format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.DateTimeFormat">
+            <summary>The syntax identifier for strings containing date and time format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.EnumFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.Enum"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.Guid"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Json">
+            <summary>The syntax identifier for strings containing JavaScript Object Notation (JSON).</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.NumericFormat">
+            <summary>The syntax identifier for strings containing numeric format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Regex">
+            <summary>The syntax identifier for strings containing regular expressions.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.TimeOnlyFormat">
+            <summary>The syntax identifier for strings containing time format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.TimeSpanFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.TimeSpan"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Uri">
+            <summary>The syntax identifier for strings containing URIs.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Xml">
+            <summary>The syntax identifier for strings containing XML.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.UnscopedRefAttribute">
+            <summary>
+            Used to indicate a byref escapes and is not scoped.
+            </summary>
+            <remarks>
+            <para>
+            There are several cases where the C# compiler treats a <see langword="ref"/> as implicitly
+            <see langword="scoped"/> - where the compiler does not allow the <see langword="ref"/> to escape the method.
+            </para>
+            <para>
+            For example:
+            <list type="number">
+                <item><see langword="this"/> for <see langword="struct"/> instance methods.</item>
+                <item><see langword="ref"/> parameters that refer to <see langword="ref"/> <see langword="struct"/> types.</item>
+                <item><see langword="out"/> parameters.</item>
+            </list>
+            </para>
+            <para>
+            This attribute is used in those instances where the <see langword="ref"/> should be allowed to escape.
+            </para>
+            <para>
+            Applying this attribute, in any form, has impact on consumers of the applicable API. It is necessary for
+            API authors to understand the lifetime implications of applying this attribute and how it may impact their users.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:System.Index">
+            <summary>Represent a type can be used to index a collection either from the start or the end.</summary>
+            <remarks>
+            Index is used by the C# compiler to support the new index syntax
+            <code>
+            int[] someArray = new int[5] { 1, 2, 3, 4, 5 } ;
+            int lastElement = someArray[^1]; // lastElement = 5
+            </code>
+            </remarks>
+        </member>
+        <member name="M:System.Index.#ctor(System.Int32,System.Boolean)">
+            <summary>Construct an Index using a value and indicating if the index is from the start or from the end.</summary>
+            <param name="value">The index value. it has to be zero or positive number.</param>
+            <param name="fromEnd">Indicating if the index is from the start or from the end.</param>
+            <remarks>
+            If the Index constructed from the end, index value 1 means pointing at the last element and index value 0 means pointing at beyond last element.
+            </remarks>
+        </member>
+        <member name="P:System.Index.Start">
+            <summary>Create an Index pointing at first element.</summary>
+        </member>
+        <member name="P:System.Index.End">
+            <summary>Create an Index pointing at beyond last element.</summary>
+        </member>
+        <member name="M:System.Index.FromStart(System.Int32)">
+            <summary>Create an Index from the start at the position indicated by the value.</summary>
+            <param name="value">The index value from the start.</param>
+        </member>
+        <member name="M:System.Index.FromEnd(System.Int32)">
+            <summary>Create an Index from the end at the position indicated by the value.</summary>
+            <param name="value">The index value from the end.</param>
+        </member>
+        <member name="P:System.Index.Value">
+            <summary>Returns the index value.</summary>
+        </member>
+        <member name="P:System.Index.IsFromEnd">
+            <summary>Indicates whether the index is from the start or the end.</summary>
+        </member>
+        <member name="M:System.Index.GetOffset(System.Int32)">
+            <summary>Calculate the offset from the start using the giving collection length.</summary>
+            <param name="length">The length of the collection that the Index will be used with. length has to be a positive value</param>
+            <remarks>
+            For performance reason, we don't validate the input length parameter and the returned offset value against negative values.
+            we don't validate either the returned offset is greater than the input length.
+            It is expected Index will be used with collections which always have non negative length/count. If the returned offset is negative and
+            then used to index a collection will get out of range exception which will be same affect as the validation.
+            </remarks>
+        </member>
+        <member name="M:System.Index.Equals(System.Object)">
+            <summary>Indicates whether the current Index object is equal to another object of the same type.</summary>
+            <param name="value">An object to compare with this object</param>
+        </member>
+        <member name="M:System.Index.Equals(System.Index)">
+            <summary>Indicates whether the current Index object is equal to another Index object.</summary>
+            <param name="other">An object to compare with this object</param>
+        </member>
+        <member name="M:System.Index.GetHashCode">
+            <summary>Returns the hash code for this instance.</summary>
+        </member>
+        <member name="M:System.Index.op_Implicit(System.Int32)~System.Index">
+            <summary>Converts integer number to an Index.</summary>
+        </member>
+        <member name="M:System.Index.ToString">
+            <summary>Converts the value of the current Index object to its equivalent string representation.</summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.AsyncMethodBuilderAttribute">
+            <summary>
+            Indicates the type of the async method builder that should be used by a language compiler to
+            build the attributed async method or to build the attributed type when used as the return type
+            of an async method.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.AsyncMethodBuilderAttribute.#ctor(System.Type)">
+            <summary>Initializes the <see cref="T:System.Runtime.CompilerServices.AsyncMethodBuilderAttribute"/>.</summary>
+            <param name="builderType">The <see cref="T:System.Type"/> of the associated builder.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.AsyncMethodBuilderAttribute.BuilderType">
+            <summary>Gets the <see cref="T:System.Type"/> of the associated builder.</summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute">
+            <summary>
+            An attribute that allows parameters to receive the expression of other parameters.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute"/> class.
+            </summary>
+            <param name="parameterName">The condition parameter value.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute.ParameterName">
+            <summary>
+            Gets the parameter name the expression is retrieved from.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute">
+            <summary>
+            Indicates that compiler support for a particular feature is required for the location where this attribute is applied.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.#ctor(System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute"/> type.
+            </summary>
+            <param name="featureName">The name of the feature to indicate.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName">
+            <summary>
+            The name of the compiler feature.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.IsOptional">
+            <summary>
+            If true, the compiler can choose to allow access to the location where this attribute is applied if it does not understand <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/>.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RefStructs">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the ref structs C# feature.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RequiredMembers">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the required members C# feature.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute">
+            <summary>
+            Indicates which arguments to a method involving an interpolated string handler should be passed to that handler.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute"/> class.
+            </summary>
+            <param name="argument">The name of the argument that should be passed to the handler.</param>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.#ctor(System.String[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute"/> class.
+            </summary>
+            <param name="arguments">The names of the arguments that should be passed to the handler.</param>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.Arguments">
+            <summary>
+            Gets the names of the arguments that should be passed to the handler.
+            </summary>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute">
+            <summary>
+            Indicates the attributed type is to be used as an interpolated string handler.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.IsExternalInit">
+            <summary>
+            Reserved to be used by the compiler for tracking metadata.
+            This class should not be used by developers in source code.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.ModuleInitializerAttribute">
+             <summary>
+             Used to indicate to the compiler that a method should be called
+             in its containing module's initializer.
+             </summary>
+             <remarks>
+             When one or more valid methods
+             with this attribute are found in a compilation, the compiler will
+             emit a module initializer which calls each of the attributed methods.
+            
+             Certain requirements are imposed on any method targeted with this attribute:
+             - The method must be `static`.
+             - The method must be an ordinary member method, as opposed to a property accessor, constructor, local function, etc.
+             - The method must be parameterless.
+             - The method must return `void`.
+             - The method must not be generic or be contained in a generic type.
+             - The method's effective accessibility must be `internal` or `public`.
+            
+             The specification for module initializers in the .NET runtime can be found here:
+             https://github.com/dotnet/runtime/blob/main/docs/design/specs/Ecma-335-Augments.md#module-initializer
+             </remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.RequiredMemberAttribute">
+            <summary>
+            Specifies that a type has required members or that a member is required.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.SkipLocalsInitAttribute">
+            <summary>
+            Used to indicate to the compiler that the <c>.locals init</c> flag should not be set in method headers.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute"/> class.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute"/> class with the specified message.
+            </summary>
+            <param name="message">An optional message associated with this attribute instance.</param>
+        </member>
+        <member name="P:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.Message">
+            <summary>
+            Returns the optional message associated with this attribute instance.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.Url">
+            <summary>
+            Returns the optional URL associated with this attribute instance.
+            </summary>
+        </member>
+    </members>
+</doc>

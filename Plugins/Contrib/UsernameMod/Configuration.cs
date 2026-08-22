@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
@@ -34,11 +34,11 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-using pGina.Shared.Settings;
-using pGina.Plugin.UsernameMod;
-using pGina.Plugin.UsernameMod.Rules;
+using OpenCredential.Shared.Settings;
+using OpenCredential.Plugin.UsernameMod;
+using OpenCredential.Plugin.UsernameMod.Rules;
 
-namespace pGina.Plugin.UsernameMod
+namespace OpenCredential.Plugin.UsernameMod
 {
     public partial class Configuration : Form
     {

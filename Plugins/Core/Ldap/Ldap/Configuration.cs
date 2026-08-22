@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
@@ -35,12 +35,12 @@ using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.IO;
 
-using pGina.Shared.Settings;
-using pGina.Plugin.Ldap;
+using OpenCredential.Shared.Settings;
+using OpenCredential.Plugin.Ldap;
 
 using log4net;
 
-namespace pGina.Plugin.Ldap
+namespace OpenCredential.Plugin.Ldap
 {
     public partial class Configuration : Form
     {

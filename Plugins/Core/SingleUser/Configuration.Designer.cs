@@ -1,4 +1,4 @@
-﻿namespace pGina.Plugin.SingleUser
+namespace OpenCredential.Plugin.SingleUser
 {
     partial class Configuration
     {

@@ -1,0 +1,9 @@
+**
+!.dockerignore
+!docker-compose.adminweb.yml
+!OpenCredential.AdminWeb/
+!OpenCredential.AdminWeb/**
+OpenCredential.AdminWeb/App_Data/
+OpenCredential.AdminWeb/.dotnet-home/
+OpenCredential.AdminWeb/artifacts/
+OpenCredential.AdminWeb/*.log

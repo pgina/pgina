@@ -1,4 +1,4 @@
-﻿namespace pGina.Plugin.DriveMapper
+namespace OpenCredential.Plugin.DriveMapper
 {
     partial class ConfigurationUi
     {

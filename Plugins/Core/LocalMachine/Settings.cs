@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
@@ -29,13 +29,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Settings;
 
-namespace pGina.Plugin.LocalMachine
+namespace OpenCredential.Plugin.LocalMachine
 {
     public class Settings
     {
-        private static dynamic m_settings = new pGinaDynamicSettings(PluginImpl.PluginUuid);
+        private static dynamic m_settings = new OpenCredentialDynamicSettings(PluginImpl.PluginUuid);
 
         static Settings()
         {            

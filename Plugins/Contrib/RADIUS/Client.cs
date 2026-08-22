@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +12,7 @@ using log4net;
  * RFC 2866 - RADIUS Accounting - http://tools.ietf.org/html/rfc2866
  */
 
-namespace pGina.Plugin.RADIUS
+namespace OpenCredential.Plugin.RADIUS
 {
     class RADIUSClient
     {

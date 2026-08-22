@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,13 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Settings;
 
-namespace pGina.Plugin.RADIUS
+namespace OpenCredential.Plugin.RADIUS
 {
     public partial class Configuration : Form
     {
-        dynamic m_settings = new pGinaDynamicSettings(RADIUSPlugin.SimpleUuid);
+        dynamic m_settings = new OpenCredentialDynamicSettings(RADIUSPlugin.SimpleUuid);
 
         public Configuration()
         {

@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
@@ -36,12 +36,12 @@ using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Text.RegularExpressions;
-using pGina.Shared.Types;
+using OpenCredential.Shared.Types;
 
 // For registry access
 using Microsoft.Win32;
 
-namespace pGina.Plugin.SingleUserSwitcher
+namespace OpenCredential.Plugin.SingleUserSwitcher
 {
     public class LdapServer : IDisposable
     {

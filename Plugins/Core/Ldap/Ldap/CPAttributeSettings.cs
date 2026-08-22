@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
@@ -31,7 +31,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 
-namespace pGina.Plugin.Ldap
+namespace OpenCredential.Plugin.Ldap
 {
     class PasswordAttributeEntry
     {

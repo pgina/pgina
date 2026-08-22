@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Windows.Forms;
-namespace pGina.Plugin.UsernameMod
+namespace OpenCredential.Plugin.UsernameMod
 {
     partial class Configuration
     {
@@ -235,7 +235,7 @@ namespace pGina.Plugin.UsernameMod
             // 
             // downButton
             // 
-            this.downButton.Image = global::pGina.Plugin.UsernameMod.Properties.Resources.DownArrowSolid;
+            this.downButton.Image = global::OpenCredential.Plugin.UsernameMod.Properties.Resources.DownArrowSolid;
             this.downButton.Location = new System.Drawing.Point(211, 181);
             this.downButton.Name = "downButton";
             this.downButton.Size = new System.Drawing.Size(25, 25);
@@ -245,7 +245,7 @@ namespace pGina.Plugin.UsernameMod
             // 
             // upButton
             // 
-            this.upButton.Image = global::pGina.Plugin.UsernameMod.Properties.Resources.UpArrowSolid;
+            this.upButton.Image = global::OpenCredential.Plugin.UsernameMod.Properties.Resources.UpArrowSolid;
             this.upButton.Location = new System.Drawing.Point(241, 181);
             this.upButton.Name = "upButton";
             this.upButton.Size = new System.Drawing.Size(25, 25);

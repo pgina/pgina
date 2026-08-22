@@ -1,4 +1,4 @@
-﻿namespace pGina.Plugin.RADIUS
+namespace OpenCredential.Plugin.RADIUS
 {
     partial class Configuration
     {

@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2011, pGina Team
 	All rights reserved.
 
@@ -32,12 +32,12 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
-using pGina.Plugin.Ldap;
-using pGina.Shared.Interfaces;
-using pGina.Shared.Settings;
-using pGina.Shared.Types;
+using OpenCredential.Plugin.Ldap;
+using OpenCredential.Shared.Interfaces;
+using OpenCredential.Shared.Settings;
+using OpenCredential.Shared.Types;
 
-namespace pGina.Plugin.Ldap.Tests
+namespace OpenCredential.Plugin.Ldap.Tests
 {
     static class Program
     {
@@ -49,7 +49,7 @@ namespace pGina.Plugin.Ldap.Tests
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new pGina.Plugin.Ldap.Configuration());
+            Application.Run(new OpenCredential.Plugin.Ldap.Configuration());
         }
     }
 }

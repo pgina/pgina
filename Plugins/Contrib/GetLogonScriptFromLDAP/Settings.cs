@@ -1,4 +1,4 @@
-﻿/*
+/*
     Written by Florian Rohmer (2013)
      
     Distribued under the pGina license.
@@ -31,9 +31,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Settings;
 
-namespace pGina.Plugin.LogonScriptFromLDAP
+namespace OpenCredential.Plugin.LogonScriptFromLDAP
 {
     class Settings
     {
@@ -45,7 +45,7 @@ namespace pGina.Plugin.LogonScriptFromLDAP
 
         static Settings()
         {
-            m_settings = new pGinaDynamicSettings(PluginImpl.LdapLogonScript_uuid);
+            m_settings = new OpenCredentialDynamicSettings(PluginImpl.LdapLogonScript_uuid);
 
             // Set default values for settings (if not already set)
             m_settings.SetDefault("Attribute", "attribute_name" );

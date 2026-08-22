@@ -1,4 +1,4 @@
-﻿/*
+/*
     Copyright (c) 2011, pGina Team
     All rights reserved.
     Adapted to the LogonScript plugin by Florian Rohmer (2013).
@@ -41,10 +41,10 @@ using System.IdentityModel.Tokens;
 using Microsoft.Win32;
 
 using log4net;
-using pGina.Shared.Types;
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Types;
+using OpenCredential.Shared.Settings;
 
-namespace pGina.Plugin.LogonScriptFromLDAP
+namespace OpenCredential.Plugin.LogonScriptFromLDAP
 {
     public class LdapServer : IDisposable
     {

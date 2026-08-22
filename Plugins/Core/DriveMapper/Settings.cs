@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2014, pGina Team
 	All rights reserved.
 
@@ -30,9 +30,9 @@ using System.Linq;
 using System.Text;
 using System.Web.Script.Serialization;
 
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Settings;
 
-namespace pGina.Plugin.DriveMapper
+namespace OpenCredential.Plugin.DriveMapper
 {
     class Settings
     {
@@ -42,7 +42,7 @@ namespace pGina.Plugin.DriveMapper
 
         static Settings()
         {
-            m_settings = new pGinaDynamicSettings(PluginMain.PluginUuid);
+            m_settings = new OpenCredentialDynamicSettings(PluginMain.PluginUuid);
 
             m_jsonSerializer = new JavaScriptSerializer();
             

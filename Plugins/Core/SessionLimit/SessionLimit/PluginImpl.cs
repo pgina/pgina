@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2011, pGina Team
 	All rights reserved.
 
@@ -33,12 +33,12 @@ using System.Threading;
 
 using log4net;
 
-using pGina.Shared.Interfaces;
-using pGina.Shared.Types;
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Interfaces;
+using OpenCredential.Shared.Types;
+using OpenCredential.Shared.Settings;
 using Abstractions.WindowsApi;
 
-namespace pGina.Plugin.SessionLimit
+namespace OpenCredential.Plugin.SessionLimit
 {
     public class PluginImpl : IPluginConfiguration, IPluginEventNotifications
     {

@@ -1,4 +1,4 @@
-﻿namespace pGina.Plugin.Email
+namespace OpenCredential.Plugin.Email
 {
     partial class Configuration
     {

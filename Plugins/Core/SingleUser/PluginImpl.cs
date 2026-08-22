@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2011, pGina Team
 	All rights reserved.
 
@@ -32,12 +32,12 @@ using System.Diagnostics;
 
 using log4net;
 
-using pGina.Shared.Interfaces;
-using pGina.Shared.Types;
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Interfaces;
+using OpenCredential.Shared.Types;
+using OpenCredential.Shared.Settings;
 using Abstractions;
 
-namespace pGina.Plugin.SingleUser
+namespace OpenCredential.Plugin.SingleUser
 {
     public class PluginImpl : IPluginConfiguration, IPluginAuthenticationGateway
     {

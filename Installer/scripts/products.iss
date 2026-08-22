@@ -60,11 +60,13 @@ begin
 	path := ExpandConstant('{src}{\}') + CustomMessage('DependenciesDir') + '\' + FileName;
 	if not FileExists(path) then begin
 		path := ExpandConstant('{tmp}{\}') + FileName;
-		
-		isxdl_AddFile(URL, path);
-		
-		downloadMemo := downloadMemo + '%1' + Title + #13;
-		downloadMessage := downloadMessage + '    ' + Title + ' (' + Size + ')' + #13;
+
+		if not FileExists(path) then begin
+			isxdl_AddFile(URL, path);
+			
+			downloadMemo := downloadMemo + '%1' + Title + #13;
+			downloadMessage := downloadMessage + '    ' + Title + ' (' + Size + ')' + #13;
+		end;
 	end;
 	
 	i := GetArrayLength(products);
@@ -236,7 +238,7 @@ var pf: string;
 begin
 	Result := true;
 
-    if (CurPageID = wpWelcome) and (not IsAdminLoggedOn()) and Result then begin
+    if (CurPageID = wpWelcome) and (not IsAdmin()) and Result then begin
    
         if (Wizardform.PrevAppDir <> '') then begin
             pf := ExpandConstant('{pf}');
@@ -279,7 +281,7 @@ end;
 
 function IsIA64: Boolean;
 begin
-	Result := Is64BitInstallMode and (ProcessorArchitecture = paIA64);
+	Result := Is64BitInstallMode and (ProcessorArchitecture = paX64);
 end;
 
 function GetURL(x86, x64, ia64: String): String;

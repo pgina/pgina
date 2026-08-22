@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Settings;
 
-namespace pGina.Plugin.RADIUS
+namespace OpenCredential.Plugin.RADIUS
 {
     class Settings
     {
@@ -18,7 +18,7 @@ namespace pGina.Plugin.RADIUS
 
         static Settings()
         {
-            m_settings = new pGinaDynamicSettings(RADIUSPlugin.SimpleUuid);
+            m_settings = new OpenCredentialDynamicSettings(RADIUSPlugin.SimpleUuid);
 
             // Set default values for settings (if not already set)
             m_settings.SetDefault("EnableAuth", true);

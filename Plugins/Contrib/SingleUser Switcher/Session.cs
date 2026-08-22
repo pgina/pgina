@@ -1,4 +1,4 @@
-﻿/*
+/*
     Written by Florian Rohmer (2013)
      
     Distribued under the pGina license.
@@ -37,7 +37,7 @@ using Microsoft.Win32;
 
 using log4net;
 
-namespace pGina.Plugin.SingleUserSwitcher
+namespace OpenCredential.Plugin.SingleUserSwitcher
 {
     class Session
     {

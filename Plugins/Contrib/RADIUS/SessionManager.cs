@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2011, pGina Team
 	All rights reserved.
 
@@ -30,7 +30,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace pGina.Plugin.RADIUS
+namespace OpenCredential.Plugin.RADIUS
 {
     class Session
     {

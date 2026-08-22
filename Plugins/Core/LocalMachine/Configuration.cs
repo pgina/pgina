@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
@@ -33,7 +33,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace pGina.Plugin.LocalMachine
+namespace OpenCredential.Plugin.LocalMachine
 {
     public partial class Configuration : Form
     {

@@ -1,0 +1,424 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BCrypt.Net-Next</name>
+    </assembly>
+    <members>
+        <member name="T:BCrypt.Net.BCrypt">
+            <summary>BCrypt implementation.</summary>
+            <remarks>
+             <para>
+                   BCrypt implements OpenBSD-style Blowfish password hashing using the scheme described in
+                   <a href="http://www.usenix.org/event/usenix99/provos/provos_html/index.html">"A Future-
+                   Adaptable Password Scheme"</a> by Niels Provos and David Mazieres.
+             </para>
+             <para>
+                   This password hashing system tries to thwart off-line password cracking using a
+                   computationally-intensive hashing algorithm, based on Bruce Schneier's Blowfish cipher.
+                   The work factor of the algorithm is parameterised, so it can be increased as computers
+                   get faster.
+             </para>
+             <para>
+                   To hash a password using the defaults, call the <see cref="M:BCrypt.Net.BCrypt.HashPassword(System.String)"/> (which will generate a random salt and hash at default cost), like this:
+             </para>
+             <code>string pw_hash = BCrypt.HashPassword(plain_password);</code>
+             <para>
+                    To hash a password using SHA384 pre-hashing for increased entropy call <see cref="M:BCrypt.Net.BCrypt.EnhancedHashPassword(System.String)"/>
+                    (which will generate a random salt and hash at default cost), like this:
+             </para>
+             <code>string pw_hash = BCrypt.EnhancedHashPassword(plain_password);</code>
+             <para>
+                   To check whether a plaintext password matches one that has been hashed previously,
+                   use the <see cref="M:BCrypt.Net.BCrypt.Verify(System.String,System.String,System.Boolean,BCrypt.Net.HashType)"/> method:
+                   (To validate an enhanced hash you can pass true as the last parameter of Verify or use  <see cref="M:BCrypt.Net.BCrypt.EnhancedVerify(System.String,System.String,BCrypt.Net.HashType)"/>)
+             </para>
+             <code>
+                if (BCrypt.Verify(candidate_password, stored_hash))
+                    Console.WriteLine("It matches");
+                else
+                    Console.WriteLine("It does not match");
+              </code>
+              <para>
+                    The <see cref="M:BCrypt.Net.BCrypt.GenerateSalt"/> method takes an optional parameter (workFactor) that
+                    determines the computational complexity of the hashing:
+              </para>
+              <code>
+                string strong_salt = BCrypt.GenerateSalt(10);
+                string stronger_salt = BCrypt.GenerateSalt(12);
+              </code>
+              <para>
+                    The amount of work increases exponentially (2^workFactor), so each increment is twice
+                    as much work. The default workFactor is 10, and the valid range is 4 to 31.
+              </para>
+            </remarks>
+        </member>
+        <member name="F:BCrypt.Net.BCrypt.DefaultRounds">
+            <summary>
+            Default Work Factor
+            </summary>
+        </member>
+        <member name="F:BCrypt.Net.BCrypt.RngCsp">
+            <summary>
+            RandomNumberGenerator.Create calls RandomNumberGenerator.Create("System.Security.Cryptography.RandomNumberGenerator"), which will create an instance of RNGCryptoServiceProvider.
+            https://msdn.microsoft.com/en-us/library/42ks8fz1
+            </summary>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.ValidateAndReplacePassword(System.String,System.String,System.String,System.Int32,System.Boolean)">
+            <summary>
+            Validate existing hash and password,
+            </summary>
+            <param name="currentKey">Current password / string</param>
+            <param name="currentHash">Current hash to validate password against</param>
+            <param name="newKey">NEW password / string to be hashed</param>
+            <param name="workFactor">The log2 of the number of rounds of hashing to apply - the work
+                                     factor therefore increases as 2^workFactor. Default is 11</param>
+            <param name="forceWorkFactor">By default this method will not accept a work factor lower
+            than the one set in the current hash and will set the new work-factor to match.</param>
+            <exception cref="T:BCrypt.Net.BcryptAuthenticationException">returned if the users hash and current pass doesn't validate</exception>
+            <exception cref="T:BCrypt.Net.SaltParseException">returned if the salt is invalid in any way</exception>
+            <exception cref="T:System.ArgumentException">returned if the hash is invalid</exception>
+            <exception cref="T:System.ArgumentNullException">returned if the user hash is null</exception>
+            <returns>New hash of new password</returns>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.ValidateAndReplacePassword(System.String,System.String,System.Boolean,BCrypt.Net.HashType,System.String,System.Boolean,BCrypt.Net.HashType,System.Int32,System.Boolean)">
+             <summary>
+             Validate existing hash and password,
+             </summary>
+             <param name="currentKey">Current password / string</param>
+             <param name="currentHash">Current hash to validate password against</param>
+             <param name="currentKeyEnhancedEntropy">Set to true,the string will undergo SHA384 hashing to make
+             use of available entropy prior to bcrypt hashing</param>
+             <param name="oldHashType">HashType used (default SHA384)</param>
+            
+             <param name="newKey">NEW password / string to be hashed</param>
+             <param name="newKeyEnhancedEntropy">Set to true,the string will undergo SHA384 hashing to make
+             use of available entropy prior to bcrypt hashing</param>
+             <param name="newHashType">HashType to use (default SHA384)</param>
+             <param name="workFactor">The log2 of the number of rounds of hashing to apply - the work
+                                      factor therefore increases as 2^workFactor. Default is 11</param>
+             <param name="forceWorkFactor">By default this method will not accept a work factor lower
+             than the one set in the current hash and will set the new work-factor to match.</param>
+             <exception cref="T:BCrypt.Net.BcryptAuthenticationException">returned if the users hash and current pass doesn't validate</exception>
+             <exception cref="T:BCrypt.Net.SaltParseException">returned if the salt is invalid in any way</exception>
+             <exception cref="T:System.ArgumentException">returned if the hash is invalid</exception>
+             <exception cref="T:System.ArgumentNullException">returned if the user hash is null</exception>
+             <returns>New hash of new password</returns>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.HashString(System.String,System.Int32)">
+            <summary>
+             Hash a string using the OpenBSD BCrypt scheme and a salt generated by <see cref="M:BCrypt.Net.BCrypt.GenerateSalt"/>.
+            </summary>
+            <remarks>Just an alias for HashPassword.</remarks>
+            <param name="inputKey">  The string to hash.</param>
+            <param name="workFactor">The log2 of the number of rounds of hashing to apply - the work
+                                     factor therefore increases as 2^workFactor. Default is 11</param>
+            <returns>The hashed string.</returns>
+            <exception cref="T:BCrypt.Net.SaltParseException">Thrown when the salt could not be parsed.</exception>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.HashPassword(System.String)">
+            <summary>
+             Hash a password using the OpenBSD BCrypt scheme and a salt generated by <see cref="M:BCrypt.Net.BCrypt.GenerateSalt"/>.
+            </summary>
+            <param name="inputKey">The password to hash.</param>
+            <returns>The hashed password.</returns>
+            <exception cref="T:BCrypt.Net.SaltParseException">Thrown when the salt could not be parsed.</exception>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.EnhancedHashPassword(System.String)">
+            <summary>
+             Pre-hash a password with SHA384 then using the OpenBSD BCrypt scheme and a salt generated by <see cref="M:BCrypt.Net.BCrypt.GenerateSalt"/>.
+            </summary>
+            <param name="inputKey">The password to hash.</param>
+            <returns>The hashed password.</returns>
+            <exception cref="T:BCrypt.Net.SaltParseException">Thrown when the salt could not be parsed.</exception>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.EnhancedHashPassword(System.String,System.Int32)">
+            <summary>
+             Pre-hash a password with SHA384 then using the OpenBSD BCrypt scheme and a salt generated by <see cref="M:BCrypt.Net.BCrypt.GenerateSalt"/>.
+            </summary>
+            <param name="inputKey">The password to hash.</param>
+            <param name="workFactor"></param>
+            <returns>The hashed password.</returns>
+            <exception cref="T:BCrypt.Net.SaltParseException">Thrown when the salt could not be parsed.</exception>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.EnhancedHashPassword(System.String,System.Int32,BCrypt.Net.HashType)">
+            <summary>
+             Pre-hash a password with SHA384 then using the OpenBSD BCrypt scheme and a salt generated by <see cref="M:BCrypt.Net.BCrypt.GenerateSalt"/>.
+            </summary>
+            <param name="inputKey">The password to hash.</param>
+            <param name="workFactor"></param>
+            <param name="hashType">Configurable hash type for enhanced entropy</param>
+            <returns>The hashed password.</returns>
+            <exception cref="T:BCrypt.Net.SaltParseException">Thrown when the salt could not be parsed.</exception>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.EnhancedHashPassword(System.String,BCrypt.Net.HashType,System.Int32)">
+            <summary>
+             Pre-hash a password with SHA384 then using the OpenBSD BCrypt scheme and a salt generated by <see cref="M:BCrypt.Net.BCrypt.GenerateSalt"/>.
+            </summary>
+            <param name="inputKey">The password to hash.</param>
+            <param name="workFactor">Defaults to 11</param>
+            <param name="hashType">Configurable hash type for enhanced entropy</param>
+            <returns>The hashed password.</returns>
+            <exception cref="T:BCrypt.Net.SaltParseException">Thrown when the salt could not be parsed.</exception>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.HashPassword(System.String,System.Int32,System.Boolean)">
+            <summary>
+             Hash a password using the OpenBSD BCrypt scheme and a salt generated by <see cref="M:BCrypt.Net.BCrypt.GenerateSalt(System.Int32,System.Char)"/> using the given <paramref name="workFactor"/>.
+            </summary>
+            <param name="inputKey">     The password to hash.</param>
+            <param name="workFactor">The log2 of the number of rounds of hashing to apply - the work
+                                     factor therefore increases as 2^workFactor. Default is 11</param>
+            <param name="enhancedEntropy">Set to true,the string will undergo SHA384 hashing to make use of available entropy prior to bcrypt hashing</param>
+            <returns>The hashed password.</returns>
+            <exception cref="T:BCrypt.Net.SaltParseException">Thrown when the salt could not be parsed.</exception>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.HashPassword(System.String,System.String)">
+            <summary>Hash a password using the OpenBSD BCrypt scheme.</summary>
+            <exception cref="T:System.ArgumentException">Thrown when one or more arguments have unsupported or illegal values.</exception>
+            <param name="inputKey">The password or string to hash.</param>
+            <param name="salt">    the salt to hash with (best generated using <see cref="M:BCrypt.Net.BCrypt.GenerateSalt"/>).</param>
+            <returns>The hashed password</returns>
+            <exception cref="T:BCrypt.Net.SaltParseException">Thrown when the <paramref name="salt"/> could not be parsed.</exception>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.HashPassword(System.String,System.String,System.Boolean,BCrypt.Net.HashType)">
+            <summary>Hash a password using the OpenBSD BCrypt scheme.</summary>
+            <exception cref="T:System.ArgumentException">Thrown when one or more arguments have unsupported or illegal values.</exception>
+            <param name="inputKey">The password or string to hash.</param>
+            <param name="salt">    the salt to hash with (best generated using <see cref="M:BCrypt.Net.BCrypt.GenerateSalt"/>).</param>
+            <param name="enhancedEntropy">Set to true,the string will undergo hashing (defaults to SHA384 then base64 encoding) to make use of available entropy prior to bcrypt hashing</param>
+            <param name="hashType">Configurable hash type for enhanced entropy</param>
+            <returns>The hashed password</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when the <paramref name="inputKey"/> is null.</exception>
+            <exception cref="T:BCrypt.Net.SaltParseException">Thrown when the <paramref name="salt"/> could not be parsed.</exception>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.EnhancedHash(System.Byte[],System.Char,BCrypt.Net.HashType)">
+            <summary>
+            Hashes key, base64 encodes before returning byte array
+            </summary>
+            <param name="inputBytes"></param>
+            <param name="bcryptMinorRevision"></param>
+            <param name="hashType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.GenerateSalt(System.Int32,System.Char)">
+            <summary>
+             Generate a salt for use with the <see cref="M:BCrypt.Net.BCrypt.HashPassword(System.String,System.String)"/> method.
+            </summary>
+            <param name="workFactor">The log2 of the number of rounds of hashing to apply - the work
+                                     factor therefore increases as 2**workFactor.</param>
+            <param name="bcryptMinorRevision"></param>
+            <exception cref="T:System.ArgumentOutOfRangeException">Work factor must be between 4 and 31</exception>
+            <returns>A base64 encoded salt value.</returns>
+            <exception cref="T:System.ArgumentException">BCrypt Revision should be a, b, x or y</exception>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.PasswordNeedsRehash(System.String,System.Int32)">
+            <summary>
+            Based on password_needs_rehash in PHP this method will return true
+            if the work factor (logrounds) set on the hash is lower than the new minimum workload passed in
+            </summary>
+            <param name="hash">full bcrypt hash</param>
+            <param name="newMinimumWorkLoad">target workload</param>
+            <returns>true if new work factor is higher than the one in the hash</returns>
+            <exception cref="T:System.ArgumentException">throws if the current hash workload (logrounds) can not be parsed</exception>
+            <exception cref="T:BCrypt.Net.HashInformationException"></exception>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.InterrogateHash(System.String)">
+            <summary>
+            Takes a valid hash and outputs its component parts
+            </summary>
+            <param name="hash"></param>
+            <exception cref="T:BCrypt.Net.HashInformationException"></exception>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.GenerateSalt">
+            <summary>
+             Generate a salt for use with the <see cref="M:BCrypt.Net.BCrypt.HashPassword(System.String,System.String)"/> method
+             selecting a reasonable default for the number of hashing rounds to apply.
+            </summary>
+            <returns>A base64 encoded salt value.</returns>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.EnhancedVerify(System.String,System.String,BCrypt.Net.HashType)">
+            <summary>
+             Verifies that the hash of the given <paramref name="text"/> matches the provided
+             <paramref name="hash"/>; the string will undergo SHA384 hashing to maintain the enhanced entropy work done during hashing
+            </summary>
+            <param name="text">The text to verify.</param>
+            <param name="hash"> The previously-hashed password.</param>
+            <param name="hashType">HashType used (default SHA384)</param>
+            <returns>true if the passwords match, false otherwise.</returns>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.Verify(System.String,System.String,System.Boolean,BCrypt.Net.HashType)">
+            <summary>
+             Verifies that the hash of the given <paramref name="text"/> matches the provided
+             <paramref name="hash"/>
+            </summary>
+            <param name="text">The text to verify.</param>
+            <param name="hash"> The previously-hashed password.</param>
+            <param name="enhancedEntropy">Set to true,the string will undergo SHA384 hashing to make use of available entropy prior to bcrypt hashing</param>
+            <param name="hashType">HashType used (default SHA384)</param>
+            <returns>true if the passwords match, false otherwise.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when one or more arguments have unsupported or illegal values.</exception>
+            <exception cref="T:BCrypt.Net.SaltParseException">Thrown when the salt could not be parsed.</exception>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.EncodeBase64(System.Byte[],System.Int32)">
+            <summary>
+             Encode a byte array using BCrypt's slightly-modified base64 encoding scheme. Note that this
+             is *not* compatible with the standard MIME-base64 encoding.
+            </summary>
+            <exception cref="T:System.ArgumentException">Thrown when one or more arguments have unsupported or
+                                                illegal values.</exception>
+            <param name="byteArray">The byte array to encode.</param>
+            <param name="length">   The number of bytes to encode.</param>
+            <returns>Base64-encoded string.</returns>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.DecodeBase64(System.String,System.Int32)">
+            <summary>
+             Decode a string encoded using BCrypt's base64 scheme to a byte array.
+             Note that this is *not* compatible with the standard MIME-base64 encoding.
+            </summary>
+            <exception cref="T:System.ArgumentException">Thrown when one or more arguments have unsupported or
+                                                illegal values.</exception>
+            <param name="encodedString">The string to decode.</param>
+            <param name="maximumBytes"> The maximum bytes to decode.</param>
+            <returns>The decoded byte array.</returns>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.Char64(System.Char)">
+            <summary>
+             Look up the 3 bits base64-encoded by the specified character, range-checking against
+             conversion table.
+            </summary>
+            <param name="character">The base64-encoded value.</param>
+            <returns>The decoded value of x.</returns>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.Encipher(System.UInt32[],System.Int32)">
+            <summary>Blowfish encipher a single 64-bit block encoded as two 32-bit halves.</summary>
+            <param name="blockArray">An array containing the two 32-bit half blocks.</param>
+            <param name="offset">    The position in the array of the blocks.</param>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.StreamToWord(System.Byte[],System.Int32@)">
+            <summary>Cyclically extract a word of key material.</summary>
+            <param name="data">The string to extract the data from.</param>
+            <param name="offset"> [in,out] The current offset.</param>
+            <returns>The next word of material from data.</returns>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.InitializeKey">
+            <summary>Initializes the Blowfish key schedule.</summary>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.Key(System.Byte[])">
+            <summary>Key the Blowfish cipher.</summary>
+            <param name="keyBytes">The key byte array.</param>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.EKSKey(System.Byte[],System.Byte[])">
+            <summary>
+             Perform the "enhanced key schedule" step described by Provos and Mazieres in
+             "A Future Adaptable Password Scheme" http://www.openbsd.org/papers/bcrypt-paper.ps.
+            </summary>
+            <param name="saltBytes"> Salt byte array.</param>
+            <param name="inputBytes">Input byte array.</param>
+        </member>
+        <member name="M:BCrypt.Net.BCrypt.CryptRaw(System.Byte[],System.Byte[],System.Int32)">
+            <summary>Perform the central hashing step in the BCrypt scheme.</summary>
+            <exception cref="T:System.ArgumentException">Thrown when one or more arguments have unsupported or
+                                                illegal values.</exception>
+            <param name="inputBytes">The input byte array to hash.</param>
+            <param name="saltBytes"> The salt byte array to hash with.</param>
+            <param name="workFactor"> The binary logarithm of the number of rounds of hashing to apply.</param>
+            <returns>A byte array containing the hashed result.</returns>
+        </member>
+        <member name="T:BCrypt.Net.BcryptAuthenticationException">
+            <inheritdoc />
+            <summary>Exception for signalling hash validation errors. </summary>
+        </member>
+        <member name="M:BCrypt.Net.BcryptAuthenticationException.#ctor">
+            <inheritdoc />
+            <summary>Default constructor. </summary>
+        </member>
+        <member name="M:BCrypt.Net.BcryptAuthenticationException.#ctor(System.String)">
+            <inheritdoc />
+            <summary>Initializes a new instance of <see cref="T:BCrypt.Net.BcryptAuthenticationException" />.</summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:BCrypt.Net.BcryptAuthenticationException.#ctor(System.String,System.Exception)">
+            <inheritdoc />
+            <summary>Initializes a new instance of <see cref="T:BCrypt.Net.BcryptAuthenticationException" />.</summary>
+            <param name="message">       The message.</param>
+            <param name="innerException">The inner exception.</param>
+        </member>
+        <member name="T:BCrypt.Net.HashInformation">
+            <summary>
+                HashInformation : A value object that contains the results of interrogating a hash
+                Namely its settings (2a$10 for example); version (2a); workfactor (log rounds), and the raw hash returned
+            </summary>
+        </member>
+        <member name="M:BCrypt.Net.HashInformation.#ctor(System.String,System.String,System.String,System.String)">
+            <summary>Constructor. </summary>
+            <param name="settings">The message.</param>
+            <param name="version">The message.</param>
+            <param name="workFactor">The message.</param>
+            <param name="rawHash">The message.</param>
+        </member>
+        <member name="P:BCrypt.Net.HashInformation.Settings">
+            <summary>
+                Settings string
+            </summary>
+        </member>
+        <member name="P:BCrypt.Net.HashInformation.Version">
+            <summary>
+                Hash Version
+            </summary>
+        </member>
+        <member name="P:BCrypt.Net.HashInformation.WorkFactor">
+            <summary>
+                log rounds used / workfactor
+            </summary>
+        </member>
+        <member name="P:BCrypt.Net.HashInformation.RawHash">
+            <summary>
+                Raw Hash
+            </summary>
+        </member>
+        <member name="T:BCrypt.Net.HashInformationException">
+            <summary>
+                Exception used to signal errors that occur during use of the hash information methods
+            </summary>
+        </member>
+        <member name="M:BCrypt.Net.HashInformationException.#ctor">
+            <summary>
+                Default Constructor
+            </summary>
+        </member>
+        <member name="M:BCrypt.Net.HashInformationException.#ctor(System.String)">
+            <summary>
+                Initializes a new instance of <see cref="T:BCrypt.Net.HashInformationException" />.
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="M:BCrypt.Net.HashInformationException.#ctor(System.String,System.Exception)">
+            <summary>
+                Initializes a new instance of <see cref="T:BCrypt.Net.HashInformationException" />.
+            </summary>
+            <param name="message"></param>
+            <param name="innerException"></param>
+        </member>
+        <member name="T:BCrypt.Net.HashType">
+            <summary>
+                Type of SHA implementation to use
+                Keys will be hashed, then base64 encoded before being passed to crypt.
+                Unless legacy is selected in which case simply SHA384 hashed.
+            </summary>
+        </member>
+        <member name="T:BCrypt.Net.SaltParseException">
+            <summary>Exception for signalling parse errors during salt checks. </summary>
+        </member>
+        <member name="M:BCrypt.Net.SaltParseException.#ctor">
+            <summary>Default constructor. </summary>
+        </member>
+        <member name="M:BCrypt.Net.SaltParseException.#ctor(System.String)">
+            <summary>Initializes a new instance of <see cref="T:BCrypt.Net.SaltParseException" />.</summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:BCrypt.Net.SaltParseException.#ctor(System.String,System.Exception)">
+            <summary>Initializes a new instance of <see cref="T:BCrypt.Net.SaltParseException" />.</summary>
+            <param name="message">       The message.</param>
+            <param name="innerException">The inner exception.</param>
+        </member>
+    </members>
+</doc>

@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
@@ -32,9 +32,9 @@ using System.Text.RegularExpressions;
 
 using log4net;
 
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Settings;
 
-namespace pGina.Plugin.UsernameMod.Rules
+namespace OpenCredential.Plugin.UsernameMod.Rules
 {
 
     public enum Stage { Authentication, Authorization, Gateway };
@@ -276,7 +276,7 @@ namespace pGina.Plugin.UsernameMod.Rules
 
     class ListOfRules
     {
-        private static dynamic m_settings = new pGinaDynamicSettings(UsernameModPlugin.SimpleUuid);
+        private static dynamic m_settings = new OpenCredentialDynamicSettings(UsernameModPlugin.SimpleUuid);
         public List<IUsernameRule> list { get; private set; }
         private ILog m_logger = LogManager.GetLogger("UsernameModPlugin");
         

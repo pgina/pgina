@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -8,8 +8,8 @@
     <ProjectGuid>{40AA44E3-9A7F-4166-AEDF-D817C2A0854B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>pGina.Plugin.SingleUserSwitcher</RootNamespace>
-    <AssemblyName>pGina.Plugin.SingleUserSwitcher</AssemblyName>
+    <RootNamespace>OpenCredential.Plugin.SingleUserSwitcher</RootNamespace>
+    <AssemblyName>OpenCredential.Plugin.SingleUserSwitcher</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -32,16 +32,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Abstractions">
-      <HintPath>K:\Mes Documents\pgina-master\pgina-master\Plugins\SDK\Abstractions.dll</HintPath>
+      <HintPath>K:\Mes Documents\pgina-master\pgina-master\Plugins\SDK\OpenCredential.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
       <HintPath>K:\Mes Documents\pgina-master\pgina-master\Plugins\SDK\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="pGina.Core">
-      <HintPath>K:\Mes Documents\pgina-master\pgina-master\Plugins\SDK\pGina.Core.dll</HintPath>
+    <Reference Include="OpenCredential.Core">
+      <HintPath>K:\Mes Documents\pgina-master\pgina-master\Plugins\SDK\OpenCredential.Core.dll</HintPath>
     </Reference>
-    <Reference Include="pGina.Shared">
-      <HintPath>K:\Mes Documents\pgina-master\pgina-master\Plugins\SDK\pGina.Shared.dll</HintPath>
+    <Reference Include="OpenCredential.Shared">
+      <HintPath>K:\Mes Documents\pgina-master\pgina-master\Plugins\SDK\OpenCredential.Shared.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -84,3 +84,5 @@
   </Target>
   -->
 </Project>
+
+

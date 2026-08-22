@@ -1,4 +1,4 @@
-﻿/*
+/*
     Written by Dimitris Kouzis-Loukas.
     Integrated into this LdapLogonScript plugin with his consent.
      
@@ -31,7 +31,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace pGina.Plugin.LogonScriptFromLDAP
+namespace OpenCredential.Plugin.LogonScriptFromLDAP
 {
     public class PinvokeWindowsNetworking
     {

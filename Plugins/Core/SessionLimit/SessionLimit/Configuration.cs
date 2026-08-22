@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2011, pGina Team
 	All rights reserved.
 
@@ -34,7 +34,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace pGina.Plugin.SessionLimit
+namespace OpenCredential.Plugin.SessionLimit
 {
     public partial class Configuration : Form
     {

@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
@@ -32,11 +32,11 @@ using System.Text;
 using System.Collections;
 using System.Text.RegularExpressions;
 
-using pGina.Shared.Types;
+using OpenCredential.Shared.Types;
 
 using log4net;
 
-namespace pGina.Plugin.Ldap
+namespace OpenCredential.Plugin.Ldap
 {
     
     class GroupRuleLoader 

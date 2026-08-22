@@ -1,4 +1,4 @@
-﻿/*
+/*
     Written by Florian Rohmer (2013)
      
     Distribued under the pGina license.
@@ -35,11 +35,11 @@ using System.DirectoryServices.Protocols;
 
 using log4net;
 
-using pGina.Shared.Interfaces;
-using pGina.Shared.Types;
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Interfaces;
+using OpenCredential.Shared.Types;
+using OpenCredential.Shared.Settings;
 
-namespace pGina.Plugin.SingleUserSwitcher
+namespace OpenCredential.Plugin.SingleUserSwitcher
 {
     public class PluginImpl : IPluginConfiguration, IPluginAuthenticationGateway
     {

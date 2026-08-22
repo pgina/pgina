@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,9 +8,9 @@ using System.Text;
 using System.Windows.Forms;
 
 using log4net;
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Settings;
 
-namespace pGina.Plugin.LogonScriptFromLDAP
+namespace OpenCredential.Plugin.LogonScriptFromLDAP
 {
     public partial class Configuration : Form
     {

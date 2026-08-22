@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
 
-namespace pGina.Plugin.RADIUS
+namespace OpenCredential.Plugin.RADIUS
 {
     //Assumes 8 bits = 1 byte
     class Packet

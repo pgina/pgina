@@ -1,4 +1,4 @@
-﻿namespace pGina.Plugin.LogonScriptFromLDAP
+namespace OpenCredential.Plugin.LogonScriptFromLDAP
 {
     partial class Configuration
     {

@@ -1,0 +1,2072 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>K4os.Compression.LZ4.Streams</name>
+    </assembly>
+    <members>
+        <member name="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader">
+            <summary>
+            Generic interface for frame/stream decoder for LZ4.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.OpenFrame">
+            <summary>
+            Opens frame for reading. Please note, this method is not needed as it will be
+            called automatically, but it can be used to quickly check if frame is valid. 
+            </summary>
+            <returns><c>true</c> if frame was just opened,
+            <c>false</c> if it was opened before.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.OpenFrameAsync(System.Threading.CancellationToken)">
+            <summary>Async version of <see cref="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.OpenFrame"/>.</summary>
+            <param name="token">Cancellation token.</param>
+            <returns><c>true</c> if frame was just opened,
+            <c>false</c> if it was opened before.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.GetFrameLength">
+            <summary>Gets the length of the frame content if it was provided when content was encoded.</summary>
+            <returns>Frame length, or <c>null</c></returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.GetFrameLengthAsync(System.Threading.CancellationToken)">
+            <summary>Async version of <see cref="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.GetFrameLength"/>.</summary>
+            <param name="token">Cancellation token.</param>
+            <returns>Frame length, or <c>null</c></returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.ReadOneByte">
+            <summary>Reads one byte from LZ4 stream.</summary>
+            <returns>A byte, or -1 if end of stream.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.ReadOneByteAsync(System.Threading.CancellationToken)">
+            <summary>Reads one byte from LZ4 stream.</summary>
+            <param name="token">Cancellation token.</param>
+            <returns>A byte, or -1 if end of stream.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.ReadManyBytes(System.Span{System.Byte},System.Boolean)">
+            <summary>Reads many bytes from LZ4 stream. Return number of bytes actually read.</summary>
+            <param name="buffer">Byte buffer to read into.</param>
+            <param name="interactive">if <c>true</c> then returns as soon as some bytes are read,
+            if <c>false</c> then waits for all bytes being read or end of stream.</param>
+            <returns>Number of bytes actually read.
+            <c>0</c> means that end of stream has been reached.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.ReadManyBytesAsync(System.Threading.CancellationToken,System.Memory{System.Byte},System.Boolean)">
+            <summary>Reads many bytes from LZ4 stream. Return number of bytes actually read.</summary>
+            <param name="token">Cancellation token.</param>
+            <param name="buffer">Byte buffer to read into.</param>
+            <param name="interactive">if <c>true</c> then returns as soon as some bytes are read,
+            if <c>false</c> then waits for all bytes being read or end of stream.</param>
+            <returns>Number of bytes actually read.
+            <c>0</c> means that end of stream has been reached.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.GetBytesRead">
+            <summary>Returns how many bytes in has been read from stream so far.</summary>
+            <returns>Number of bytes read in total.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.CloseFrame">
+            <summary>Closes the stream, releases allocated memory.</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter">
+            <summary>
+            Generic interface for LZ4 frame/stream writer.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter.OpenFrame">
+            <summary>
+            Opens a stream by reading frame header. Please note, this methods can be called explicitly
+            but does not need to be called, it will be called automatically if needed. 
+            </summary>
+            <returns><c>true</c> if frame has been opened,
+            or <c>false</c> if it was opened before.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter.OpenFrameAsync(System.Threading.CancellationToken)">
+            <summary>
+            Opens a stream by reading frame header. Please note, this methods can be called explicitly
+            but does not need to be called, it will be called automatically if needed. 
+            </summary>
+            <param name="token">Cancellation token.</param>
+            <returns><c>true</c> if frame has been opened,
+            or <c>false</c> if it was opened before.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter.WriteOneByte(System.Byte)">
+            <summary>Writes one byte to stream.</summary>
+            <param name="value">Byte to be written.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter.WriteOneByteAsync(System.Threading.CancellationToken,System.Byte)">
+            <summary>Writes one byte to stream.</summary>
+            <param name="token">Cancellation token.</param>
+            <param name="value">Byte to be written.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter.WriteManyBytes(System.ReadOnlySpan{System.Byte})">
+            <summary>Writes multiple bytes to stream.</summary>
+            <param name="buffer">Byte buffer.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter.WriteManyBytesAsync(System.Threading.CancellationToken,System.ReadOnlyMemory{System.Byte})">
+            <summary>Writes multiple bytes to stream.</summary>
+            <param name="token">Cancellation token.</param>
+            <param name="buffer">Byte buffer.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter.GetBytesWritten">
+            <summary>Gets number of bytes written.</summary>
+            <returns>Total number of bytes (before compression).</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter.CloseFrame">
+            <summary>
+            Closes frame. Frame needs to be closed for stream to by valid, although
+            this methods does not need to be called explicitly if stream is properly dispose.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter.CloseFrameAsync(System.Threading.CancellationToken)">
+            <summary>
+            Closes frame. Frame needs to be closed for stream to by valid, although
+            this methods does not need to be called explicitly if stream is properly dispose.
+            </summary>
+            <param name="token">Cancellation token.</param>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Abstractions.IStreamReader`1">
+            <summary>
+            Stream reader interface. It is an adapter for all stream-like structures.
+            </summary>
+            <typeparam name="TStreamState">Stream state.</typeparam>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.IStreamReader`1.Read(`0@,System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Reads at-most <paramref name="length"/> bytes from given <paramref name="state"/>. 
+            </summary>
+            <param name="state">Stream state.</param>
+            <param name="buffer">Buffer to read bytes into.</param>
+            <param name="offset">Offset in buffer.</param>
+            <param name="length">Maximum number of bytes to read.</param>
+            <returns>Number of bytes actually read.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.IStreamReader`1.ReadAsync(`0,System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Reads at-most <paramref name="length"/> bytes from given <paramref name="state"/>. 
+            </summary>
+            <param name="state">Stream state.</param>
+            <param name="buffer">Buffer to read bytes into.</param>
+            <param name="offset">Offset in buffer.</param>
+            <param name="length">Maximum number of bytes to read.</param>
+            <param name="token">Cancellation token.</param>
+            <returns><see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ReadResult`1"/> containing new stream state,
+            and number of bytes actually read..</returns>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Abstractions.IStreamWriter`1">
+            <summary>
+            Generic stream writer interface.
+            When implementing custom compression target or decompression source you need to implement
+            this adapter. Please note, that this adapter can be implemented as <c>class</c> or
+            <c>readonly struct</c>. If implemented as <c>struct</c> it cannot have mutable state
+            as it will be lost. Immutable state is allowed but strongly discouraged.
+            Use <typeparamref name="TStreamState"/> instead.
+            </summary>
+            <typeparam name="TStreamState">Mutable part of stream state.</typeparam>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Abstractions.IStreamWriter`1.CanFlush">
+            <summary>Indicates that writer can and should flush after frame.
+            Please note, flushing may have negative performance effect but may also lead to
+            better interactivity between writer and reader, as reader will get new block
+            available as soon as possible.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.IStreamWriter`1.Write(`0@,System.Byte[],System.Int32,System.Int32)">
+            <summary>Writes byte buffer to underlying stream.</summary>
+            <param name="state">Stream state.</param>
+            <param name="buffer">Byte buffer.</param>
+            <param name="offset">Offset within buffer.</param>
+            <param name="length">Number of bytes.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.IStreamWriter`1.WriteAsync(`0,System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <summary>Writes byte buffer to underlying stream.</summary>
+            <param name="state">Stream state.</param>
+            <param name="buffer">Byte buffer.</param>
+            <param name="offset">Offset within buffer.</param>
+            <param name="length">Number of bytes.</param>
+            <param name="token">Cancellation token.</param>
+            <returns>New stream state (mutable part).</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.IStreamWriter`1.Flush(`0@)">
+            <summary>Flushes buffers to underlying storage. Called only when <see cref="P:K4os.Compression.LZ4.Streams.Abstractions.IStreamWriter`1.CanFlush"/></summary>
+            <param name="state">Stream state.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.IStreamWriter`1.FlushAsync(`0,System.Threading.CancellationToken)">
+            <summary>Flushes buffers to underlying storage. Called only when <see cref="P:K4os.Compression.LZ4.Streams.Abstractions.IStreamWriter`1.CanFlush"/></summary>
+            <param name="state">Stream state.</param>
+            <param name="token">Cancellation token.</param>
+            <returns>New stream state (mutable part).</returns>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Abstractions.ReadResult`1">
+            <summary>
+            Result of async read operation. Returns new state of the stream and number of bytes read.
+            </summary>
+            <param name="Stream">New stream state.</param>
+            <param name="Bytes">Number of bytes read.</param>
+            <typeparam name="TStreamState">Stream state.</typeparam>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ReadResult`1.#ctor(`0,System.Int32)">
+            <summary>
+            Result of async read operation. Returns new state of the stream and number of bytes read.
+            </summary>
+            <param name="Stream">New stream state.</param>
+            <param name="Bytes">Number of bytes read.</param>
+            <typeparam name="TStreamState">Stream state.</typeparam>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Abstractions.ReadResult`1.Stream">
+            <summary>New stream state.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Abstractions.ReadResult`1.Bytes">
+            <summary>Number of bytes read.</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Abstractions.ReadResult">
+            <summary>
+            Helper methods to create <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ReadResult`1"/>
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Abstractions.ReadResult.Create``1(``0,System.Int32)">
+            <summary>
+            Creates read result, composed of new stream state and bytes read.
+            </summary>
+            <param name="stream">Stream state.</param>
+            <param name="bytes">Bytes read.</param>
+            <typeparam name="TStreamState">Stream state.</typeparam>
+            <returns>Read result.</returns>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Adapters.ByteBufferAdapter`1">
+            <summary>
+            Stream adapter for any class implementing <see cref="T:System.Buffers.IBufferWriter`1"/>.
+            It takes actual class, not interface, so it can use struct implementations
+            of <see cref="T:System.Buffers.IBufferWriter`1"/> for performance reasons.
+            Please note, whole <c>K4os.Compression.LZ4.Streams.Adapters</c> namespace should be considered
+            pubternal - exposed as public but still very likely to change.
+            </summary>
+            <typeparam name="TBufferWriter">Type implementing <see cref="T:System.Buffers.IBufferWriter`1"/></typeparam>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteBufferAdapter`1.Write(`0@,System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteBufferAdapter`1.WriteAsync(`0,System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Adapters.ByteBufferAdapter`1.CanFlush">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteBufferAdapter`1.Flush(`0@)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteBufferAdapter`1.FlushAsync(`0,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Adapters.ByteMemoryReadAdapter">
+            <summary>
+            Stream adapter for <see cref="T:System.ReadOnlyMemory`1"/> and <see cref="T:System.Memory`1"/>.
+            This class implements <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.IStreamWriter`1"/> for <see cref="T:System.Memory`1"/>
+            but should be used only in some niche situations, as it is not easy to find out
+            how many bytes has been written, use <see cref="T:K4os.Compression.LZ4.Streams.Adapters.ByteBufferAdapter`1"/>
+            instead.
+            Please note, whole <c>K4os.Compression.LZ4.Streams.Adapters</c> namespace should be considered
+            pubternal - exposed as public but still very likely to change.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteMemoryReadAdapter.#ctor(System.ReadOnlyMemory{System.Byte})">
+            <summary>
+            
+            </summary>
+            <param name="memory"></param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteMemoryReadAdapter.CopyToBuffer(System.Int32,System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Copies bytes from span to buffer. Performs all length checks. 
+            </summary>
+            <param name="head">Head offset of <see cref="T:System.ReadOnlyMemory`1"/>.</param>
+            <param name="buffer">Target buffer.</param>
+            <param name="offset">Offset in target buffer.</param>
+            <param name="length">Number of bytes to copy.</param>
+            <returns>Number of bytes actually copied.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteMemoryReadAdapter.Read(System.Int32@,System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteMemoryReadAdapter.ReadAsync(System.Int32,System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Adapters.ByteMemoryWriteAdapter">
+            <summary>
+            Stream adapter for <see cref="T:System.ReadOnlyMemory`1"/> and <see cref="T:System.Memory`1"/>.
+            This class implements <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.IStreamWriter`1"/> for <see cref="T:System.Memory`1"/>
+            but should be used only in some niche situations, as it is not easy to find out
+            how many bytes has been written, use <see cref="T:K4os.Compression.LZ4.Streams.Adapters.ByteBufferAdapter`1"/>
+            instead.
+            Please note, whole <c>K4os.Compression.LZ4.Streams.Adapters</c> namespace should be considered
+            pubternal - exposed as public but still very likely to change.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteMemoryWriteAdapter.#ctor(System.Memory{System.Byte})">
+            <summary>
+            Initializes a new instance of the <see cref="T:K4os.Compression.LZ4.Streams.Adapters.ByteMemoryWriteAdapter"/> class. 
+            </summary>
+            <param name="memory">Memory buffer.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteMemoryWriteAdapter.Write(System.Int32@,System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteMemoryWriteAdapter.WriteAsync(System.Int32,System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Adapters.ByteMemoryWriteAdapter.CanFlush">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteMemoryWriteAdapter.Flush(System.Int32@)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteMemoryWriteAdapter.FlushAsync(System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Adapters.ByteSequenceAdapter">
+            <summary>
+            Naive and simplistic implementation of adapter for <see cref="T:System.Buffers.ReadOnlySequence`1"/>.
+            It might be improved in many ways I believe, but it gives some starting point.
+            Please note, whole <c>K4os.Compression.LZ4.Streams.Adapters</c> namespace should be considered
+            pubternal - exposed as public but still very likely to change.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteSequenceAdapter.Read(System.Buffers.ReadOnlySequence{System.Byte}@,System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteSequenceAdapter.ReadAsync(System.Buffers.ReadOnlySequence{System.Byte},System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Adapters.ByteSpanAdapter">
+            <summary>
+            LZ4 stream reader/writer adapter for <see cref="T:K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan"/>.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteSpanAdapter.#ctor(K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan)">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Adapters.ByteSpanAdapter"/>.
+            </summary>
+            <param name="span">Memory span.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteSpanAdapter.Read(System.Int32@,System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteSpanAdapter.ReadAsync(System.Int32,System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteSpanAdapter.Write(System.Int32@,System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteSpanAdapter.WriteAsync(System.Int32,System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Adapters.ByteSpanAdapter.CanFlush">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteSpanAdapter.Flush(System.Int32@)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.ByteSpanAdapter.FlushAsync(System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Adapters.EmptyState">
+            <summary>
+            Empty record equivalent to Unit/Void.
+            Works as placeholder type used when working with generic interfaces which do require type,
+            but implementation needs none.
+            Please note, whole <c>K4os.Compression.LZ4.Streams.Adapters</c> namespace should be considered
+            pubternal - exposed as public but still very likely to change.
+            </summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Adapters.PipeReaderAdapter">
+            <summary>
+            Stream adapter for <see cref="T:System.IO.Pipelines.PipeReader"/>.
+            Please note, whole <c>K4os.Compression.LZ4.Streams.Adapters</c> namespace should be considered
+            pubternal - exposed as public but still very likely to change.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.PipeReaderAdapter.#ctor(System.IO.Pipelines.PipeReader)">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Adapters.PipeReaderAdapter"/>.
+            </summary>
+            <param name="reader">Pipe reader.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.PipeReaderAdapter.Read(K4os.Compression.LZ4.Streams.Adapters.EmptyState@,System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.PipeReaderAdapter.ReadAsync(K4os.Compression.LZ4.Streams.Adapters.EmptyState,System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Adapters.PipeWriterAdapter">
+            <summary>
+            LZ4 stream adapter for <see cref="T:System.IO.Pipelines.PipeReader"/>.
+            Please note, whole <c>K4os.Compression.LZ4.Streams.Adapters</c> namespace should be considered
+            pubternal - exposed as public but still very likely to change.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.PipeWriterAdapter.#ctor(System.IO.Pipelines.PipeWriter)">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Adapters.PipeWriterAdapter"/>.
+            </summary>
+            <param name="writer">Pipe writer.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.PipeWriterAdapter.Write(K4os.Compression.LZ4.Streams.Adapters.EmptyState@,System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.PipeWriterAdapter.WriteAsync(K4os.Compression.LZ4.Streams.Adapters.EmptyState,System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Adapters.PipeWriterAdapter.CanFlush">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.PipeWriterAdapter.Flush(K4os.Compression.LZ4.Streams.Adapters.EmptyState@)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.PipeWriterAdapter.FlushAsync(K4os.Compression.LZ4.Streams.Adapters.EmptyState,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Adapters.StreamAdapter">
+            <summary>
+            LZ4 stream reader/writer adapter for <see cref="T:System.IO.Stream"/>.
+            Please note, whole <c>K4os.Compression.LZ4.Streams.Adapters</c> namespace should be considered
+            pubternal - exposed as public but still very likely to change.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.StreamAdapter.#ctor(System.IO.Stream)">
+            <summary>
+            Creates new stream adapter for 
+            </summary>
+            <param name="stream"></param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.StreamAdapter.Read(K4os.Compression.LZ4.Streams.Adapters.EmptyState@,System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.StreamAdapter.ReadAsync(K4os.Compression.LZ4.Streams.Adapters.EmptyState,System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.StreamAdapter.Write(K4os.Compression.LZ4.Streams.Adapters.EmptyState@,System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.StreamAdapter.WriteAsync(K4os.Compression.LZ4.Streams.Adapters.EmptyState,System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Adapters.StreamAdapter.CanFlush">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.StreamAdapter.Flush(K4os.Compression.LZ4.Streams.Adapters.EmptyState@)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.StreamAdapter.FlushAsync(K4os.Compression.LZ4.Streams.Adapters.EmptyState,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan">
+            <summary>
+            Unsafe version of <see cref="T:System.Span`1"/>. It is unsafe as it stores raw memory pointer
+            so memory it points to must be pinned. It allows reading and writing straight to
+            unmanaged memory but must be used carefully.
+            NOTE: If you don't understand what has been said above - don't use it. Misuse of this
+            struct may lead to unpredictable errors and memory corruption. 
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan.Bytes">
+            <summary>Pointer to the first byte of the span.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan.Length">
+            <summary>Length of the span in bytes.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan.#ctor(System.Void*,System.Int32)">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan"/> from given pointer and length.
+            </summary>
+            <param name="bytes">Pointer to the first byte of the span.</param>
+            <param name="length">Length of the span in bytes.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan.Create(System.Void*,System.Int32)">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan"/> from raw pointer.
+            </summary>
+            <param name="bytes">Pointer block of bytes.</param>
+            <param name="length">Length of the block.</param>
+            <returns>New <see cref="T:K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan"/>.</returns>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan.Span">
+            <summary>
+            Converted to <see cref="T:System.Span`1"/>.
+            </summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Extensions">
+            <summary>
+            Utility methods for LZ4 streams.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.CreateEncoder(K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.LZ4Level,System.Int32)">
+            <summary>
+            Creates <see cref="T:K4os.Compression.LZ4.Encoders.ILZ4Encoder"/> using <see cref="T:K4os.Compression.LZ4.Streams.ILZ4Descriptor"/>.
+            </summary>
+            <param name="descriptor">LZ4 descriptor.</param>
+            <param name="level">Compression level.</param>
+            <param name="extraMemory">Additional memory for encoder.</param>
+            <returns>Encoder.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.CreateEncoder(K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Streams.LZ4EncoderSettings)">
+            <summary>
+            Creates <see cref="T:K4os.Compression.LZ4.Encoders.ILZ4Encoder"/> using <see cref="T:K4os.Compression.LZ4.Streams.ILZ4Descriptor"/> and <see cref="T:K4os.Compression.LZ4.Streams.LZ4EncoderSettings"/>.
+            </summary>
+            <param name="descriptor">LZ4 descriptor.</param>
+            <param name="settings">Encoder settings.</param>
+            <returns>Encoder.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.CreateDecoder(K4os.Compression.LZ4.Streams.ILZ4Descriptor,System.Int32)">
+            <summary>
+            Create <see cref="T:K4os.Compression.LZ4.Encoders.ILZ4Decoder"/> using <see cref="T:K4os.Compression.LZ4.Streams.ILZ4Descriptor"/>.
+            </summary>
+            <param name="descriptor">Descriptor.</param>
+            <param name="extraMemory">Extra memory (may improves speed, but creates memory pressure).</param>
+            <returns><see cref="T:K4os.Compression.LZ4.Encoders.ILZ4Decoder"/>.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.CreateDecoder(K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Streams.LZ4DecoderSettings)">
+            <summary>
+            Create <see cref="T:K4os.Compression.LZ4.Encoders.ILZ4Decoder"/> using <see cref="T:K4os.Compression.LZ4.Streams.ILZ4Descriptor"/> and <see cref="T:K4os.Compression.LZ4.Streams.LZ4DecoderSettings"/>.
+            </summary>
+            <param name="descriptor">Descriptor.</param>
+            <param name="settings">Settings.</param>
+            <returns><see cref="T:K4os.Compression.LZ4.Encoders.ILZ4Decoder"/>.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.CreateDescriptor(K4os.Compression.LZ4.Streams.LZ4EncoderSettings)">
+            <summary>
+            Creates <see cref="T:K4os.Compression.LZ4.Streams.ILZ4Descriptor"/> from <see cref="T:K4os.Compression.LZ4.Streams.LZ4DecoderSettings"/>.
+            </summary>
+            <param name="settings">Settings.</param>
+            <returns>LZ4 Descriptor.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.OpenFrameAsync(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader)">
+            <summary>Async version of <see cref="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.OpenFrame"/>.</summary>
+            <param name="reader">Decoder.</param>
+            <returns><c>true</c> if frame was just opened,
+            <c>false</c> if it was opened before.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.GetFrameLengthAsync(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader)">
+            <summary>Async version of <see cref="M:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader.GetFrameLength"/>.</summary>
+            <param name="reader">Decoder.</param>
+            <returns>Frame length, or <c>null</c></returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.ReadOneByteAsync(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader)">
+            <summary>Reads one byte from LZ4 stream.</summary>
+            <param name="reader">Decoder.</param>
+            <returns>A byte, or -1 if end of stream.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.ReadManyBytesAsync(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader,System.Memory{System.Byte},System.Boolean)">
+            <summary>Reads many bytes from LZ4 stream. Return number of bytes actually read.</summary>
+            <param name="reader">Decoder.</param>
+            <param name="buffer">Byte buffer to read into.</param>
+            <param name="interactive">if <c>true</c> then returns as soon as some bytes are read,
+            if <c>false</c> then waits for all bytes being read or end of stream.</param>
+            <returns>Number of bytes actually read.
+            <c>0</c> means that end of stream has been reached.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.OpenFrameAsync(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter)">
+            <summary>
+            Opens a stream by reading frame header. Please note, this methods can be called explicitly
+            but does not need to be called, it will be called automatically if needed. 
+            </summary>
+            <param name="writer">Encoder.</param>
+            <returns><c>true</c> if frame has been opened, or <c>false</c> if it was opened before.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.WriteOneByteAsync(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter,System.Byte)">
+            <summary>Writes one byte to stream.</summary>
+            <param name="writer">Encoder.</param>
+            <param name="value">Byte to be written.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.WriteManyBytesAsync(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter,System.ReadOnlyMemory{System.Byte})">
+            <summary>Writes multiple bytes to stream.</summary>
+            <param name="writer">Encoder.</param>
+            <param name="buffer">Byte buffer.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.CloseFrameAsync(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter)">
+            <summary>
+            Closes frame. Frame needs to be closed for stream to by valid, although
+            this methods does not need to be called explicitly if stream is properly dispose.
+            </summary>
+            <param name="writer">Encoder.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.CopyTo``1(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader,``0,System.Int32)">
+            <summary>
+            Copies all bytes from <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader"/> into <see cref="T:System.Buffers.IBufferWriter`1"/>.
+            </summary>
+            <param name="source">Frame reader.</param>
+            <param name="target">Buffer writer.</param>
+            <param name="blockSize">Chunk size.</param>
+            <typeparam name="TBufferWriter">Type of buffer writer.</typeparam>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.CopyToAsync``1(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader,``0,System.Int32)">
+            <summary>
+            Copies all bytes from <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader"/> into <see cref="T:System.Buffers.IBufferWriter`1"/>.
+            </summary>
+            <param name="source">LZ4 frame reader.</param>
+            <param name="target">Buffer writer.</param>
+            <param name="blockSize">Chunk size.</param>
+            <typeparam name="TBufferWriter">Type of buffer writer.</typeparam>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.CopyFrom(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter,System.Buffers.ReadOnlySequence{System.Byte})">
+            <summary>
+            Copies all bytes from <see cref="T:System.Buffers.ReadOnlySequence`1"/> into <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter"/>.
+            </summary>
+            <param name="target">Frame writer.</param>
+            <param name="source">Sequence of bytes.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.CopyFromAsync(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter,System.Buffers.ReadOnlySequence{System.Byte})">
+            <summary>
+            Copies all bytes from <see cref="T:System.Buffers.ReadOnlySequence`1"/> into <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter"/>.
+            </summary>
+            <param name="target">Frame writer.</param>
+            <param name="source">Sequence of bytes.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.AsStream(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader,System.Boolean,System.Boolean)">
+            <summary>
+            Wraps <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader"/> as <see cref="T:System.IO.Stream"/>.
+            </summary>
+            <param name="reader">LZ4 frame reader.</param>
+            <param name="leaveOpen">Indicates that frame reader should be left open even if stream is
+            disposed.</param>
+            <param name="interactive">Indicates that data should be provided to reader as quick as
+            possible, instead of waiting for whole block to be read.</param>
+            <returns><see cref="T:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReaderAsStream"/> stream wrapper.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Extensions.AsStream(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter,System.Boolean)">
+            <summary>
+            Wraps <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter"/> as <see cref="T:System.IO.Stream"/>.
+            </summary>
+            <param name="writer">LZ4 frame writer.</param>
+            <param name="leaveOpen">Indicates that frame writer should be left open even if stream is
+            disposed.</param>
+            <returns><see cref="T:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriterAsStream"/> stream wrapper.</returns>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2">
+            <summary>
+            LZ4 Decompression stream handling.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.#ctor(`0,`1,System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Decoder})">
+            <summary>Creates new instance <see cref="T:K4os.Compression.LZ4.Streams.LZ4DecoderStream"/>.</summary>
+            <param name="reader">Inner stream.</param>
+            <param name="stream">Inner stream initial state.</param>
+            <param name="decoderFactory">Decoder factory.</param>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.StreamState">
+            <summary>
+            Exposes internal stream state. Existence of this property is a hack,
+            and it really shouldn't be here but it is needed for relatively low
+            level operations (like writing directly to unmanaged memory).
+            Please, do not use it directly, if don't know what you are doing. 
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.CloseFrame">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.AllocBuffer(System.Int32)">
+            <summary>Allocate temporary buffer to store decompressed data.</summary>
+            <param name="size">Minimum size of the buffer.</param>
+            <returns>Allocated buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.ReleaseBuffer(System.Byte[])">
+            <summary>Releases allocated buffer. <see cref="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.AllocBuffer(System.Int32)"/></summary>
+            <param name="buffer">Previously allocated buffer.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.OpenFrame">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.OpenFrameAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.GetBytesRead">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.GetFrameLength">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.GetFrameLengthAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.ReadOneByte">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.ReadOneByteAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.ReadManyBytes(System.Span{System.Byte},System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.ReadManyBytesAsync(System.Threading.CancellationToken,System.Memory{System.Byte},System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.Dispose(System.Boolean)">
+            <summary>
+            Disposes the decoder. Consecutive attempts to read will fail.
+            </summary>
+            <param name="disposing"><c>true</c> is stream is being disposed by user,
+            <c>true</c> is by garbage collector.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.ReleaseResources">
+            <summary>
+            Releases unmanaged resources. 
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.ReleaseResourcesAsync">
+            <summary>
+            Releases unmanaged resources.
+            </summary>
+            <returns>Task indicating operation is finished.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReader`2.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.ByteSpanLZ4FrameReader">
+            <summary>
+            <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader"/> implementation for <see cref="T:K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan"/>.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.ByteSpanLZ4FrameReader.#ctor(K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan,System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Decoder})">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Frames.ByteSpanLZ4FrameReader"/>.
+            </summary>
+            <param name="span">Bytes span.</param>
+            <param name="decoderFactory">LZ4 decoder factory.</param>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.ByteMemoryLZ4FrameReader">
+            <summary>
+            <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader"/> implementation for <see cref="T:System.ReadOnlyMemory`1"/>.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.ByteMemoryLZ4FrameReader.#ctor(System.ReadOnlyMemory{System.Byte},System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Decoder})">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Frames.ByteMemoryLZ4FrameReader"/>.
+            </summary>
+            <param name="memory">Memory buffer.</param>
+            <param name="decoderFactory">LZ4 decoder factory.</param>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.ByteSequenceLZ4FrameReader">
+            <summary>
+            <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader"/> implementation for <see cref="T:System.Buffers.ReadOnlySequence`1"/>.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.ByteSequenceLZ4FrameReader.#ctor(System.Buffers.ReadOnlySequence{System.Byte},System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Decoder})">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Frames.ByteSequenceLZ4FrameReader"/>.
+            </summary>
+            <param name="sequence">Byte sequence.</param>
+            <param name="decoderFactory">LZ4 decoder factory.</param>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.StreamLZ4FrameReader">
+            <summary>
+            <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader"/> implementation for <see cref="T:System.IO.Stream"/>.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.StreamLZ4FrameReader.#ctor(System.IO.Stream,System.Boolean,System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Decoder})">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Frames.StreamLZ4FrameReader"/>.
+            </summary>
+            <param name="stream">Stream to read from.</param>
+            <param name="leaveOpen">Leave stream open after reader is disposed.</param>
+            <param name="decoderFactory">LZ4 decoder factory.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.StreamLZ4FrameReader.Dispose(System.Boolean)">
+            <summary>
+            Disposes the reader.
+            </summary>
+            <param name="disposing"><c>true</c> if user is disposing it; <c>false</c> if it has been triggered by garbage collector</param>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.PipeLZ4FrameReader">
+            <summary>
+            <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader"/> implementation for <see cref="T:System.IO.Pipelines.PipeReader"/>.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.PipeLZ4FrameReader.#ctor(System.IO.Pipelines.PipeReader,System.Boolean,System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Decoder})">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Frames.PipeLZ4FrameReader"/>.
+            </summary>
+            <param name="pipe">Pipe to be read.</param>
+            <param name="leaveOpen">Leave pipe open after reader is disposed.</param>
+            <param name="decoderFactory">LZ4 decoder factory.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.PipeLZ4FrameReader.ReleaseResources">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.PipeLZ4FrameReader.ReleaseResourcesAsync">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReaderAsStream">
+            <summary>
+            <see cref="T:System.IO.Stream"/> wrapper for <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader"/>.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReaderAsStream.#ctor(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader,System.Boolean,System.Boolean)">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReaderAsStream"/>.
+            </summary>
+            <param name="reader">LZ4 frame reader.</param>
+            <param name="doNotDispose">Indicates to not dispose <paramref name="reader"/> after disposing this stream.</param>
+            <param name="interactive">Use interactive mode; return bytes as soon as they available.</param>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReaderAsStream.CanRead">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReaderAsStream.ReadByte">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReaderAsStream.Read(System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReaderAsStream.ReadAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReaderAsStream.Length">
+            <summary>
+            Length of stream. Please note, this will only work if original LZ4 stream has
+            <c>ContentLength</c> field set in descriptor. Otherwise returned value will be <c>-1</c>.
+            It will also require synchronous stream access, so it wont work if AllowSynchronousIO
+            is <c>false</c>.
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Frames.LZ4FrameReaderAsStream.Position">
+            <summary>
+            Position within the stream. Position can be read, but cannot be set as LZ4 stream does
+            not have <c>Seek</c> capability.
+            </summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2">
+            <summary>
+            LZ4 stream encoder. 
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.#ctor(`0,`1,System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Encoder},K4os.Compression.LZ4.Streams.ILZ4Descriptor)">
+            <summary>Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.LZ4EncoderStream"/>.</summary>
+            <param name="writer">Inner stream.</param>
+            <param name="stream">Inner stream initial state.</param>
+            <param name="encoderFactory">LZ4 Encoder factory.</param>
+            <param name="descriptor">LZ4 settings.</param>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.StreamState">
+            <summary>
+            Exposes internal stream state. Existence of this field is a hack,
+            and it really shouldn't be here but it is needed for relatively low
+            level operations (like writing directly to unmanaged memory).
+            Please, do not use it directly, if don't know what you are doing. 
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.AllocateBuffer(System.Int32)">
+            <summary>Allocate temporary buffer to store decompressed data.</summary>
+            <param name="size">Minimum size of the buffer.</param>
+            <returns>Allocated buffer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.ReleaseBuffer(System.Byte[])">
+            <summary>Releases allocated buffer. <see cref="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.AllocateBuffer(System.Int32)"/></summary>
+            <param name="buffer">Previously allocated buffer.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.GetBytesWritten">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.WriteOneByte(System.Byte)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.WriteOneByteAsync(System.Threading.CancellationToken,System.Byte)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.WriteManyBytes(System.ReadOnlySpan{System.Byte})">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.WriteManyBytesAsync(System.Threading.CancellationToken,System.ReadOnlyMemory{System.Byte})">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.OpenFrame">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.OpenFrameAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.CloseFrame">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.CloseFrameAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.Dispose(System.Boolean)">
+            <summary>
+            Disposes the stream and releases all resources.
+            </summary>
+            <param name="disposing"><c>true</c> if called by user; <c>false</c> when called by garbage collector.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.ReleaseResources">
+            <summary>
+            Releases all unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriter`2.ReleaseResourcesAsync">
+            <summary>
+            Releases all unmanaged resources.
+            </summary>
+            <returns>Task indicating completion of the operation.</returns>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.ByteBufferLZ4FrameWriter`1">
+            <summary>
+            <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter"/> implementation for <see cref="T:System.Buffers.IBufferWriter`1"/>
+            </summary>
+            <typeparam name="TBufferWriter">Type of buffer writer.</typeparam>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.ByteBufferLZ4FrameWriter`1.#ctor(`0,System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Encoder},K4os.Compression.LZ4.Streams.ILZ4Descriptor)">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Frames.ByteBufferLZ4FrameWriter`1"/>.
+            </summary>
+            <param name="stream">Buffer writer to write to.</param>
+            <param name="encoderFactory">Encoder factory.</param>
+            <param name="descriptor">Frame descriptor.</param>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Frames.ByteBufferLZ4FrameWriter`1.BufferWriter">
+            <summary>Current state of buffer writer.</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.ByteBufferLZ4FrameWriter">
+            <summary>
+            <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter"/> implementation for <see cref="T:System.Buffers.IBufferWriter`1"/>
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.ByteBufferLZ4FrameWriter.#ctor(System.Buffers.IBufferWriter{System.Byte},System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Encoder},K4os.Compression.LZ4.Streams.ILZ4Descriptor)">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Frames.ByteBufferLZ4FrameWriter"/>.
+            </summary>
+            <param name="stream">Buffer writer to write to.</param>
+            <param name="encoderFactory">Encoder factory.</param>
+            <param name="descriptor">Frame descriptor.</param>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.ByteMemoryLZ4FrameWriter">
+            <summary>
+            <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter"/> implementation for <see cref="T:System.Memory`1"/>
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.ByteMemoryLZ4FrameWriter.#ctor(System.Memory{System.Byte},System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Encoder},K4os.Compression.LZ4.Streams.ILZ4Descriptor)">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Frames.ByteMemoryLZ4FrameWriter"/>.
+            </summary>
+            <param name="memory">Memory block where data will be written.</param>
+            <param name="encoderFactory">Encoder factory.</param>
+            <param name="descriptor">Frame descriptor.</param>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Frames.ByteMemoryLZ4FrameWriter.CompressedLength">
+            <summary>Number of bytes written to the memory.</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.ByteSpanLZ4FrameWriter">
+            <summary>
+            <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter"/> implementation for <see cref="T:K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan"/>.
+            <see cref="T:K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan"/> is a wrapper around <see cref="T:System.Span`1"/> that
+            can be stored in a field. Please note: it makes it unsafe and address needs to be pinned,
+            one way or another.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.ByteSpanLZ4FrameWriter.#ctor(K4os.Compression.LZ4.Streams.Adapters.UnsafeByteSpan,System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Encoder},K4os.Compression.LZ4.Streams.ILZ4Descriptor)">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Frames.ByteSpanLZ4FrameWriter"/>.
+            </summary>
+            <param name="span">Span to write to.</param>
+            <param name="encoderFactory">Encoder factory.</param>
+            <param name="descriptor">Frame descriptor.</param>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Frames.ByteSpanLZ4FrameWriter.CompressedLength">
+            <summary>Number of bytes written to the memory.</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.StreamLZ4FrameWriter">
+            <summary>
+            <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter"/> implementation for <see cref="T:System.IO.Stream"/>.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.StreamLZ4FrameWriter.#ctor(System.IO.Stream,System.Boolean,System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Encoder},K4os.Compression.LZ4.Streams.ILZ4Descriptor)">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Frames.StreamLZ4FrameWriter"/>.
+            </summary>
+            <param name="stream">Stream to write to.</param>
+            <param name="leaveOpen">Leave stream open after disposing this writer.</param>
+            <param name="encoderFactory">Encoder factory.</param>
+            <param name="descriptor">Frame descriptor.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.StreamLZ4FrameWriter.ReleaseResources">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.StreamLZ4FrameWriter.ReleaseResourcesAsync">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.PipeLZ4FrameWriter">
+            <summary>
+            <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter"/> implementation for <see cref="T:System.IO.Pipelines.PipeWriter"/>.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.PipeLZ4FrameWriter.#ctor(System.IO.Pipelines.PipeWriter,System.Boolean,System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Encoder},K4os.Compression.LZ4.Streams.ILZ4Descriptor)">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Frames.PipeLZ4FrameWriter"/>.
+            </summary>
+            <param name="pipe">Pipe writer to write to.</param>
+            <param name="leaveOpen">Leave pipe open after disposing this writer.</param>
+            <param name="encoderFactory">Encoder factory.</param>
+            <param name="descriptor">Frame descriptor.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.PipeLZ4FrameWriter.ReleaseResources">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.PipeLZ4FrameWriter.ReleaseResourcesAsync">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriterAsStream">
+            <summary>
+            Adapter to make <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter"/> look like <see cref="T:System.IO.Stream"/>.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriterAsStream.#ctor(K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter,System.Boolean)">
+            <summary>Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.LZ4EncoderStream"/>.</summary>
+            <param name="writer">Underlying frame encoder.</param>
+            <param name="doNotDispose">Indicates <paramref name="writer"/> should be left
+            open after disposing this stream.</param>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriterAsStream.CanWrite">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriterAsStream.WriteByte(System.Byte)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriterAsStream.Write(System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriterAsStream.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriterAsStream.Length">
+            <summary>Length of the stream and number of bytes written so far.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Frames.LZ4FrameWriterAsStream.Position">
+            <summary>Read-only position in the stream. Trying to set it will throw
+            <see cref="T:System.InvalidOperationException"/>.</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.ILZ4Descriptor">
+            <summary>
+            LZ4 Frame descriptor.
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.ILZ4Descriptor.ContentLength">
+            <summary>Content length. Not always known.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.ILZ4Descriptor.ContentChecksum">
+            <summary>Indicates if content checksum is provided.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.ILZ4Descriptor.Chaining">
+            <summary>Indicates if blocks are chained (dependent) or not (independent).</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.ILZ4Descriptor.BlockChecksum">
+            <summary>Indicates if block checksums are provided.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.ILZ4Descriptor.Dictionary">
+            <summary>Dictionary id. May be null.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.ILZ4Descriptor.BlockSize">
+            <summary>Block size.</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Internal.EmptyToken">
+            <summary>
+            Completely empty class to do nothing.
+            It is used internally instead of CancellationToken to make sure
+            blocking operations are easily distinguishable from async ones
+            (you cannot call blocking operation by accident as they *require* EmptyToken).
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.Extensions.AssertIsNotNull``1(``0,System.String)">
+            <summary>
+            Asserts that given argument is not null. As it is designed to be used only in
+            situations when we 100% ure that value is not null, it actually does anything
+            only in DEBUG builds and has no effect in RELEASE. Mostly used to ensure
+            static analysis tools that we know what we are doing.
+            </summary>
+            <param name="value">Argument value.</param>
+            <param name="name">Name of argument.</param>
+            <typeparam name="T">Type of argument.</typeparam>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1">
+            <summary>
+            Base class for all <see cref="T:System.IO.Stream"/> compatible adapters.
+            </summary>
+            <typeparam name="T">Type of resource stream adapter if for.</typeparam>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.#ctor(`0,System.Boolean)">
+            <summary>
+            Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1"/>.
+            </summary>
+            <param name="innerResource">Wrapped resource.</param>
+            <param name="doNotDispose">Do not dispose inner resource after stream is disposed.</param>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.InnerResource">
+            <summary>Wrapped resource.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.CanRead">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.CanWrite">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.CanTimeout">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.ReadTimeout">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.WriteTimeout">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.CanSeek">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.Position">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.Length">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.Flush">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.FlushAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.Seek(System.Int64,System.IO.SeekOrigin)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.SetLength(System.Int64)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.ReadByte">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.Read(System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.ReadAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.Dispose(System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.WriteByte(System.Byte)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.Write(System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamEssentials`1.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.Internal.LZ4StreamOnStreamEssentials">
+            <summary>
+            LZ4 stream essentials when wrapping another stream.
+            You most likely should not use it but it needs to be public as it is inherited from.
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamOnStreamEssentials.CanRead">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamOnStreamEssentials.CanWrite">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamOnStreamEssentials.CanTimeout">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamOnStreamEssentials.ReadTimeout">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.Internal.LZ4StreamOnStreamEssentials.WriteTimeout">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamOnStreamEssentials.Flush">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.Internal.LZ4StreamOnStreamEssentials.FlushAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.LZ4DecoderSettings">
+            <summary>
+            Decoder settings.
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4DecoderSettings.ExtraMemory">
+            <summary>Extra memory for decompression.</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.LZ4DecoderStream">
+            <summary>
+            LZ4 frame decoder stream.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4DecoderStream.#ctor(System.IO.Stream,System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Decoder},System.Boolean,System.Boolean)">
+            <summary>
+            Creates LZ4 decoder stream.
+            </summary>
+            <param name="inner">Inner stream, the stream compressed data is coming from..</param>
+            <param name="decoderFactory">Decoder factory.</param>
+            <param name="leaveOpen">Leave inner stream open after this stream is disposed.</param>
+            <param name="interactive">Interactive mode, provide bytes as soon as they are available; don't wait for full block.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4DecoderStream.ReadByte">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4DecoderStream.Read(System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4DecoderStream.ReadAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4DecoderStream.CanWrite">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4DecoderStream.Length">
+            <summary>
+            Length of stream. Please note, this will only work if original LZ4 stream has
+            <c>ContentLength</c> field set in descriptor. Otherwise returned value will be <c>-1</c>.
+            It will also require synchronous stream access, so it wont work if AllowSynchronousIO
+            is <c>false</c>.
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4DecoderStream.Position">
+            <summary>
+            Position within the stream. Position can be read, but cannot be set as LZ4 stream does
+            not have <c>Seek</c> capability.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4DecoderStream.Dispose(System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.LZ4Descriptor">
+            <summary>
+            LZ4 frame descriptor.
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4Descriptor.ContentLength">
+            <summary>Content length (if available).</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4Descriptor.ContentChecksum">
+            <summary>Indicates if content checksum if present.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4Descriptor.Chaining">
+            <summary>Indicates if blocks are chained.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4Descriptor.BlockChecksum">
+            <summary>Indicates if block checksums are present.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4Descriptor.Dictionary">
+            <summary>Dictionary id (or null).</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4Descriptor.BlockSize">
+            <summary>Block size.</summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Descriptor.#ctor(System.Nullable{System.Int64},System.Boolean,System.Boolean,System.Boolean,System.Nullable{System.UInt32},System.Int32)">
+            <summary>Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.LZ4Descriptor"/>.</summary>
+            <param name="contentLength">Content length.</param>
+            <param name="contentChecksum">Content checksum flag.</param>
+            <param name="chaining">Chaining flag.</param>
+            <param name="blockChecksum">Block checksum flag.</param>
+            <param name="dictionary">Dictionary id.</param>
+            <param name="blockSize">Block size.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Descriptor.#ctor(K4os.Compression.LZ4.Streams.ILZ4Descriptor)">
+            <summary>Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.LZ4Descriptor"/>.</summary>
+            <param name="descriptor">Descriptor to copy.</param>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.LZ4EncoderSettings">
+            <summary>
+            LZ4 encoder settings.
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4EncoderSettings.ContentLength">
+            <summary>
+            Content length. It is not enforced, it can be set to any value, but it will be
+            written to the stream so it can be used while decoding. If you don't know the length
+            just leave default value.
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4EncoderSettings.ChainBlocks">
+            <summary>
+            Indicates if blocks should be chained (dependent) or not (independent). Dependent blocks
+            (with chaining) provide better compression ratio but are a little but slower and take
+            more memory. 
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4EncoderSettings.BlockSize">
+            <summary>
+            Block size. You can use any block size, but default values for LZ4 are 64k, 256k, 1m,
+            and 4m. 64k is good enough for dependent blocks, but for independent blocks bigger is
+            better. 
+            </summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4EncoderSettings.ContentChecksum">
+            <summary>Indicates is content checksum should be included.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4EncoderSettings.BlockChecksum">
+            <summary>Indicates if block checksum should be included.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4EncoderSettings.Dictionary">
+            <summary>Dictionary id. Not implemented yet.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4EncoderSettings.CompressionLevel">
+            <summary>Compression level.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4EncoderSettings.ExtraMemory">
+            <summary>Extra memory (for the process, more is usually better).</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.LZ4EncoderStream">
+            <summary>
+            LZ4 frame encoder stream.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4EncoderStream.#ctor(System.IO.Stream,K4os.Compression.LZ4.Streams.ILZ4Descriptor,System.Func{K4os.Compression.LZ4.Streams.ILZ4Descriptor,K4os.Compression.LZ4.Encoders.ILZ4Encoder},System.Boolean)">
+            <summary>Creates new instance of <see cref="T:K4os.Compression.LZ4.Streams.LZ4EncoderStream"/>.</summary>
+            <param name="inner">Inner stream.</param>
+            <param name="descriptor">LZ4 Descriptor.</param>
+            <param name="encoderFactory">Function which will take descriptor and return
+            appropriate encoder.</param>
+            <param name="leaveOpen">Indicates if <paramref name="inner"/> stream should be left
+            open after disposing.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4EncoderStream.Dispose(System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4EncoderStream.WriteByte(System.Byte)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4EncoderStream.Write(System.Byte[],System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4EncoderStream.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4EncoderStream.CanRead">
+            <inheritdoc />
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4EncoderStream.Length">
+            <summary>Length of the stream and number of bytes written so far.</summary>
+        </member>
+        <member name="P:K4os.Compression.LZ4.Streams.LZ4EncoderStream.Position">
+            <summary>Read-only position in the stream. Trying to set it will throw
+            <see cref="T:System.InvalidOperationException"/>.</summary>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.LZ4Frame">
+            <summary>
+            LZ4 factory methods to encode/decode anything which can be represented as a stream-like object.
+            Please note, to avoid all the complexity of dealing with streams, it uses
+            <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameReader"/> and <see cref="T:K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter"/> as stream abstractions.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Decode``1(System.ReadOnlySpan{System.Byte},``0,System.Int32)">
+            <summary>Creates decompression stream on top of inner stream.</summary>
+            <param name="source">Span to read from.</param>
+            <param name="target">Buffer to write to.</param>
+            <param name="extraMemory">Extra memory used for decompression.</param>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Decode(System.ReadOnlyMemory{System.Byte},System.Int32)">
+            <summary>Creates decompression stream on top of inner stream.</summary>
+            <param name="memory">Stream to be decoded.</param>
+            <param name="extraMemory">Extra memory used for decompression.</param>
+            <returns>Decompression stream.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Decode(System.Buffers.ReadOnlySequence{System.Byte},System.Int32)">
+            <summary>Creates decompression stream on top of inner stream.</summary>
+            <param name="sequence">Stream to be decoded.</param>
+            <param name="extraMemory">Extra memory used for decompression.</param>
+            <returns>Decompression stream.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Decode(System.IO.Stream,System.Int32,System.Boolean)">
+            <summary>Creates decompression stream on top of inner stream.</summary>
+            <param name="stream">Stream to be decoded.</param>
+            <param name="extraMemory">Extra memory used for decompression.</param>
+            <param name="leaveOpen">Indicates if stream should stay open after disposing decoder.</param>
+            <returns>Decompression stream.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Decode(System.IO.Pipelines.PipeReader,System.Int32,System.Boolean)">
+            <summary>Creates decompression stream on top of inner stream.</summary>
+            <param name="reader">Stream to be decoded.</param>
+            <param name="extraMemory">Extra memory used for decompression.</param>
+            <param name="leaveOpen">Indicates if stream should stay open after disposing decoder.</param>
+            <returns>Decompression stream.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode``1(System.Buffers.ReadOnlySequence{System.Byte},``0,K4os.Compression.LZ4.Streams.LZ4EncoderSettings)">
+            <summary>
+            Compresses source bytes into target buffer. Returns number of bytes actually written. 
+            </summary>
+            <param name="source">Source bytes.</param>
+            <param name="target">Target buffer.</param>
+            <param name="settings">Compression settings.</param>
+            <returns>Number of bytes actually written.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode``1(System.ReadOnlySpan{System.Byte},``0,K4os.Compression.LZ4.Streams.LZ4EncoderSettings)">
+            <summary>
+            Compresses source bytes into target buffer. Returns number of bytes actually written. 
+            </summary>
+            <param name="source">Source bytes.</param>
+            <param name="target">Target buffer.</param>
+            <param name="settings">Compression settings.</param>
+            <returns>Number of bytes actually written.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode``1(System.Buffers.ReadOnlySequence{System.Byte},``0,K4os.Compression.LZ4.LZ4Level,System.Int32)">
+            <summary>
+            Compresses source bytes into target buffer. Returns number of bytes actually written. 
+            </summary>
+            <param name="source">Source bytes.</param>
+            <param name="target">Target buffer.</param>
+            <param name="level">Compression level.</param>
+            <param name="extraMemory">Extra memory.</param>
+            <returns>Number of bytes actually written.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode``1(System.ReadOnlySpan{System.Byte},``0,K4os.Compression.LZ4.LZ4Level,System.Int32)">
+            <summary>
+            Compresses source bytes into target buffer. Returns number of bytes actually written. 
+            </summary>
+            <param name="source">Source bytes.</param>
+            <param name="target">Target buffer.</param>
+            <param name="level">Compression level.</param>
+            <param name="extraMemory">Extra memory.</param>
+            <returns>Number of bytes actually written.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.Buffers.ReadOnlySequence{System.Byte},System.Span{System.Byte},K4os.Compression.LZ4.Streams.LZ4EncoderSettings)">
+            <summary>
+            Compresses source bytes into target buffer. Returns number of bytes actually written. 
+            </summary>
+            <param name="source">Source bytes.</param>
+            <param name="target">Target buffer.</param>
+            <param name="settings">Compression settings.</param>
+            <returns>Number of bytes actually written.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.Span{System.Byte},System.Span{System.Byte},K4os.Compression.LZ4.Streams.LZ4EncoderSettings)">
+            <summary>
+            Compresses source bytes into target buffer. Returns number of bytes actually written. 
+            </summary>
+            <param name="source">Source bytes.</param>
+            <param name="target">Target buffer.</param>
+            <param name="settings">Compression settings.</param>
+            <returns>Number of bytes actually written.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.Action{K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter},System.Span{System.Byte},K4os.Compression.LZ4.Streams.LZ4EncoderSettings)">
+            <summary>
+            Writes bytes into target buffer. Returns number of bytes actually written. 
+            </summary>
+            <param name="source">Source of bytes, a function which write to LZ4 encoder.</param>
+            <param name="target">Target buffer.</param>
+            <param name="settings">Compression settings.</param>
+            <returns>Number of bytes actually written.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.Buffers.ReadOnlySequence{System.Byte},System.Span{System.Byte},K4os.Compression.LZ4.LZ4Level,System.Int32)">
+            <summary>
+            Compresses source bytes into target buffer. Returns number of bytes actually written. 
+            </summary>
+            <param name="source">Source bytes.</param>
+            <param name="target">Target buffer.</param>
+            <param name="level">Compression level.</param>
+            <param name="extraMemory">Extra memory for encoder.</param>
+            <returns>Number of bytes actually written.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.Span{System.Byte},System.Span{System.Byte},K4os.Compression.LZ4.LZ4Level,System.Int32)">
+            <summary>
+            Compresses source bytes into target buffer. Returns number of bytes actually written. 
+            </summary>
+            <param name="source">Source bytes.</param>
+            <param name="target">Target buffer.</param>
+            <param name="level">Compression level.</param>
+            <param name="extraMemory">Extra memory for encoder.</param>
+            <returns>Number of bytes actually written.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.Action{K4os.Compression.LZ4.Streams.Abstractions.ILZ4FrameWriter},System.Span{System.Byte},K4os.Compression.LZ4.LZ4Level,System.Int32)">
+            <summary>
+            Compresses source bytes into target buffer. Returns number of bytes actually written. 
+            </summary>
+            <param name="source">Source of bytes, a function which write to LZ4 encoder.</param>
+            <param name="target">Target buffer.</param>
+            <param name="level">Compression level.</param>
+            <param name="extraMemory">Extra memory for encoder.</param>
+            <returns>Number of bytes actually written.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.Byte*,System.Int32,K4os.Compression.LZ4.Streams.LZ4EncoderSettings)">
+            <summary>
+            Create LZ4 encoder that writes compressed data into target buffer.
+            Please note, target buffer needs to be pinned for the whole time encoder is used.
+            This is definitely very unsafe method, and if you don't understand what it does,
+            don't use it.
+            </summary>
+            <param name="target">Pointer to target buffer.</param>
+            <param name="length">Length of target buffer.</param>
+            <param name="settings">Encoder settings.</param>
+            <returns>LZ4 frame writer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.Byte*,System.Int32,K4os.Compression.LZ4.LZ4Level,System.Int32)">
+            <summary>
+            Create LZ4 encoder that writes compressed data into target buffer.
+            Please note, target buffer needs to be pinned for the whole time encoder is used.
+            This is definitely very unsafe method, and if you don't understand what it does,
+            don't use it.
+            </summary>
+            <param name="target">Pointer to target buffer.</param>
+            <param name="length">Length of target buffer.</param>
+            <param name="level">Compression level.</param>
+            <param name="extraMemory">Extra memory for encoder.</param>
+            <returns>LZ4 frame writer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.Memory{System.Byte},K4os.Compression.LZ4.Streams.LZ4EncoderSettings)">
+            <summary>
+            Create LZ4 encoder that writes compressed data into target buffer.
+            </summary>
+            <param name="target">Target buffer.</param>
+            <param name="settings">Encoder settings.</param>
+            <returns>LZ4 frame writer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.Memory{System.Byte},K4os.Compression.LZ4.LZ4Level,System.Int32)">
+            <summary>
+            Create LZ4 encoder that writes compressed data into target buffer.
+            </summary>
+            <param name="target">Target buffer.</param>
+            <param name="level">Compression level.</param>
+            <param name="extraMemory">Extra memory for encoder.</param>
+            <returns>LZ4 frame writer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode``1(``0,K4os.Compression.LZ4.Streams.LZ4EncoderSettings)">
+            <summary>
+            Create LZ4 encoder that writes compressed data into target buffer.
+            </summary>
+            <param name="target">Target buffer.</param>
+            <param name="settings">Encoder settings.</param>
+            <typeparam name="TBufferWriter">Byte of buffer writer implementing <see cref="T:System.Buffers.IBufferWriter`1"/>.</typeparam>
+            <returns>LZ4 frame writer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode``1(``0,K4os.Compression.LZ4.LZ4Level,System.Int32)">
+            <summary>
+            Create LZ4 encoder that writes compressed data into target buffer.
+            </summary>
+            <param name="target">Target buffer.</param>
+            <param name="level">Compression level.</param>
+            <param name="extraMemory">Extra memory for encoder.</param>
+            <typeparam name="TBufferWriter">Byte of buffer writer implementing <see cref="T:System.Buffers.IBufferWriter`1"/>.</typeparam>
+            <returns>LZ4 frame writer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.Buffers.IBufferWriter{System.Byte},K4os.Compression.LZ4.Streams.LZ4EncoderSettings)">
+            <summary>
+            Create LZ4 encoder that writes compressed data into target buffer.
+            </summary>
+            <param name="target">Target buffer.</param>
+            <param name="settings">Encoder settings.</param>
+            <returns>LZ4 frame writer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.Buffers.IBufferWriter{System.Byte},K4os.Compression.LZ4.LZ4Level,System.Int32)">
+            <summary>
+            Create LZ4 encoder that writes compressed data into target buffer.
+            </summary>
+            <param name="target">Target buffer.</param>
+            <param name="level">Compression level.</param>
+            <param name="extraMemory">Extra memory for encoder.</param>
+            <returns>LZ4 frame writer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.IO.Stream,K4os.Compression.LZ4.Streams.LZ4EncoderSettings,System.Boolean)">
+            <summary>
+            Create LZ4 encoder that writes compressed data into target stream.
+            </summary>
+            <param name="target">Target stream.</param>
+            <param name="settings">Encoder settings.</param>
+            <param name="leaveOpen">Leave target stream open after encoder is disposed.</param>
+            <returns>LZ4 frame writer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.IO.Stream,K4os.Compression.LZ4.LZ4Level,System.Int32,System.Boolean)">
+            <summary>
+            Create LZ4 encoder that writes compressed data into target stream.
+            </summary>
+            <param name="target">Target stream.</param>
+            <param name="level">Compression level.</param>
+            <param name="extraMemory">Extra memory for encoder.</param>
+            <param name="leaveOpen">Leave target stream open after encoder is disposed.</param>
+            <returns></returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.IO.Pipelines.PipeWriter,K4os.Compression.LZ4.Streams.LZ4EncoderSettings,System.Boolean)">
+            <summary>
+            Create LZ4 encoder that writes compressed data into target pipe.
+            </summary>
+            <param name="target">Target pipe.</param>
+            <param name="settings">Encoder settings.</param>
+            <param name="leaveOpen">Leave target pipe open after encoder is disposed.</param>
+            <returns>LZ4 frame writer.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Frame.Encode(System.IO.Pipelines.PipeWriter,K4os.Compression.LZ4.LZ4Level,System.Int32,System.Boolean)">
+            <summary>
+            Create LZ4 encoder that writes compressed data into target pipe.
+            </summary>
+            <param name="target">Target pipe.</param>
+            <param name="level">Compression level.</param>
+            <param name="extraMemory">Extra memory for encoder.</param>
+            <param name="leaveOpen">Leave target pipe open after encoder is disposed.</param>
+            <returns>LZ4 frame writer.</returns>
+        </member>
+        <member name="T:K4os.Compression.LZ4.Streams.LZ4Stream">
+            <summary>
+            Utility class with factory methods to create LZ4 compression and decompression streams.
+            </summary>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Stream.Encode(System.IO.Stream,K4os.Compression.LZ4.Streams.LZ4EncoderSettings,System.Boolean)">
+            <summary>Created compression stream on top of inner stream.</summary>
+            <param name="stream">Inner stream.</param>
+            <param name="settings">Compression settings.</param>
+            <param name="leaveOpen">Leave inner stream open after disposing.</param>
+            <returns>Compression stream.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Stream.Encode(System.IO.Stream,K4os.Compression.LZ4.LZ4Level,System.Int32,System.Boolean)">
+            <summary>Created compression stream on top of inner stream.</summary>
+            <param name="stream">Inner stream.</param>
+            <param name="level">Compression level.</param>
+            <param name="extraMemory">Extra memory used for compression.</param>
+            <param name="leaveOpen">Leave inner stream open after disposing.</param>
+            <returns>Compression stream.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Stream.Decode(System.IO.Stream,K4os.Compression.LZ4.Streams.LZ4DecoderSettings,System.Boolean,System.Boolean)">
+            <summary>Creates decompression stream on top of inner stream.</summary>
+            <param name="stream">Inner stream.</param>
+            <param name="settings">Decompression settings.</param>
+            <param name="leaveOpen">Leave inner stream open after disposing.</param>
+            <param name="interactive">If <c>true</c> reading from stream will be "interactive" allowing
+            to read bytes as soon as possible, even if more data is expected.</param>
+            <returns>Decompression stream.</returns>
+        </member>
+        <member name="M:K4os.Compression.LZ4.Streams.LZ4Stream.Decode(System.IO.Stream,System.Int32,System.Boolean,System.Boolean)">
+            <summary>Creates decompression stream on top of inner stream.</summary>
+            <param name="stream">Inner stream.</param>
+            <param name="extraMemory">Extra memory used for decompression.</param>
+            <param name="leaveOpen">Leave inner stream open after disposing.</param>
+            <param name="interactive">If <c>true</c> reading from stream will be "interactive" allowing
+            to read bytes as soon as possible, even if more data is expected.</param>
+            <returns>Decompression stream.</returns>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.AllowNullAttribute">
+            <summary>
+            Specifies that null is allowed as an input even if the corresponding type disallows it.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DisallowNullAttribute">
+            <summary>
+            Specifies that null is disallowed as an input even if the corresponding type allows it.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute">
+            <summary>
+            Applied to a method that will never return under any circumstance.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute">
+            <summary>
+            Specifies that the method will not return if the associated Boolean parameter is passed the specified value.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.#ctor(System.Boolean)">
+            <summary>
+            Initializes the attribute with the specified parameter value.
+            </summary>
+            <param name="parameterValue">
+            The condition parameter value. Code after the method will be considered unreachable
+            by diagnostics if the argument to the associated parameter matches this value.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.ParameterValue">
+            <summary>
+            Gets the condition parameter value.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullAttribute">
+            <summary>
+            Specifies that an output may be null even if the corresponding type disallows it.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute">
+            <summary>
+            Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue"/>, the parameter may be null even if the corresponding type disallows it.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.#ctor(System.Boolean)">
+            <summary>
+            Initializes the attribute with the specified return value condition.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter may be null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue">
+            <summary>
+            Gets the return value condition.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute">
+            <summary>
+            Specifies that the method or property will ensure that the listed field and property members have not-null values.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String)">
+            <summary>
+            Initializes the attribute with a field or property member.
+            </summary>
+            <param name="member">The field or property member that is promised to be not-null.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String[])">
+            <summary>
+            Initializes the attribute with the list of field and property members.
+            </summary>
+            <param name="members">The list of field and property members that are promised to be not-null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.Members">
+            <summary>
+            Gets field or property member names.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute">
+            <summary>
+            Specifies that the method or property will ensure that the listed field and property
+            members have not-null values when returning with the specified return value condition.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String)">
+            <summary>
+            Initializes the attribute with the specified return value condition and a field or property member.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter will not be null.</param>
+            <param name="member">The field or property member that is promised to be not-null.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String[])">
+            <summary>
+            Initializes the attribute with the specified return value condition and list of field and property members.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter will not be null.</param>
+            <param name="members">The list of field and property members that are promised to be not-null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.ReturnValue">
+            <summary>
+            Gets the return value condition.
+            </summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.Members">
+            <summary>
+            Gets field or property member names.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullAttribute">
+            <summary>
+            Specifies that an output will not be null even if the corresponding type allows it.
+            Specifies that an input argument was not null when the call returns.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute">
+            <summary>
+            Specifies that the output will be non-null if the named parameter is non-null.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.#ctor(System.String)">
+            <summary>
+            Initializes the attribute with the associated parameter name.
+            </summary>
+            <param name="parameterName">The associated parameter name. The output will be non-null if the argument to the parameter specified is non-null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.ParameterName">
+            <summary>
+            Gets the associated parameter name.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute">
+            <summary>
+            Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.ReturnValue"/>, the parameter will not be null even if the corresponding type allows it.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.#ctor(System.Boolean)">
+            <summary>
+            Initializes the attribute with the specified return value condition.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter will not be null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute">
+            <summary>
+            Specifies that this constructor sets all required members for the current type,
+            and callers do not need to set any required members themselves.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute">
+            <summary>
+            Specifies the syntax used in a string.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.#ctor(System.String)">
+            <summary>
+            Initializes the <see cref="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/> with the identifier of the syntax used.
+            </summary>
+            <param name="syntax">The syntax identifier.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.#ctor(System.String,System.Object[])">
+            <summary>Initializes the <see cref="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/> with the identifier of the syntax used.</summary>
+            <param name="syntax">The syntax identifier.</param>
+            <param name="arguments">Optional arguments associated with the specific syntax employed.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Syntax">
+            <summary>Gets the identifier of the syntax used.</summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Arguments">
+            <summary>Optional arguments associated with the specific syntax employed.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.CompositeFormat">
+            <summary>The syntax identifier for strings containing composite formats for string formatting.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.DateOnlyFormat">
+            <summary>The syntax identifier for strings containing date format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.DateTimeFormat">
+            <summary>The syntax identifier for strings containing date and time format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.EnumFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.Enum"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.Guid"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Json">
+            <summary>The syntax identifier for strings containing JavaScript Object Notation (JSON).</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.NumericFormat">
+            <summary>The syntax identifier for strings containing numeric format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Regex">
+            <summary>The syntax identifier for strings containing regular expressions.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.TimeOnlyFormat">
+            <summary>The syntax identifier for strings containing time format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.TimeSpanFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.TimeSpan"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Uri">
+            <summary>The syntax identifier for strings containing URIs.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Xml">
+            <summary>The syntax identifier for strings containing XML.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.UnscopedRefAttribute">
+            <summary>
+            Used to indicate a byref escapes and is not scoped.
+            </summary>
+            <remarks>
+            <para>
+            There are several cases where the C# compiler treats a <see langword="ref"/> as implicitly
+            <see langword="scoped"/> - where the compiler does not allow the <see langword="ref"/> to escape the method.
+            </para>
+            <para>
+            For example:
+            <list type="number">
+                <item><see langword="this"/> for <see langword="struct"/> instance methods.</item>
+                <item><see langword="ref"/> parameters that refer to <see langword="ref"/> <see langword="struct"/> types.</item>
+                <item><see langword="out"/> parameters.</item>
+            </list>
+            </para>
+            <para>
+            This attribute is used in those instances where the <see langword="ref"/> should be allowed to escape.
+            </para>
+            <para>
+            Applying this attribute, in any form, has impact on consumers of the applicable API. It is necessary for
+            API authors to understand the lifetime implications of applying this attribute and how it may impact their users.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:System.Index">
+            <summary>Represent a type can be used to index a collection either from the start or the end.</summary>
+            <remarks>
+            Index is used by the C# compiler to support the new index syntax
+            <code>
+            int[] someArray = new int[5] { 1, 2, 3, 4, 5 } ;
+            int lastElement = someArray[^1]; // lastElement = 5
+            </code>
+            </remarks>
+        </member>
+        <member name="M:System.Index.#ctor(System.Int32,System.Boolean)">
+            <summary>Construct an Index using a value and indicating if the index is from the start or from the end.</summary>
+            <param name="value">The index value. it has to be zero or positive number.</param>
+            <param name="fromEnd">Indicating if the index is from the start or from the end.</param>
+            <remarks>
+            If the Index constructed from the end, index value 1 means pointing at the last element and index value 0 means pointing at beyond last element.
+            </remarks>
+        </member>
+        <member name="P:System.Index.Start">
+            <summary>Create an Index pointing at first element.</summary>
+        </member>
+        <member name="P:System.Index.End">
+            <summary>Create an Index pointing at beyond last element.</summary>
+        </member>
+        <member name="M:System.Index.FromStart(System.Int32)">
+            <summary>Create an Index from the start at the position indicated by the value.</summary>
+            <param name="value">The index value from the start.</param>
+        </member>
+        <member name="M:System.Index.FromEnd(System.Int32)">
+            <summary>Create an Index from the end at the position indicated by the value.</summary>
+            <param name="value">The index value from the end.</param>
+        </member>
+        <member name="P:System.Index.Value">
+            <summary>Returns the index value.</summary>
+        </member>
+        <member name="P:System.Index.IsFromEnd">
+            <summary>Indicates whether the index is from the start or the end.</summary>
+        </member>
+        <member name="M:System.Index.GetOffset(System.Int32)">
+            <summary>Calculate the offset from the start using the giving collection length.</summary>
+            <param name="length">The length of the collection that the Index will be used with. length has to be a positive value</param>
+            <remarks>
+            For performance reason, we don't validate the input length parameter and the returned offset value against negative values.
+            we don't validate either the returned offset is greater than the input length.
+            It is expected Index will be used with collections which always have non negative length/count. If the returned offset is negative and
+            then used to index a collection will get out of range exception which will be same affect as the validation.
+            </remarks>
+        </member>
+        <member name="M:System.Index.Equals(System.Object)">
+            <summary>Indicates whether the current Index object is equal to another object of the same type.</summary>
+            <param name="value">An object to compare with this object</param>
+        </member>
+        <member name="M:System.Index.Equals(System.Index)">
+            <summary>Indicates whether the current Index object is equal to another Index object.</summary>
+            <param name="other">An object to compare with this object</param>
+        </member>
+        <member name="M:System.Index.GetHashCode">
+            <summary>Returns the hash code for this instance.</summary>
+        </member>
+        <member name="M:System.Index.op_Implicit(System.Int32)~System.Index">
+            <summary>Converts integer number to an Index.</summary>
+        </member>
+        <member name="M:System.Index.ToString">
+            <summary>Converts the value of the current Index object to its equivalent string representation.</summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute">
+            <summary>
+            An attribute that allows parameters to receive the expression of other parameters.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute"/> class.
+            </summary>
+            <param name="parameterName">The condition parameter value.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute.ParameterName">
+            <summary>
+            Gets the parameter name the expression is retrieved from.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute">
+            <summary>
+            Indicates that compiler support for a particular feature is required for the location where this attribute is applied.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.#ctor(System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute"/> type.
+            </summary>
+            <param name="featureName">The name of the feature to indicate.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName">
+            <summary>
+            The name of the compiler feature.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.IsOptional">
+            <summary>
+            If true, the compiler can choose to allow access to the location where this attribute is applied if it does not understand <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/>.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RefStructs">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the ref structs C# feature.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RequiredMembers">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the required members C# feature.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute">
+            <summary>
+            Indicates which arguments to a method involving an interpolated string handler should be passed to that handler.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute"/> class.
+            </summary>
+            <param name="argument">The name of the argument that should be passed to the handler.</param>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.#ctor(System.String[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute"/> class.
+            </summary>
+            <param name="arguments">The names of the arguments that should be passed to the handler.</param>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.Arguments">
+            <summary>
+            Gets the names of the arguments that should be passed to the handler.
+            </summary>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute">
+            <summary>
+            Indicates the attributed type is to be used as an interpolated string handler.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.IsExternalInit">
+            <summary>
+            Reserved to be used by the compiler for tracking metadata.
+            This class should not be used by developers in source code.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.ModuleInitializerAttribute">
+             <summary>
+             Used to indicate to the compiler that a method should be called
+             in its containing module's initializer.
+             </summary>
+             <remarks>
+             When one or more valid methods
+             with this attribute are found in a compilation, the compiler will
+             emit a module initializer which calls each of the attributed methods.
+            
+             Certain requirements are imposed on any method targeted with this attribute:
+             - The method must be `static`.
+             - The method must be an ordinary member method, as opposed to a property accessor, constructor, local function, etc.
+             - The method must be parameterless.
+             - The method must return `void`.
+             - The method must not be generic or be contained in a generic type.
+             - The method's effective accessibility must be `internal` or `public`.
+            
+             The specification for module initializers in the .NET runtime can be found here:
+             https://github.com/dotnet/runtime/blob/main/docs/design/specs/Ecma-335-Augments.md#module-initializer
+             </remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.RequiredMemberAttribute">
+            <summary>
+            Specifies that a type has required members or that a member is required.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.SkipLocalsInitAttribute">
+            <summary>
+            Used to indicate to the compiler that the <c>.locals init</c> flag should not be set in method headers.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute"/> class.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute"/> class with the specified message.
+            </summary>
+            <param name="message">An optional message associated with this attribute instance.</param>
+        </member>
+        <member name="P:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.Message">
+            <summary>
+            Returns the optional message associated with this attribute instance.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.Url">
+            <summary>
+            Returns the optional URL associated with this attribute instance.
+            </summary>
+        </member>
+    </members>
+</doc>

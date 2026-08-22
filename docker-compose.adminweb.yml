@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: opencredential-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Define POSTGRES_DB en tu archivo .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Define POSTGRES_USER en tu archivo .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en tu archivo .env}
+    volumes:
+      - opencredential_postgres_data:/var/lib/postgresql/data
+
+  opencredential-adminweb:
+    build:
+      context: .
+      dockerfile: OpenCredential.AdminWeb/Dockerfile
+    container_name: opencredential-adminweb
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "${ADMINWEB_PORT:-8080}:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      AdminAuth__Username: ${ADMIN_USERNAME:?Define ADMIN_USERNAME en tu archivo .env}
+      AdminAuth__Password: ${ADMIN_PASSWORD:?Define ADMIN_PASSWORD en tu archivo .env}
+      AdminAuth__Role: ${ADMIN_ROLE:-SuperAdmin}
+      Database__Mode: Sql
+      Database__Provider: PostgreSql
+      Database__ConnectionString: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Include Error Detail=true
+      Database__AutoInitialize: "true"
+    volumes:
+      - opencredential_adminweb_data:/data
+
+volumes:
+  opencredential_postgres_data:
+  opencredential_adminweb_data:

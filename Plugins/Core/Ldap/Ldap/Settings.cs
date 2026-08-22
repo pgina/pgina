@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
@@ -29,9 +29,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Settings;
 
-namespace pGina.Plugin.Ldap
+namespace OpenCredential.Plugin.Ldap
 {
     public class Settings
     {
@@ -49,7 +49,7 @@ namespace pGina.Plugin.Ldap
 
         static Settings()
         {
-            m_settings = new pGinaDynamicSettings(LdapPlugin.LdapUuid);
+            m_settings = new OpenCredentialDynamicSettings(LdapPlugin.LdapUuid);
 
             // Set default values for settings (if not already set)
             m_settings.SetDefault("LdapHost", new string[] { "ldap.example.com" });

@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
@@ -32,12 +32,12 @@ using System.Diagnostics;
 
 using log4net;
 
-using pGina.Shared.Interfaces;
-using pGina.Shared.Types;
-using pGina.Shared.Settings;
-using pGina.Plugin.UsernameMod.Rules;
+using OpenCredential.Shared.Interfaces;
+using OpenCredential.Shared.Types;
+using OpenCredential.Shared.Settings;
+using OpenCredential.Plugin.UsernameMod.Rules;
 
-namespace pGina.Plugin.UsernameMod
+namespace OpenCredential.Plugin.UsernameMod
 {
     public class UsernameModPlugin : IPluginConfiguration, IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway
     {
@@ -52,7 +52,7 @@ namespace pGina.Plugin.UsernameMod
         {
             using(Process me = Process.GetCurrentProcess())
             {
-                m_settings = new pGinaDynamicSettings(SimpleUuid);
+                m_settings = new OpenCredentialDynamicSettings(SimpleUuid);
                 m_settings.SetDefault("ShowDescription", true);
                 m_settings.SetDefault("Description", m_defaultDescription);
                 

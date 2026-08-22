@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2014, pGina Team
 	All rights reserved.
 
@@ -32,10 +32,10 @@ using System.DirectoryServices.Protocols;
 
 using log4net;
 
-using pGina.Shared.Interfaces;
-using pGina.Shared.Types;
+using OpenCredential.Shared.Interfaces;
+using OpenCredential.Shared.Types;
 
-namespace pGina.Plugin.Ldap
+namespace OpenCredential.Plugin.Ldap
 {
     public class LdapPlugin : IStatefulPlugin, IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration, IPluginChangePassword
     {

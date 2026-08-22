@@ -1,4 +1,4 @@
-﻿namespace pGina.Plugin.Ldap
+namespace OpenCredential.Plugin.Ldap
 {
     partial class Configuration
     {
@@ -671,7 +671,7 @@
             // 
             // authzRuleDeleteBtn
             // 
-            this.authzRuleDeleteBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.delete;
+            this.authzRuleDeleteBtn.Image = global::OpenCredential.Plugin.Ldap.Properties.Resources.delete;
             this.authzRuleDeleteBtn.Location = new System.Drawing.Point(577, 105);
             this.authzRuleDeleteBtn.Name = "authzRuleDeleteBtn";
             this.authzRuleDeleteBtn.Size = new System.Drawing.Size(32, 34);
@@ -681,7 +681,7 @@
             // 
             // authzRuleDownBtn
             // 
-            this.authzRuleDownBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.DownArrowSolid;
+            this.authzRuleDownBtn.Image = global::OpenCredential.Plugin.Ldap.Properties.Resources.DownArrowSolid;
             this.authzRuleDownBtn.Location = new System.Drawing.Point(577, 146);
             this.authzRuleDownBtn.Name = "authzRuleDownBtn";
             this.authzRuleDownBtn.Size = new System.Drawing.Size(32, 34);
@@ -691,7 +691,7 @@
             // 
             // authzRuleUpBtn
             // 
-            this.authzRuleUpBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.UpArrowSolid;
+            this.authzRuleUpBtn.Image = global::OpenCredential.Plugin.Ldap.Properties.Resources.UpArrowSolid;
             this.authzRuleUpBtn.Location = new System.Drawing.Point(577, 65);
             this.authzRuleUpBtn.Name = "authzRuleUpBtn";
             this.authzRuleUpBtn.Size = new System.Drawing.Size(32, 34);
@@ -819,7 +819,7 @@
             // 
             // gatewayRuleDeleteBtn
             // 
-            this.gatewayRuleDeleteBtn.Image = global::pGina.Plugin.Ldap.Properties.Resources.delete;
+            this.gatewayRuleDeleteBtn.Image = global::OpenCredential.Plugin.Ldap.Properties.Resources.delete;
             this.gatewayRuleDeleteBtn.Location = new System.Drawing.Point(622, 89);
             this.gatewayRuleDeleteBtn.Name = "gatewayRuleDeleteBtn";
             this.gatewayRuleDeleteBtn.Size = new System.Drawing.Size(32, 34);

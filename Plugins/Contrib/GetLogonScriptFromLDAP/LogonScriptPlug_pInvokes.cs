@@ -1,4 +1,4 @@
-﻿/*
+/*
     Copyright (c) 2011, pGina Team
     All rights reserved.
     Adapted to the LogonScript plugin by Florian Rohmer (2013).
@@ -37,7 +37,7 @@ using System.Net.Security;
 using System.Security.Principal;
 using System.ComponentModel;
 
-namespace pGina.Plugin.LogonScriptFromLDAP
+namespace OpenCredential.Plugin.LogonScriptFromLDAP
 {
     public class pInvokes
     {

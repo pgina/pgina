@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2011, pGina Team
 	All rights reserved.
 
@@ -32,11 +32,11 @@ using System.Diagnostics;
 
 using log4net;
 
-using pGina.Shared.Interfaces;
-using pGina.Shared.Types;
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Interfaces;
+using OpenCredential.Shared.Types;
+using OpenCredential.Shared.Settings;
 
-namespace pGina.Plugin.Sample
+namespace OpenCredential.Plugin.Sample
 {
     public class SimplePlugin : IPluginConfiguration, IPluginAuthentication, IPluginChangePassword
     {
@@ -49,7 +49,7 @@ namespace pGina.Plugin.Sample
         {
             using(Process me = Process.GetCurrentProcess())
             {
-                m_settings = new pGinaDynamicSettings(SimpleUuid);
+                m_settings = new OpenCredentialDynamicSettings(SimpleUuid);
                 m_settings.SetDefault("ShowDescription", true);
                 m_settings.SetDefault("Description", m_defaultDescription);
                 

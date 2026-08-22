@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2011, pGina Team
 	All rights reserved.
 
@@ -37,12 +37,12 @@ using System.Net.NetworkInformation;
 
 using log4net;
 
-using pGina.Shared.Interfaces;
-using pGina.Shared.Types;
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Interfaces;
+using OpenCredential.Shared.Types;
+using OpenCredential.Shared.Settings;
 
 
-namespace pGina.Plugin.RADIUS
+namespace OpenCredential.Plugin.RADIUS
 {
 
     //TODO:
@@ -61,7 +61,7 @@ namespace pGina.Plugin.RADIUS
         {
             using(Process me = Process.GetCurrentProcess())
             {
-                m_settings = new pGinaDynamicSettings(SimpleUuid);
+                m_settings = new OpenCredentialDynamicSettings(SimpleUuid);
                 m_settings.SetDefault("ShowDescription", true);
                 m_settings.SetDefault("Description", m_defaultDescription);
 
@@ -244,7 +244,7 @@ namespace pGina.Plugin.RADIUS
         }
 
         //Processes accounting on logon/logoff
-        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, pGina.Shared.Types.SessionProperties properties)
+        public void SessionChange(System.ServiceProcess.SessionChangeDescription changeDescription, OpenCredential.Shared.Types.SessionProperties properties)
         {
             if (changeDescription.Reason != System.ServiceProcess.SessionChangeReason.SessionLogon
                 && changeDescription.Reason != System.ServiceProcess.SessionChangeReason.SessionLogoff)

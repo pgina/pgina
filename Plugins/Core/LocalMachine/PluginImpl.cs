@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2012, pGina Team
 	All rights reserved.
 
@@ -36,10 +36,10 @@ using System.Threading;
 
 using log4net;
 
-using pGina.Shared.Interfaces;
-using pGina.Shared.Types;
+using OpenCredential.Shared.Interfaces;
+using OpenCredential.Shared.Types;
 
-namespace pGina.Plugin.LocalMachine
+namespace OpenCredential.Plugin.LocalMachine
 {
 
     public class PluginImpl : IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration, IPluginChangePassword

@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using pGina.Plugin.Ldap;
+using OpenCredential.Plugin.Ldap;
 using System.DirectoryServices.Protocols;
 
 using NUnit.Framework;
-using pGina.Shared.Types;
+using OpenCredential.Shared.Types;
 
-namespace pGina.Plugin.Ldap.Test
+namespace OpenCredential.Plugin.Ldap.Test
 {
     [TestFixture]
     public class LdapTests
@@ -28,9 +28,9 @@ namespace pGina.Plugin.Ldap.Test
         [TestFixtureSetUp]
         public void InitFixture()
         {
-            pGina.Shared.Logging.Logging.Init();
+            OpenCredential.Shared.Logging.Logging.Init();
 
-           // m_settings = new pGina.Shared.Settings.pGinaDynamicSettings(Ldap.LdapPlugin.LdapUuid);
+           // m_settings = new OpenCredential.Shared.Settings.OpenCredentialDynamicSettings(Ldap.LdapPlugin.LdapUuid);
 
             m_plugin = new LdapPlugin();
             m_plugin.Starting();

@@ -1,4 +1,4 @@
-﻿/*
+/*
     Written by Florian Rohmer (2013)
      
     Distribued under the pGina license.
@@ -35,10 +35,10 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Settings;
 using log4net;
 
-namespace pGina.Plugin.SingleUserSwitcher
+namespace OpenCredential.Plugin.SingleUserSwitcher
 {
     public partial class Configuration : Form
     {

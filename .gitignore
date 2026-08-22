@@ -1,21 +1,57 @@
-*.suo
-*~
-*.user
-*.aps
-*.ipch
-*.sdf
-*.opensdf
+# General development clutter
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+.DS_Store
+Thumbs.db
+.env
+.env.local
+*.env.*
+*.log
 
-# Log files
-*_log.txt
-
-# Build/output directories
-obj/
-bin/
+# Python / JS / Java leftovers
+node_modules/
+venv/
+.venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+target/
+.gradle/
+coverage/
+htmlcov/
+.coverage
+dist/
 build/
 
-# Installer output
-Installer/Output
+# Visual Studio / .NET
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+**/bin/
+**/obj/
+Debug/
+Release/
+TestResults/
 
-# Installer pre-processor
-Installer/PreprocessedpGina0.iss
+# NuGet
+packages/
+.nuget/
+*.nupkg
+.dotnet-home/
+
+# OpenCredential runtime secrets / local state
+admin_cookies.txt
+OpenCredential.AdminWeb/
+Installer/PreprocessedOpenCredential*.iss
+Installer/Output/
+Plugins/SDK/
+artifacts/
+
+# Keep installer payloads under source control
+!Installer/bin/
+!Installer/bin/**

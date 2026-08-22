@@ -1,4 +1,4 @@
-﻿namespace pGina.Plugin.LocalMachine
+namespace OpenCredential.Plugin.LocalMachine
 {
     partial class Configuration
     {

@@ -1,4 +1,4 @@
-﻿namespace pGina.Plugin.SessionLimit
+namespace OpenCredential.Plugin.SessionLimit
 {
     partial class Configuration
     {

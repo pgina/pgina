@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2011, pGina Team
 	All rights reserved.
 
@@ -37,9 +37,9 @@ using System.Security.Principal;
 using System.Security.AccessControl;
 using System.IO;
 
-using pGina.Shared.Types;
+using OpenCredential.Shared.Types;
 
-namespace pGina.Plugin.LocalMachine
+namespace OpenCredential.Plugin.LocalMachine
 {
     public class LocalAccount
     {

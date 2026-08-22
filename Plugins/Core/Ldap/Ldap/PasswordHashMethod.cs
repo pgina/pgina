@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2013, pGina Team
 	All rights reserved.
 
@@ -30,7 +30,7 @@ using System.Linq;
 using System.Text;
 using Org.BouncyCastle.Crypto.Digests;
 
-namespace pGina.Plugin.Ldap
+namespace OpenCredential.Plugin.Ldap
 {
     enum HashMethod
     {

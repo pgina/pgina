@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2014, pGina Team
 	All rights reserved.
 
@@ -31,13 +31,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using pGina.Shared.Interfaces;
+using OpenCredential.Shared.Interfaces;
 using Abstractions.WindowsApi;
 using System.ComponentModel;
 using log4net;
-using pGina.Shared.Types;
+using OpenCredential.Shared.Types;
 
-namespace pGina.Plugin.DriveMapper
+namespace OpenCredential.Plugin.DriveMapper
 {
     public class PluginMain : IPluginEventNotifications, IPluginConfiguration
     {

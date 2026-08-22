@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Written by Evan Horne.
  
     Distributed under the pGina License.
@@ -42,13 +42,13 @@ using System.IO;
 
 using log4net;
 
-using pGina.Shared.Interfaces;
-using pGina.Shared.Types;
-using pGina.Shared.Settings;
+using OpenCredential.Shared.Interfaces;
+using OpenCredential.Shared.Types;
+using OpenCredential.Shared.Settings;
 
 
 
-namespace pGina.Plugin.Email
+namespace OpenCredential.Plugin.Email
 {
     public class EmailAuthPlugin : IPluginConfiguration, IPluginAuthentication
     {
@@ -61,7 +61,7 @@ namespace pGina.Plugin.Email
         {
             using(Process me = Process.GetCurrentProcess())
             {
-                m_settings = new pGinaDynamicSettings(SimpleUuid);
+                m_settings = new OpenCredentialDynamicSettings(SimpleUuid);
                 m_settings.SetDefault("ShowDescription", true);
                 m_settings.SetDefault("Description", m_defaultDescription);
                 

@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2011, pGina Team
 	All rights reserved.
 
@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace pGina.Plugin.SessionLimit
+namespace OpenCredential.Plugin.SessionLimit
 {
     class SessionCache
     {
