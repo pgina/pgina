@@ -240,11 +240,16 @@ namespace OpenCredential.InstallUtil
             {
                 if (openCredentialService != null)
                 {
-                    if (openCredentialService.Status == ServiceControllerStatus.Running)
+                    if (openCredentialService.Status == ServiceControllerStatus.StartPending)
+                        openCredentialService.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
+
+                    if (openCredentialService.Status != ServiceControllerStatus.Stopped &&
+                        openCredentialService.Status != ServiceControllerStatus.StopPending)
                     {
                         m_logger.InfoFormat("Stopping OpenCredential service...");
                         openCredentialService.Stop();
                     }
+                    openCredentialService.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
                 }
                 else
                     throw new Exception("OpenCredential service not installed");
@@ -257,11 +262,16 @@ namespace OpenCredential.InstallUtil
             {
                 if (openCredentialService != null)
                 {
-                    if ( openCredentialService.Status != ServiceControllerStatus.Running )
+                    if (openCredentialService.Status == ServiceControllerStatus.StopPending)
+                        openCredentialService.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
+
+                    if (openCredentialService.Status != ServiceControllerStatus.Running &&
+                        openCredentialService.Status != ServiceControllerStatus.StartPending)
                     {
                         m_logger.InfoFormat("Starting OpenCredential service...");
                         openCredentialService.Start();
                     }
+                    openCredentialService.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
                 }
                 else
                     throw new Exception("OpenCredential service not installed");

@@ -69,6 +69,16 @@ namespace OpenCredential.Plugin.DatabaseLogger
             }
         }
 
+        public static void OpenConnection(DbConnection connection)
+        {
+            connection.Open();
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = connection is NpgsqlConnection ? "SET TIME ZONE 'UTC'" : "SET time_zone = '+00:00'";
+                command.ExecuteNonQuery();
+            }
+        }
+
         private static string BuildConnectionString()
         {
             if (Settings.GetDatabaseProvider() == Settings.DatabaseProvider.PostgreSql)
@@ -80,7 +90,8 @@ namespace OpenCredential.Plugin.DatabaseLogger
                     Username = Settings.Store.User,
                     Database = Settings.Store.Database,
                     Password = Settings.Store.GetEncryptedSetting("Password"),
-                    SslMode = SslMode.Disable,
+                    SslMode = Settings.GetSslMode() == MySqlSslMode.None ? SslMode.Disable : SslMode.Require,
+                    TrustServerCertificate = Settings.GetSslMode() == MySqlSslMode.Required,
                     Pooling = true
                 };
 
@@ -93,7 +104,8 @@ namespace OpenCredential.Plugin.DatabaseLogger
                 Port = Settings.GetPort(),
                 UserID = Settings.Store.User,
                 Database = Settings.Store.Database,
-                Password = Settings.Store.GetEncryptedSetting("Password")
+                Password = Settings.Store.GetEncryptedSetting("Password"),
+                SslMode = Settings.GetSslMode()
             };
 
             return bldr.ConnectionString;

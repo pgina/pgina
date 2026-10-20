@@ -10,7 +10,6 @@
 ; Use some useful packaging stuff from: http://toneday.blogspot.com/2010/12/innosetup.html
 ; dotnet_Passive enabled shows the .NET/VC runtime installation progress, as it can take quite some time
 #define dotnet_Passive
-#define use_dotnetfx40
 #define use_vc14
 
 ; Enable the required define(s) below if a local event function (prepended with Local) is used
@@ -47,54 +46,16 @@ AlwaysShowGroupOnReadyPage=yes
 DisableProgramGroupPage=auto
 
 ArchitecturesInstallIn64BitMode=x64compatible
+MinVersion=10.0.19044
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
 ;Name: "english"; MessagesFile: "compiler:Default.isl"
 
-[Registry]
-; Remove legacy registry keys from earlier pGina-based installs
-Root: HKLM; Subkey: "SOFTWARE\pGina"; Flags: uninsdeletekey
-Root: HKCU; Subkey: "SOFTWARE\pGina"; Flags: uninsdeletekey
-; Also remove older compatibility keys if they exist
-Root: HKLM; Subkey: "SOFTWARE\pGina3"; Flags: uninsdeletekey
-Root: HKCU; Subkey: "SOFTWARE\pGina3"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "SOFTWARE\OpenCredential"; Flags: uninsdeletekey
-Root: HKCU; Subkey: "SOFTWARE\OpenCredential"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "SOFTWARE\OpenCredential3"; Flags: uninsdeletekey
-Root: HKCU; Subkey: "SOFTWARE\OpenCredential3"; Flags: uninsdeletekey
-
-[InstallDelete]
-; Remove previous configuration before installing (clean install)
-Type: filesandordirs; Name: "{commonappdata}\pGina"
-Type: filesandordirs; Name: "{commonappdata}\pGina3"
-Type: filesandordirs; Name: "{userappdata}\pGina"
-Type: filesandordirs; Name: "{userappdata}\pGina3"
-Type: filesandordirs; Name: "{localappdata}\pGina"
-Type: filesandordirs; Name: "{localappdata}\pGina3"
-Type: filesandordirs; Name: "{commonappdata}\OpenCredential"
-Type: filesandordirs; Name: "{commonappdata}\OpenCredential3"
-Type: filesandordirs; Name: "{userappdata}\OpenCredential"
-Type: filesandordirs; Name: "{userappdata}\OpenCredential3"
-Type: filesandordirs; Name: "{localappdata}\OpenCredential"
-Type: filesandordirs; Name: "{localappdata}\OpenCredential3"
-
-[UninstallDelete]
-; Remove configuration during uninstall
-Type: filesandordirs; Name: "{commonappdata}\pGina"
-Type: filesandordirs; Name: "{commonappdata}\pGina3"
-Type: filesandordirs; Name: "{userappdata}\pGina"
-Type: filesandordirs; Name: "{userappdata}\pGina3"
-Type: filesandordirs; Name: "{localappdata}\pGina"
-Type: filesandordirs; Name: "{localappdata}\pGina3"
-Type: filesandordirs; Name: "{commonappdata}\OpenCredential"
-Type: filesandordirs; Name: "{commonappdata}\OpenCredential3"
-Type: filesandordirs; Name: "{userappdata}\OpenCredential"
-Type: filesandordirs; Name: "{userappdata}\OpenCredential3"
-Type: filesandordirs; Name: "{localappdata}\OpenCredential"
-Type: filesandordirs; Name: "{localappdata}\OpenCredential3"
-; Remove installation directory completely
-Type: filesandordirs; Name: "{app}"
+; Configuration, offline databases and registry settings are persistent user data.
+; Do not purge them during upgrades or uninstall. Inno removes only its own
+; registered payload; InstallUtil unregisters the provider/service on uninstall.
+; An intentional data purge must be a separate, backed-up administrative action.
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -119,7 +80,6 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\OpenCredential.InstallUtil.exe"; Parameters: "post-install"; StatusMsg: "Installing OpenCredential service, credential provider, and permissions..."; WorkingDir: "{app}"; Flags: runhidden
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, "&", "&&")}}"; Flags: nowait postinstall skipifsilent runascurrentuser
 
 [UninstallRun]
@@ -150,6 +110,8 @@ winxpsp3_title=Windows XP Service Pack 3
 
 [Code]
 function InitializeSetup(): Boolean;
+var
+    DotNetRelease: Cardinal;
 begin
     //init windows version
     initwinversion();
@@ -164,10 +126,12 @@ begin
         exit;
     end;
     
-    // If no .NET 4.0 framework found, install the full thing
-#ifdef use_dotnetfx40
-    dotnetfx40full(false);
-#endif
+    DotNetRelease := 0;
+    if (not RegQueryDWordValue(HKLM32, 'Software\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', DotNetRelease)) or (DotNetRelease < 528040) then begin
+        MsgBox('OpenCredential requires .NET Framework 4.8 or later. Install it from Microsoft, then run setup again.', mbError, MB_OK);
+        Result := false;
+        exit;
+    end;
 
     // Latest supported Visual C++ v14 Redistributable
 #ifdef use_vc14
@@ -188,8 +152,13 @@ begin
 end;
 
 procedure DoPostInstall();
+var
+    ExitCode: Integer;
 begin
-  // ...
+  if not Exec(ExpandConstant('{app}\OpenCredential.InstallUtil.exe'), 'post-install', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, ExitCode) then
+    RaiseException('Could not run OpenCredential post-install. Keep the alternate Windows sign-in provider enabled and review the setup log.');
+  if ExitCode <> 0 then
+    RaiseException(Format('OpenCredential post-install failed (exit code %d). Keep the alternate Windows sign-in provider enabled and review the application log.', [ExitCode]));
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);

@@ -156,7 +156,8 @@ namespace OpenCredential.Plugin.DatabaseAuth
             catch (Exception e)
             {
                 LogDatabaseException("Authentication", e);
-                return TryOfflineAuthentication(userInfo, e.Message);
+                if (IsConnectivityException(e)) return TryOfflineAuthentication(userInfo, e.Message);
+                return new BooleanResult { Success = false, Message = "Authentication service error. Contact support." };
             }
 
             m_logger.WarnFormat("Authentication failed - user {0} not found", userInfo.Username);
@@ -290,10 +291,9 @@ namespace OpenCredential.Plugin.DatabaseAuth
             }
             catch (Exception e)
             {
-                if (IsConnectivityException(e) && Settings.IsOfflineFallbackEnabled() && Settings.AllowOfflineBypassForAuthorization())
+                if (IsConnectivityException(e) && Settings.IsOfflineFallbackEnabled() && GroupRuleLoader.GetGatewayRules().Count == 0)
                 {
-                    m_logger.WarnFormat("Gateway offline bypass enabled: {0}", e.Message);
-                    return new BooleanResult { Success = true, Message = "Gateway bypassed while the database is unavailable." };
+                    return new BooleanResult { Success = true, Message = "No database gateway rules require evaluation." };
                 }
 
                 if (IsConnectivityException(e) && Settings.PreventLogonOnServerError())
@@ -391,10 +391,22 @@ namespace OpenCredential.Plugin.DatabaseAuth
             }
             catch (Exception e)
             {
-                if (IsConnectivityException(e) && Settings.IsOfflineFallbackEnabled() && Settings.AllowOfflineBypassForAuthorization())
+                if (IsConnectivityException(e) && Settings.IsOfflineFallbackEnabled())
                 {
-                    m_logger.WarnFormat("Authorization offline bypass enabled because the database is unavailable: {0}", e.Message);
-                    return new BooleanResult { Success = true, Message = "Authorization bypassed while the database is unavailable." };
+                    var activity = properties.GetTrackedSingle<PluginActivityInformation>();
+                    bool authenticated = false;
+                    try { authenticated = activity != null && activity.GetAuthenticationResult(Uuid).Success; }
+                    catch (KeyNotFoundException) { }
+                    if (authenticated)
+                    {
+                        // Only unconditional rules can be evaluated without a current group snapshot.
+                        foreach (var rule in rules)
+                        {
+                            if (rule.RuleCondition != GroupRule.Condition.ALWAYS) break;
+                            return new BooleanResult { Success = rule.AllowOnMatch, Message = "Offline unconditional authorization rule." };
+                        }
+                    }
+                    return new BooleanResult { Success = false, Message = "Group authorization requires a database connection." };
                 }
 
                 if (IsConnectivityException(e))
@@ -419,7 +431,13 @@ namespace OpenCredential.Plugin.DatabaseAuth
             }
 
             UserEntry cachedEntry;
-            bool authenticated = LocalUserCache.TryAuthenticate(userInfo.Username, userInfo.Password, out cachedEntry);
+            bool authenticated;
+            try { authenticated = LocalUserCache.TryAuthenticate(userInfo.Username, userInfo.Password, out cachedEntry); }
+            catch (Exception)
+            {
+                m_logger.Error("Offline cache is unavailable or could not be decrypted.");
+                return new BooleanResult { Success = false, Message = "Offline cache unavailable. Contact support." };
+            }
 
             if (authenticated)
             {
@@ -471,7 +489,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
                         DateTime.UtcNow - lastSyncUtc.Value >= TimeSpan.FromMinutes(Settings.GetSyncIntervalMinutes()))
                     {
                         List<UserEntry> users = dataSource.GetAllUserEntriesForCache();
-                        LocalUserCache.UpsertUsers(users);
+                        LocalUserCache.ReplaceUsers(users);
                         LocalUserCache.SetLastSyncUtc(DateTime.UtcNow);
                         m_logger.InfoFormat("Local SQLite cache synchronized. Users cached: {0}", users.Count);
                     }
@@ -537,11 +555,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
         private static string FormatLockoutDisplay(DateTime blockedUntilUtc)
         {
-            DateTime localTime = blockedUntilUtc.Kind == DateTimeKind.Utc
-                ? blockedUntilUtc.ToLocalTime()
-                : blockedUntilUtc;
-
-            return localTime.ToString("yyyy-MM-dd HH:mm:ss");
+            return DatabaseUtcTime.Format(blockedUntilUtc);
         }
 
         private void LogDatabaseException(string operation, Exception ex)
@@ -566,7 +580,16 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
         private static bool IsConnectivityException(Exception ex)
         {
-            return ex is MySqlException || ex is NpgsqlException;
+            for (var cause = ex; cause != null; cause = cause.InnerException)
+                if (cause is System.Security.Authentication.AuthenticationException) return false;
+            var mysql = ex as MySqlException;
+            if (mysql != null)
+                return mysql.Number == 1042 || mysql.Number == 2002 || mysql.Number == 2003 || mysql.Number == 2006 || mysql.Number == 2013 ||
+                    (mysql.InnerException != null && IsConnectivityException(mysql.InnerException));
+            // Server-side PostgreSQL errors (permissions, schema, SQL) are not outages.
+            if (ex is PostgresException) return false;
+            if (ex is TimeoutException || ex is System.Net.Sockets.SocketException || ex is System.IO.IOException) return true;
+            return ex is NpgsqlException && ex.InnerException != null && IsConnectivityException(ex.InnerException);
         }
 
         private static string GetProviderDisplayName()

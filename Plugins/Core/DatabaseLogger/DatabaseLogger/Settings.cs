@@ -58,6 +58,7 @@ namespace OpenCredential.Plugin.DatabaseLogger
             m_settings.SetDefault("Host", "localhost");
             m_settings.SetDefault("Port", 3306);
             m_settings.SetDefault("DatabaseProvider", (int)DatabaseProvider.MySql);
+            m_settings.SetDefault("SslMode", MySqlConnector.MySqlSslMode.None.ToString());
             m_settings.SetDefault("User", "pGina");
             m_settings.SetDefaultEncryptedSetting("Password", string.Empty, null);
             m_settings.SetDefault("Database", "pgina_access_control");
@@ -152,6 +153,14 @@ namespace OpenCredential.Plugin.DatabaseLogger
         public static DatabaseProvider GetDatabaseProvider()
         {
             return (DatabaseProvider)GetIntSetting("DatabaseProvider", (int)DatabaseProvider.MySql);
+        }
+
+        public static MySqlConnector.MySqlSslMode GetSslMode()
+        {
+            MySqlConnector.MySqlSslMode mode;
+            if (!Enum.TryParse(GetStringSetting("SslMode", "None"), true, out mode))
+                throw new InvalidOperationException("Invalid database logger TLS mode.");
+            return mode;
         }
 
         public static bool GetEventMode()

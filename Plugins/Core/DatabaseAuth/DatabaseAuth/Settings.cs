@@ -129,7 +129,8 @@ namespace OpenCredential.Plugin.DatabaseAuth
             // Offline resilience
             m_settings.SetDefault("LocalCacheEnabled", true);
             m_settings.SetDefault("OfflineFallbackEnabled", true);
-            m_settings.SetDefault("AllowOfflineBypassForAuthorization", true);
+            m_settings.SetDefault("AllowOfflineBypassForAuthorization", false);
+            m_settings.SetDefault("OfflineCacheMaxAgeHours", 24);
             m_settings.SetDefault("SyncIntervalMinutes", 5);
             m_settings.SetDefault("HealthCheckSeconds", 30);
             m_settings.SetDefault("LocalCachePath", string.Empty);
@@ -365,7 +366,12 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
         public static bool AllowOfflineBypassForAuthorization()
         {
-            return GetBoolSetting("AllowOfflineBypassForAuthorization", true);
+            return GetBoolSetting("AllowOfflineBypassForAuthorization", false);
+        }
+
+        public static int GetOfflineCacheMaxAgeHours()
+        {
+            return Math.Max(1, Math.Min(168, GetIntSetting("OfflineCacheMaxAgeHours", 24)));
         }
 
         public static int GetSyncIntervalMinutes()

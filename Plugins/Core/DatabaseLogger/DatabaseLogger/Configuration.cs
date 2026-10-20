@@ -38,6 +38,7 @@ namespace OpenCredential.Plugin.DatabaseLogger
     public partial class Configuration : Form
     {
         private ComboBox m_providerCB;
+        private ComboBox m_sslModeCB;
         private Label m_providerLabel;
         private CheckBox m_presenceTrackingEnabledCB;
         private Label m_heartbeatIntervalLabel;
@@ -120,12 +121,17 @@ namespace OpenCredential.Plugin.DatabaseLogger
             this.optionsBox.Controls.Add(m_presenceStatePathLabel);
             this.optionsBox.Controls.Add(m_presenceStatePathTB);
 
-            this.optionsBox.Height = 180;
-            this.testButton.Top += 65;
-            this.createTableBtn.Top += 65;
-            this.cancelBtn.Top += 65;
-            this.okBtn.Top += 65;
-            this.ClientSize = new Size(this.ClientSize.Width, this.ClientSize.Height + 65);
+            var sslLabel = new Label { AutoSize = true, Location = new Point(6, 179), Text = "TLS mode:" };
+            m_sslModeCB = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Location = new Point(73, 175), Size = new Size(160, 21), Name = "sslModeCB", AccessibleName = "Database TLS mode" };
+            m_sslModeCB.Items.AddRange(new object[] { "None", "Required", "VerifyCA", "VerifyFull" });
+            this.optionsBox.Controls.Add(sslLabel);
+            this.optionsBox.Controls.Add(m_sslModeCB);
+            this.optionsBox.Height = 210;
+            this.testButton.Top += 95;
+            this.createTableBtn.Top += 95;
+            this.cancelBtn.Top += 95;
+            this.okBtn.Top += 95;
+            this.ClientSize = new Size(this.ClientSize.Width, this.ClientSize.Height + 95);
         }
 
         private void InitUI()
@@ -138,6 +144,7 @@ namespace OpenCredential.Plugin.DatabaseLogger
             string port = Convert.ToString(Settings.GetPort());
             this.portTB.Text = port;
             m_providerCB.SelectedItem = Settings.GetDatabaseProvider().ToString();
+            m_sslModeCB.SelectedItem = Settings.GetSslMode().ToString();
             string db = Convert.ToString(Settings.Store.Database);
             this.dbTB.Text = db;
 
@@ -269,6 +276,7 @@ namespace OpenCredential.Plugin.DatabaseLogger
             Settings.Store.SessionMode = sessionModeCB.Checked;
             Settings.Store.EventMode = eventModeCB.Checked;
             Settings.Store.DatabaseProvider = (int)provider;
+            Settings.Store.SslMode = Convert.ToString(m_sslModeCB.SelectedItem);
 
             Settings.Store.Host = this.hostTB.Text.Trim();
             Settings.Store.Database = this.dbTB.Text.Trim();

@@ -9,6 +9,7 @@ Thumbs.db
 .env
 .env.local
 *.env.*
+!.env.adminweb.example
 *.log
 
 # Python / JS / Java leftovers
@@ -32,6 +33,7 @@ build/
 *.user
 *.userosscache
 *.sln.docstates
+UpgradeLog*.htm
 **/bin/
 **/obj/
 Debug/

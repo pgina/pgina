@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+- Mark replayed queued session starts as `offline_cache` instead of inheriting the SQL table's `online` default; retain the origin through heartbeat and close.
+- Type nullable logger SQL parameters explicitly so PostgreSQL can replay offline heartbeats/session updates instead of retaining the queue on an ambiguous-parameter error.
+- Fix SQL lockout expiry on non-UTC Windows clients: interpret zone-less database timestamps as UTC and label lockout messages explicitly with UTC.
+- Preserve persistent configuration/cache directories and registry settings in the installer; require .NET Framework 4.8 and surface failed post-install registration.
+- Add installer compilation/preservation checks and a VM-only validation package guarded against execution on the development host.
+
+- Bound offline cache age, local failed-attempt lockout, DPAPI-protected hashes and restricted cache-file permissions.
+- Full cache synchronization removes revoked users; non-connectivity failures no longer enable offline fallback.
+- Replace unrestricted offline authorization bypass with fail-closed handling of group rules.
+- Validate PostgreSQL certificates for VerifyCA/VerifyFull; expose database logger TLS options and use UTC database sessions.
+- Remove stale log4net strong-name references in core plugins without discarding the existing local core migration.
+- Fix nested AdminWeb Docker build context and discover MSBuild using Visual Studio Installer.
+- Add isolated offline-cache regression tests and plugin type-load validation.
+
 ## [1.0.0] - 2026-03-09
 
 ### Added

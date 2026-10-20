@@ -310,8 +310,25 @@ Current implementation supports PostgreSQL through `Npgsql 4.1.14`.
 
 Important note:
 
-- In the current implementation, MySQL-style UI values `VerifyCA` and `VerifyFull` are mapped internally to PostgreSQL `Require`.
-- If you need strict PostgreSQL certificate validation, that should be implemented and tested separately before documenting it as supported.
+- With Npgsql 4.x, `VerifyCA` and `VerifyFull` use `Require` **without** trusting the server certificate: the certificate chain and hostname must validate against the machine trust store. `VerifyCA` is deliberately stricter and also checks the hostname.
+- `Required` encrypts the connection but explicitly trusts the server certificate. Prefer `VerifyFull` in production and test your institutional CA on a VM before rollout.
+- Database Logger now exposes the same TLS modes in its configuration dialog.
+
+## Coordinated stabilization
+
+The web repository is independent and lives at `OpenCredential.AdminWeb/`; run Git commands separately in each repository. The root Compose file builds from that nested directory, not from an unrelated external copy.
+
+See [STABILIZATION.md](STABILIZATION.md) for compatibility, validation, upgrade and rollback precautions. Offline authentication now enforces a 24-hour cache lifetime (configurable `OfflineCacheMaxAgeHours`, 1–168), local lockout and DPAPI protection. A full successful synchronization removes revoked users. Database errors that are not connectivity outages no longer trigger offline access.
+
+Offline authorization no longer bypasses group checks. Without a database, only an unconditional authorization rule can be evaluated, and only after successful Database Auth authentication. Group-based authorization/gateway rules require connectivity. Plan your offline policy explicitly before updating a lab.
+
+After building, run these **local validation commands** (no service installation or registry configuration):
+
+```powershell
+powershell -NoProfile -File .\Tests\Test-Desktop.ps1
+dotnet run --project .\OpenCredential.AdminWeb\Tests\RegressionTests.csproj
+node --test .\OpenCredential.AdminWeb\Tests\frontend.test.cjs
+```
 
 ## Build from Source
 

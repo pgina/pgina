@@ -1,18 +1,25 @@
 param(
     [string]$Configuration = "Release",
     [string]$Platform = "Mixed Platforms",
-    [string]$Target = "BuildAll"
+    [string]$Target = "BuildAll",
+    [string]$MSBuildPath = ""
 )
 
 $buildProjectPath = Join-Path $PSScriptRoot "OpenCredentialBuild.msbuild.xml"
-$msbuildPath = "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe"
+$msbuildPath = $MSBuildPath
+if ([string]::IsNullOrWhiteSpace($msbuildPath)) {
+    $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+    if (Test-Path $vswhere) {
+        $msbuildPath = & $vswhere -latest -products '*' -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
+    }
+}
 
 if (-not (Test-Path $buildProjectPath)) {
     throw "Build project not found: $buildProjectPath"
 }
 
-if (-not (Test-Path $msbuildPath)) {
-    throw "MSBuild not found: $msbuildPath"
+if ([string]::IsNullOrWhiteSpace($msbuildPath) -or -not (Test-Path $msbuildPath)) {
+    throw "MSBuild not found. Install Visual Studio C++/.NET Framework build tools or pass -MSBuildPath."
 }
 
 $psi = New-Object System.Diagnostics.ProcessStartInfo
@@ -39,9 +46,11 @@ foreach ($entry in $normalized.GetEnumerator()) {
 }
 
 $process = [System.Diagnostics.Process]::Start($psi)
-$stdout = $process.StandardOutput.ReadToEnd()
-$stderr = $process.StandardError.ReadToEnd()
+$stdoutTask = $process.StandardOutput.ReadToEndAsync()
+$stderrTask = $process.StandardError.ReadToEndAsync()
 $process.WaitForExit()
+$stdout = $stdoutTask.Result
+$stderr = $stderrTask.Result
 
 Write-Output $stdout
 if ($stderr) {

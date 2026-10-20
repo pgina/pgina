@@ -4,6 +4,9 @@ using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Security.Cryptography;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using log4net;
 
 namespace OpenCredential.Plugin.DatabaseAuth
@@ -12,6 +15,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
     {
         private static readonly ILog m_logger = LogManager.GetLogger("DatabaseAuth.LocalUserCache");
         private static readonly object m_syncRoot = new object();
+        private static readonly HashSet<string> m_securedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         public static void Initialize()
         {
@@ -30,6 +34,18 @@ namespace OpenCredential.Plugin.DatabaseAuth
                 if (!File.Exists(dbPath))
                 {
                     SQLiteConnection.CreateFile(dbPath);
+                }
+
+                if (!m_securedPaths.Contains(dbPath))
+                {
+                    var security = new FileSecurity();
+                    security.SetAccessRuleProtection(true, false);
+                    foreach (var sid in new[] { WindowsIdentity.GetCurrent().User,
+                        new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null),
+                        new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null) })
+                        security.AddAccessRule(new FileSystemAccessRule(sid, FileSystemRights.FullControl, AccessControlType.Allow));
+                    File.SetAccessControl(dbPath, security);
+                    m_securedPaths.Add(dbPath);
                 }
 
                 using (var conn = OpenConnection())
@@ -64,6 +80,16 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
         public static void UpsertUsers(IEnumerable<UserEntry> entries)
         {
+            WriteUsers(entries, false);
+        }
+
+        public static void ReplaceUsers(IEnumerable<UserEntry> entries)
+        {
+            WriteUsers(entries, true);
+        }
+
+        private static void WriteUsers(IEnumerable<UserEntry> entries, bool replace)
+        {
             if (entries == null)
                 return;
 
@@ -74,6 +100,15 @@ namespace OpenCredential.Plugin.DatabaseAuth
                 using (var conn = OpenConnection())
                 using (var transaction = conn.BeginTransaction())
                 {
+                    if (replace)
+                    {
+                        using (var clear = conn.CreateCommand())
+                        {
+                            clear.Transaction = transaction;
+                            clear.CommandText = "DELETE FROM users";
+                            clear.ExecuteNonQuery();
+                        }
+                    }
                     foreach (UserEntry entry in entries)
                     {
                         if (entry == null || string.IsNullOrWhiteSpace(entry.Name))
@@ -102,7 +137,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
                                 "updated_utc = excluded.updated_utc;";
                             cmd.Parameters.AddWithValue("@username", entry.Name);
                             cmd.Parameters.AddWithValue("@hash_method", entry.HashAlg.ToString());
-                            cmd.Parameters.AddWithValue("@hash_value", entry.Hash ?? string.Empty);
+                            cmd.Parameters.AddWithValue("@hash_value", ProtectHash(entry.Hash ?? string.Empty));
                             cmd.Parameters.AddWithValue("@status_value", (object)entry.StatusValue ?? DBNull.Value);
                             cmd.Parameters.AddWithValue("@failed_attempts", entry.FailedAttempts);
                             cmd.Parameters.AddWithValue(
@@ -134,7 +169,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
                 using (var conn = OpenConnection())
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT hash_method, hash_value, status_value, failed_attempts, blocked_until_utc FROM users WHERE username = @username";
+                    cmd.CommandText = "SELECT hash_method, hash_value, status_value, failed_attempts, blocked_until_utc, updated_utc FROM users WHERE username = @username";
                     cmd.Parameters.AddWithValue("@username", username);
 
                     using (var reader = cmd.ExecuteReader())
@@ -144,6 +179,8 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
                         string hashMethod = Convert.ToString(reader["hash_method"]);
                         string hashValue = Convert.ToString(reader["hash_value"]);
+                        if (hashValue.StartsWith("dpapi:", StringComparison.Ordinal))
+                            hashValue = Encoding.UTF8.GetString(ProtectedData.Unprotect(Convert.FromBase64String(hashValue.Substring(6)), null, DataProtectionScope.LocalMachine));
                         string statusValue = reader["status_value"] == DBNull.Value
                             ? null
                             : Convert.ToString(reader["status_value"]);
@@ -151,6 +188,9 @@ namespace OpenCredential.Plugin.DatabaseAuth
                             ? 0
                             : Convert.ToInt32(reader["failed_attempts"]);
                         DateTime? blockedUntilUtc = ParseUtc(reader["blocked_until_utc"]);
+                        DateTime? updatedUtc = ParseUtc(reader["updated_utc"]);
+                        if (!updatedUtc.HasValue || DateTime.UtcNow - updatedUtc.Value > TimeSpan.FromHours(Settings.GetOfflineCacheMaxAgeHours()))
+                            return false;
                         PasswordHashAlgorithm hashAlg;
 
                         if (!TryParseHashAlgorithm(hashMethod, out hashAlg))
@@ -172,7 +212,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
                             return false;
                         }
 
-                        if (Settings.IsLoginLockoutEnabled() && cachedEntry.IsCurrentlyLocked())
+                        if (cachedEntry.IsCurrentlyLocked())
                         {
                             m_logger.WarnFormat(
                                 "Offline cache rejected user {0} because account is locked until {1:u}",
@@ -181,7 +221,18 @@ namespace OpenCredential.Plugin.DatabaseAuth
                             return false;
                         }
 
-                        return cachedEntry.VerifyPassword(password);
+                        reader.Close();
+                        if (cachedEntry.VerifyPassword(password))
+                        {
+                            cmd.CommandText = "UPDATE users SET failed_attempts = 0, blocked_until_utc = NULL WHERE username = @username";
+                            cmd.ExecuteNonQuery();
+                            return true;
+                        }
+                        cmd.CommandText = "UPDATE users SET failed_attempts = failed_attempts + 1, blocked_until_utc = CASE WHEN failed_attempts + 1 >= @maximum THEN @until ELSE blocked_until_utc END WHERE username = @username";
+                        cmd.Parameters.AddWithValue("@maximum", Settings.GetMaxFailedAttempts());
+                        cmd.Parameters.AddWithValue("@until", DateTime.UtcNow.AddMinutes(Settings.GetLockoutMinutes()).ToString("o", CultureInfo.InvariantCulture));
+                        cmd.ExecuteNonQuery();
+                        return false;
                     }
                 }
             }
@@ -274,6 +325,11 @@ namespace OpenCredential.Plugin.DatabaseAuth
             var conn = new SQLiteConnection(string.Format("Data Source={0};Version=3;", Settings.GetLocalCachePath()));
             conn.Open();
             return conn;
+        }
+
+        private static string ProtectHash(string value)
+        {
+            return "dpapi:" + Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value), null, DataProtectionScope.LocalMachine));
         }
 
         private static void EnsureOptionalColumns()

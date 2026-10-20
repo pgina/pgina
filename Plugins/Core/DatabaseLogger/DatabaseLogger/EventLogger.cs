@@ -200,7 +200,7 @@ namespace OpenCredential.Plugin.DatabaseLogger
                 throw new InvalidOperationException("No database connection present.");
 
             if (m_conn.State != ConnectionState.Open)
-                m_conn.Open();
+                LoggerModeFactory.OpenConnection(m_conn);
         }
 
         private void AddParameter(DbCommand cmd, string name, object value)

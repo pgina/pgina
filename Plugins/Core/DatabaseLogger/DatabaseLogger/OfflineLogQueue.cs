@@ -107,7 +107,7 @@ namespace OpenCredential.Plugin.DatabaseLogger
 
                 using (var dbConn = LoggerModeFactory.CreateConnection())
                 {
-                    dbConn.Open();
+                    LoggerModeFactory.OpenConnection(dbConn);
 
                     foreach (QueuedLogEntry entry in queuedEntries)
                     {
@@ -219,7 +219,7 @@ namespace OpenCredential.Plugin.DatabaseLogger
             {
                 string insertSql = dbConn is NpgsqlConnection
                     ? string.Format(
-                        "INSERT INTO {0} ({1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}) VALUES (@loginstamp, NULL, @username, @machine, @ipaddress, NULL, @windows_session_id, @session_state, @last_heartbeat_at, NULL)",
+                        "INSERT INTO {0} ({1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}) VALUES (@loginstamp, NULL, @username, @machine, @ipaddress, NULL, @windows_session_id, @session_state, @last_heartbeat_at, NULL, @session_origin)",
                         Quote(table, dbConn),
                         QuoteColumn("loginstamp", dbConn),
                         QuoteColumn("logoutstamp", dbConn),
@@ -230,9 +230,10 @@ namespace OpenCredential.Plugin.DatabaseLogger
                         QuoteColumn("windows_session_id", dbConn),
                         QuoteColumn("session_state", dbConn),
                         QuoteColumn("last_heartbeat_at", dbConn),
-                        QuoteColumn("session_end_reason", dbConn))
+                        QuoteColumn("session_end_reason", dbConn),
+                        QuoteColumn("session_origin", dbConn))
                     : string.Format(
-                        "INSERT INTO {0} (dbid, loginstamp, logoutstamp, username, machine, ipaddress, client_session_id, windows_session_id, session_state, last_heartbeat_at, session_end_reason) VALUES (NULL, @loginstamp, NULL, @username, @machine, @ipaddress, NULL, @windows_session_id, @session_state, @last_heartbeat_at, NULL)",
+                        "INSERT INTO {0} (dbid, loginstamp, logoutstamp, username, machine, ipaddress, client_session_id, windows_session_id, session_state, last_heartbeat_at, session_end_reason, session_origin) VALUES (NULL, @loginstamp, NULL, @username, @machine, @ipaddress, NULL, @windows_session_id, @session_state, @last_heartbeat_at, NULL, @session_origin)",
                         Quote(table, dbConn));
 
                 using (var insertCmd = dbConn.CreateCommand())
@@ -245,6 +246,10 @@ namespace OpenCredential.Plugin.DatabaseLogger
                     AddParameter(insertCmd, "@windows_session_id", entry.SessionId);
                     AddParameter(insertCmd, "@session_state", "active");
                     AddParameter(insertCmd, "@last_heartbeat_at", entry.EventUtc);
+                    // Match pending-session reconciliation: the logon was queued
+                    // locally rather than registered online. Do not inherit the
+                    // table's 'online' default when replaying it later.
+                    AddParameter(insertCmd, "@session_origin", "offline_cache");
                     insertCmd.ExecuteNonQuery();
                 }
             }
@@ -583,6 +588,10 @@ namespace OpenCredential.Plugin.DatabaseLogger
         {
             var parameter = cmd.CreateParameter();
             parameter.ParameterName = name;
+            // Nullable fields emitted by replay (IP/end reason) are text. Npgsql
+            // cannot infer a DBNull parameter used first in an IS NOT NULL test.
+            if (value == null || value == DBNull.Value)
+                parameter.DbType = System.Data.DbType.String;
             parameter.Value = value ?? DBNull.Value;
             cmd.Parameters.Add(parameter);
         }

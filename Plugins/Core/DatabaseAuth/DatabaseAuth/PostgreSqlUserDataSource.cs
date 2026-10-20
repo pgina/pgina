@@ -47,11 +47,17 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
                 if (builder.SslMode == SslMode.Require)
                 {
-                    builder.TrustServerCertificate = true;
+                    // Npgsql 4.x validates chain AND hostname unless explicitly trusted.
+                    builder.TrustServerCertificate = Settings.GetSslMode() == MySqlConnector.MySqlSslMode.Required;
                 }
 
                 m_conn = new NpgsqlConnection(builder.ConnectionString);
                 m_conn.Open();
+                using (var timezone = m_conn.CreateCommand())
+                {
+                    timezone.CommandText = "SET TIME ZONE 'UTC'";
+                    timezone.ExecuteNonQuery();
+                }
 
                 m_logger.DebugFormat("Connected to PostgreSQL. Server version: {0}", m_conn.PostgreSqlVersion);
             }
@@ -525,16 +531,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
         private DateTime? ReadUtcDateTime(object value)
         {
-            if (value == null || value == DBNull.Value)
-                return null;
-
-            if (value is DateTime dateTime)
-                return dateTime.Kind == DateTimeKind.Utc ? dateTime : dateTime.ToUniversalTime();
-
-            if (DateTime.TryParse(Convert.ToString(value), CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out DateTime parsed))
-                return parsed.ToUniversalTime();
-
-            return null;
+            return DatabaseUtcTime.Read(value);
         }
     }
 }

@@ -1,0 +1,25 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <OutputPath>bin\Release\</OutputPath>
+    <LangVersion>7.3</LangVersion>
+    <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>OpenCredential.DatabaseAuth.RegressionTests</AssemblyName>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" /><Reference Include="System.Core" /><Reference Include="System.Data" /><Reference Include="System.Security" />
+    <Reference Include="log4net"><HintPath>..\..\Plugins\Core\bin\log4net.dll</HintPath></Reference>
+    <Reference Include="System.Data.SQLite"><HintPath>..\..\Plugins\Core\bin\System.Data.SQLite.dll</HintPath></Reference>
+    <Reference Include="BCrypt.Net-Next"><HintPath>..\..\Plugins\Core\bin\BCrypt.Net-Next.dll</HintPath></Reference>
+    <Compile Include="Program.cs" />
+    <Compile Include="..\..\Plugins\Core\DatabaseAuth\DatabaseAuth\DatabaseUtcTime.cs"><Link>DatabaseUtcTime.cs</Link></Compile>
+    <Compile Include="..\..\Plugins\Core\DatabaseAuth\DatabaseAuth\LocalUserCache.cs"><Link>LocalUserCache.cs</Link></Compile>
+    <Compile Include="..\..\Plugins\Core\DatabaseAuth\DatabaseAuth\UserEntry.cs"><Link>UserEntry.cs</Link></Compile>
+    <Compile Include="..\..\Plugins\Core\DatabaseAuth\DatabaseAuth\BCryptHasher.cs"><Link>BCryptHasher.cs</Link></Compile>
+    <Compile Include="..\..\Plugins\Core\DatabaseAuth\DatabaseAuth\SQLiteNativeBootstrap.cs"><Link>SQLiteNativeBootstrap.cs</Link></Compile>
+    <Content Include="..\..\Plugins\Core\bin\runtimes\win-x64\native\e_sqlite3.dll"><Link>runtimes\win-x64\native\e_sqlite3.dll</Link><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

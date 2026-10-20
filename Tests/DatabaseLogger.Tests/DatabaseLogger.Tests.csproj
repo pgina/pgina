@@ -1,0 +1,25 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <OutputPath>bin\Release\</OutputPath>
+    <LangVersion>7.3</LangVersion>
+    <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>OpenCredential.DatabaseLogger.RegressionTests</AssemblyName>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <AppConfig>..\..\Plugins\Core\DatabaseLogger\DatabaseLogger\app.config</AppConfig>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" /><Reference Include="System.Core" /><Reference Include="System.Data" /><Reference Include="System.ServiceProcess" />
+    <Reference Include="log4net"><HintPath>..\..\Plugins\Core\bin\log4net.dll</HintPath></Reference>
+    <Reference Include="Npgsql"><HintPath>..\..\Plugins\Core\bin\Npgsql.dll</HintPath></Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces"><HintPath>..\..\Plugins\Core\bin\Microsoft.Bcl.AsyncInterfaces.dll</HintPath></Reference>
+    <Reference Include="System.Text.Json"><HintPath>..\..\Plugins\Core\bin\System.Text.Json.dll</HintPath></Reference>
+    <Reference Include="System.Text.Encodings.Web"><HintPath>..\..\Plugins\Core\bin\System.Text.Encodings.Web.dll</HintPath></Reference>
+    <Reference Include="System.Data.SQLite"><HintPath>..\..\Plugins\Core\bin\System.Data.SQLite.dll</HintPath></Reference>
+    <Reference Include="OpenCredential.Shared"><HintPath>..\..\Plugins\SDK\OpenCredential.Shared.dll</HintPath></Reference>
+    <Compile Include="Program.cs" />
+    <Compile Include="..\..\Plugins\Core\DatabaseLogger\DatabaseLogger\OfflineLogQueue.cs"><Link>OfflineLogQueue.cs</Link></Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

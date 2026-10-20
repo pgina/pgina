@@ -12,8 +12,8 @@ services:
 
   opencredential-adminweb:
     build:
-      context: .
-      dockerfile: OpenCredential.AdminWeb/Dockerfile
+      context: ./OpenCredential.AdminWeb
+      dockerfile: Dockerfile
     container_name: opencredential-adminweb
     restart: unless-stopped
     depends_on:
@@ -25,9 +25,16 @@ services:
       AdminAuth__Username: ${ADMIN_USERNAME:?Define ADMIN_USERNAME en tu archivo .env}
       AdminAuth__Password: ${ADMIN_PASSWORD:?Define ADMIN_PASSWORD en tu archivo .env}
       AdminAuth__Role: ${ADMIN_ROLE:-SuperAdmin}
+      ForwardedHeaders__TrustedProxies__0: ${ADMINWEB_TRUSTED_PROXY:-}
+      RecoveryDelivery__Enabled: "${RECOVERY_SMTP_ENABLED:-false}"
+      RecoveryDelivery__Host: ${RECOVERY_SMTP_HOST:-}
+      RecoveryDelivery__Port: ${RECOVERY_SMTP_PORT:-587}
+      RecoveryDelivery__Sender: ${RECOVERY_SMTP_SENDER:-}
+      RecoveryDelivery__Username: ${RECOVERY_SMTP_USERNAME:-}
+      RecoveryDelivery__Password: ${RECOVERY_SMTP_PASSWORD:-}
       Database__Mode: Sql
       Database__Provider: PostgreSql
-      Database__ConnectionString: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Include Error Detail=true
+      Database__ConnectionString: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       Database__AutoInitialize: "true"
     volumes:
       - opencredential_adminweb_data:/data

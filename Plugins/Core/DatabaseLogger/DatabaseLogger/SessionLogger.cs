@@ -257,7 +257,7 @@ namespace OpenCredential.Plugin.DatabaseLogger
                 throw new InvalidOperationException("No database connection present.");
 
             if (m_conn.State != ConnectionState.Open)
-                m_conn.Open();
+                LoggerModeFactory.OpenConnection(m_conn);
         }
 
         private void EnsureSessionSchema()
@@ -520,6 +520,10 @@ namespace OpenCredential.Plugin.DatabaseLogger
         {
             var parameter = cmd.CreateParameter();
             parameter.ParameterName = name;
+            // Nullable session identifiers/IP/end reason are text, even when
+            // DBNull. Explicit typing also supports predicates using IS NOT NULL.
+            if (value == null || value == DBNull.Value)
+                parameter.DbType = System.Data.DbType.String;
             parameter.Value = value ?? DBNull.Value;
             cmd.Parameters.Add(parameter);
         }

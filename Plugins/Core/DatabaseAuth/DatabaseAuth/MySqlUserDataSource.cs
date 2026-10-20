@@ -83,6 +83,11 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
                 m_conn = new MySqlConnection(builder.ConnectionString);
                 m_conn.Open();
+                using (var timezone = m_conn.CreateCommand())
+                {
+                    timezone.CommandText = "SET time_zone = '+00:00'";
+                    timezone.ExecuteNonQuery();
+                }
                 
                 m_logger.DebugFormat("Connected to MySQL. Server version: {0}", m_conn.ServerVersion);
             }
@@ -551,27 +556,15 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
         private DateTime? ReadUtcDateTime(object value)
         {
-            if (value == null || value == DBNull.Value)
-                return null;
-
-            if (value is DateTime dateTime)
-                return dateTime.Kind == DateTimeKind.Utc ? dateTime : dateTime.ToUniversalTime();
-
             if (value is MySqlDateTime mySqlDateTime)
             {
                 if (!mySqlDateTime.IsValidDateTime)
                     return null;
 
-                DateTime parsedDateTime = mySqlDateTime.GetDateTime();
-                return parsedDateTime.Kind == DateTimeKind.Utc
-                    ? parsedDateTime
-                    : parsedDateTime.ToUniversalTime();
+                return DatabaseUtcTime.Read(mySqlDateTime.GetDateTime());
             }
 
-            if (DateTime.TryParse(Convert.ToString(value), CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out DateTime parsed))
-                return parsed.ToUniversalTime();
-
-            return null;
+            return DatabaseUtcTime.Read(value);
         }
     }
 }
