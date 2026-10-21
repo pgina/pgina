@@ -376,10 +376,71 @@ namespace Microsoft
 		}
 
 		//
-		// If pwzPassword should be encrypted, return a copy encrypted with CredProtect.
-		// 
-		// If not, just return a copy.
+		// Incoming RDP credentials may be protected by Windows. Return a clear
+		// copy for the authentication plugins, or fail without returning data.
 		//
+		HRESULT UnprotectAndCopyPassword(PCWSTR password, PWSTR* copy, UnprotectPasswordFunction unprotect)
+		{
+			if (!copy) return E_POINTER;
+			*copy = NULL;
+			if (!unprotect) return E_INVALIDARG;
+			if (!password) return S_OK;
+			DWORD chars = 0;
+			HRESULT hr = SizeTToDWord(wcslen(password) + 1, &chars);
+			if (FAILED(hr)) return hr;
+			size_t bytes = 0;
+			hr = SizeTMult(chars, sizeof(WCHAR), &bytes);
+			if (FAILED(hr)) return hr;
+			PWSTR working = static_cast<PWSTR>(LocalAlloc(LMEM_ZEROINIT, bytes));
+			if (!working) return E_OUTOFMEMORY;
+			CopyMemory(working, password, bytes);
+			CRED_PROTECTION_TYPE protection = CredUnprotected;
+			if (*working && !CredIsProtectedW(working, &protection))
+			{
+				DWORD error = GetLastError();
+				SecureZeroMemory(working, bytes);
+				LocalFree(working);
+				return error ? HRESULT_FROM_WIN32(error) : E_FAIL;
+			}
+			if (protection == CredUnprotected)
+			{
+				*copy = working;
+				return S_OK;
+			}
+			// RDP may deliver CredProtect text through SetSerialization. The
+			// plugins need the original password, not that protected payload.
+			DWORD clearChars = 0;
+			BOOL sized = unprotect(FALSE, working, chars, NULL, &clearChars);
+			DWORD error = GetLastError();
+			size_t clearBytes = 0;
+			hr = (!sized && error == ERROR_INSUFFICIENT_BUFFER && clearChars > 0)
+				? SizeTMult(clearChars, sizeof(WCHAR), &clearBytes)
+				: (error ? HRESULT_FROM_WIN32(error) : E_FAIL);
+			PWSTR clear = NULL;
+			if (SUCCEEDED(hr))
+			{
+				clear = static_cast<PWSTR>(LocalAlloc(LMEM_ZEROINIT, clearBytes));
+				if (!clear) hr = E_OUTOFMEMORY;
+				else if (!unprotect(FALSE, working, chars, clear, &clearChars))
+				{
+					error = GetLastError();
+					hr = error ? HRESULT_FROM_WIN32(error) : E_FAIL;
+				}
+			}
+			SecureZeroMemory(working, bytes);
+			LocalFree(working);
+			if (FAILED(hr))
+			{
+				if (clear) { SecureZeroMemory(clear, clearBytes); LocalFree(clear); }
+				// Never submit an undecryptable payload as a password: that would
+				// create artificial failed-attempt lockouts in the database.
+				return hr;
+			}
+			*copy = clear;
+			return S_OK;
+		}
+
+		// Outgoing credentials must retain the protection expected by Windows.
 		HRESULT ProtectIfNecessaryAndCopyPassword(
 			__in PCWSTR pwzPassword,
 			__in CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus,

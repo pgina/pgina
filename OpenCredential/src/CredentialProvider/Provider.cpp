@@ -49,6 +49,22 @@ namespace OpenCredential
 {
 	namespace CredProv
 	{
+		// Serialized credentials may contain a decrypted password. Wipe the
+		// entire LocalAlloc buffer on every exit path, including failures.
+		class SerializedPasswordCleanup : public OpenCredential::Memory::ObjectCleanupBase
+		{
+		public:
+			SerializedPasswordCleanup(void* memory) : ObjectCleanupBase(memory) {}
+			virtual ~SerializedPasswordCleanup()
+			{
+				if (m_memory)
+				{
+					SecureZeroMemory(m_memory, LocalSize(m_memory));
+					LocalFree(m_memory);
+				}
+			}
+		};
+
 		IFACEMETHODIMP Provider::QueryInterface(__in REFIID riid, __deref_out void **ppv)
 		{
 			// And more crazy ass v-table madness, yay COM again!
@@ -324,16 +340,17 @@ namespace OpenCredential
 			// Currently we have just the one, we lazy init it here when first requested
 			if(!m_credential)
 			{
-				m_credential = new Credential();
-
 				OpenCredential::Memory::ObjectCleanupPool cleanup;
 				
-				PWSTR serializedUser, serializedPass;
-				GetSerializedCredentials(&serializedUser, &serializedPass, NULL);
+				PWSTR serializedUser = NULL, serializedPass = NULL;
+				HRESULT unpackResult = GetSerializedCredentials(&serializedUser, &serializedPass, NULL);
 				if(serializedUser != NULL)
 					cleanup.Add(new OpenCredential::Memory::LocalFreeCleanup(serializedUser));
 				if(serializedPass != NULL)
-					cleanup.Add(new OpenCredential::Memory::LocalFreeCleanup(serializedPass));					
+					cleanup.Add(new SerializedPasswordCleanup(serializedPass));
+				if (FAILED(unpackResult))
+					return unpackResult;
+				m_credential = new Credential();
 
 				switch(m_usageScenario)
 				{
@@ -454,13 +471,17 @@ namespace OpenCredential
 			return false;
 		}
 
-		void Provider::GetSerializedCredentials(PWSTR *username, PWSTR *password, PWSTR *domain)
-		{							
+		HRESULT Provider::GetSerializedCredentials(PWSTR *username, PWSTR *password, PWSTR *domain)
+		{
+			if (username) *username = NULL;
+			if (password) *password = NULL;
+			if (domain) *domain = NULL;
 			if(username)
 			{
 				if(SerializedUserNameAvailable())
 				{
 					*username = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.UserName.Length + sizeof(wchar_t));
+					if (!*username) return E_OUTOFMEMORY;
 					CopyMemory(*username, m_setSerialization->Logon.UserName.Buffer, m_setSerialization->Logon.UserName.Length);
 				}
 				else
@@ -471,8 +492,14 @@ namespace OpenCredential
 			{
 				if(SerializedPasswordAvailable())
 				{
-					*password = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.Password.Length + sizeof(wchar_t));
-					CopyMemory(*password, m_setSerialization->Logon.Password.Buffer, m_setSerialization->Logon.Password.Length);
+					SIZE_T bytes = m_setSerialization->Logon.Password.Length + sizeof(wchar_t);
+					PWSTR incoming = (PWSTR) LocalAlloc(LMEM_ZEROINIT, bytes);
+					if (!incoming) return E_OUTOFMEMORY;
+					CopyMemory(incoming, m_setSerialization->Logon.Password.Buffer, m_setSerialization->Logon.Password.Length);
+					HRESULT hr = Microsoft::Sample::UnprotectAndCopyPassword(incoming, password);
+					SecureZeroMemory(incoming, bytes);
+					LocalFree(incoming);
+					if (FAILED(hr)) return hr;
 				}
 				else
 					*password = NULL;
@@ -483,11 +510,13 @@ namespace OpenCredential
 				if(SerializedDomainNameAvailable())
 				{
 					*domain = (PWSTR) LocalAlloc(LMEM_ZEROINIT, m_setSerialization->Logon.LogonDomainName.Length + sizeof(wchar_t));
+					if (!*domain) return E_OUTOFMEMORY;
 					CopyMemory(*domain, m_setSerialization->Logon.LogonDomainName.Buffer, m_setSerialization->Logon.LogonDomainName.Length);
 				}
 				else
 					*domain = NULL;
 			}
+			return S_OK;
 		}
 
 		void Provider::ServiceStateChanged(bool newState)

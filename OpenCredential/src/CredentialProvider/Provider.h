@@ -68,7 +68,7 @@ namespace OpenCredential
 			bool SerializedUserNameAvailable();
 			bool SerializedPasswordAvailable();
 			bool SerializedDomainNameAvailable();
-			void GetSerializedCredentials(PWSTR *username, PWSTR *password, PWSTR *domain);			
+			HRESULT GetSerializedCredentials(PWSTR *username, PWSTR *password, PWSTR *domain);
 
 		private:
 			long m_referenceCount;

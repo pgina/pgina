@@ -40,7 +40,7 @@ AdminWeb agrega `admin_id_sequences` para asignar IDs atómicamente y un índice
 
 Validaciones ejecutadas en este trabajo: build Desktop x64/Win32 y plugins, carga de tipos de los ocho plugins core, regresiones SQLite/DPAPI, 12 grupos de regresión web/HTTP/SQL con PostgreSQL 16 y MySQL 8.4, tres pruebas de frontend, build Release web y prueba funcional de la imagen Linux (login, datos y PDF). Los contenedores SQL usados contienen únicamente datos sintéticos y no tienen volúmenes persistentes.
 
-- Validados en VM Windows 11: instalación inicial, actualización integrada con marcadores/hashes y login posterior, login nuevo online/offline, usuario inactivo, clave incorrecta, bloqueo/expiración, logger online y sincronización de cola con origen offline_cache. Faltan RDP, desinstalación y reversión; Windows 10 no se probó en VM.
+- Validados en VM Windows 11: instalación inicial, actualización integrada con marcadores/hashes y login posterior, login nuevo online/offline, usuario inactivo, clave incorrecta, bloqueo/expiración, logger online y sincronización de cola con origen offline_cache. Posteriormente se validaron desinstalación con preservación/reinicio, reversión por snapshots y RDP con NLA tras corregir recepción de credenciales protegidas y claves de grupos PostgreSQL. Windows 10 no se probó en VM.
 - Validación con CA institucional, servidor SMTP real y proxy HTTPS del despliegue.
 - Pruebas de carga y paginación SQL de todos los listados: el snapshot heredado todavía carga colecciones completas.
 - Asistente de despliegue/configuración y mejoras adicionales de UX; no son requisitos para las correcciones de integridad.
@@ -48,6 +48,6 @@ Validaciones ejecutadas en este trabajo: build Desktop x64/Win32 y plugins, carg
 
 ## Ampliación de pruebas antes de commit/push
 
-Consultar [QA_READINESS.md](QA_READINESS.md). Se corrigió el borrado de datos/configuración del instalador y se validaron la instalación inicial y actualización integrada FinalUpdate con marcadores conservados. Las correcciones UTC, parámetros SQL nulos y origen offline también se validaron en la VM; servicio y login posterior a la actualización pasaron. Los metadatos de desinstalación de versiones antiguas y la reversión siguen pendientes; no se consideran certificados por un análisis estático.
+Consultar [QA_READINESS.md](QA_READINESS.md). Se corrigió el borrado de datos/configuración del instalador y se validaron la instalación inicial y actualización integrada FinalUpdate con marcadores conservados. Las correcciones UTC, parámetros SQL nulos y origen offline también se validaron en la VM; servicio y login posterior a la actualización pasaron. Desinstalación, reinicio y reversión por snapshots se probaron después en esa VM concreta; no certifican todos los metadatos de desinstaladores antiguos ni una reversión de esquema/datos en producción.
 
 Se agregaron pruebas de HTTPS/STARTTLS en Linux aislado con CA efímera por proceso, rechazo de certificados inválidos y negativa a transmitir correo sin TLS. No se agregaron certificados al almacén del anfitrión ni se enviaron correos a servicios externos. Estas pruebas no sustituyen la validación de la CA y SMTP institucionales.

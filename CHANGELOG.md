@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Preserve the PostgreSQL user primary-key type in group membership lookups; avoid integer=text failures during group-based authorization/gateway and handle NULL keys as non-members.
+- Decode incoming CredProtect credentials before plugin authentication during RDP serialization; fail closed if decoding fails instead of submitting the protected payload as a password. Native x64/Win32 regressions cover plaintext, Unicode, protected round-trip and unprotect failure.
 - Mark replayed queued session starts as `offline_cache` instead of inheriting the SQL table's `online` default; retain the origin through heartbeat and close.
 - Type nullable logger SQL parameters explicitly so PostgreSQL can replay offline heartbeats/session updates instead of retaining the queue on an ambiguous-parameter error.
 - Fix SQL lockout expiry on non-UTC Windows clients: interpret zone-less database timestamps as UTC and label lockout messages explicitly with UTC.

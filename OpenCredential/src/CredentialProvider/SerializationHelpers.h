@@ -25,6 +25,7 @@
 #include <intsafe.h>
 
 #include <windows.h>
+#include <wincred.h>
 #include <strsafe.h>
 
 #pragma warning(push)
@@ -69,6 +70,11 @@ namespace Microsoft
 		HRESULT RetrieveNegotiateAuthPackage(
 			__out ULONG * pulAuthPackage
 			);
+
+		// Returns a LocalAlloc-owned clear-text copy for plugin authentication.
+		typedef BOOL (WINAPI *UnprotectPasswordFunction)(BOOL, LPWSTR, DWORD, LPWSTR, LPDWORD);
+		HRESULT UnprotectAndCopyPassword(PCWSTR password, PWSTR* copy,
+			UnprotectPasswordFunction unprotect = CredUnprotectW);
 
 		//encrypt a password (if necessary) and copy it; if not, just copy it
 		HRESULT ProtectIfNecessaryAndCopyPassword(

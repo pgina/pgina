@@ -288,15 +288,17 @@ namespace OpenCredential.Plugin.DatabaseAuth
                 Q(usernameColumn),
                 Q(userPrimaryKeyColumn));
 
-            string userId = null;
+            // Retain the database key type (integer/bigint/UUID/text). Turning
+            // it into a string makes Npgsql bind text even for a numeric FK.
+            object userId = null;
 
             using (var cmd = new NpgsqlCommand(userIdQuery, m_conn))
             {
                 cmd.Parameters.AddWithValue("@user", userName);
                 using (var rdr = cmd.ExecuteReader())
                 {
-                    if (rdr.Read())
-                        userId = Convert.ToString(rdr[0]);
+                    if (rdr.Read() && !rdr.IsDBNull(0))
+                        userId = rdr.GetValue(0);
                 }
             }
 

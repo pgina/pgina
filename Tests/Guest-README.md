@@ -35,6 +35,20 @@ El campo `RecheckOnly=true` identifica esta comprobación. Conserva el código d
 
 ## Pruebas de aceptación posteriores
 
+### Proveedor nativo RDP en revisión
+
+`RdpFix\OpenCredentialInstaller-rdp-review.exe` es un paquete sin firma, distinto de FinalUpdate, con la corrección de entrada CredProtect. Instalar manualmente solo dentro de la VM, con sesión administrativa alternativa y snapshot conservados. Cerrar mstsc y la herramienta de configuración; actualizar la carpeta actualmente instalada sin borrar configuración/cachés. Si setup falla, no repetir RDP ni ignorar el error. Tras instalar, reiniciar Windows e iniciar sesión con el proveedor nativo de contraseña de Windows en la cuenta administrativa.
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "\\VBOXSVR\OpenCredentialQA\Inspect-GuestRdpBuild.ps1"
+```
+
+La comprobación compara hashes de las DLL registradas en System32/SysWOW64 y exige servicio Running, proveedor registrado, NLA activa y boot posterior a la creación del paquete. No modifica NLA, reglas, cuentas ni servicio y no prueba por sí misma la autenticación RDP. Solo después del PASS se autoriza un único intento real con credenciales sintéticas; no repetir en bucle ni desactivar NLA para ocultar un fallo. Restaurar cambios temporales con `Set-GuestRdpLab.ps1 -Action Restore` y retirar el reenvío localhost desde VirtualBox al terminar.
+
+El paquete posterior `RdpGroupsFix` conserva la corrección nativa y corrige la comparación de claves de usuario/grupo PostgreSQL (conservar el tipo original, sin convertir IDs numéricos a texto). La prueba integral con ese paquete pasó con NLA, inicio/cierre SQL y retirada de los permisos temporales; consultar `QA_READINESS.md`.
+
+Para reproducir las regresiones sin instalar nada: `Tests/Test-CredentialSerialization.ps1` prueba CredProtect/Unprotect en x64 y Win32. `Tests/Test-DatabaseGroups.ps1` requiere una conexión sintética explícita en `OC_QA_GROUP_CONNECTION`, sin imprimirla ni guardarla en Git; crea solo tablas temporales para claves integer/bigint/uuid/text y prueba membresías positivas/negativas. No apuntar las pruebas a una base de producción.
+
 ### Actualización integrada final de revisión
 
 Con sesión administrativa alternativa abierta, snapshot previo conservado y configuración cerrada, `Invoke-GuestFinalUpdate.ps1` instala el paquete `FinalUpdate` sin reiniciar Windows. Reutiliza las comprobaciones VM/admin/SHA256/preservación/arranque y admite únicamente el instalador de revisión sin firma aprobado para este laboratorio. Compara además los hashes instalados de DatabaseAuth y DatabaseLogger. No exporta configuración ni secretos; copia informes de estado a la carpeta de resultados. Repetir después autenticación por servicio y login mediante OpenCredential. Un resultado PASS no certifica desinstalación ni reversión.
