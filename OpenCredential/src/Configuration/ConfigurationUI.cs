@@ -245,7 +245,7 @@ namespace OpenCredential.Configuration
         private void LoadGeneralSettings()
         {
             m_openCredentialVersionLbl.Text = "OpenCredential " +
-                System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                Application.ProductVersion;
 
             m_tileImageTxt.Text = Settings.Get.GetSetting("TileImage", null);
             LoadTileImagePreview();
@@ -1137,7 +1137,7 @@ namespace OpenCredential.Configuration
                 this.logWindow.LogTextBox.AppendText("****" + Environment.NewLine);
                 this.logWindow.LogTextBox.AppendText("**** Simulated login starting: " + DateTime.Now.ToString("F") + Environment.NewLine);
                 this.logWindow.LogTextBox.AppendText("**** OpenCredential Version:  " +
-                    System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + Environment.NewLine);
+                    Application.ProductVersion + Environment.NewLine);
                 this.logWindow.LogTextBox.AppendText("**** Enabled plugins: " + Environment.NewLine);
                 foreach (string s in GetPluginList())
                 {

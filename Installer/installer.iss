@@ -1,5 +1,6 @@
 #define MyAppName "OpenCredential"
-#define MyAppVersion "1.0.0.0"
+#define MyAppVersion "1.0.1.0"
+#define MyAppReleaseVersion "1.0.1.0-rc.1"
 #define MyAppPublisher "OpenCredential Project"
 #define MyAppURL "https://github.com/pedropablobm/OpenCredential"
 #define MyAppExeName "OpenCredential.Configuration.exe"
@@ -25,7 +26,10 @@
 AppID={{3D8D0F0D-7DBF-400C-9C44-00BD21986138}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-AppVerName={#MyAppName} v{#MyAppVersion}
+AppVerName={#MyAppName} v{#MyAppReleaseVersion}
+VersionInfoVersion={#MyAppVersion}
+VersionInfoTextVersion={#MyAppReleaseVersion}
+VersionInfoProductTextVersion={#MyAppReleaseVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -34,7 +38,7 @@ DefaultDirName={commonpf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=true
 LicenseFile=OpenCredential-License.txt
-OutputBaseFilename=OpenCredentialInstaller-{#MyAppVersion}
+OutputBaseFilename=OpenCredentialInstaller-{#MyAppReleaseVersion}
 SetupIconFile=..\OpenCredential\src\Configuration\Resources\OpenCredentialApp.ico
 Compression=lzma/Max
 SolidCompression=true

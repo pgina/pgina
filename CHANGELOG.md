@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.1.0-rc.1] - 2026-10-21
+
+Prerelease for evaluation. The installer is not Authenticode-signed. Windows 11 Pro VM validation does not certify all supported platforms or third-party plugins.
+
 - Preserve the PostgreSQL user primary-key type in group membership lookups; avoid integer=text failures during group-based authorization/gateway and handle NULL keys as non-members.
 - Decode incoming CredProtect credentials before plugin authentication during RDP serialization; fail closed if decoding fails instead of submitting the protected payload as a password. Native x64/Win32 regressions cover plaintext, Unicode, protected round-trip and unprotect failure.
 - Mark replayed queued session starts as `offline_cache` instead of inheriting the SQL table's `online` default; retain the origin through heartbeat and close.
