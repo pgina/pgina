@@ -350,8 +350,7 @@ namespace OpenCredential.Service.Impl
             string pattern = @"\%v";
             if (Regex.IsMatch(motd, pattern))
             {
-                string vers = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                motd = Regex.Replace(motd, pattern, vers);
+                motd = MotdVersion.Expand(motd);
             }
 
             // IP Address

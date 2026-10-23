@@ -1,5 +1,13 @@
 # Estado de validación antes de commit/push
 
+## Corrección del rótulo de versión: 2026-10-23
+
+- El propietario reportó `OpenCredential Version: 1.0.0.0` en el inicio de sesión. El origen era el formateador `%v` del servicio, que leía `AssemblyVersion` en vez de la versión de distribución. La identidad se conserva intencionalmente para compatibilidad; no es prueba de que el proveedor instalado sea de una versión antigua.
+- La inspección de metadatos del equipo mostró versión de archivo `1.0.1.0` e informativa `1.0.1.0-rc.1`, correspondientes al instalador local de evaluación. No se iniciaron/detuvieron servicios ni se escribió configuración instalada durante el diagnóstico.
+- La regresión aislada reprodujo `1.0.0.0` antes de la corrección y pasó después. Comprueba la versión informativa, múltiples `%v`, otros marcadores y mensajes literales conservados, sin inicializar `Service`, Framework, plugins ni registro real.
+- El propietario autoriza commit/push y sustituir el release anterior. Se publica el hotfix `v1.0.1.1` y se retira únicamente el release de GitHub `v1.0.1.0` con sus adjuntos, conservando su etiqueta Git y los demás releases. Los binarios nuevos no se atribuyen al commit anterior.
+- La nueva instalación/login integral del hotfix no se declara ejecutada por el agente; siguen vigentes los límites de aceptación descritos abajo. El instalador continúa sin firma.
+
 ## Actualización de release estable: 2026-10-23
 
 - El propietario confirma que ejecutó el instalador local `desktop-idiomas-prueba-20261023-160659` y que funciona correctamente, y autoriza commit/push y un nuevo release estable Desktop `v1.0.1.0`. SHA256 del instalador probado: `eef0c38905ecbb58e97545d44be5af7db3db458eabf1509dd54f5e913c877579`.

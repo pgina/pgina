@@ -6,6 +6,20 @@ if (-not $MSBuildPath) {
     $MSBuildPath = & $vswhere -latest -products '*' -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
 }
 if (-not $MSBuildPath) { throw 'MSBuild is required.' }
+& $MSBuildPath (Join-Path $root 'OpenCredential\src\Service\Impl\Impl.csproj') /p:Configuration=Release /p:Platform=AnyCPU /verbosity:minimal /nologo
+if ($LASTEXITCODE -ne 0) { throw 'Service formatting regression build failed.' }
+$serviceAssembly = [Reflection.Assembly]::LoadFrom((Join-Path $root 'OpenCredential\src\bin\OpenCredential.Service.Impl.dll'))
+# Invoke only the standalone formatter, never Service (whose static constructor initializes real settings).
+$formatter = $serviceAssembly.GetType('OpenCredential.Service.Impl.MotdVersion', $true).GetMethod('Expand', [Reflection.BindingFlags]'Static,NonPublic')
+$releaseVersion = @($serviceAssembly.GetCustomAttributes([Reflection.AssemblyInformationalVersionAttribute], $false))[0].InformationalVersion
+$expected = 'OpenCredential Version: ' + $releaseVersion
+$actual = $formatter.Invoke($null, [object[]]@('OpenCredential Version: %v'))
+if ($actual -ne $expected) { throw "MOTD must display release version '$expected', not '$actual'." }
+$actual = $formatter.Invoke($null, [object[]]@('%v / %v | %m %d %i %n | synthetic-text'))
+if ($actual -ne ($releaseVersion + ' / ' + $releaseVersion + ' | %m %d %i %n | synthetic-text')) { throw 'MOTD version substitution must preserve custom text and other tokens.' }
+$literal = 'Custom welcome: 1.0.0.0'
+if ($formatter.Invoke($null, [object[]]@($literal)) -ne $literal) { throw 'Literal administrator messages must not be rewritten.' }
+Write-Output 'PASS MOTD uses the published release version, preserving assembly identity, other tokens and custom text; service not initialized.'
 & $MSBuildPath (Join-Path $PSScriptRoot 'DatabaseAuth.Tests\DatabaseAuth.Tests.csproj') /p:Configuration=Release /verbosity:minimal /nologo
 if ($LASTEXITCODE -ne 0) { throw 'Desktop regression build failed.' }
 & (Join-Path $PSScriptRoot 'DatabaseAuth.Tests\bin\Release\OpenCredential.DatabaseAuth.RegressionTests.exe')

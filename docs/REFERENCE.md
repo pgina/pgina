@@ -66,7 +66,8 @@ Install these runtimes on target machines:
 
 Note:
 
-- The current stable installer is `OpenCredentialInstaller-1.0.1.0-unsigned.exe`; it is unsigned. Verify `SHA256SUMS` from the same release before running it.
+- The current stable installer is `OpenCredentialInstaller-1.0.1.1-unsigned.exe`; it is unsigned. Verify `SHA256SUMS` from the same release before running it.
+- The welcome-message token `%v` displays the informational release version. Managed assembly identity remains `1.0.0.0` for compatibility and must not be used as the installed product version. Literal administrator messages without `%v` are preserved.
 
 ## Production Security Notes
 

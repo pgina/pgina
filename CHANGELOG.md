@@ -4,7 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.1.1] - 2026-10-23
+
+- Fix the sign-in welcome message `%v` token to show the informational release version (file/assembly fallback), not the compatibility assembly identity `1.0.0.0`. Preserve literal custom messages and other tokens; add an isolated regression without initializing the service.
+- Supersede the withdrawn GitHub release `v1.0.1.0` without moving/deleting its Git tag. Keep managed assembly identity `1.0.0.0`; stamp installer/file/product versions `1.0.1.1`. The installer remains unsigned.
+
 ## [1.0.1.0] - 2026-10-23
+
+GitHub release withdrawn in favor of `1.0.1.1` because the sign-in welcome version label used the compatibility assembly identity. The Git tag is retained for source history.
 
 Stable Desktop release authorized after the owner reported successful execution of the local evaluation installer. The installer remains unsigned; this is not certification of every supported platform, accessibility combination or third-party plugin. Includes the fixes from 1.0.1.0-rc.1, preserved below.
 

@@ -15,7 +15,7 @@ OpenCredential is an open-source Windows Credential Provider with managed plugin
 
 ## Install and evaluate
 
-**Current stable release: [v1.0.1.0](https://github.com/pedropablobm/OpenCredential/releases/tag/v1.0.1.0). The installer is unsigned.** Trusted signing is pending provider approval, not yet available. The earlier `v1.0.1.0-rc.1` prerelease remains available unchanged.
+**Current stable release: [v1.0.1.1](https://github.com/pedropablobm/OpenCredential/releases/tag/v1.0.1.1). The installer is unsigned.** Trusted signing is pending provider approval, not yet available. This replaces the withdrawn `v1.0.1.0` release and corrects the version shown at sign-in. The earlier `v1.0.1.0-rc.1` prerelease remains unchanged.
 
 Requirements: Windows 10 21H2+ or Windows 11 22H2+, .NET Framework 4.8 and Microsoft Visual C++ v14 runtimes. The installer includes the x86/x64 VC++ redistributables.
 

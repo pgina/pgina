@@ -1,6 +1,6 @@
 #define MyAppName "OpenCredential"
-#define MyAppVersion "1.0.1.0"
-#define MyAppReleaseVersion "1.0.1.0"
+#define MyAppVersion "1.0.1.1"
+#define MyAppReleaseVersion "1.0.1.1"
 #define MyAppPublisher "OpenCredential Project"
 #define MyAppURL "https://github.com/pedropablobm/OpenCredential"
 #define MyAppExeName "OpenCredential.Configuration.exe"
