@@ -54,6 +54,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Logging\InProcAppender.cs" />
+    <Compile Include="Localization\LanguageCatalog.cs" />
     <Compile Include="Registration\CredProviderManager.cs" />
     <Compile Include="Registration\DllUtils.cs" />
     <Compile Include="Registration\Settings.cs" />
@@ -69,6 +70,9 @@
     <Compile Include="Types\PluginActivityInformation.cs" />
     <Compile Include="Types\SessionProperties.cs" />
     <Compile Include="Types\UserInformation.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\es.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="log4net.config">

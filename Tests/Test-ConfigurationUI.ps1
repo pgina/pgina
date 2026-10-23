@@ -16,6 +16,12 @@ if (-not $MSBuildPath) { throw 'Visual Studio MSBuild required.' }
 if ($LASTEXITCODE -ne 0) { throw 'Configuration UI build failed.' }
 & $MSBuildPath (Join-Path $root 'Plugins\Core\DatabaseAuth\DatabaseAuth\DatabaseAuth.csproj') /p:Configuration=Release /p:Platform=AnyCPU /verbosity:minimal /nologo
 if ($LASTEXITCODE -ne 0) { throw 'Database Auth configuration UI build failed.' }
+& $MSBuildPath (Join-Path $root 'Plugins\Core\DatabaseLogger\DatabaseLogger\DatabaseLogger.csproj') /p:Configuration=Release /p:Platform=AnyCPU /verbosity:minimal /nologo
+if ($LASTEXITCODE -ne 0) { throw 'Database Logger configuration UI build failed.' }
+foreach ($project in @('SessionLimit\SessionLimit\SessionLimit.csproj', 'SingleUser\SingleUser.csproj', 'Sample\Sample.csproj', 'LocalMachine\LocalMachine.csproj', 'DriveMapper\DriveMapper.csproj', 'Ldap\Ldap\Ldap.csproj')) {
+    & $MSBuildPath (Join-Path $root ('Plugins\Core\' + $project)) /p:Configuration=Release /p:Platform=AnyCPU /verbosity:minimal /nologo
+    if ($LASTEXITCODE -ne 0) { throw "Plugin configuration UI build failed: $project" }
+}
 & $MSBuildPath (Join-Path $PSScriptRoot 'Configuration.UI.Tests\Configuration.UI.Tests.csproj') /p:Configuration=Release /verbosity:minimal /nologo
 if ($LASTEXITCODE -ne 0) { throw 'Configuration UI test build failed.' }
 $arguments = @((Join-Path $root 'OpenCredential\src\bin\OpenCredential.Configuration.exe'))

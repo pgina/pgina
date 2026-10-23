@@ -14,6 +14,9 @@ namespace OpenCredential.Plugin.DatabaseAuth
         public TextBoxInfoDialog()
         {
             InitializeComponent();
+            Text = OpenCredential.Shared.Localization.UiLanguage.Text("DatabaseAuth", "Diagnostics.Title", "Information");
+            closeButton.Text = OpenCredential.Shared.Localization.UiLanguage.Text("DatabaseAuth", "Control.cancelButton", "Close");
+            closeButton.AccessibleName = closeButton.Text;
         }
 
         public void AppendText(string text)

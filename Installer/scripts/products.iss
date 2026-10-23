@@ -26,6 +26,17 @@ en.depinstall_missing=%1 must be installed before setup can continue. Please ins
 en.depinstall_error=An error occured while installing the dependencies. Please restart the computer and run the setup again or install the following dependencies manually:%n
 
 en.isxdl_langfile=
+es.depdownload_msg=Se requieren estas aplicaciones para continuar:%n%n%1%n¿Desea descargarlas e instalarlas ahora?
+es.depdownload_admin=Se requiere una cuenta administrativa para instalar las dependencias.%nEjecute este instalador como administrador o instale manualmente:%n%n%1%nCierre este mensaje y pulse Cancelar.
+es.previousinstall_admin=Esta instalación se ejecutó anteriormente como administrador.%nVuelva a ejecutarla como administrador para actualizarla.%nCierre este mensaje y pulse Cancelar.
+es.depdownload_memo_title=Descargar dependencias
+es.depinstall_memo_title=Instalar dependencias
+es.depinstall_title=Instalando dependencias
+es.depinstall_description=Espere mientras se instalan las dependencias en su equipo.
+es.depinstall_status=Instalando %1...
+es.depinstall_missing=Debe instalar %1 para continuar. Instálelo y vuelva a ejecutar el instalador.
+es.depinstall_error=Se produjo un error al instalar las dependencias. Reinicie y ejecute de nuevo el instalador o instale manualmente:%n
+es.isxdl_langfile=
 
 
 [Files]

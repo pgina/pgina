@@ -152,6 +152,8 @@
     <Compile Include="Configuration.OfflineStatus.cs">
       <DependentUpon>Configuration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Configuration.Localization.cs"><DependentUpon>Configuration.cs</DependentUpon></Compile>
+    <Compile Include="..\..\Localization\PluginPresentation.cs"><Link>PluginPresentation.cs</Link></Compile>
     <Compile Include="Configuration.Designer.cs">
       <DependentUpon>Configuration.cs</DependentUpon>
     </Compile>

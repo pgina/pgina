@@ -66,7 +66,7 @@ Install these runtimes on target machines:
 
 Note:
 
-- The current evaluation installer is `OpenCredentialInstaller-1.0.1.0-rc.1.exe`; it is unsigned.
+- The current stable installer is `OpenCredentialInstaller-1.0.1.0-unsigned.exe`; it is unsigned. Verify `SHA256SUMS` from the same release before running it.
 
 ## Production Security Notes
 

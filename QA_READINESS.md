@@ -1,5 +1,15 @@
 # Estado de validación antes de commit/push
 
+## Actualización de release estable: 2026-10-23
+
+- El propietario confirma que ejecutó el instalador local `desktop-idiomas-prueba-20261023-160659` y que funciona correctamente, y autoriza commit/push y un nuevo release estable Desktop `v1.0.1.0`. SHA256 del instalador probado: `eef0c38905ecbb58e97545d44be5af7db3db458eabf1509dd54f5e913c877579`.
+- Ese artefacto de prueba contenía los cambios locales y aún mostraba `1.0.1.0-rc.1`. El instalador estable se recompila desde el commit de release, con metadatos `1.0.1.0`, checksums y procedencia propios; no se presenta como idéntico byte a byte al probado.
+- Regresiones locales de esta entrega: configuración e idiomas de los ocho plugins, importación XML, créditos/licencia, política administrativa opcional, caché offline, carga de tipos, selección de idioma nativo y serialización x64/Win32. Instalador bilingüe compilado sin ejecutarlo por el agente.
+- No se deduce de la confirmación general del propietario una nueva matriz completa de login/RDP/DPI/NVDA/diseñador. Persisten los límites de aceptación detallados en `docs/LANGUAGES.md` y `docs/OFFLINE_SYNCHRONIZATION.md` y los pendientes históricos de abajo.
+- Se conserva `AssemblyVersion=1.0.0.0`; versiones de archivo/producto `1.0.1.0`. El instalador sigue sin firma Authenticode. AdminWeb, Docker Hub y el prerelease anterior no se modifican.
+
+## Historial de estabilización
+
 Actualizado: 2026-10-21. El usuario autorizó commit/push de estabilización en Desktop `master` y AdminWeb `main`, incluida la migración previa a log4net. La publicación inicial se completó y también se autorizó publicar las correcciones posteriores de RDP/grupos y sus pruebas en Desktop `master`. No equivale a publicar una versión certificada ni un instalador firmado.
 
 | Prueba | Resultado | Alcance |

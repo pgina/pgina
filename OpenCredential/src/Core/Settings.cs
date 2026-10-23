@@ -60,6 +60,7 @@ namespace OpenCredential.Core
             s_settings.SetDefault("EnableSpecialActionButton", false);
             s_settings.SetDefault("SpecialAction", "Shutdown");
             s_settings.SetDefault("ShowServiceStatusInLogonUi", true);
+            s_settings.SetDefault("RequireConfigurationReauthentication", false);
 
             s_settings.SetDefault("CredentialProviderFilters", new string[] { });
             s_settings.SetDefault("CredentialProviderDefaultTile", true);

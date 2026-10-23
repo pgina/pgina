@@ -17,12 +17,22 @@ namespace OpenCredential.Configuration
         public LogViewWindow()
         {
             InitializeComponent();
+            Text = T("Log.Title", "OpenCredential Log");
+            saveBtn.Text = T("Log.Save", "Save");
+            saveBtn.AccessibleName = saveBtn.Text;
+            logTextArea.AccessibleName = T("Log.Content", "Technical log contents");
+        }
+
+        private static string T(string key, string english)
+        {
+            return OpenCredential.Shared.Localization.UiLanguage.Text("Configuration", key, english);
         }
 
         private void saveBtn_Click(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "Text File (.txt)|*.txt|All Files (*.*)|*.*";
+            sfd.Filter = T("Log.TextFile", "Text File (.txt)").Replace("|", "") + "|*.txt|" +
+                T("Log.AllFiles", "All Files (*.*)").Replace("|", "") + "|*.*";
             sfd.CheckPathExists = true;
 
             if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -32,7 +42,7 @@ namespace OpenCredential.Configuration
                     file.Write(logTextArea.Text);
                 }
 
-                MessageBox.Show(string.Format("File saved successfully: {0}", sfd.FileName), "Log Export", MessageBoxButtons.OK);
+                MessageBox.Show(string.Format(T("Log.Saved", "File saved successfully: {0}"), sfd.FileName), T("Log.Export", "Log Export"), MessageBoxButtons.OK);
             }
         }
         

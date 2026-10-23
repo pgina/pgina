@@ -109,6 +109,11 @@
     <Compile Include="ConfigurationUI.Presentation.cs">
       <DependentUpon>ConfigurationUI.cs</DependentUpon>
     </Compile>
+    <Compile Include="ConfigurationUI.Language.cs"><DependentUpon>ConfigurationUI.cs</DependentUpon></Compile>
+    <Compile Include="AboutDialog.cs" />
+    <Compile Include="ConfigurationAccessPolicy.cs" />
+    <EmbeddedResource Include="..\..\..\LICENSE"><LogicalName>OpenCredential.Configuration.Legal.LICENSE</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="..\..\..\NOTICE"><LogicalName>OpenCredential.Configuration.Legal.NOTICE</LogicalName></EmbeddedResource>
     <Compile Include="ConfigurationUI.Designer.cs">
       <DependentUpon>ConfigurationUI.cs</DependentUpon>
     </Compile>

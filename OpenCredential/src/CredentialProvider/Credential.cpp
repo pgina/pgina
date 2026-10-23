@@ -27,6 +27,7 @@
 #include <Windows.h>
 
 #include "Credential.h"
+#include "NativeLanguage.h"
 #include "Dll.h"
 
 #pragma warning(push)
@@ -272,7 +273,7 @@ namespace OpenCredential
 			{
 				// User clicked cancel during logon
 				pDEBUG(L"Credential::GetSerialization - Logon was cancelled, returning S_FALSE");
-				SHStrDupW(L"Logon cancelled", ppwszOptionalStatusText);
+                SHStrDupW(OpenCredential::Localization::Text(L"Logon cancelled"), ppwszOptionalStatusText);
 				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
 				*pcpsiOptionalStatusIcon = CPSI_ERROR;
 				return S_FALSE;
@@ -287,7 +288,7 @@ namespace OpenCredential
 				}
 				else
 				{
-					SHStrDupW(L"Plugins did not provide a specific error message", ppwszOptionalStatusText);
+                    SHStrDupW(OpenCredential::Localization::Text(L"Plugins did not provide a specific error message"), ppwszOptionalStatusText);
 				}
 				
 				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
@@ -306,7 +307,7 @@ namespace OpenCredential
 				}
 				else
 				{
-                SHStrDupW(L"OpenCredential: Your password was successfully changed", ppwszOptionalStatusText);
+                SHStrDupW(OpenCredential::Localization::Text(L"OpenCredential: Your password was successfully changed"), ppwszOptionalStatusText);
 				}
 
 				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;						
@@ -448,7 +449,7 @@ namespace OpenCredential
 
 				if(fields.fields[x].wstr && !IsFieldDynamic(x))
 				{
-					SHStrDup(fields.fields[x].wstr, &m_fields->fields[x].wstr);
+                    SHStrDup(OpenCredential::Localization::Text(fields.fields[x].wstr), &m_fields->fields[x].wstr);
 				}
 
 				if(IsFieldDynamic(x))
@@ -792,7 +793,10 @@ namespace OpenCredential
 			// Set the status message
 			if (pqcws && username)
 			{
-				std::wstring message = OpenCredential::Registry::GetString(L"LogonProgressMessage", L"Logging on...");
+                std::wstring message = OpenCredential::Registry::GetString(L"LogonProgressMessage", L"");
+                // Preserve custom administrator text; translate only the shipped defaults.
+                if (message.empty() || message == L"Logging on..." || message == L"Logging on %u...")
+                    message = OpenCredential::Localization::Text(message.empty() ? L"Logging on..." : message.c_str());
 
 				// Replace occurences of %u with the username
 				std::wstring unameCopy = username;
@@ -818,12 +822,12 @@ namespace OpenCredential
 				if( m_loginResult.Result() )
 				{
 					pDEBUG(L"Plugins registered logon success");
-					pqcws->SetStatusMessage(L"Logon successful");
+                    pqcws->SetStatusMessage(OpenCredential::Localization::Text(L"Logon successful"));
 				}
 				else
 				{
 					pDEBUG(L"Plugins registered logon failure");
-					pqcws->SetStatusMessage(L"Logon failed");
+                    pqcws->SetStatusMessage(OpenCredential::Localization::Text(L"Logon failed"));
 				}
 
 				// Did the user click the "Cancel" button?
@@ -857,7 +861,7 @@ namespace OpenCredential
 			// return a failure.
 			if( wcscmp(newPassword, newPasswordConfirm ) != 0 ) {
 				m_loginResult.Result(false);
-				m_loginResult.Message(L"New passwords do not match");
+                m_loginResult.Message(OpenCredential::Localization::Text(L"New passwords do not match"));
 				return;
 			}
 
@@ -866,9 +870,9 @@ namespace OpenCredential
 
 			if( m_loginResult.Message().empty() ) {
 				if( m_loginResult.Result() )
-					m_loginResult.Message(L"Password was successfully changed");
+                    m_loginResult.Message(OpenCredential::Localization::Text(L"Password was successfully changed"));
 				else
-					m_loginResult.Message(L"Failed to change password, no message from plugins.");
+                    m_loginResult.Message(OpenCredential::Localization::Text(L"Failed to change password, no message from plugins."));
 			}
 		}
 	}

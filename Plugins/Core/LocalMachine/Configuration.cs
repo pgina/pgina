@@ -32,15 +32,32 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using OpenCredential.Plugin.Presentation;
 
 namespace OpenCredential.Plugin.LocalMachine
 {
     public partial class Configuration : Form
     {
-        public Configuration()
+        public Configuration() : this(true) { }
+
+        internal Configuration(bool initializeSettings)
         {
             InitializeComponent();
-            SettingsToUi();
+            PluginPresentation.Apply(this, "LocalMachine");
+            LocalGroup.HeaderText = PluginPresentation.Text("LocalMachine", "Column.Groups", "Local Groups");
+            Group.HeaderText = PluginPresentation.Text("LocalMachine", "Column.Mandatory", "Mandatory Groups");
+            Username.HeaderText = PluginPresentation.Text("LocalMachine", "Column.Username", "Username");
+            foreach (var grid in new[] { m_localGroupDgv, m_groupsDgv, m_scrambleAllExceptDGV })
+            { grid.Height = 150; grid.StandardTab = true; grid.AccessibleName = grid.Columns[0].HeaderText; }
+            PluginPresentation.Stack(groupBox1, m_chkAlwaysAuth);
+            PluginPresentation.Stack(groupBox2, m_chkAuthzAll, m_chkAuthzLocalAdmin, m_chkAuthzRequireLocal, m_localGroupDgv, m_chkMirror);
+            PluginPresentation.Stack(groupBox3, m_chkGroupFailIsFAIL, m_groupsDgv, m_chkScramble,
+                m_chkScrambleWhenLMFails, label1, m_scrambleAllExceptDGV, m_chkRemoveProfile);
+            var body = new Panel { AutoScroll = true };
+            PluginPresentation.Stack(body, groupBox1, groupBox2, groupBox3);
+            PluginPresentation.Shell(this, body, m_btnSave, m_btnClose);
+            if (initializeSettings) SettingsToUi();
+            else PluginPresentation.DisablePreviewActions(this);
         }
 
         public void SettingsToUi()

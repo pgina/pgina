@@ -10,10 +10,13 @@ namespace OpenCredential.Configuration
     {
         private readonly ComponentResourceManager presentationResources = new ComponentResourceManager(typeof(ConfigurationUI));
         private readonly Dictionary<PictureBox, Label> stageText = new Dictionary<PictureBox, Label>();
+        private CheckBox requireConfigurationReauthenticationCB;
+        private ComboBox signInLanguageCB;
+        private static readonly string[] signInLanguages = { "auto", "en", "es" };
 
         private string PresentationText(string key)
         {
-            return presentationResources.GetString(key) ?? key;
+            return T(key, presentationResources.GetString(key) ?? key);
         }
 
         // Keep runtime composition separate from the WinForms designer's serialization.
@@ -24,6 +27,8 @@ namespace OpenCredential.Configuration
             MinimumSize = new Size(860, 580);
             AccessibleName = Text;
             AccessibleDescription = PresentationText("Shell.Description");
+            Text = PresentationText("Shell.Heading");
+            TranslateCaptions(this);
             SetText(btnSaveAndClose, "Action.SaveClose");
             SetText(btnApply, "Action.Apply");
             SetText(btnOkay, "Action.Close");
@@ -41,7 +46,7 @@ namespace OpenCredential.Configuration
             shell.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             var heading = new Label { Name = "configurationHeading", AutoSize = true,
                 Text = PresentationText("Shell.Heading"), Margin = new Padding(4, 4, 4, 12) };
-            shell.Controls.Add(heading, 0, 0);
+            shell.Controls.Add(LanguageHeader(heading), 0, 0);
             m_tabs.Dock = DockStyle.Fill;
             m_tabs.Margin = new Padding(0);
             m_tabs.AccessibleName = PresentationText("Shell.Tabs");
@@ -170,6 +175,21 @@ namespace OpenCredential.Configuration
             layout.SetColumnSpan(groupBox4, 2);
             layout.Controls.Add(groupBox17, 0, 3);
             layout.SetColumnSpan(groupBox17, 2);
+            var accessGroup = new GroupBox { Name = "configurationAccessGroup", Text = PresentationText("Access.Title") };
+            requireConfigurationReauthenticationCB = new CheckBox { Name = "requireConfigurationReauthenticationCB",
+                Text = PresentationText("Access.RequirePassword"), AutoSize = true, Checked = false,
+                AccessibleName = PresentationText("Access.RequirePassword") };
+            var accessHelp = new Label { AutoSize = true, Text = PresentationText("Access.Help") };
+            var signInLabel = new Label { AutoSize = true, Text = PresentationText("Language.SignIn") };
+            signInLanguageCB = new ComboBox { Name = "signInLanguageCB", DropDownStyle = ComboBoxStyle.DropDownList,
+                AccessibleName = PresentationText("Language.SignIn"), Width = 220 };
+            signInLanguageCB.Items.AddRange(new object[] { PresentationText("Language.SignInAuto"), "English", "Español" });
+            signInLanguageCB.SelectedIndex = 0;
+            var signInHelp = new Label { AutoSize = true, Text = PresentationText("Language.SignInHelp") };
+            Stack(accessGroup, requireConfigurationReauthenticationCB, accessHelp, signInLabel, signInLanguageCB, signInHelp);
+            layout.Controls.Add(accessGroup, 0, 4);
+            layout.SetColumnSpan(accessGroup, 2);
+            accessGroup.TabIndex = 6;
             servGB.TabIndex = 0;
             groupBox14.TabIndex = 1;
             groupBox12.TabIndex = 2;

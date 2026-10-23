@@ -32,6 +32,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using OpenCredential.Plugin.Presentation;
 
 namespace OpenCredential.Plugin.DriveMapper
 {
@@ -41,11 +42,37 @@ namespace OpenCredential.Plugin.DriveMapper
         private string[] m_credsOptions;
         private BindingList<DriveMap> m_maps;
 
-        public ConfigurationUi()
+        public ConfigurationUi() : this(true) { }
+
+        internal ConfigurationUi(bool initializeSettings)
         {
             InitializeComponent();
             InitUi();
-            LoadSettings();
+            PluginPresentation.Apply(this, "DriveMapper");
+            PluginPresentation.Options(m_credsCb, "DriveMapper");
+            m_mapListDgv.CellFormatting += delegate(object sender, DataGridViewCellFormattingEventArgs args)
+            {
+                if (args.ColumnIndex >= 0 && m_mapListDgv.Columns[args.ColumnIndex].Name == "Creds" && args.Value != null)
+                    args.Value = PluginPresentation.Text("DriveMapper", "Credential." + args.Value, args.Value.ToString());
+            };
+            foreach (DataGridViewColumn column in m_mapListDgv.Columns)
+                column.HeaderText = PluginPresentation.Text("DriveMapper", "Column." + column.Name, column.HeaderText);
+            m_mapListDgv.Height = 200;
+            m_mapListDgv.StandardTab = true;
+            m_mapListDgv.AccessibleName = PluginPresentation.Text("DriveMapper", "Input.Maps", "Drive mappings");
+            PluginPresentation.Stack(groupBox1, PluginPresentation.Fields(label1, m_driveLetterCb, label2, m_uncPathTb,
+                label5, m_credsCb, label3, m_usernameTb, label4, m_passwordTb, null, m_showPasswordCb,
+                label6, m_groupTb, null, PluginPresentation.Actions(m_newMapButton, m_deleteMapButton)));
+            var body = new Panel { AutoScroll = true };
+            PluginPresentation.Stack(body, m_mapListDgv, groupBox1);
+            PluginPresentation.Shell(this, body, m_saveCloseButton, m_cancelButton);
+            if (initializeSettings) LoadSettings();
+            else
+            {
+                m_maps = new BindingList<DriveMap>();
+                m_mapListDgv.DataSource = m_maps;
+                PluginPresentation.DisablePreviewActions(this);
+            }
         }
 
         private void InitUi()

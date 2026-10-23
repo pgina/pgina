@@ -8,15 +8,30 @@ using System.Text;
 using System.Windows.Forms;
 
 using OpenCredential.Shared.Settings;
+using OpenCredential.Plugin.Presentation;
 
 namespace OpenCredential.Plugin.SingleUser
 {
     public partial class Configuration : Form
     {       
-        public Configuration()
+        public Configuration() : this(true)
+        {
+        }
+
+        internal Configuration(bool initializeSettings)
         {
             InitializeComponent();
-            SettingsToUi();
+            PluginPresentation.Apply(this, "SingleUser");
+            PluginUuid.HeaderText = PluginPresentation.Text("SingleUser", "Column.PluginUuid", "Plugin Unique ID");
+            m_dgv.AccessibleName = PluginPresentation.Text("SingleUser", "Input.Plugins", "Required plugin identifiers");
+            m_dgv.StandardTab = true;
+            m_dgv.Height = 180;
+            var body = new Panel { AutoScroll = true };
+            PluginPresentation.Stack(body, PluginPresentation.Fields(label1, m_txtUser, label2, m_txtDomain, label3, m_txtPass,
+                null, substituteCB, null, PluginPresentation.Actions(anyRB, allRB), null, label4, null, m_dgv));
+            PluginPresentation.Shell(this, body, btnOk, btnCancel);
+            if (initializeSettings) SettingsToUi();
+            else PluginPresentation.DisablePreviewActions(this);
         }
 
         public void SettingsToUi()

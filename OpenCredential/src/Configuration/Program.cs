@@ -46,6 +46,7 @@ namespace OpenCredential.Configuration
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            LanguagePreferences.Initialize();
 
             if (!EnsureAuthorizedAdministrator())
                 return;
@@ -62,13 +63,29 @@ namespace OpenCredential.Configuration
             if (!principal.IsInRole(WindowsBuiltInRole.Administrator))
             {
                 MessageBox.Show(
-                    "OpenCredential Configuration can only be opened by a local administrator.",
-                    "Access denied",
+                    T("Admin.Required", "OpenCredential Configuration can only be opened by a local administrator."),
+                    T("Admin.Denied", "Access denied"),
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return false;
             }
 
+            try
+            {
+                return ConfigurationAccessPolicy.Authorize(true, ConfigurationAccessPolicy.ReadValue,
+                    () => ReauthenticateAdministrator(identity, currentSid));
+            }
+            catch (Exception error) when (error is System.IO.IOException || error is System.IO.InvalidDataException ||
+                error is UnauthorizedAccessException || error is System.Security.SecurityException)
+            {
+                MessageBox.Show(T("Admin.PolicyError", "Unable to read the configuration access policy. Access denied; contact an administrator."),
+                    T("Admin.Denied", "Access denied"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        private static bool ReauthenticateAdministrator(WindowsIdentity identity, string currentSid)
+        {
             string expectedDomain;
             string expectedUser;
             GetIdentityParts(identity, out expectedDomain, out expectedUser);
@@ -77,7 +94,7 @@ namespace OpenCredential.Configuration
             {
                 NetworkCredential credential = pInvokes.GetCredentials(
                     "OpenCredential Configuration",
-                    "Re-enter your current Windows administrator credentials to continue.");
+                    T("Admin.Prompt", "Re-enter your current Windows administrator credentials to continue."));
 
                 if (credential == null)
                     return false;
@@ -106,8 +123,8 @@ namespace OpenCredential.Configuration
                     }
 
                     MessageBox.Show(
-                        "Please authenticate with the same Windows administrator account that is currently signed in.",
-                        "Authentication failed",
+                        T("Admin.SameAccount", "Please authenticate with the same Windows administrator account that is currently signed in."),
+                        T("Admin.Failed", "Authentication failed"),
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                     continue;
@@ -115,14 +132,19 @@ namespace OpenCredential.Configuration
 
                 MessageBox.Show(
                     attempt < MaxAuthenticationAttempts
-                        ? "The Windows credentials could not be validated. Please try again."
-                        : "The Windows credentials could not be validated.",
-                    "Authentication failed",
+                        ? T("Admin.Retry", "The Windows credentials could not be validated. Please try again.")
+                        : T("Admin.Invalid", "The Windows credentials could not be validated."),
+                    T("Admin.Failed", "Authentication failed"),
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
             }
 
             return false;
+        }
+
+        private static string T(string key, string english)
+        {
+            return OpenCredential.Shared.Localization.UiLanguage.Text("Configuration", key, english);
         }
 
         private static void GetIdentityParts(WindowsIdentity identity, out string domain, out string user)

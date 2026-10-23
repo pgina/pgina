@@ -1,6 +1,6 @@
 #define MyAppName "OpenCredential"
 #define MyAppVersion "1.0.1.0"
-#define MyAppReleaseVersion "1.0.1.0-rc.1"
+#define MyAppReleaseVersion "1.0.1.0"
 #define MyAppPublisher "OpenCredential Project"
 #define MyAppURL "https://github.com/pedropablobm/OpenCredential"
 #define MyAppExeName "OpenCredential.Configuration.exe"
@@ -54,6 +54,7 @@ MinVersion=10.0.19044
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
 ;Name: "english"; MessagesFile: "compiler:Default.isl"
 
 ; Configuration, offline databases and registry settings are persistent user data.
@@ -87,7 +88,7 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, "&", "&&")}}"; Flags: nowait postinstall skipifsilent runascurrentuser
 
 [UninstallRun]
-Filename: "{app}\OpenCredential.InstallUtil.exe"; Parameters: "post-uninstall"; StatusMsg: "Removing OpenCredential service, credential provider, and permissions..."; WorkingDir: "{app}"; Flags: runhidden; RunOnceId: "UninstallService"
+Filename: "{app}\OpenCredential.InstallUtil.exe"; Parameters: "post-uninstall"; StatusMsg: "{cm:UninstallIntegration}"; WorkingDir: "{app}"; Flags: runhidden; RunOnceId: "UninstallService"
 
 ; More custom stuff from [] for ensuring user gets everything needed
 #include "scripts\products.iss"
@@ -106,6 +107,14 @@ Filename: "{app}\OpenCredential.InstallUtil.exe"; Parameters: "post-uninstall"; 
 #include "scripts\services.iss"
 
 [CustomMessages]
+en.RequiredFramework=OpenCredential requires .NET Framework 4.8 or later. Install it from Microsoft, then run setup again.
+es.RequiredFramework=OpenCredential requiere .NET Framework 4.8 o posterior. Instálelo desde Microsoft y vuelva a ejecutar el instalador.
+en.PostInstallLaunch=Could not run OpenCredential post-install. Keep the alternate Windows sign-in provider enabled and review the setup log.
+es.PostInstallLaunch=No se pudo ejecutar la configuración posterior de OpenCredential. Mantenga habilitado un proveedor alternativo de Windows y revise el registro del instalador.
+en.PostInstallFailed=OpenCredential post-install failed (exit code %d). Keep the alternate Windows sign-in provider enabled and review the application log.
+es.PostInstallFailed=Falló la configuración posterior de OpenCredential (código %d). Mantenga habilitado un proveedor alternativo de Windows y revise el registro de la aplicación.
+en.UninstallIntegration=Removing OpenCredential service, credential provider, and permissions...
+es.UninstallIntegration=Quitando el servicio, el proveedor de credenciales y los permisos de OpenCredential...
 win2000sp3_title=Windows 2000 Service Pack 3
 winxpsp2_title=Windows XP Service Pack 2
 winxpsp3_title=Windows XP Service Pack 3
@@ -132,7 +141,7 @@ begin
     
     DotNetRelease := 0;
     if (not RegQueryDWordValue(HKLM32, 'Software\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', DotNetRelease)) or (DotNetRelease < 528040) then begin
-        MsgBox('OpenCredential requires .NET Framework 4.8 or later. Install it from Microsoft, then run setup again.', mbError, MB_OK);
+        MsgBox(CustomMessage('RequiredFramework'), mbError, MB_OK);
         Result := false;
         exit;
     end;
@@ -160,9 +169,9 @@ var
     ExitCode: Integer;
 begin
   if not Exec(ExpandConstant('{app}\OpenCredential.InstallUtil.exe'), 'post-install', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, ExitCode) then
-    RaiseException('Could not run OpenCredential post-install. Keep the alternate Windows sign-in provider enabled and review the setup log.');
+    RaiseException(CustomMessage('PostInstallLaunch'));
   if ExitCode <> 0 then
-    RaiseException(Format('OpenCredential post-install failed (exit code %d). Keep the alternate Windows sign-in provider enabled and review the application log.', [ExitCode]));
+    RaiseException(Format(CustomMessage('PostInstallFailed'), [ExitCode]));
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);

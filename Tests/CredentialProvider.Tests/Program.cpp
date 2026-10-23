@@ -1,4 +1,5 @@
 #include "../../OpenCredential/src/CredentialProvider/SerializationHelpers.h"
+#include "../../OpenCredential/src/CredentialProvider/NativeText.h"
 #include <wincred.h>
 #include <vector>
 #include <cstdio>
@@ -23,6 +24,17 @@ static BOOL WINAPI FailsAfterSizing(BOOL, LPWSTR, DWORD, LPWSTR output, LPDWORD 
 
 int wmain()
 {
+    using namespace OpenCredential::Localization;
+    if (!IsSpanish(L"es", MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT)) ||
+        !IsSpanish(L"auto", MAKELANGID(LANG_SPANISH, SUBLANG_DEFAULT)) ||
+        IsSpanish(L"en", MAKELANGID(LANG_SPANISH, SUBLANG_DEFAULT)) ||
+        IsSpanish(L"invalid", MAKELANGID(LANG_SPANISH, SUBLANG_DEFAULT)) ||
+        wcscmp(Text(L"Password", true), L"Contrase\u00f1a") || wcscmp(Text(L"Password", false), L"Password") ||
+        wcscmp(Text(L"synthetic-user-payload", true), L"synthetic-user-payload") ||
+        wcscmp(Text(L"MOTD", true), L"MOTD") ||
+        !wcsstr(Text(L"Logging on %u...", true), L"%u"))
+    { puts("FAIL Native language policy/text fallback"); return 1; }
+    puts("PASS Native language: machine policy, English/Spanish fallback, protocol identifiers and substitutions; no registry access.");
     // Synthetic text only: never access registry, install/register a provider,
     // contact a service/database or print either clear or protected credentials.
     const WCHAR original[] = L" Synthetic-only RDP regression 123! \u00E1\u4E2D ";

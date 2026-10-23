@@ -126,7 +126,8 @@ namespace OpenCredential.Configuration
             }
             catch (DuplicatePluginDetectedException e)
             {
-                MessageBox.Show(string.Format("Unable to load full plugin list: {0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                m_logger.Warn("Duplicate plugin detected.", e);
+                MessageBox.Show(T("Error.Plugins", "Unable to load the complete plugin list. Check for duplicate or incompatible plugins."), T("Error.Title", "Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             InitSimulationTab();
@@ -149,8 +150,8 @@ namespace OpenCredential.Configuration
             }
             catch (System.UnauthorizedAccessException)
             {
-                MessageBox.Show("Unable to access registry, good bye.",
-                    "Registry access error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(T("Error.Registry", "Unable to access the registry. Open configuration with the required administrator permissions."),
+                    T("Error.Title", "Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Environment.Exit(1);
             }
         }
@@ -188,7 +189,7 @@ namespace OpenCredential.Configuration
             {
                 Name = CPF_CP_NAME_COLUMN,
                 DataPropertyName = CPF_CP_NAME_COLUMN,
-                HeaderText = "Credential Provider",
+                HeaderText = T("Column.Provider", "Credential Provider"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
                 ReadOnly = true
             });
@@ -196,21 +197,21 @@ namespace OpenCredential.Configuration
             {
                 Name = CPF_CP_LOGON_COLUMN,
                 DataPropertyName = CPF_CP_LOGON_COLUMN,
-                HeaderText = "Logon",
+                HeaderText = T("Column.Logon", "Logon"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
             dgvCredProvFilter.Columns.Add(new DataGridViewCheckBoxColumn()
             {
                 Name = CPF_CP_UNLOCK_COLUMN,
                 DataPropertyName = CPF_CP_UNLOCK_COLUMN,
-                HeaderText = "Unlock",
+                HeaderText = T("Column.Unlock", "Unlock"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
             dgvCredProvFilter.Columns.Add(new DataGridViewCheckBoxColumn()
             {
                 Name = CPF_CP_CHANGE_PASS_COLUMN,
                 DataPropertyName = CPF_CP_CHANGE_PASS_COLUMN,
-                HeaderText = "Change Password",
+                HeaderText = T("Column.ChangePassword", "Change Password"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
             dgvCredProvFilter.Columns.Add(new DataGridViewCheckBoxColumn()
@@ -261,6 +262,9 @@ namespace OpenCredential.Configuration
 
         private void LoadGeneralSettings()
         {
+            requireConfigurationReauthenticationCB.Checked = ConfigurationAccessPolicy.Parse(ConfigurationAccessPolicy.ReadValue());
+            int languageIndex = Array.IndexOf(signInLanguages, MachineSignInLanguage.Read());
+            signInLanguageCB.SelectedIndex = languageIndex < 0 ? 0 : languageIndex;
             m_openCredentialVersionLbl.Text = "OpenCredential " +
                 Application.ProductVersion;
 
@@ -301,7 +305,7 @@ namespace OpenCredential.Configuration
             }
             else
             {
-                this.serviceStatusTB.Text = "Not Installed";
+                this.serviceStatusTB.Text = T("Service.NotInstalled", "Not Installed");
                 this.serviceStopBtn.Enabled = false;
                 this.serviceStartBtn.Enabled = false;
             }
@@ -322,42 +326,41 @@ namespace OpenCredential.Configuration
 
             if (manager.Registered())
             {
-                this.cpRegisteredTB.Text = "Yes";
+                this.cpRegisteredTB.Text = T("Common.Yes", "Yes");
                 this.cpRegisteredTB.ForeColor = SystemColors.WindowText;
-                this.cpRegisterBtn.Text = "Unregister";
+                this.cpRegisterBtn.Text = T("Provider.Unregister", "Unregister");
                 this.cpEnableDisableBtn.Enabled = true;
 
                 if (manager.Enabled())
                 {
-                    this.cpEnabledTB.Text = "Yes";
+                    this.cpEnabledTB.Text = T("Common.Yes", "Yes");
                     this.cpEnabledTB.ForeColor = SystemColors.WindowText;
-                    this.cpEnableDisableBtn.Text = "Disable";
+                    this.cpEnableDisableBtn.Text = T("Provider.Disable", "Disable");
                 }
                 else
                 {
-                    this.cpEnabledTB.Text = "No";
+                    this.cpEnabledTB.Text = T("Common.No", "No");
                     this.cpEnabledTB.ForeColor = SystemColors.WindowText;
-                    this.cpEnableDisableBtn.Text = "Enable";
+                    this.cpEnableDisableBtn.Text = T("Provider.Enable", "Enable");
                 }
 
                 if (Abstractions.Windows.OsInfo.Is64Bit() && Abstractions.Windows.OsInfo.IsVistaOrLater() && !manager.Registered6432())
                 {
-                    MessageBox.Show("Warning: The 32-bit CredentialProvider is not registered.  32-bit apps that " +
-                        "make use of the CredentialProvider may not function correctly.");
+                    MessageBox.Show(T("Provider.Missing32", "Warning: The 32-bit CredentialProvider is not registered. 32-bit apps that use it may not function correctly."), T("Common.Warning", "Warning"));
                 }
             }
             else
             {
-                this.cpRegisteredTB.Text = "No";
+                this.cpRegisteredTB.Text = T("Common.No", "No");
                 this.cpRegisteredTB.ForeColor = SystemColors.WindowText;
-                this.cpRegisterBtn.Text = "Register";
-                this.cpEnabledTB.Text = "No";
+                this.cpRegisterBtn.Text = T("Provider.Register", "Register");
+                this.cpEnabledTB.Text = T("Common.No", "No");
                 this.cpEnabledTB.ForeColor = SystemColors.WindowText;
                 this.cpEnableDisableBtn.Enabled = false;
-                this.cpEnableDisableBtn.Text = "Enable";
+                this.cpEnableDisableBtn.Text = T("Provider.Enable", "Enable");
             }
-            this.cpRegisterBtn.AccessibleName = this.cpRegisterBtn.Text + " credential provider";
-            this.cpEnableDisableBtn.AccessibleName = this.cpEnableDisableBtn.Text + " credential provider";
+            this.cpRegisterBtn.AccessibleName = this.cpRegisterBtn.Text;
+            this.cpEnableDisableBtn.AccessibleName = this.cpEnableDisableBtn.Text;
         }
 
         private void UpdateServiceStatus()
@@ -371,39 +374,40 @@ namespace OpenCredential.Configuration
                     this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = true;
                     this.serviceStartBtn.Enabled = false;
-                    statusStr = "Running";
+                    statusStr = T("Service.Running", "Running");
                     break;
                 case ServiceControllerStatus.ContinuePending:
-                    statusStr = "Continue pending...";
+                    statusStr = T("Service.ContinuePending", "Continue pending...");
                     this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = false;
                     this.serviceStartBtn.Enabled = false;
                     break;
                 case ServiceControllerStatus.PausePending:
-                    statusStr = "Pause pending...";
+                    statusStr = T("Service.PausePending", "Pause pending...");
                     this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = false;
                     this.serviceStartBtn.Enabled = false;
                     break;
                 case ServiceControllerStatus.StartPending:
-                    statusStr = "Starting...";
+                    statusStr = T("Service.StartPending", "Starting...");
                     this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = false;
                     this.serviceStartBtn.Enabled = false;
                     break;
                 case ServiceControllerStatus.StopPending:
-                    statusStr = "Stopping...";
+                    statusStr = T("Service.StopPending", "Stopping...");
                     this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = false;
                     this.serviceStartBtn.Enabled = false;
                     break;
                 case ServiceControllerStatus.Paused:
+                    statusStr = T("Service.Paused", "Paused");
                     this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = true;
                     this.serviceStartBtn.Enabled = true;
                     break;
                 case ServiceControllerStatus.Stopped:
-                    statusStr = "Stopped";
+                    statusStr = T("Service.Stopped", "Stopped");
                     this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = false;
                     this.serviceStartBtn.Enabled = true;
@@ -422,7 +426,7 @@ namespace OpenCredential.Configuration
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Unable to load a preview image for the selected file, OpenCredential may not be able to show this image at login time.\n", "Error", MessageBoxButtons.OK);
+                    MessageBox.Show(T("Error.Image", "Unable to load the preview. Check that the file is a valid, accessible image."), T("Error.Title", "Error"), MessageBoxButtons.OK);
                     m_logger.ErrorFormat("User chose {0} as image file, but we failed to load it? Exception: {1}", m_tileImageTxt.Text, ex);
                     m_tileImagePreview.Image = null;
                 }
@@ -432,10 +436,10 @@ namespace OpenCredential.Configuration
         private void InitSimulationTab()
         {
             // Set up columns in simPluginResultsListView
-            this.simPluginResultsListView.Columns.Add("Stage", -2, HorizontalAlignment.Left);
-            this.simPluginResultsListView.Columns.Add("Plugin", -2, HorizontalAlignment.Left);
-            this.simPluginResultsListView.Columns.Add("Result", -2, HorizontalAlignment.Left);
-            this.simPluginResultsListView.Columns.Add("Message", -2, HorizontalAlignment.Left);
+            this.simPluginResultsListView.Columns.Add(T("Column.Stage", "Stage"), -2, HorizontalAlignment.Left);
+            this.simPluginResultsListView.Columns.Add(T("Column.Plugin", "Plugin"), -2, HorizontalAlignment.Left);
+            this.simPluginResultsListView.Columns.Add(T("Column.Result", "Result"), -2, HorizontalAlignment.Left);
+            this.simPluginResultsListView.Columns.Add(T("Column.Message", "Message"), -2, HorizontalAlignment.Left);
             this.simPluginResultsListView.LabelEdit = false;
             this.simPluginResultsListView.GridLines = true;
             this.simPluginResultsListView.View = View.Details;
@@ -478,7 +482,7 @@ namespace OpenCredential.Configuration
             dgv.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 Name = PLUGIN_NAME_COLUMN,
-                HeaderText = "Plugin",
+                HeaderText = T("Column.Plugin", "Plugin"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
                 ReadOnly = true
             });
@@ -494,7 +498,7 @@ namespace OpenCredential.Configuration
             pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 Name = PLUGIN_NAME_COLUMN,
-                HeaderText = "Plugin Name",
+                HeaderText = T("Column.PluginName", "Plugin Name"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
                 ReadOnly = true
             });
@@ -502,42 +506,42 @@ namespace OpenCredential.Configuration
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
                 Name = AUTHENTICATION_COLUMN,
-                HeaderText = "Authentication",
+                HeaderText = T("Stage.Authentication", "Authentication"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
 
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
                 Name = AUTHORIZATION_COLUMN,
-                HeaderText = "Authorization",
+                HeaderText = T("Stage.Authorization", "Authorization"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
 
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
                 Name = GATEWAY_COLUMN,
-                HeaderText = "Gateway",
+                HeaderText = T("Stage.Gateway", "Gateway"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
 
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
                 Name = NOTIFICATION_COLUMN,
-                HeaderText = "Notification",
+                HeaderText = T("Column.Notification", "Notification"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
 
             pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
             {
                 Name = CHANGE_PASSWORD_COLUMN,
-                HeaderText = "Change Password",
+                HeaderText = T("Column.ChangePassword", "Change Password"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             });
 
             pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 Name = PLUGIN_DESC_COLUMN,
-                HeaderText = "Description",
+                HeaderText = T("Column.Description", "Description"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
                 ReadOnly = true
             });
@@ -545,7 +549,7 @@ namespace OpenCredential.Configuration
             pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 Name = PLUGIN_VERSION_COLUMN,
-                HeaderText = "Version",
+                HeaderText = T("Column.Version", "Version"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
                 ReadOnly = true
             });
@@ -817,7 +821,7 @@ namespace OpenCredential.Configuration
             // Populate plugin directories UI
             string[] pluginDirectories = Settings.Get.PluginDirectories;
             lstPluginDirs.Columns.Clear();
-            lstPluginDirs.Columns.Add("Directory");
+            lstPluginDirs.Columns.Add(T("Column.Directory", "Directory"));
             lstPluginDirs.Columns[0].Width = lstPluginDirs.Width - 5;
             lstPluginDirs.Items.Clear();
 
@@ -865,7 +869,8 @@ namespace OpenCredential.Configuration
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("Exception when saving data: " + e);
+                    m_logger.Error("Unable to save configuration.", e);
+                    MessageBox.Show(T("Error.Save", "Unable to save configuration. Check permissions and diagnostic logs."), T("Error.Title", "Error"));
                 }
             }
         }
@@ -910,6 +915,8 @@ namespace OpenCredential.Configuration
 
             // Save logon progress setting
             Settings.Get.LogonProgressMessage = tbLogonProgressMessage.Text;
+            Settings.Get.SetSetting(ConfigurationAccessPolicy.SettingName, requireConfigurationReauthenticationCB.Checked);
+            MachineSignInLanguage.Save(signInLanguages[signInLanguageCB.SelectedIndex < 0 ? 0 : signInLanguageCB.SelectedIndex]);
 
             if (Abstractions.Windows.OsInfo.IsVistaOrLater())
                 this.SaveCpSettings();
@@ -948,7 +955,7 @@ namespace OpenCredential.Configuration
         private void btnApply_Click(object sender, EventArgs e)
         {
             SaveSettings();
-            MessageBox.Show("Settings written to registry.", "Settings Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(T("Settings.Saved", "Settings written to registry."), T("Settings.Title", "Settings Saved"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void btnSaveAndClose_Click(object sender, EventArgs e)
@@ -977,7 +984,8 @@ namespace OpenCredential.Configuration
                 }
                 catch (DuplicatePluginDetectedException ex)
                 {
-                    MessageBox.Show(string.Format("Unable to load full plugin list: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    m_logger.Warn("Duplicate plugin detected.", ex);
+                    MessageBox.Show(T("Error.Plugins", "Unable to load the complete plugin list. Check for duplicate or incompatible plugins."), T("Error.Title", "Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
         }
@@ -997,7 +1005,8 @@ namespace OpenCredential.Configuration
                 }
                 catch (DuplicatePluginDetectedException ex)
                 {
-                    MessageBox.Show(string.Format("Unable to load full plugin list: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    m_logger.Warn("Duplicate plugin detected.", ex);
+                    MessageBox.Show(T("Error.Plugins", "Unable to load the complete plugin list. Check for duplicate or incompatible plugins."), T("Error.Title", "Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }                
             }
         }
@@ -1087,7 +1096,7 @@ namespace OpenCredential.Configuration
         private void btnLaunchCredUI_Click(object sender, EventArgs e)
         {
             ResetSimUI();
-            System.Net.NetworkCredential credential = pInvokes.GetCredentials("Simulated Login", "Please enter your credentials...");
+            System.Net.NetworkCredential credential = pInvokes.GetCredentials(T("Simulation.Title", "Simulated Login"), T("Simulation.Prompt", "Please enter your credentials..."));
             if (credential != null)
             {
                 ResetStageStatus();
@@ -1170,8 +1179,8 @@ namespace OpenCredential.Configuration
         {            
             if (m_radioUseService.Checked)
             {
-                if (MessageBox.Show("Individual plugin results and results for each stage are unavailable when using the OpenCredential service.  Continue?",
-                                "Warning", MessageBoxButtons.YesNo) != System.Windows.Forms.DialogResult.Yes)
+                if (MessageBox.Show(T("Simulation.ServiceWarning", "Individual plugin results and results for each stage are unavailable when using the OpenCredential service. Continue?"),
+                                T("Common.Warning", "Warning"), MessageBoxButtons.YesNo) != System.Windows.Forms.DialogResult.Yes)
                     return;
 
                 ResetSimUI();
@@ -1179,8 +1188,8 @@ namespace OpenCredential.Configuration
             }
             else
             {
-                if (MessageBox.Show("Continuing will save all pending changes in configuration, do you want to continue?",
-                                "Warning", MessageBoxButtons.YesNo) != System.Windows.Forms.DialogResult.Yes)
+                if (MessageBox.Show(T("Simulation.SaveWarning", "Continuing will save all pending changes in configuration, do you want to continue?"),
+                                T("Common.Warning", "Warning"), MessageBoxButtons.YesNo) != System.Windows.Forms.DialogResult.Yes)
                 {
                     return;
                 }
@@ -1466,7 +1475,8 @@ namespace OpenCredential.Configuration
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                m_logger.Error("Credential provider operation failed.", ex);
+                MessageBox.Show(T("Error.Operation", "Unable to complete the operation. See diagnostic logs."), T("Error.Title", "Error"));
             }
 
             this.UpdateCpStatus();
@@ -1489,7 +1499,8 @@ namespace OpenCredential.Configuration
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                m_logger.Error("Credential provider operation failed.", ex);
+                MessageBox.Show(T("Error.Operation", "Unable to complete the operation. See diagnostic logs."), T("Error.Title", "Error"));
             }
 
             this.UpdateCpStatus();

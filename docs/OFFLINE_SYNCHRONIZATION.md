@@ -2,7 +2,7 @@
 
 ## Estado de la entrega
 
-Cambios locales de Desktop, todavía sin publicar. PostgreSQL y MySQL/MariaDB siguen siendo proveedores directos; no se requiere AdminWeb ni una API para sincronizar. No cambia el contrato público del plugin ni el instalador.
+Funcionalidad incluida en Desktop `v1.0.1.0`. PostgreSQL y MySQL/MariaDB siguen siendo proveedores directos; no se requiere AdminWeb ni una API para sincronizar. No cambia el contrato público del plugin.
 
 La réplica completa ya incluía usuarios que nunca habían iniciado sesión en el equipo. Esta entrega refuerza su actualización y permite consultar su estado. Replica material mínimo de autenticación (identidad, algoritmo/hash protegido, estado y bloqueo), no toda la base SQL ni sus grupos.
 
@@ -49,4 +49,4 @@ Con snapshot previo y una cuenta administrativa local de recuperación:
 4. Recuperar SQL, revocar la cuenta, sincronizar y verificar su rechazo offline. Probar ambos proveedores por separado.
 5. Comprobar sincronización desde configuración y servicio, cierre de ventana durante la operación, recuperación tras error y accesibilidad con Narrador/NVDA y DPI reales.
 
-Las pruebas previas de la versión publicada no sustituyen esta aceptación de los cambios nuevos. No se ha ejecutado el round-trip del diseñador de Visual Studio ni se ha publicado un instalador con esta entrega.
+La confirmación general de funcionamiento del instalador por el propietario para el release estable no sustituye la aceptación específica anterior. No se ha ejecutado el round-trip del diseñador de Visual Studio.

@@ -10,6 +10,12 @@ if ($text -match '(?im)^\s*\[(InstallDelete|UninstallDelete)\]') { throw 'Instal
 if ($text -match '(?im)^Root:.*Subkey:.*(OpenCredential|pGina).*uninsdeletekey') { throw 'Installer must preserve authentication configuration on uninstall.' }
 if ($text -notmatch 'DotNetRelease\s*<\s*528040') { throw '.NET Framework 4.8 requirement is missing.' }
 if ($text -notmatch 'if ExitCode <> 0 then') { throw 'Post-install failure must not be silently ignored.' }
+if ($text -notmatch 'Name: "en";' -or $text -notmatch 'Name: "es";') { throw 'English/Spanish installer languages are required.' }
+foreach ($message in @('RequiredFramework', 'PostInstallLaunch', 'PostInstallFailed', 'UninstallIntegration')) {
+    foreach ($language in @('en', 'es')) {
+        if ($text -notmatch ('(?m)^' + $language + '\.' + $message + '=')) { throw "Missing installer translation: $language.$message" }
+    }
+}
 if (-not (Test-Path -LiteralPath $CompilerPath)) { throw 'Inno Setup 6 compiler is required.' }
 New-Item -ItemType Directory -Force -Path $OutputDirectory | Out-Null
 & $CompilerPath '/Qp' ('/O' + $OutputDirectory) '/FOpenCredentialInstaller-review' $source

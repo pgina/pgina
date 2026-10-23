@@ -58,6 +58,7 @@
     <Compile Include="Configuration.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="..\Localization\PluginPresentation.cs"><Link>PluginPresentation.cs</Link></Compile>
     <Compile Include="Configuration.Designer.cs">
       <DependentUpon>Configuration.cs</DependentUpon>
     </Compile>

@@ -33,16 +33,27 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using OpenCredential.Plugin.Presentation;
 
 namespace OpenCredential.Plugin.SessionLimit
 {
     public partial class Configuration : Form
     {
-        public Configuration()
+        public Configuration() : this(true)
+        {
+        }
+
+        internal Configuration(bool initializeSettings)
         {
             InitializeComponent();
-
-            InitUI();
+            PluginPresentation.Apply(this, "SessionLimit");
+            var body = new Panel { AutoScroll = true };
+            PluginPresentation.Stack(body, PluginPresentation.Fields(globalLimitLbl, globalLimitTB, null, label1));
+            PluginPresentation.Shell(this, body, saveButton, cancelButton);
+            MinimumSize = new Size(500, 240);
+            Size = new Size(620, 280);
+            if (initializeSettings) InitUI();
+            else PluginPresentation.DisablePreviewActions(this);
         }
 
         private void InitUI()
@@ -60,13 +71,13 @@ namespace OpenCredential.Plugin.SessionLimit
             }
             catch( FormatException )
             {
-                MessageBox.Show("Time limit must be a positive integer.");
+                MessageBox.Show(PluginPresentation.Text("SessionLimit", "Error.Limit", "Time limit must be a positive integer."));
                 return false;
             }
 
             if( limit < 0 )
             {
-                MessageBox.Show("Time limit must be a positive integer.");
+                MessageBox.Show(PluginPresentation.Text("SessionLimit", "Error.Limit", "Time limit must be a positive integer."));
                 return false;
             }
 

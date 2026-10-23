@@ -46,16 +46,22 @@ namespace OpenCredential.Plugin.Ldap
     {
         private ILog m_logger = LogManager.GetLogger("Ldap Configuration");
 
-        public Configuration()
+        public Configuration() : this(true) { }
+
+        internal Configuration(bool initializeSettings)
         {
             InitializeComponent();
             
             InitUI();
-            LoadSettings();
-            UpdateSslElements();
-            UpdateAuthenticationElements();
-
-            this.gatewayRuleGroupMemberCB.SelectedIndex = 0;
+            InitializeLocalizedPresentation();
+            if (initializeSettings)
+            {
+                LoadSettings();
+                UpdateSslElements();
+                UpdateAuthenticationElements();
+                this.gatewayRuleGroupMemberCB.SelectedIndex = 0;
+            }
+            else OpenCredential.Plugin.Presentation.PluginPresentation.DisablePreviewActions(this);
         }
 
         private void InitUI()
@@ -69,7 +75,7 @@ namespace OpenCredential.Plugin.Ldap
             {
                 Name = "Attribute Name",
                 DataPropertyName = "Name",
-                HeaderText = "Attribute Name",
+                HeaderText = T("Column.Attribute", "Attribute Name"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
                 ReadOnly = false
             });
@@ -77,7 +83,7 @@ namespace OpenCredential.Plugin.Ldap
             {
                 Name = "Hash Method",
                 DataPropertyName = "HashMethod",
-                HeaderText = "Hash Method",
+                HeaderText = T("Column.Hash", "Hash Method"),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
                 Width = 250,
                 DisplayMember = "Name",
@@ -305,7 +311,7 @@ namespace OpenCredential.Plugin.Ldap
         {
             if (ldapHostTextBox.Text.Trim().Length == 0)
             {
-                MessageBox.Show("Please provide at least one LDAP host");
+                MessageBox.Show(T("Error.Host", "Please provide at least one LDAP host"));
                 return false;
             }
 
@@ -316,7 +322,7 @@ namespace OpenCredential.Plugin.Ldap
             }
             catch (FormatException)
             {
-                MessageBox.Show("The LDAP port number must be a positive integer > 0.");
+                MessageBox.Show(T("Error.Port", "The LDAP port number must be a positive integer > 0."));
                 return false;
             }
 
@@ -327,7 +333,7 @@ namespace OpenCredential.Plugin.Ldap
             }
             catch (FormatException)
             {
-                MessageBox.Show("The timout be a positive integer > 0.");
+                MessageBox.Show(T("Error.Timeout", "The timeout must be a positive integer > 0."));
                 return false;
             }
 
@@ -335,22 +341,21 @@ namespace OpenCredential.Plugin.Ldap
                 sslCertFileTextBox.Text.Trim().Length > 0 &&
                 !(File.Exists(sslCertFileTextBox.Text.Trim())))
             {
-                MessageBox.Show("SSL certificate file does not exist."
-                    + "Please select a valid certificate file.");
+                MessageBox.Show(T("Error.Certificate", "SSL certificate file does not exist. Please select a valid certificate file."));
                 return false;
             }
 
             if (searchForDnCheckBox.Checked &&
                 string.IsNullOrEmpty(searchFilterTextBox.Text.Trim()))
             {
-                MessageBox.Show("Please provide a search filter when \"Search for DN\" is enabled.");
+                MessageBox.Show(T("Error.Filter", "Please provide a search filter when \"Search for DN\" is enabled."));
                 return false;
             }
 
             if (searchForDnCheckBox.Checked &&
                 string.IsNullOrEmpty(searchContextsTextBox.Text.Trim()))
             {
-                MessageBox.Show("Please provide at least one search context when \"Search for DN\" is enabled.");
+                MessageBox.Show(T("Error.Context", "Please provide at least one search context when \"Search for DN\" is enabled."));
                 return false;
             }
 
@@ -359,8 +364,7 @@ namespace OpenCredential.Plugin.Ldap
                 string.IsNullOrEmpty(this.groupDNPattern.Text.Trim()) ||
                 string.IsNullOrEmpty(this.groupMemberAttrTB.Text.Trim())) )
             {
-                MessageBox.Show("WARNING: You should provide a Group DN Pattern and Member Attribute when \n" +
-                    " using one or more group authorization or gateway rules.");
+                MessageBox.Show(T("Error.GroupAttributes", "Provide a Group DN Pattern and Member Attribute when using group authorization or gateway rules."));
             }
 
             if (
@@ -379,7 +383,7 @@ namespace OpenCredential.Plugin.Ldap
                 )
 
             {
-                MessageBox.Show("ERROR: To use the gid Attributes all group info needs to be filled in!");
+                MessageBox.Show(T("Error.Gid", "To use the gid attributes all group info needs to be filled in."));
                 return false;
             }
 
@@ -469,7 +473,7 @@ namespace OpenCredential.Plugin.Ldap
             string grp = this.authzRuleGroupTB.Text.Trim();
             if (string.IsNullOrEmpty(grp))
             {
-                MessageBox.Show("Please enter a group name.");
+                MessageBox.Show(T("Error.Group", "Please enter a group name."));
                 return;
             }
 
@@ -497,7 +501,7 @@ namespace OpenCredential.Plugin.Ldap
             string localGrp = this.gatewayLocalGroupTB.Text.Trim();
             if (string.IsNullOrEmpty(localGrp))
             {
-                MessageBox.Show("Please enter a group name");
+                MessageBox.Show(T("Error.Group", "Please enter a group name"));
                 return;
             }
             int idx = this.gatewayRuleGroupMemberCB.SelectedIndex;
@@ -517,7 +521,7 @@ namespace OpenCredential.Plugin.Ldap
                 string remoteGroup = this.gatwayRemoteGroupTB.Text.Trim();
                 if (string.IsNullOrEmpty(remoteGroup))
                 {
-                    MessageBox.Show("Please enter a remote group name");
+                    MessageBox.Show(T("Error.RemoteGroup", "Please enter a remote group name"));
                     return;
                 }
                 this.gatewayRulesListBox.Items.Add(new GroupGatewayRule(remoteGroup, c, localGrp));

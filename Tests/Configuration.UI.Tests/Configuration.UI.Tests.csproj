@@ -12,6 +12,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="OpenCredential.Shared"><HintPath>..\..\OpenCredential\src\bin\OpenCredential.Shared.dll</HintPath></Reference>
     <Compile Include="Program.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

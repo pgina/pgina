@@ -46,13 +46,29 @@ namespace OpenCredential.Plugin.DatabaseLogger
         private Label m_presenceStatePathLabel;
         private TextBox m_presenceStatePathTB;
         private bool m_hasStoredPassword;
+        private Label m_tlsLabel;
 
-        public Configuration()
+        public Configuration() : this(true)
+        {
+        }
+
+        internal Configuration(bool initializeSettings)
         {
             InitializeComponent();
             InitializeProviderControls();
             InitializePresenceControls();
-            InitUI();
+            InitializeLocalizedPresentation();
+            if (initializeSettings) InitUI();
+            else DisablePreviewButtons(this);
+        }
+
+        private static void DisablePreviewButtons(Control parent)
+        {
+            foreach (Control control in parent.Controls)
+            {
+                if (control is Button) control.Enabled = false;
+                DisablePreviewButtons(control);
+            }
         }
 
         private void InitializeProviderControls()
@@ -121,7 +137,8 @@ namespace OpenCredential.Plugin.DatabaseLogger
             this.optionsBox.Controls.Add(m_presenceStatePathLabel);
             this.optionsBox.Controls.Add(m_presenceStatePathTB);
 
-            var sslLabel = new Label { AutoSize = true, Location = new Point(6, 179), Text = "TLS mode:" };
+            var sslLabel = new Label { Name = "tlsLabel", AutoSize = true, Location = new Point(6, 179), Text = "TLS mode:" };
+            m_tlsLabel = sslLabel;
             m_sslModeCB = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Location = new Point(73, 175), Size = new Size(160, 21), Name = "sslModeCB", AccessibleName = "Database TLS mode" };
             m_sslModeCB.Items.AddRange(new object[] { "None", "Required", "VerifyCA", "VerifyFull" });
             this.optionsBox.Controls.Add(sslLabel);
@@ -219,7 +236,7 @@ namespace OpenCredential.Plugin.DatabaseLogger
             }
             catch (FormatException)
             {
-                MessageBox.Show("Invalid port number.");
+                MessageBox.Show(T("Error.Port", "Invalid port number."));
                 return false;
             }
 
@@ -231,45 +248,45 @@ namespace OpenCredential.Plugin.DatabaseLogger
             }
             catch (FormatException)
             {
-                MessageBox.Show("Heartbeat, health check and flush batch must be positive integers.");
+                MessageBox.Show(T("Error.Intervals", "Heartbeat, health check and flush batch must be positive integers."));
                 return false;
             }
 
             if (healthCheckSeconds < 5)
             {
-                MessageBox.Show("Health check must be at least 5 seconds.");
+                MessageBox.Show(T("Error.Health", "Health check must be at least 5 seconds."));
                 return false;
             }
 
             if (flushBatchSize < 1)
             {
-                MessageBox.Show("Flush batch must be at least 1.");
+                MessageBox.Show(T("Error.Batch", "Flush batch must be at least 1."));
                 return false;
             }
 
             if (heartbeatIntervalSeconds < 15)
             {
-                MessageBox.Show("Heartbeat interval must be at least 15 seconds.");
+                MessageBox.Show(T("Error.Heartbeat", "Heartbeat interval must be at least 15 seconds."));
                 return false;
             }
 
             if (sessionModeCB.Checked && eventModeCB.Checked
                 && sessionTableTB.Text.Trim() == eventTableTB.Text.Trim())
             {
-                MessageBox.Show("The Event Table must be different from the Session Table.");
+                MessageBox.Show(T("Error.Tables", "The Event Table must be different from the Session Table."));
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(this.passwdTB.Text) && !m_hasStoredPassword)
             {
-                MessageBox.Show("Please enter a database password.");
+                MessageBox.Show(T("Error.Password", "Please enter a database password."));
                 return false;
             }
 
             Settings.DatabaseProvider provider;
             if (!Enum.TryParse(Convert.ToString(m_providerCB.SelectedItem), out provider))
             {
-                MessageBox.Show("Please select a valid database provider.");
+                MessageBox.Show(T("Error.Provider", "Please select a valid database provider."));
                 return false;
             }
 
@@ -325,13 +342,13 @@ namespace OpenCredential.Plugin.DatabaseLogger
                 if (Settings.GetSessionMode())
                 {
                     ILoggerMode mode = LoggerModeFactory.getLoggerMode(LoggerMode.SESSION);
-                    sessionModeMsg = mode.TestTable();
+                    sessionModeMsg = DiagnosticResult(mode.TestTable());
                 }
 
                 if (Settings.GetEventMode())
                 {
                     ILoggerMode mode = LoggerModeFactory.getLoggerMode(LoggerMode.EVENT);
-                    eventModeMsg = mode.TestTable();
+                    eventModeMsg = DiagnosticResult(mode.TestTable());
                 }
 
                 //Show one or both messages
@@ -339,7 +356,7 @@ namespace OpenCredential.Plugin.DatabaseLogger
                 {
                     MessageBox.Show(
                         String.Format(
-                            "Event Mode Table: {0}\nSession Mode Table: {1}\n\n{2}",
+                            T("Report.BothWithQueue", "Event Mode Table: {0}\nSession Mode Table: {1}\n\n{2}"),
                             eventModeMsg,
                             sessionModeMsg,
                             OfflineLogQueue.TestConfiguration()));
@@ -351,7 +368,8 @@ namespace OpenCredential.Plugin.DatabaseLogger
             }
             catch (Exception ex)
             {
-                MessageBox.Show(String.Format("The following error occurred: {0}", ex.Message));
+                log4net.LogManager.GetLogger("DatabaseLogger.Configuration").WarnFormat("Database test failed ({0}).", ex.GetType().Name);
+                MessageBox.Show(T("Error.Database", "The database operation failed. Check connection settings, TLS and permissions."));
             }
 
             //Since the server info may change, close the connection
@@ -370,19 +388,19 @@ namespace OpenCredential.Plugin.DatabaseLogger
                 if (Settings.GetSessionMode())
                 {
                     ILoggerMode mode = LoggerModeFactory.getLoggerMode(LoggerMode.SESSION);
-                    sessionModeMsg = mode.CreateTable();
+                    sessionModeMsg = DiagnosticResult(mode.CreateTable());
                 }
 
                 if (Settings.GetEventMode())
                 {
                     ILoggerMode mode = LoggerModeFactory.getLoggerMode(LoggerMode.EVENT);
-                    eventModeMsg = mode.CreateTable();
+                    eventModeMsg = DiagnosticResult(mode.CreateTable());
                 }
 
                 //Show one or both messages
                 if (sessionModeMsg != null && eventModeMsg != null)
                 {
-                    MessageBox.Show(String.Format("Event Mode Table: {0}\nSession Mode Table: {1}", eventModeMsg, sessionModeMsg));
+                    MessageBox.Show(String.Format(T("Report.Both", "Event Mode Table: {0}\nSession Mode Table: {1}"), eventModeMsg, sessionModeMsg));
                 } 
                 else
                 {
@@ -391,7 +409,8 @@ namespace OpenCredential.Plugin.DatabaseLogger
             }
             catch (Exception ex)
             {
-                MessageBox.Show(string.Format("The following error occurred: {0}", ex.Message));
+                log4net.LogManager.GetLogger("DatabaseLogger.Configuration").WarnFormat("Database table operation failed ({0}).", ex.GetType().Name);
+                MessageBox.Show(T("Error.Database", "The database operation failed. Check connection settings, TLS and permissions."));
             }
 
             //Since the server info may change, close the current connection

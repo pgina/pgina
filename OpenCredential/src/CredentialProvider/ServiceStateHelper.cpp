@@ -26,6 +26,7 @@
 */
 
 #include "ServiceStateHelper.h"
+#include "NativeLanguage.h"
 
 namespace OpenCredential
 {
@@ -54,11 +55,11 @@ namespace OpenCredential
 		{
 			if(s_serviceStateThread.IsServiceRunning())
 			{
-				return L"OpenCredential service connected.";
+                return OpenCredential::Localization::Text(L"OpenCredential service connected.");
 			}
 			else
 			{
-				return L"OpenCredential service is starting or temporarily unavailable. You can continue signing in, and offline sign-in will work when cached credentials are available.";
+                return OpenCredential::Localization::Text(L"OpenCredential service is starting or temporarily unavailable. You can continue signing in, and offline sign-in will work when cached credentials are available.");
 			}
 		}			
 

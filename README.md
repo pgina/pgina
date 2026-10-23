@@ -11,10 +11,11 @@ OpenCredential is an open-source Windows Credential Provider with managed plugin
 - LDAP and local Windows account integration.
 - Group-based access rules, active-user checks and configurable login lockout.
 - Optional DPAPI-protected offline authentication and queued session logging.
+- English/Spanish configuration and sign-in text, importable configuration language packs and developer/license credits.
 
 ## Install and evaluate
 
-**Current evaluation build: [v1.0.1.0-rc.1](https://github.com/pedropablobm/OpenCredential/releases/tag/v1.0.1.0-rc.1). This is a prerelease and the installer is unsigned.** Trusted signing is pending provider approval, not yet available.
+**Current stable release: [v1.0.1.0](https://github.com/pedropablobm/OpenCredential/releases/tag/v1.0.1.0). The installer is unsigned.** Trusted signing is pending provider approval, not yet available. The earlier `v1.0.1.0-rc.1` prerelease remains available unchanged.
 
 Requirements: Windows 10 21H2+ or Windows 11 22H2+, .NET Framework 4.8 and Microsoft Visual C++ v14 runtimes. The installer includes the x86/x64 VC++ redistributables.
 
@@ -49,6 +50,7 @@ Projects default to `v145`; omit `-PlatformToolset` when using that installed to
 | Database setup, schema, TLS, hashing and troubleshooting | [Configuration reference](docs/REFERENCE.md) |
 | Upgrade, offline policy and rollback precautions | [Stabilization](STABILIZATION.md) |
 | Complete offline copy, synchronization status and first-login limits | [Offline synchronization](docs/OFFLINE_SYNCHRONIZATION.md) |
+| Interface languages, importing translations and developer credits | [Languages and About](docs/LANGUAGES.md) |
 | Validation evidence and pending acceptance | [QA readiness](QA_READINESS.md) · [VM testing](Tests/Guest-README.md) |
 | Signing status and manual approval policy | [Code signing](CODE_SIGNING.md) · [Setup guide](docs/signing/README.md) |
 | Data processing and retention | [Privacy draft](PRIVACY.md) |

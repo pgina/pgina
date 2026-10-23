@@ -64,6 +64,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
             InitializeComponent();
             InitializeProviderControls();
             InitializeOfflineStatusControls(!initializeSettings);
+            InitializeLocalizedPresentation();
             if (initializeSettings)
             {
                 InitUI();
@@ -223,7 +224,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
             }
             catch (Exception)
             {
-                MessageBox.Show("The port must be a positive integer.");
+                MessageBox.Show(T("Error.Port", "The port must be a positive integer."));
                 return false;
             }
 
@@ -234,19 +235,19 @@ namespace OpenCredential.Plugin.DatabaseAuth
             }
             catch (Exception)
             {
-                MessageBox.Show("Sync interval and health check must be positive integers.");
+                MessageBox.Show(T("Error.Intervals", "Sync interval and health check must be positive integers."));
                 return false;
             }
 
             if (syncIntervalMinutes < 1)
             {
-                MessageBox.Show("Sync interval must be at least 1 minute.");
+                MessageBox.Show(T("Error.SyncInterval", "Sync interval must be at least 1 minute."));
                 return false;
             }
 
             if (healthCheckSeconds < 5)
             {
-                MessageBox.Show("Health check must be at least 5 seconds.");
+                MessageBox.Show(T("Error.Health", "Health check must be at least 5 seconds."));
                 return false;
             }
 
@@ -259,13 +260,13 @@ namespace OpenCredential.Plugin.DatabaseAuth
                 }
                 catch (Exception)
                 {
-                    MessageBox.Show("Login lockout values must be positive integers.");
+                    MessageBox.Show(T("Error.LockoutInteger", "Login lockout values must be positive integers."));
                     return false;
                 }
 
                 if (maxFailedAttempts < 1 || lockoutMinutes < 1)
                 {
-                    MessageBox.Show("Login lockout values must be at least 1.");
+                    MessageBox.Show(T("Error.LockoutMinimum", "Login lockout values must be at least 1."));
                     return false;
                 }
             }
@@ -273,7 +274,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
             if (this.enforceStatusCB.Checked &&
                 (string.IsNullOrWhiteSpace(this.statusColTB.Text) || string.IsNullOrWhiteSpace(this.activeValueTB.Text)))
             {
-                MessageBox.Show("User status validation requires both status column and active value.");
+                MessageBox.Show(T("Error.Status", "User status validation requires both status column and active value."));
                 return false;
             }
 
@@ -282,27 +283,27 @@ namespace OpenCredential.Plugin.DatabaseAuth
                  string.IsNullOrWhiteSpace(this.blockedUntilColTB.Text) ||
                  string.IsNullOrWhiteSpace(this.lastAttemptColTB.Text)))
             {
-                MessageBox.Show("Login lockout requires attempts, blocked-until and last-attempt columns.");
+                MessageBox.Show(T("Error.LockoutColumns", "Login lockout requires attempts, blocked-until and last-attempt columns."));
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(this.passwordTB.Text) && !m_hasStoredPassword)
             {
-                MessageBox.Show("Please enter a database password.");
+                MessageBox.Show(T("Error.Password", "Please enter a database password."));
                 return false;
             }
 
             MySqlSslMode sslMode;
             if (!Enum.TryParse(this.sslModeCB.Text, true, out sslMode))
             {
-                MessageBox.Show("Please select a valid TLS mode.");
+                MessageBox.Show(T("Error.Tls", "Please select a valid TLS mode."));
                 return false;
             }
 
             Settings.DatabaseProvider provider;
             if (!Enum.TryParse(Convert.ToString(this.m_providerCB.SelectedItem), out provider))
             {
-                MessageBox.Show("Please select a valid database provider.");
+                MessageBox.Show(T("Error.Provider", "Please select a valid database provider."));
                 return false;
             }
 
@@ -401,7 +402,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
                 return;
             }
 
-            infoDlg.AppendLine(string.Format("Beginning test of {0} database...", GetSelectedProviderDisplayName()) + Environment.NewLine);
+            infoDlg.AppendLine(string.Format(T("Report.Begin", "Beginning test of {0} database..."), GetSelectedProviderDisplayName()) + Environment.NewLine);
             MySqlConnection conn = null;
             string tableName = this.userTableTB.Text.Trim();
             try
@@ -409,13 +410,13 @@ namespace OpenCredential.Plugin.DatabaseAuth
                 string connStr = this.BuildConnectionString();
                 if (connStr == null) return;
                 
-                infoDlg.AppendLine("Connection Status");
+                infoDlg.AppendLine(T("Report.Connection", "Connection Status"));
                 infoDlg.AppendLine("-------------------------------------");
 
                 conn = new MySqlConnection(connStr);
                 conn.Open();
 
-                infoDlg.AppendLine(string.Format("Connection to {0} successful.", this.hostTB.Text.Trim()));
+                infoDlg.AppendLine(string.Format(T("Report.Connected", "Connection to {0} successful."), this.hostTB.Text.Trim()));
 
                 // Variables to be used repeatedly below
                 MySqlCommand cmd = null;
@@ -438,7 +439,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
                     if (string.IsNullOrEmpty(cipher))
                     {
-                        infoDlg.AppendLine("TLS mode configured, but no cipher is active.");
+                        infoDlg.AppendLine(T("Report.NoCipher", "TLS mode configured, but no cipher is active."));
                     }
                     else
                     {
@@ -447,22 +448,22 @@ namespace OpenCredential.Plugin.DatabaseAuth
                 }
                 else
                 {
-                    infoDlg.AppendLine("TLS disabled.");
+                    infoDlg.AppendLine(T("Report.NoTls", "TLS disabled."));
                 }
 
-                infoDlg.AppendLine( Environment.NewLine + "User Table" );
+                infoDlg.AppendLine(Environment.NewLine + T("Control.tabPage1", "User Table"));
                 infoDlg.AppendLine( "-------------------------------");
                 CheckTable(tableName,
                     BuildUserTableColumns(),
                     infoDlg, conn);
 
-                infoDlg.AppendLine(Environment.NewLine + "Group Table");
+                infoDlg.AppendLine(Environment.NewLine + T("Control.tabPage2", "Group Table"));
                 infoDlg.AppendLine("-------------------------------");
                 CheckTable(this.groupTableNameTB.Text.Trim(),
                     new string[] { this.groupNameColTB.Text.Trim(), this.groupTablePrimaryKeyColTB.Text.Trim() },
                     infoDlg, conn);
 
-                infoDlg.AppendLine(Environment.NewLine + "User-Group Table");
+                infoDlg.AppendLine(Environment.NewLine + T("Control.tabPage3", "User-Group Table"));
                 infoDlg.AppendLine("-------------------------------");
                 CheckTable(this.userGroupTableNameTB.Text.Trim(),
                     new string[] { this.userGroupUserFKColTB.Text.Trim(), this.userGroupGroupFKColTB.Text.Trim() },
@@ -472,22 +473,14 @@ namespace OpenCredential.Plugin.DatabaseAuth
             }
             catch (Exception ex)
             {
-                if (ex is MySqlException)
-                {
-                    MySqlException mysqlEx = ex as MySqlException;
-                    infoDlg.AppendLine("DATABASE ERROR: " + mysqlEx.Message);
-                }
-                else
-                {
-                    infoDlg.AppendLine(string.Format("ERROR: A fatal error occured: {0}", ex));
-                }
+                infoDlg.AppendLine(DatabaseErrorMessage(ex));
             }
             finally
             {
-                infoDlg.AppendLine(Environment.NewLine + "Closing connection.");
+                infoDlg.AppendLine(Environment.NewLine + T("Report.Closing", "Closing connection."));
                 if (conn != null)
                     conn.Close();
-                infoDlg.AppendLine("Test complete.");
+                infoDlg.AppendLine(T("Report.Complete", "Test complete."));
             }
         }
 
@@ -498,12 +491,12 @@ namespace OpenCredential.Plugin.DatabaseAuth
             if (tableExists)
             {
                 m_logger.DebugFormat("Table \"{0}\" found.", tableName);
-                infoDlg.AppendLine(string.Format("Table \"{0}\" found.", tableName));
+                infoDlg.AppendLine(string.Format(T("Report.TableFound", "Table \"{0}\" found."), tableName));
             }
             else
             {
                 m_logger.DebugFormat("Table {0} not found.", tableName);
-                infoDlg.AppendLine(string.Format("ERROR: Table \"{0}\" not found.", tableName));
+                infoDlg.AppendLine(string.Format(T("Report.TableMissing", "ERROR: Table \"{0}\" not found."), tableName));
                 return;
             }
 
@@ -526,16 +519,16 @@ namespace OpenCredential.Plugin.DatabaseAuth
                 foreach (string c in columnNames)
                 {
                     if (columnNamesFromDB.Contains(c, StringComparer.CurrentCultureIgnoreCase))
-                        infoDlg.AppendLine(string.Format("Found column \"{0}\"", c));
+                        infoDlg.AppendLine(string.Format(T("Report.ColumnFound", "Found column \"{0}\""), c));
                     else
                     {
                         ok = false;
-                        infoDlg.AppendLine(string.Format("ERROR: Column \"{0}\" not found!", c));
+                        infoDlg.AppendLine(string.Format(T("Report.ColumnMissing", "ERROR: Column \"{0}\" not found!"), c));
                     }
                 }
 
                 if (!ok)
-                    infoDlg.AppendLine(string.Format("ERROR: Table \"{0}\" schema looks incorrect.", tableName));
+                    infoDlg.AppendLine(string.Format(T("Report.SchemaInvalid", "ERROR: Table \"{0}\" schema looks incorrect."), tableName));
             }
         }
 
@@ -705,7 +698,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
             }
             catch (MySqlException ex)
             {
-                infoDlg.AppendLine(String.Format("ERROR: {0}", ex.Message));
+                infoDlg.AppendLine(DatabaseErrorMessage(ex));
             }
             finally
             {
@@ -896,7 +889,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
             }
             catch (FormatException)
             {
-                MessageBox.Show("Invalid port number.");
+                MessageBox.Show(T("Error.Port", "Invalid port number."));
                 return null;
             }
 
@@ -961,7 +954,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
         private void TestPostgreSql(TextBoxInfoDialog infoDlg)
         {
-            infoDlg.AppendLine(string.Format("Beginning test of {0} database...", GetSelectedProviderDisplayName()) + Environment.NewLine);
+            infoDlg.AppendLine(string.Format(T("Report.Begin", "Beginning test of {0} database..."), GetSelectedProviderDisplayName()) + Environment.NewLine);
             NpgsqlConnection conn = null;
             try
             {
@@ -969,26 +962,26 @@ namespace OpenCredential.Plugin.DatabaseAuth
                 if (connStr == null)
                     return;
 
-                infoDlg.AppendLine("Connection Status");
+                infoDlg.AppendLine(T("Report.Connection", "Connection Status"));
                 infoDlg.AppendLine("-------------------------------------");
 
                 conn = new NpgsqlConnection(connStr);
                 conn.Open();
 
-                infoDlg.AppendLine(string.Format("Connection to {0} successful.", this.hostTB.Text.Trim()));
+                infoDlg.AppendLine(string.Format(T("Report.Connected", "Connection to {0} successful."), this.hostTB.Text.Trim()));
                 infoDlg.AppendLine(string.Format("SSL mode: {0}", MapPostgreSqlSslMode(Settings.GetSslMode())));
 
-                infoDlg.AppendLine(Environment.NewLine + "User Table");
+                infoDlg.AppendLine(Environment.NewLine + T("Control.tabPage1", "User Table"));
                 infoDlg.AppendLine("-------------------------------");
                 CheckTable(this.userTableTB.Text.Trim(), BuildUserTableColumns(), infoDlg, conn);
 
-                infoDlg.AppendLine(Environment.NewLine + "Group Table");
+                infoDlg.AppendLine(Environment.NewLine + T("Control.tabPage2", "Group Table"));
                 infoDlg.AppendLine("-------------------------------");
                 CheckTable(this.groupTableNameTB.Text.Trim(),
                     new string[] { this.groupNameColTB.Text.Trim(), this.groupTablePrimaryKeyColTB.Text.Trim() },
                     infoDlg, conn);
 
-                infoDlg.AppendLine(Environment.NewLine + "User-Group Table");
+                infoDlg.AppendLine(Environment.NewLine + T("Control.tabPage3", "User-Group Table"));
                 infoDlg.AppendLine("-------------------------------");
                 CheckTable(this.userGroupTableNameTB.Text.Trim(),
                     new string[] { this.userGroupUserFKColTB.Text.Trim(), this.userGroupGroupFKColTB.Text.Trim() },
@@ -998,14 +991,14 @@ namespace OpenCredential.Plugin.DatabaseAuth
             }
             catch (Exception ex)
             {
-                infoDlg.AppendLine(string.Format("ERROR: A fatal error occurred: {0}", ex));
+                infoDlg.AppendLine(DatabaseErrorMessage(ex));
             }
             finally
             {
-                infoDlg.AppendLine(Environment.NewLine + "Closing connection.");
+                infoDlg.AppendLine(Environment.NewLine + T("Report.Closing", "Closing connection."));
                 if (conn != null)
                     conn.Close();
-                infoDlg.AppendLine("Test complete.");
+                infoDlg.AppendLine(T("Report.Complete", "Test complete."));
             }
         }
 
@@ -1014,11 +1007,11 @@ namespace OpenCredential.Plugin.DatabaseAuth
             bool tableExists = this.TableExists(tableName, conn);
             if (!tableExists)
             {
-                infoDlg.AppendLine(string.Format("ERROR: Table \"{0}\" not found.", tableName));
+                infoDlg.AppendLine(string.Format(T("Report.TableMissing", "ERROR: Table \"{0}\" not found."), tableName));
                 return;
             }
 
-            infoDlg.AppendLine(string.Format("Table \"{0}\" found.", tableName));
+            infoDlg.AppendLine(string.Format(T("Report.TableFound", "Table \"{0}\" found."), tableName));
             List<string> columnNamesFromDb = new List<string>();
 
             using (NpgsqlCommand cmd = new NpgsqlCommand(
@@ -1037,16 +1030,16 @@ namespace OpenCredential.Plugin.DatabaseAuth
             foreach (string columnName in columnNames)
             {
                 if (columnNamesFromDb.Contains(columnName, StringComparer.CurrentCultureIgnoreCase))
-                    infoDlg.AppendLine(string.Format("Found column \"{0}\"", columnName));
+                    infoDlg.AppendLine(string.Format(T("Report.ColumnFound", "Found column \"{0}\""), columnName));
                 else
                 {
                     ok = false;
-                    infoDlg.AppendLine(string.Format("ERROR: Column \"{0}\" not found!", columnName));
+                    infoDlg.AppendLine(string.Format(T("Report.ColumnMissing", "ERROR: Column \"{0}\" not found!"), columnName));
                 }
             }
 
             if (!ok)
-                infoDlg.AppendLine(string.Format("ERROR: Table \"{0}\" schema looks incorrect.", tableName));
+                infoDlg.AppendLine(string.Format(T("Report.SchemaInvalid", "ERROR: Table \"{0}\" schema looks incorrect."), tableName));
         }
 
         private void CreatePostgreSqlTables()
@@ -1080,7 +1073,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
             }
             catch (Exception ex)
             {
-                infoDlg.AppendLine(string.Format("ERROR: {0}", ex.Message));
+                infoDlg.AppendLine(DatabaseErrorMessage(ex));
             }
             finally
             {
@@ -1360,8 +1353,8 @@ namespace OpenCredential.Plugin.DatabaseAuth
             bool isMySql = provider == Settings.DatabaseProvider.MySql;
             this.label21.Enabled = isMySql;
             this.sslModeCB.Enabled = true;
-            this.groupBox1.Text = "Database Server";
-            this.label4.Text = "Database:";
+            this.groupBox1.Text = T("Control.groupBox1", "Database Server");
+            this.label4.Text = T("Control.label4", "Database:");
         }
 
         private string GetSelectedProviderDisplayName()
@@ -1422,7 +1415,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
             string localGrp = this.gtwRuleLocalGroupTB.Text.Trim();
             if (string.IsNullOrEmpty(localGrp))
             {
-                MessageBox.Show("Please enter a local group name");
+                MessageBox.Show(T("Error.LocalGroup", "Please enter a local group name"));
                 return;
             }
             int idx = this.gtwRuleConditionCB.SelectedIndex;
@@ -1441,7 +1434,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
                 string remoteGroup = this.gtwRuleMysqlGroupTB.Text.Trim();
                 if (string.IsNullOrEmpty(remoteGroup))
                 {
-                    MessageBox.Show("Please enter a remote group name");
+                    MessageBox.Show(T("Error.RemoteGroup", "Please enter a remote group name"));
                     return;
                 }
                 this.gtwRulesListBox.Items.Add(new GroupGatewayRule(remoteGroup, c, localGrp));
@@ -1464,7 +1457,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
             string grp = this.tbAuthzRuleGroup.Text.Trim();
             if (string.IsNullOrEmpty(grp))
             {
-                MessageBox.Show("Please enter a group name.");
+                MessageBox.Show(T("Error.Group", "Please enter a group name."));
                 return;
             }
 

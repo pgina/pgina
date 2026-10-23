@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.1.0] - 2026-10-23
+
+Stable Desktop release authorized after the owner reported successful execution of the local evaluation installer. The installer remains unsigned; this is not certification of every supported platform, accessibility combination or third-party plugin. Includes the fixes from 1.0.1.0-rc.1, preserved below.
+
+- Complete the remaining official plugin windows (LDAP, LocalMachine and DriveMapper), rule presentation and table-test summaries in English/Spanish without changing serialized policies, identifiers or authentication. Translate the log-viewer chrome; preserve raw SQL/log payloads.
+- Add a separate machine-wide automatic/English/Spanish selector for built-in native Windows sign-in text, labels, service state and password-change messages. Native UI uses bounded registry reads and embedded text, not external XML; preserve custom messages and plugin responses. Add x64/Win32 presentation regressions alongside credential serialization tests.
+- Add Spanish installer dialogs, dependency prompts and post-install errors while retaining the original license and data-preservation behavior.
+- Make the extra administrator-password prompt for configuration opt-in from General, disabled by default. Retain administrator/UAC requirements and same-account verification when enabled; store the machine policy in HKLM and deny access if it is invalid or unreadable.
+- Extend UI localization to Database Auth, Database Logger, SessionLimit, SingleUser and Sample, including validation messages, offline status and flexible layouts; keep stored provider/TLS/UUID values unchanged. Add isolated bilingual plugin UI tests without touching real settings, caches or SQL.
+- Add a text-only XML language catalog with built-in English/Spanish fallback, per-user configuration language selection and validated import without changing authentication or data culture. Localize the main configuration interface, administrator prompts and common configuration errors.
+- Add a localized About dialog crediting Yuri Mercedes Bermúdez Mazuera and Pedro Pablo Bermúdez Medina, with the exact embedded LICENSE/NOTICE available offline and preserved pGina attribution.
 - Commit complete offline user snapshots and synchronization metadata atomically; preserve the previous copy on failed, interrupted, null or duplicate responses. Reject a disconnected MySQL source instead of treating it as an empty snapshot.
 - Coordinate automatic/manual cache synchronization across processes and add Database Auth offline availability status, manual synchronization and a 1–168 hour maximum record age setting. Registered users replicated before an outage can authenticate against the cache without a previous login on that PC; complete Windows first-login acceptance remains pending.
 - Add cache rollback, first-use offline, cross-process synchronization and future-timestamp regressions; bound synthetic UI tests with stage diagnostics and an executable-only timeout.
