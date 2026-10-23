@@ -1,0 +1,69 @@
+name: Desktop unsigned build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+# No signing secrets, release publishing, privileged PR triggers or self-hosted runners.
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-unsigned-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: windows-2025
+    timeout-minutes: 45
+    env:
+      # Allow long source paths on Windows. Apply Git's setting to this job
+      # only, never the developer's global configuration.
+      GIT_CONFIG_COUNT: '1'
+      GIT_CONFIG_KEY_0: core.longpaths
+      GIT_CONFIG_VALUE_0: 'true'
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Check out the exact workflow commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Restore pinned NuGet dependencies
+        run: .\scripts\ci\Restore-DesktopDependencies.ps1
+
+      - name: Build Desktop x64, Win32 and core plugins
+        run: .\Build-OpenCredential.ps1 -Configuration Release -PlatformToolset v143
+
+      - name: Test native credential serialization x64 and Win32
+        run: .\Tests\Test-CredentialSerialization.ps1 -PlatformToolset v143
+
+      - name: Test offline cache and plugin type loading
+        run: .\Tests\Test-Desktop.ps1
+
+      - name: Test VM installation-script guards without installing
+        run: .\Tests\Test-GuestScript.ps1
+
+      - name: Validate installer compilation without running it
+        run: .\Tests\Test-Installer.ps1 -OutputDirectory "$env:RUNNER_TEMP\opencredential-installer-check"
+
+      - name: Package unsigned installer and provenance metadata
+        if: github.event_name != 'pull_request'
+        run: .\scripts\ci\New-UnsignedArtifact.ps1 -OutputDirectory "$env:RUNNER_TEMP\opencredential-unsigned" -PlatformToolset v143
+
+      - name: Upload unsigned evaluation artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: opencredential-unsigned-${{ github.sha }}
+          path: ${{ runner.temp }}/opencredential-unsigned/*
+          if-no-files-found: error
+          include-hidden-files: false
+          retention-days: 7
+          compression-level: 0

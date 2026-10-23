@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Prepare unsigned Windows CI builds and manual-approval signing/privacy policies; SignPath acceptance and trusted signing remain pending.
+- Restore pinned NuGet dependencies instead of tracking package caches; preserve local copies and required installer/native/SDK dependencies.
+- Shorten the project README and move detailed setup/troubleshooting to `docs/REFERENCE.md`.
+
 ## [1.0.1.0-rc.1] - 2026-10-21
 
 Prerelease for evaluation. The installer is not Authenticode-signed. Windows 11 Pro VM validation does not certify all supported platforms or third-party plugins.

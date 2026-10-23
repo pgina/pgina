@@ -33,6 +33,7 @@ build/
 *.user
 *.userosscache
 *.sln.docstates
+*.pdb
 UpgradeLog*.htm
 **/bin/
 **/obj/

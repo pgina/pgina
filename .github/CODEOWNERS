@@ -1,0 +1,12 @@
+# Review ownership; enforcement requires branch rules configured by the owner.
+/.github/ @pedropablobm
+/Build-OpenCredential.ps1 @pedropablobm
+/OpenCredentialBuild.msbuild.xml @pedropablobm
+/Installer/ @pedropablobm
+/scripts/ci/ @pedropablobm
+/Tests/ @pedropablobm
+/CODE_SIGNING.md @pedropablobm
+/PRIVACY.md @pedropablobm
+/docs/signing/ @pedropablobm
+/LICENSE @pedropablobm
+/NOTICE @pedropablobm

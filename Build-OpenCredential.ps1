@@ -2,7 +2,9 @@ param(
     [string]$Configuration = "Release",
     [string]$Platform = "Mixed Platforms",
     [string]$Target = "BuildAll",
-    [string]$MSBuildPath = ""
+    [string]$MSBuildPath = "",
+    [ValidatePattern('^(|v[0-9]+)$')]
+    [string]$PlatformToolset = ""
 )
 
 $buildProjectPath = Join-Path $PSScriptRoot "OpenCredentialBuild.msbuild.xml"
@@ -25,6 +27,7 @@ if ([string]::IsNullOrWhiteSpace($msbuildPath) -or -not (Test-Path $msbuildPath)
 $psi = New-Object System.Diagnostics.ProcessStartInfo
 $psi.FileName = $msbuildPath
 $psi.Arguments = ('"{0}" /t:{1} /p:Configuration={2} /m:1' -f $buildProjectPath, $Target, $Configuration)
+if ($PlatformToolset) { $psi.Arguments += ' /p:PlatformToolset=' + $PlatformToolset }
 $psi.UseShellExecute = $false
 $psi.RedirectStandardOutput = $true
 $psi.RedirectStandardError = $true
