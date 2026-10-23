@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Commit complete offline user snapshots and synchronization metadata atomically; preserve the previous copy on failed, interrupted, null or duplicate responses. Reject a disconnected MySQL source instead of treating it as an empty snapshot.
+- Coordinate automatic/manual cache synchronization across processes and add Database Auth offline availability status, manual synchronization and a 1–168 hour maximum record age setting. Registered users replicated before an outage can authenticate against the cache without a previous login on that PC; complete Windows first-login acceptance remains pending.
+- Add cache rollback, first-use offline, cross-process synchronization and future-timestamp regressions; bound synthetic UI tests with stage diagnostics and an executable-only timeout.
+- Improve Desktop configuration accessibility: system-color status text, named controls, keyboard-friendly tables and explicit action labels; use scrollable layouts and keep save/close actions visible when resizing.
+- Add isolated WinForms layout/accessibility regressions without initializing real registry settings, services or authentication plugins.
 - Prepare unsigned Windows CI builds and manual-approval signing/privacy policies; SignPath acceptance and trusted signing remain pending.
 - Restore pinned NuGet dependencies instead of tracking package caches; preserve local copies and required installer/native/SDK dependencies.
 - Shorten the project README and move detailed setup/troubleshooting to `docs/REFERENCE.md`.

@@ -149,6 +149,9 @@
     <Compile Include="Configuration.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Configuration.OfflineStatus.cs">
+      <DependentUpon>Configuration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Configuration.Designer.cs">
       <DependentUpon>Configuration.cs</DependentUpon>
     </Compile>
@@ -157,6 +160,8 @@
     <Compile Include="GroupRules.cs" />
     <Compile Include="IUserDataSource.cs" />
     <Compile Include="LocalUserCache.cs" />
+    <Compile Include="OfflineCacheStatus.cs" />
+    <Compile Include="CacheSynchronization.cs" />
     <Compile Include="MySqlUserDataSource.cs" />
     <Compile Include="PostgreSqlUserDataSource.cs" />
     <Compile Include="PluginImpl.cs" />

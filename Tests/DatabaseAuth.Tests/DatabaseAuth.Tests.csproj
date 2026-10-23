@@ -14,6 +14,8 @@
     <Reference Include="System.Data.SQLite"><HintPath>..\..\Plugins\Core\bin\System.Data.SQLite.dll</HintPath></Reference>
     <Reference Include="BCrypt.Net-Next"><HintPath>..\..\Plugins\Core\bin\BCrypt.Net-Next.dll</HintPath></Reference>
     <Compile Include="Program.cs" />
+    <Compile Include="..\..\Plugins\Core\DatabaseAuth\DatabaseAuth\OfflineCacheStatus.cs"><Link>OfflineCacheStatus.cs</Link></Compile>
+    <Compile Include="..\..\Plugins\Core\DatabaseAuth\DatabaseAuth\CacheSynchronization.cs"><Link>CacheSynchronization.cs</Link></Compile>
     <Compile Include="..\..\Plugins\Core\DatabaseAuth\DatabaseAuth\DatabaseUtcTime.cs"><Link>DatabaseUtcTime.cs</Link></Compile>
     <Compile Include="..\..\Plugins\Core\DatabaseAuth\DatabaseAuth\LocalUserCache.cs"><Link>LocalUserCache.cs</Link></Compile>
     <Compile Include="..\..\Plugins\Core\DatabaseAuth\DatabaseAuth\UserEntry.cs"><Link>UserEntry.cs</Link></Compile>

@@ -55,11 +55,30 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
         private log4net.ILog m_logger = log4net.LogManager.GetLogger("DatabaseAuth Configuration");
 
-        public Configuration()
+        public Configuration() : this(true)
+        {
+        }
+
+        internal Configuration(bool initializeSettings)
         {
             InitializeComponent();
             InitializeProviderControls();
-            InitUI();
+            InitializeOfflineStatusControls(!initializeSettings);
+            if (initializeSettings)
+            {
+                InitUI();
+                offlineMaxAgeHours.Value = Settings.GetOfflineCacheMaxAgeHours();
+            }
+            else DisablePreviewButtons(this);
+        }
+
+        private static void DisablePreviewButtons(Control parent)
+        {
+            foreach (Control control in parent.Controls)
+            {
+                if (control is Button) control.Enabled = false;
+                DisablePreviewButtons(control);
+            }
         }
 
         private void InitializeProviderControls()
@@ -300,6 +319,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
             }
             Settings.Store.Database = this.dbTB.Text.Trim();
             Settings.Store.LocalCacheEnabled = this.localCacheEnabledCB.Checked;
+            Settings.Store.OfflineCacheMaxAgeHours = (int)offlineMaxAgeHours.Value;
             Settings.Store.OfflineFallbackEnabled = this.offlineFallbackEnabledCB.Checked;
             Settings.Store.AllowOfflineBypassForAuthorization = this.offlineBypassCB.Checked;
             Settings.Store.SyncIntervalMinutes = syncIntervalMinutes;

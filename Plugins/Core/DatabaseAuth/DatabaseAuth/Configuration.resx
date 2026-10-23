@@ -117,4 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="OfflineStatus.Title" xml:space="preserve"><value>Offline availability</value></data>
+  <data name="OfflineStatus.MaximumAge" xml:space="preserve"><value>Maximum offline record age (hours)</value></data>
+  <data name="OfflineStatus.Sync" xml:space="preserve"><value>&amp;Synchronize now</value></data>
+  <data name="OfflineStatus.Refresh" xml:space="preserve"><value>&amp;Refresh status</value></data>
+  <data name="OfflineStatus.StatusName" xml:space="preserve"><value>Local user copy synchronization status</value></data>
+  <data name="OfflineStatus.Initial" xml:space="preserve"><value>Select this tab to inspect the local user copy.</value></data>
+  <data name="OfflineStatus.Help" xml:space="preserve"><value>Synchronization uses saved settings and changes the local cache immediately; Cancel does not undo it. Save and reopen after editing database settings. A synchronized registered user need not have signed in on this PC before. Password, account status, lockout and authorization still apply. Group-dependent offline rules remain fail-closed.</value></data>
 </root>

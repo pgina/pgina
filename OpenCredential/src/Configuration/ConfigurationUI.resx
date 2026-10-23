@@ -117,6 +117,56 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Shell.Heading" xml:space="preserve"><value>OpenCredential · Configuration</value></data>
+  <data name="Shell.Description" xml:space="preserve"><value>Configure sign-in plugins and Windows integration. Changes are saved only with the save actions; service and provider buttons act immediately.</value></data>
+  <data name="Shell.Tabs" xml:space="preserve"><value>Configuration sections</value></data>
+  <data name="Action.SaveClose" xml:space="preserve"><value>&amp;Save and close</value></data>
+  <data name="Action.Apply" xml:space="preserve"><value>&amp;Apply changes</value></data>
+  <data name="Action.Close" xml:space="preserve"><value>&amp;Close without saving</value></data>
+  <data name="Action.Browse" xml:space="preserve"><value>&amp;Browse…</value></data>
+  <data name="Action.Configure" xml:space="preserve"><value>Con&amp;figure plugin…</value></data>
+  <data name="Action.AddDirectory" xml:space="preserve"><value>Add &amp;directory…</value></data>
+  <data name="Action.RemoveDirectory" xml:space="preserve"><value>&amp;Remove directory</value></data>
+  <data name="Action.MoveUp" xml:space="preserve"><value>Move up</value></data>
+  <data name="Action.MoveDown" xml:space="preserve"><value>Move down</value></data>
+  <data name="Action.Simulate" xml:space="preserve"><value>&amp;Run simulation</value></data>
+  <data name="Action.CredentialPrompt" xml:space="preserve"><value>Open Windows credential prompt</value></data>
+  <data name="General.Image" xml:space="preserve"><value>Sign-in image</value></data>
+  <data name="General.Message" xml:space="preserve"><value>Welcome message (MOTD)</value></data>
+  <data name="General.ServiceHelp" xml:space="preserve"><value>Start and Stop affect the service immediately. Stop can interrupt sign-in requests.</value></data>
+  <data name="General.ProviderHelp" xml:space="preserve"><value>These buttons change Windows sign-in immediately. Keep a tested recovery account.</value></data>
+  <data name="Order.Description" xml:space="preserve"><value>Select a plugin with the arrow keys. Tab leaves the table; use Move up or Move down to change its order.</value></data>
+  <data name="Provider.Warning" xml:space="preserve"><value>Warning: Windows sign-in recovery</value></data>
+  <data name="Provider.WarningText" xml:space="preserve"><value>WARNING: Disabling a credential provider can prevent access to Windows. Keep a tested local administrator account and a recovery method before changing these options. Service and registration buttons on the General tab take effect immediately.</value></data>
+  <data name="Simulation.PasswordHelp" xml:space="preserve"><value>Test password, hidden from view. Running a simulation can save pending settings and execute the configured plugins.</value></data>
+  <data name="Simulation.ResultPasswordHelp" xml:space="preserve"><value>Password returned by the simulation, hidden unless Show Text is selected.</value></data>
+  <data name="Stage.Authentication" xml:space="preserve"><value>Authentication</value></data>
+  <data name="Stage.Authorization" xml:space="preserve"><value>Authorization</value></data>
+  <data name="Stage.Gateway" xml:space="preserve"><value>Gateway</value></data>
+  <data name="Stage.Result" xml:space="preserve"><value>Result</value></data>
+  <data name="Status.Success" xml:space="preserve"><value>Success</value></data>
+  <data name="Status.Failure" xml:space="preserve"><value>Failure</value></data>
+  <data name="Status.NotRun" xml:space="preserve"><value>Not run</value></data>
+  <data name="Input.ServiceStatus" xml:space="preserve"><value>OpenCredential service status</value></data>
+  <data name="Input.Registered" xml:space="preserve"><value>Credential provider registered</value></data>
+  <data name="Input.Enabled" xml:space="preserve"><value>Credential provider enabled</value></data>
+  <data name="Input.TilePath" xml:space="preserve"><value>Sign-in image file path</value></data>
+  <data name="Input.Message" xml:space="preserve"><value>Welcome message</value></data>
+  <data name="Input.Progress" xml:space="preserve"><value>Sign-in progress message</value></data>
+  <data name="Input.Directories" xml:space="preserve"><value>Plugin search directories</value></data>
+  <data name="Input.Plugins" xml:space="preserve"><value>Available plugins and enabled stages</value></data>
+  <data name="Input.Providers" xml:space="preserve"><value>Credential provider exclusions by sign-in scenario</value></data>
+  <data name="Input.Username" xml:space="preserve"><value>Simulation username</value></data>
+  <data name="Input.Password" xml:space="preserve"><value>Simulation password</value></data>
+  <data name="Input.ResultUsername" xml:space="preserve"><value>Result username</value></data>
+  <data name="Input.ResultDomain" xml:space="preserve"><value>Result domain</value></data>
+  <data name="Input.ResultPassword" xml:space="preserve"><value>Result password</value></data>
+  <data name="Input.PluginResults" xml:space="preserve"><value>Simulation results by plugin</value></data>
+  <data name="Input.ResultMessage" xml:space="preserve"><value>Simulation result message</value></data>
+  <data name="Input.ResultGroups" xml:space="preserve"><value>Result local groups</value></data>
+  <data name="Input.GinaPath" xml:space="preserve"><value>Chained GINA library path</value></data>
+  <data name="Label.SimulationUsername" xml:space="preserve"><value>&amp;Username:</value></data>
+  <data name="Label.SimulationPassword" xml:space="preserve"><value>&amp;Password:</value></data>
   <data name="textBox1.Text" xml:space="preserve">
     <value>WARNING: Disabling a credential provider can be risky.  If OpenCredential malfunctions or otherwise prevents access
  to the machine, it may be necessary to boot into safe mode in order to restore access.  Before disabling a 

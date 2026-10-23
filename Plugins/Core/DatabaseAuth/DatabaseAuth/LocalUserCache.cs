@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
@@ -85,6 +86,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
         public static void ReplaceUsers(IEnumerable<UserEntry> entries)
         {
+            if (entries == null) throw new ArgumentNullException("entries");
             WriteUsers(entries, true);
         }
 
@@ -92,6 +94,12 @@ namespace OpenCredential.Plugin.DatabaseAuth
         {
             if (entries == null)
                 return;
+
+            // Materialize and validate the entire response before touching the previous snapshot.
+            var snapshot = entries.ToList();
+            if (replace && (snapshot.Any(entry => entry == null || string.IsNullOrWhiteSpace(entry.Name)) ||
+                snapshot.GroupBy(entry => entry.Name, StringComparer.Ordinal).Any(group => group.Count() > 1)))
+                throw new InvalidOperationException("The complete user snapshot contains invalid or duplicate identities.");
 
             lock (m_syncRoot)
             {
@@ -109,7 +117,8 @@ namespace OpenCredential.Plugin.DatabaseAuth
                             clear.ExecuteNonQuery();
                         }
                     }
-                    foreach (UserEntry entry in entries)
+                    DateTime writtenUtc = DateTime.UtcNow;
+                    foreach (UserEntry entry in snapshot)
                     {
                         if (entry == null || string.IsNullOrWhiteSpace(entry.Name))
                             continue;
@@ -117,14 +126,6 @@ namespace OpenCredential.Plugin.DatabaseAuth
                         using (var cmd = conn.CreateCommand())
                         {
                             cmd.Transaction = transaction;
-                            cmd.CommandText =
-                                "INSERT INTO users (username, hash_method, hash_value, status_value, updated_utc) " +
-                                "VALUES (@username, @hash_method, @hash_value, @status_value, @updated_utc) " +
-                                "ON CONFLICT(username) DO UPDATE SET " +
-                                "hash_method = excluded.hash_method, " +
-                                "hash_value = excluded.hash_value, " +
-                                "status_value = excluded.status_value, " +
-                                "updated_utc = excluded.updated_utc;";
                             cmd.CommandText =
                                 "INSERT INTO users (username, hash_method, hash_value, status_value, failed_attempts, blocked_until_utc, updated_utc) " +
                                 "VALUES (@username, @hash_method, @hash_value, @status_value, @failed_attempts, @blocked_until_utc, @updated_utc) " +
@@ -145,11 +146,17 @@ namespace OpenCredential.Plugin.DatabaseAuth
                                 entry.BlockedUntilUtc.HasValue
                                     ? (object)entry.BlockedUntilUtc.Value.ToString("o", CultureInfo.InvariantCulture)
                                     : DBNull.Value);
-                            cmd.Parameters.AddWithValue("@updated_utc", DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture));
+                            cmd.Parameters.AddWithValue("@updated_utc", writtenUtc.ToString("o", CultureInfo.InvariantCulture));
                             cmd.ExecuteNonQuery();
                         }
                     }
 
+                    if (replace)
+                    {
+                        WriteMetadata(conn, transaction, "last_sync_utc", writtenUtc.ToString("o", CultureInfo.InvariantCulture));
+                        WriteMetadata(conn, transaction, "last_attempt_utc", writtenUtc.ToString("o", CultureInfo.InvariantCulture));
+                        WriteMetadata(conn, transaction, "last_attempt_result", "completed");
+                    }
                     transaction.Commit();
                 }
             }
@@ -189,7 +196,8 @@ namespace OpenCredential.Plugin.DatabaseAuth
                             : Convert.ToInt32(reader["failed_attempts"]);
                         DateTime? blockedUntilUtc = ParseUtc(reader["blocked_until_utc"]);
                         DateTime? updatedUtc = ParseUtc(reader["updated_utc"]);
-                        if (!updatedUtc.HasValue || DateTime.UtcNow - updatedUtc.Value > TimeSpan.FromHours(Settings.GetOfflineCacheMaxAgeHours()))
+                        if (!updatedUtc.HasValue || updatedUtc.Value > DateTime.UtcNow.AddMinutes(2) ||
+                            DateTime.UtcNow - updatedUtc.Value > TimeSpan.FromHours(Settings.GetOfflineCacheMaxAgeHours()))
                             return false;
                         PasswordHashAlgorithm hashAlg;
 
@@ -310,6 +318,8 @@ namespace OpenCredential.Plugin.DatabaseAuth
                 }
 
                 sb.AppendLine("SQLite offline cache: OK");
+                var status = GetStatus();
+                sb.AppendLine(status.ToDisplayText());
             }
             catch (Exception ex)
             {
@@ -325,6 +335,71 @@ namespace OpenCredential.Plugin.DatabaseAuth
             var conn = new SQLiteConnection(string.Format("Data Source={0};Version=3;", Settings.GetLocalCachePath()));
             conn.Open();
             return conn;
+        }
+
+        public static OfflineCacheStatus GetStatus()
+        {
+            lock (m_syncRoot)
+            {
+                if (!File.Exists(Settings.GetLocalCachePath())) return new OfflineCacheStatus();
+                Initialize();
+                using (var conn = OpenConnection())
+                {
+                    var status = new OfflineCacheStatus { Exists = true };
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "SELECT COUNT(*), COALESCE(SUM(CASE WHEN julianday(updated_utc) >= julianday(@cutoff) AND julianday(updated_utc) <= julianday(@future) THEN 1 ELSE 0 END), 0) FROM users";
+                        cmd.Parameters.AddWithValue("@cutoff", DateTime.UtcNow.AddHours(-Settings.GetOfflineCacheMaxAgeHours()).ToString("o", CultureInfo.InvariantCulture));
+                        cmd.Parameters.AddWithValue("@future", DateTime.UtcNow.AddMinutes(2).ToString("o", CultureInfo.InvariantCulture));
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            reader.Read();
+                            status.UserCount = Convert.ToInt32(reader[0]);
+                            status.FreshUserCount = Convert.ToInt32(reader[1]);
+                        }
+                    }
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "SELECT key, value FROM metadata WHERE key IN ('last_sync_utc','last_attempt_utc','last_attempt_result')";
+                        using (var reader = cmd.ExecuteReader())
+                        while (reader.Read())
+                        {
+                            var key = Convert.ToString(reader[0]);
+                            if (key == "last_sync_utc") status.LastFullSyncUtc = ParseUtc(reader[1]);
+                            else if (key == "last_attempt_utc") status.LastAttemptUtc = ParseUtc(reader[1]);
+                            else status.LastAttemptResult = Convert.ToString(reader[1]);
+                        }
+                    }
+                    return status;
+                }
+            }
+        }
+
+        internal static void RecordSyncAttempt(string result)
+        {
+            lock (m_syncRoot)
+            {
+                Initialize();
+                using (var conn = OpenConnection())
+                using (var transaction = conn.BeginTransaction())
+                {
+                    WriteMetadata(conn, transaction, "last_attempt_utc", DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture));
+                    WriteMetadata(conn, transaction, "last_attempt_result", result);
+                    transaction.Commit();
+                }
+            }
+        }
+
+        private static void WriteMetadata(SQLiteConnection connection, SQLiteTransaction transaction, string key, string value)
+        {
+            using (var cmd = connection.CreateCommand())
+            {
+                cmd.Transaction = transaction;
+                cmd.CommandText = "INSERT INTO metadata (key,value) VALUES (@key,@value) ON CONFLICT(key) DO UPDATE SET value=excluded.value";
+                cmd.Parameters.AddWithValue("@key", key);
+                cmd.Parameters.AddWithValue("@value", value);
+                cmd.ExecuteNonQuery();
+            }
         }
 
         private static string ProtectHash(string value)

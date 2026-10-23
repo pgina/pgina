@@ -40,6 +40,13 @@ try {
         }
         Write-Output "PASS Compiled provider UTC: $provider"
     }
+    $mysqlType = $authAssembly.GetType('OpenCredential.Plugin.DatabaseAuth.MySqlUserDataSource', $true)
+    $closedSource = [Runtime.Serialization.FormatterServices]::GetUninitializedObject($mysqlType)
+    $rejected = $false
+    try { $null = $mysqlType.GetMethod('GetAllUserEntriesForCache').Invoke($closedSource, [object[]]@()) }
+    catch { $rejected = $_.Exception.GetBaseException() -is [InvalidOperationException] }
+    if (-not $rejected) { throw 'A closed MySQL source must not produce an apparently successful empty snapshot.' }
+    Write-Output 'PASS Closed MySQL source rejects full-copy requests without touching registry or SQL.'
 } finally {
     [AppDomain]::CurrentDomain.remove_AssemblyResolve($resolve)
 }

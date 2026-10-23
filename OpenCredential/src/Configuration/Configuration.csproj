@@ -106,6 +106,9 @@
     <Compile Include="ConfigurationUI.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ConfigurationUI.Presentation.cs">
+      <DependentUpon>ConfigurationUI.cs</DependentUpon>
+    </Compile>
     <Compile Include="ConfigurationUI.Designer.cs">
       <DependentUpon>ConfigurationUI.cs</DependentUpon>
     </Compile>

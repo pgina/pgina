@@ -239,8 +239,7 @@ namespace OpenCredential.Plugin.DatabaseAuth
         {
             if (m_conn == null || m_conn.State != ConnectionState.Open)
             {
-                m_logger.Error("Database connection is not open");
-                return new List<UserEntry>();
+                throw new InvalidOperationException("A complete user snapshot requires an open database connection.");
             }
 
             bool includeStatus = Settings.IsUserStatusValidationEnabled();

@@ -91,13 +91,30 @@ namespace OpenCredential.Configuration
         private const string CPF_CP_UUID_COLUMN = "Uuid";
 
         private LogViewWindow logWindow = null;
+        private bool m_presentationOnly;
         
-        public ConfigurationUI()
+        public ConfigurationUI() : this(true)
         {
-            VerifyRegistryAccess();
-            Framework.Init();
+        }
+
+        // Layout tests use this internal path without registry, service or plugin initialization.
+        internal ConfigurationUI(bool initializeSettings)
+        {
+            m_presentationOnly = !initializeSettings;
+            if (initializeSettings)
+            {
+                VerifyRegistryAccess();
+                Framework.Init();
+            }
            
             InitializeComponent();
+            InitializePresentation();
+            if (!initializeSettings)
+            {
+                DisablePreviewActions();
+                ResetStageStatus();
+                return;
+            }
             InitOptionsTabs();
             InitPluginsDGV();
             PopulatePluginDirs();
@@ -268,9 +285,9 @@ namespace OpenCredential.Configuration
 
             // This works around an annoying aspect of the textbox where the foreground color
             // can't be changed unless the background color is set.
-            this.serviceStatusTB.BackColor = Color.GhostWhite;
-            this.cpEnabledTB.BackColor = Color.GhostWhite;
-            this.cpRegisteredTB.BackColor = Color.GhostWhite;
+            this.serviceStatusTB.BackColor = SystemColors.Window;
+            this.cpEnabledTB.BackColor = SystemColors.Window;
+            this.cpRegisteredTB.BackColor = SystemColors.Window;
 
             if (m_openCredentialServiceController != null)
             {
@@ -306,20 +323,20 @@ namespace OpenCredential.Configuration
             if (manager.Registered())
             {
                 this.cpRegisteredTB.Text = "Yes";
-                this.cpRegisteredTB.ForeColor = Color.Green;
+                this.cpRegisteredTB.ForeColor = SystemColors.WindowText;
                 this.cpRegisterBtn.Text = "Unregister";
                 this.cpEnableDisableBtn.Enabled = true;
 
                 if (manager.Enabled())
                 {
                     this.cpEnabledTB.Text = "Yes";
-                    this.cpEnabledTB.ForeColor = Color.Green;
+                    this.cpEnabledTB.ForeColor = SystemColors.WindowText;
                     this.cpEnableDisableBtn.Text = "Disable";
                 }
                 else
                 {
                     this.cpEnabledTB.Text = "No";
-                    this.cpEnabledTB.ForeColor = Color.Red;
+                    this.cpEnabledTB.ForeColor = SystemColors.WindowText;
                     this.cpEnableDisableBtn.Text = "Enable";
                 }
 
@@ -332,13 +349,15 @@ namespace OpenCredential.Configuration
             else
             {
                 this.cpRegisteredTB.Text = "No";
-                this.cpRegisteredTB.ForeColor = Color.Red;
+                this.cpRegisteredTB.ForeColor = SystemColors.WindowText;
                 this.cpRegisterBtn.Text = "Register";
                 this.cpEnabledTB.Text = "No";
-                this.cpEnabledTB.ForeColor = Color.Red;
+                this.cpEnabledTB.ForeColor = SystemColors.WindowText;
                 this.cpEnableDisableBtn.Enabled = false;
                 this.cpEnableDisableBtn.Text = "Enable";
             }
+            this.cpRegisterBtn.AccessibleName = this.cpRegisterBtn.Text + " credential provider";
+            this.cpEnableDisableBtn.AccessibleName = this.cpEnableDisableBtn.Text + " credential provider";
         }
 
         private void UpdateServiceStatus()
@@ -349,43 +368,43 @@ namespace OpenCredential.Configuration
             switch (stat)
             {
                 case ServiceControllerStatus.Running:
-                    this.serviceStatusTB.ForeColor = Color.Green;
+                    this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = true;
                     this.serviceStartBtn.Enabled = false;
                     statusStr = "Running";
                     break;
                 case ServiceControllerStatus.ContinuePending:
                     statusStr = "Continue pending...";
-                    this.serviceStatusTB.ForeColor = Color.Black;
+                    this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = false;
                     this.serviceStartBtn.Enabled = false;
                     break;
                 case ServiceControllerStatus.PausePending:
                     statusStr = "Pause pending...";
-                    this.serviceStatusTB.ForeColor = Color.Black;
+                    this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = false;
                     this.serviceStartBtn.Enabled = false;
                     break;
                 case ServiceControllerStatus.StartPending:
                     statusStr = "Starting...";
-                    this.serviceStatusTB.ForeColor = Color.Black;
+                    this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = false;
                     this.serviceStartBtn.Enabled = false;
                     break;
                 case ServiceControllerStatus.StopPending:
                     statusStr = "Stopping...";
-                    this.serviceStatusTB.ForeColor = Color.Black;
+                    this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = false;
                     this.serviceStartBtn.Enabled = false;
                     break;
                 case ServiceControllerStatus.Paused:
-                    this.serviceStatusTB.ForeColor = Color.Black;
+                    this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = true;
                     this.serviceStartBtn.Enabled = true;
                     break;
                 case ServiceControllerStatus.Stopped:
                     statusStr = "Stopped";
-                    this.serviceStatusTB.ForeColor = Color.Red;
+                    this.serviceStatusTB.ForeColor = SystemColors.WindowText;
                     this.serviceStopBtn.Enabled = false;
                     this.serviceStartBtn.Enabled = true;
                     break;
@@ -1002,7 +1021,7 @@ namespace OpenCredential.Configuration
 
         private void simMethodChanged(object sender, EventArgs e)
         {
-            btnLaunchCredUI.Enabled = (sender == m_radioCredUI);
+            btnLaunchCredUI.Enabled = !m_presentationOnly && m_radioCredUI.Checked;
         }
 
         private void authenticateBtnUp_Click(object sender, EventArgs e)
@@ -1237,8 +1256,9 @@ namespace OpenCredential.Configuration
 
         private void DoInternalSimulation()
         {
-            Color successColor = Color.FromArgb(150, 255, 150);
-            Color failColor = Color.FromArgb(255, 150, 150);
+            // Result text, not red/green backgrounds, conveys success in all Windows themes.
+            Color successColor = SystemColors.Window;
+            Color failColor = SystemColors.Window;
 
             PluginDriver sessionDriver = new PluginDriver();
             sessionDriver.UserInformation.Username = m_username.Text;
@@ -1321,6 +1341,7 @@ namespace OpenCredential.Configuration
 
         private void SetStageStatus(PictureBox pb, bool success)
         {
+            UpdateStageText(pb, success ? "Status.Success" : "Status.Failure");
             if (success)
                 pb.Image = Configuration.Properties.Resources.greenCheckMark;
             else
@@ -1329,6 +1350,8 @@ namespace OpenCredential.Configuration
 
         private void ResetStageStatus()
         {
+            foreach (PictureBox picture in new[] { simAuthResultPB, simAuthzResultPB, simGatewayResultPB, simFinalResultPB })
+                UpdateStageText(picture, "Status.NotRun");
             this.simAuthResultPB.Image = Configuration.Properties.Resources.grayBar;
             this.simAuthzResultPB.Image = Configuration.Properties.Resources.grayBar;
             this.simGatewayResultPB.Image = Configuration.Properties.Resources.grayBar;

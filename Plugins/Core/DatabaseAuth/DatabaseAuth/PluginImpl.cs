@@ -475,25 +475,15 @@ namespace OpenCredential.Plugin.DatabaseAuth
 
         private void BackgroundHealthCheck(object state)
         {
-            if (!Settings.IsLocalCacheEnabled() || !m_localCacheRuntimeAvailable)
+            if (!Settings.IsLocalCacheEnabled())
                 return;
 
             try
             {
-                using (IUserDataSource dataSource = UserDataSourceFactory.Create())
-                {
-                    m_mysqlAvailable = true;
-
-                    DateTime? lastSyncUtc = LocalUserCache.GetLastSyncUtc();
-                    if (!lastSyncUtc.HasValue ||
-                        DateTime.UtcNow - lastSyncUtc.Value >= TimeSpan.FromMinutes(Settings.GetSyncIntervalMinutes()))
-                    {
-                        List<UserEntry> users = dataSource.GetAllUserEntriesForCache();
-                        LocalUserCache.ReplaceUsers(users);
-                        LocalUserCache.SetLastSyncUtc(DateTime.UtcNow);
-                        m_logger.InfoFormat("Local SQLite cache synchronized. Users cached: {0}", users.Count);
-                    }
-                }
+                var result = SynchronizeLocalCache(false);
+                if (result == CacheSyncOutcome.Completed || result == CacheSyncOutcome.NotDue)
+                    m_localCacheRuntimeAvailable = true;
+                m_mysqlAvailable = result != CacheSyncOutcome.Failed;
             }
             catch (Exception ex)
             {
@@ -519,8 +509,17 @@ namespace OpenCredential.Plugin.DatabaseAuth
             {
                 m_localCacheRuntimeAvailable = false;
                 m_logger.ErrorFormat("Disabling local SQLite cache after runtime failure: {0}", ex);
-                StopBackgroundTasks();
+                // Keep the periodic synchronizer alive so a transient local error can recover.
             }
+        }
+
+        internal static CacheSyncOutcome SynchronizeLocalCache(bool force)
+        {
+            if (!Settings.IsLocalCacheEnabled()) return CacheSyncOutcome.Disabled;
+            return CacheSynchronization.Run(() =>
+            {
+                using (var source = UserDataSourceFactory.Create()) return source.GetAllUserEntriesForCache();
+            }, TimeSpan.FromMinutes(Settings.GetSyncIntervalMinutes()), force);
         }
 
         /// <summary>

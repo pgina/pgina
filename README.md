@@ -48,6 +48,7 @@ Projects default to `v145`; omit `-PlatformToolset` when using that installed to
 |---|---|
 | Database setup, schema, TLS, hashing and troubleshooting | [Configuration reference](docs/REFERENCE.md) |
 | Upgrade, offline policy and rollback precautions | [Stabilization](STABILIZATION.md) |
+| Complete offline copy, synchronization status and first-login limits | [Offline synchronization](docs/OFFLINE_SYNCHRONIZATION.md) |
 | Validation evidence and pending acceptance | [QA readiness](QA_READINESS.md) · [VM testing](Tests/Guest-README.md) |
 | Signing status and manual approval policy | [Code signing](CODE_SIGNING.md) · [Setup guide](docs/signing/README.md) |
 | Data processing and retention | [Privacy draft](PRIVACY.md) |

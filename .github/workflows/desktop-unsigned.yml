@@ -47,6 +47,9 @@ jobs:
       - name: Test offline cache and plugin type loading
         run: .\Tests\Test-Desktop.ps1
 
+      - name: Test isolated configuration accessibility and layout
+        run: .\Tests\Test-ConfigurationUI.ps1
+
       - name: Test VM installation-script guards without installing
         run: .\Tests\Test-GuestScript.ps1
 
